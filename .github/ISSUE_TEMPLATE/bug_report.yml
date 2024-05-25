@@ -43,3 +43,8 @@ body:
     attributes:
       label: Actual behavior
       description: 实际结果
+  - type: input
+    attributes:
+      label: Bug prevalence
+      description: 发生频率
+      value: 必现
