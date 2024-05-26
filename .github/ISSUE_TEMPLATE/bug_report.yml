@@ -1,0 +1,50 @@
+name: Bug Report
+description: File a bug report.
+labels:
+  - bug
+body:
+  - type: textarea
+    attributes:
+      label: Relate issues
+      description: 关联的issue
+  - type: input
+    attributes:
+      label: Environment
+      description: 软件运行的操作系统、版本号、指令集架构等
+      placeholder: Debian 12, x64
+  - type: dropdown
+    attributes:
+      label: Product
+      description: 受影响的构件
+      options:
+        - java-sdk
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Version
+      description: 构件的版本号
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: properties
+      description: 运行时的配置
+      render: yml
+  - type: textarea
+    attributes:
+      label: To Reproduce
+      description: 复现步骤
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: 预期结果
+  - type: textarea
+    attributes:
+      label: Actual behavior
+      description: 实际结果
+  - type: input
+    attributes:
+      label: Bug prevalence
+      description: 发生频率
+      value: 必现

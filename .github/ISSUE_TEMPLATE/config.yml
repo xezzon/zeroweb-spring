@@ -1,0 +1,4 @@
+contact_links:
+  - name: Support Request
+    url: https://github.com/xezzon/geom-spring-boot/discussions
+    about: Questions and requests for support
