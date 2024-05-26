@@ -1,0 +1,11 @@
+changelog:
+  exclude:
+    authors:
+      - octocat
+  categories:
+    - title: New Feature
+      labels:
+        - feature
+    - title: Fix Bug
+      labels:
+        - bug
