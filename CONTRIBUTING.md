@@ -2,6 +2,42 @@
 
 ## 项目结构
 
+- `geom-proto`: 通过protobuf定义的服务间交互的结构体与接口。
+- `geom-sdk`: 服务间接口的客户端SDK。
+- `geom-spring-boot-starter`: 所有服务间共享的配置与工具。
+- `geom-service`: 包含若干子模块，每一个模块是一个微服务构件。
+
+### 包名
+
+本项目的基础包为`io.github.xezzon.geom`，采用结构化设计。目录结构如下：
+
+```
+geom-service-admin
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── io/github/xezzon/geom
+│   │   │       ├── user  # 用户功能
+│   │   │       │   ├── UserService.java  # 该功能的逻辑运转中枢
+│   │   │       │   ├── UserHttpController.java  # 提供前端调用的 HTTP 接口
+│   │   │       │   ├── UserGrpcController.java  # 服务间调用的 GRPC 接口服务端
+│   │   │       │   ├── domain  # 模型
+│   │   │       │   ├── convert  # MapStruct 接口
+│   │   │       │   ├── repository  # DAO 接口
+│   │   │       │   ├── service   # 向其他包提供的功能的接口定义
+│   │   │       │   │   └── IUserService4Group   # 向用户组提供的接口
+│   │   │       │   └── README.md  # 用户功能的详细设计文档
+│   │   │       ├── group  # 用户组
+│   │   │       └── AdminApplication.java  # 启动类
+│   │   └── resources
+│   │       └── config
+│   └── test  # 单元测试代码
+│       ├── java
+│       └── resources
+└── target
+    └── generated-sources  # 由 Maven 插件生成的代码
+```
+
 ## 本地运行
 
 ## 工程规范
