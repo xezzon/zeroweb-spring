@@ -35,14 +35,20 @@ body:
     attributes:
       label: To Reproduce
       description: 复现步骤
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Expected behavior
       description: 预期结果
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Actual behavior
       description: 实际结果
+    validations:
+      required: true
   - type: input
     attributes:
       label: Bug prevalence
