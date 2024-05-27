@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    include:
+      - common
+      - ${SPRING_ENVIRONMENT:prod}
+
+server:
+  port: @app.port@

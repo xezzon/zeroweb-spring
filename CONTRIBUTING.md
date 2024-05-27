@@ -6,6 +6,7 @@
 - `geom-sdk`: 服务间接口的客户端SDK。
 - `geom-spring-boot-starter`: 所有服务间共享的配置与工具。
 - `geom-service`: 包含若干子模块，每一个模块是一个微服务构件。
+  - `geom-service-admin`: 后台管理服务
 
 ### 包名
 
