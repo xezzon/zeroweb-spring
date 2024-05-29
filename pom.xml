@@ -14,7 +14,6 @@
 
   <modules>
     <module>geom-proto</module>
-    <module>geom-sdk</module>
     <module>geom-spring-boot-starter</module>
     <module>geom-service</module>
   </modules>
@@ -24,6 +23,7 @@
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- 依赖版本 -->
+    <grpc-spring-boot-starter.version>3.1.0.RELEASE</grpc-spring-boot-starter.version>
     <lombok.version>1.18.32</lombok.version>
   </properties>
 
@@ -33,6 +33,11 @@
         <groupId>io.github.xezzon</groupId>
         <artifactId>tao-core</artifactId>
         <version>0.15.0</version>
+      </dependency>
+      <dependency>
+        <groupId>net.devh</groupId>
+        <artifactId>grpc-spring-boot-starter</artifactId>
+        <version>${grpc-spring-boot-starter.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
