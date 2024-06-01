@@ -6,11 +6,35 @@
   <parent>
     <groupId>io.github.xezzon</groupId>
     <artifactId>xezzon-java</artifactId>
-    <version>3.1</version>
+    <version>3.5</version>
   </parent>
   <artifactId>geom</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>
+    基于 Spring Boot 框架的一组微服务构件，包含认证、后台管理、开放平台等服务。提供 SDK 与服务进行交互。
+  </description>
+  <url>https://github.com/xezzon/geom-spring-boot</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License v3.0</name>
+      <url>https://www.gnu.org/licenses/lgpl-3.0.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>xezzon</name>
+      <email>xezzon@outlook.com</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:https://github.com/xezzon/geom-spring-boot.git</connection>
+    <developerConnection>scm:git:git@github.com:xezzon/geom-spring-boot.git</developerConnection>
+    <url>${project.url}/tree/main</url>
+  </scm>
 
   <modules>
     <module>geom-proto</module>
@@ -25,6 +49,7 @@
     <!-- 依赖版本 -->
     <grpc-spring-boot-starter.version>3.1.0.RELEASE</grpc-spring-boot-starter.version>
     <lombok.version>1.18.32</lombok.version>
+    <therapi-runtime-javadoc.version>0.15.0</therapi-runtime-javadoc.version>
   </properties>
 
   <dependencyManagement>
@@ -66,4 +91,38 @@
       <optional>true</optional>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <licenseName>lgpl_v3</licenseName>
+          <organizationName>geom</organizationName>
+          <inceptionYear>2024</inceptionYear>
+          <extraExtensions>
+            <proto>java</proto>
+          </extraExtensions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>add-third-party-license</id>
+            <phase>install</phase>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <distributionManagement>
+    <site>
+      <id>github</id>
+      <name>Github Pages</name>
+      <url>https://xezzon.github.io/geom-spring-boot</url>
+    </site>
+  </distributionManagement>
 </project>

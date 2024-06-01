@@ -11,11 +11,15 @@
   <artifactId>geom-service-admin</artifactId>
   <packaging>jar</packaging>
 
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>后台管理服务</description>
+
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <app.port>9001</app.port>
+    <grpc.port>9002</grpc.port>
   </properties>
 
   <dependencies>
