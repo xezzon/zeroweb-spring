@@ -10,6 +10,9 @@
   </parent>
   <artifactId>geom-proto</artifactId>
 
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>与 geom 微服务进行交互的 Java SDK</description>
+
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
@@ -47,7 +50,7 @@
         </configuration>
         <executions>
           <execution>
-            <phase>compile</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>compile</goal>
               <goal>compile-custom</goal>
