@@ -7,12 +7,11 @@ import org.hibernate.id.IdentifierGenerator;
 import org.springframework.stereotype.Component;
 
 /**
+ * ID 生成器
  * @author xezzon
  */
 @Component
 public class HibernateIdGenerator implements IdentifierGenerator {
-
-  public static final String GENERATOR_NAME = "id-generator";
 
   @Override
   public Object generate(

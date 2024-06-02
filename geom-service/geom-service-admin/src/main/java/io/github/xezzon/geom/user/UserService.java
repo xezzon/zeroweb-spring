@@ -13,10 +13,15 @@ public class UserService {
 
   private final UserDAO userDAO;
 
-  public UserService(UserDAO userDAO) {
+  UserService(UserDAO userDAO) {
     this.userDAO = userDAO;
   }
 
+  /**
+   * 添加用户
+   * @param user 用户
+   * @throws RepeatDataException 如果用户名已存在，则抛出此异常
+   */
   protected void addUser(User user) {
     /* 前置校验 */
     Optional<User> exist = userDAO.get().findByUsername(user.getUsername());

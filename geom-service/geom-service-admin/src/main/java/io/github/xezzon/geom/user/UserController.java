@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * 用户功能HTTP接口
  * @author xezzon
  */
 @RequestMapping("/user")
@@ -19,10 +20,15 @@ public class UserController {
 
   private final UserService userService;
 
-  public UserController(UserService userService) {
+  UserController(UserService userService) {
     this.userService = userService;
   }
 
+  /**
+   * 用户注册
+   * @param req 用户名、昵称、密码等
+   * @return 用户ID
+   */
   @PostMapping("/register")
   public Id register(@RequestBody @Validated RegisterUserReq req) {
     User user = req.into();

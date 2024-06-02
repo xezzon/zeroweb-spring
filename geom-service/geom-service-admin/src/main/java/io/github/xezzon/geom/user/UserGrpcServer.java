@@ -7,6 +7,7 @@ import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 /**
+ * 用户功能Grpc接口
  * @author xezzon
  */
 @GrpcService
@@ -14,7 +15,7 @@ public class UserGrpcServer extends UserGrpc.UserImplBase {
 
   private final UserService userService;
 
-  public UserGrpcServer(UserService userService) {
+  UserGrpcServer(UserService userService) {
     this.userService = userService;
   }
 
