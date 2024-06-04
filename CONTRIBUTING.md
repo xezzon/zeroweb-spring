@@ -40,6 +40,37 @@ geom-service-admin
 
 ## 本地运行
 
+### 前置条件
+
+开始开发前，请保证以下开发环境已经安装完成：
+
+- [Git](https://git-scm.com/downloads)
+- [OpenJDK 17](https://adoptium.net/zh-CN/temurin/releases/?version=17&package=jdk)
+- [Maven](https://maven.apache.org/download.cgi)
+- PostgreSQL
+
+### 获取项目源代码
+
+```shell
+git clone https://github.com/xezzon/geom-spring-boot.git
+```
+
+### 项目配置文件
+
+详细配置项请查看各服务的说明，示例如下：
+
+```properties
+# .local.env
+SPRING_ENVIRONMENT=dev
+JDBC_TYPE=postgresql
+```
+
+主流IDE的配置方法请查看对应的链接：[IDEA](https://www.jetbrains.com/help/idea/run-debug-configuration-java-application.html#more_options)、[Eclipse](https://help.eclipse.org/latest/topic/org.eclipse.jdt.doc.user/tasks/tasks-java-local-configuration.htm?cp=1_3_6_3)、[VSCode](https://code.visualstudio.com/docs/java/java-debugging)。
+
+### 运行服务
+
+依据[项目结构](#项目结构)所示，运行服务的启动类。
+
 ## 工程规范
 
 Project：需求、Bug 管理的各种视图。每一个功能对应一个 Project。可关联多个仓库。
