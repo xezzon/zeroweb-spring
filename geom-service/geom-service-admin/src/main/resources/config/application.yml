@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    include:
+      - common
+      - ${JDBC_TYPE:postgresql}
+      - ${SPRING_ENVIRONMENT:prod}
+
+server:
+  port: @app.port@
+grpc:
+  server:
+    port: @grpc.port@
