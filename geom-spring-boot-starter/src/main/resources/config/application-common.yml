@@ -1,5 +1,5 @@
 geom:
-  id-generator: ${GEOM_ID_GENERATOR:uuid}
+  id-generator: ${GEOM_ID_GENERATOR:UUID}
 
 spring:
   datasource:

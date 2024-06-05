@@ -10,6 +10,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
  */
 public class ArgumentNotValidException extends ClientException {
 
+  /**
+   * HTTP请求参数未通过校验
+   * @param e 方法参数异常
+   */
   public ArgumentNotValidException(MethodArgumentNotValidException e) {
     super(
         ErrorCode.ARGUMENT_NOT_VALID.code(),

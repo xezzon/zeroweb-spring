@@ -1,5 +1,9 @@
 # 开发者手册
 
+首先为您对本项目的贡献表示感谢。
+
+本文档希望能帮助您写出高质量的、运维友好的设计与代码，更好地参与本项目的开发。
+
 ## 项目结构
 
 - `geom-proto`: 通过protobuf定义的服务间交互的结构体与接口。
@@ -39,6 +43,37 @@ geom-service-admin
 ```
 
 ## 本地运行
+
+### 前置条件
+
+开始开发前，请保证以下开发环境已经安装完成：
+
+- [Git](https://git-scm.com/downloads)
+- [OpenJDK 17](https://adoptium.net/zh-CN/temurin/releases/?version=17&package=jdk)
+- [Maven](https://maven.apache.org/download.cgi)
+- PostgreSQL
+
+### 获取项目源代码
+
+```shell
+git clone https://github.com/xezzon/geom-spring-boot.git
+```
+
+### 项目配置文件
+
+详细配置项请查看各服务的说明，示例如下：
+
+```properties
+# .local.env
+SPRING_ENVIRONMENT=dev
+JDBC_TYPE=postgresql
+```
+
+主流IDE的配置方法请查看对应的链接：[IDEA](https://www.jetbrains.com/help/idea/run-debug-configuration-java-application.html#more_options)、[Eclipse](https://help.eclipse.org/latest/topic/org.eclipse.jdt.doc.user/tasks/tasks-java-local-configuration.htm?cp=1_3_6_3)、[VSCode](https://code.visualstudio.com/docs/java/java-debugging)。
+
+### 运行服务
+
+依据[项目结构](#项目结构)所示，运行服务的启动类。
 
 ## 工程规范
 
@@ -148,3 +183,41 @@ Target选择`main`，`Publish release`。
 - `PUT /dict/update` 整体更新字典
 - `POST /openapi/audit` 审核接口（审核接口会发起流程，所以是非幂等的）
 - `PUT /openapi/cancel` 作废接口
+
+#### 服务间接口
+
+- 服务间交互的接口（包括geom的后端服务之间、其他服务与geom之间）采用 gRPC 协议。
+
+## DevOps 规范
+
+### Liquibase
+
+版本演进时，如果有数据库表项或数据的调整，应该将对应的SQL语句写在 resource 文件夹的 db/changelog 目录的SQL文件中。
+
+单元测试及线上环境会由[Liquibase](https://www.liquibase.com/)执行。
+
+本项目遵循以下规则维护SQL文件：
+
+- Liquibase 版本控制文件的格式是 SQL。
+- 采用[共享的、面向对象的](https://docs.liquibase.com/start/design-liquibase-project.html)设计范式。即数据库的每一个表对应一个SQL文件。
+- 每一段SQL之前应该有如下内容: `-- changeset ${contributor}:${issue} labels:${milestone}`。
+
+以下是Liquibase的一个示例：
+
+```postgres-sql
+-- db/changelog/user.sql
+-- changeset xezzon:10 labels:0.1
+CREATE TABLE geom_user (
+  id VARCHAR(64) NOT NULL,
+  username VARCHAR(255) NOT NULL,
+  nickname VARCHAR(255),
+  cipher VARCHAR(255) NOT NULL,
+  create_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  update_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  CONSTRAINT pk_geom_user PRIMARY KEY (id)
+);
+ALTER TABLE geom_user ADD CONSTRAINT uc_geom_user_username UNIQUE (username);
+
+INSERT INTO geom_user(id, username, nickname, cipher, create_time, update_time)
+VALUES ('1', 'root', '超级管理员', '', '1970-01-01 08:00:00', '1970-01-01 08:00:00');
+```

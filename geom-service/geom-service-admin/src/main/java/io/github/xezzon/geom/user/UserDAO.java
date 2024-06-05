@@ -12,7 +12,7 @@ public class UserDAO implements NewType<UserRepository> {
 
   private final UserRepository repository;
 
-  public UserDAO(UserRepository repository) {
+  UserDAO(UserRepository repository) {
     this.repository = repository;
   }
 
