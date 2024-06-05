@@ -31,3 +31,15 @@ jobs:
         with:
           paths: '**/target/surefire-reports/*.xml'
         if: always()
+  super-linter:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      statuses: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Super-linter
+        uses: super-linter/super-linter@v6.6.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
