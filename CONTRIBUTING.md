@@ -179,3 +179,9 @@ Target选择`main`，`Publish release`。
 - `PUT /dict/update` 整体更新字典
 - `POST /openapi/audit` 审核接口（审核接口会发起流程，所以是非幂等的）
 - `PUT /openapi/cancel` 作废接口
+
+#### 服务间接口
+
+- 服务间交互的接口（包括geom的后端服务之间、其他服务与geom之间）采用 gRPC 协议。
+
+## DevOps 规范
