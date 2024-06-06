@@ -31,6 +31,26 @@ jobs:
         with:
           paths: '**/target/surefire-reports/*.xml'
         if: always()
+  check-style:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: MegaLinter
+        uses: oxsecurity/megalinter@v7
+        env:
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SARIF_REPORTER: true
+      - name: Upload MegaLinter scan results to GitHub Security tab
+        if: success() || failure()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'megalinter-reports/megalinter-report.sarif'
   security-scan:
     runs-on: ubuntu-latest
     steps:
