@@ -6,9 +6,29 @@ spring:
       - common
       - ${JDBC_TYPE:postgresql}
       - ${SPRING_ENVIRONMENT:prod}
+  data:
+    redis:
+      url: redis://${REDIS_URL:localhost:6379}
+      database: ${REDIS_DATABASE:0}
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 0
+          max-idle: 10
+          max-active: 200
+          max-wait: -1ms
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
 
 server:
   port: @app.port@
+
 grpc:
   server:
     port: @grpc.port@
+
+sa-token:
+  token-name: X-SESSION-ID
+  token-style: tik
+  timeout: ${SA_TOKEN_TIMEOUT:2592000}

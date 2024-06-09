@@ -13,7 +13,11 @@ public enum ErrorCode {
   /**
    * HTTP请求参数不符合校验规则
    */
-  ARGUMENT_NOT_VALID("A0003", "参数错误")
+  ARGUMENT_NOT_VALID("A0003", "参数错误"),
+  /**
+   * 用户名或密码错误
+   */
+  INVALID_TOKEN("A0101", "用户名或密码错误"),
   ;
 
   /**
