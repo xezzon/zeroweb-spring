@@ -28,6 +28,27 @@ public class GeomConfig {
    * ID生成策略
    */
   protected IdGeneratorEnum idGenerator;
+  /**
+   * JWT 相关配置
+   */
+  protected GeomJwtConfig jwt;
+
+  /**
+   * JWT 相关配置
+   */
+  @Getter
+  @Setter
+  public static class GeomJwtConfig {
+
+    /**
+     * JWT 签发机构
+     */
+    protected String issuer;
+    /**
+     * JWT 有效时长，单位 秒
+     */
+    protected Long timeout;
+  }
 
   /**
    * ID生成策略枚举值

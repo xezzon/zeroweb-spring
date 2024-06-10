@@ -2,14 +2,16 @@ package io.github.xezzon.geom.user;
 
 import io.github.xezzon.geom.common.exception.RepeatDataException;
 import io.github.xezzon.geom.user.domain.User;
+import io.github.xezzon.geom.user.service.IUserService4Auth;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 /**
  * @author xezzon
  */
 @Service
-public class UserService {
+public class UserService implements IUserService4Auth {
 
   private final UserDAO userDAO;
 
@@ -30,5 +32,19 @@ public class UserService {
     }
     /* 持久化 */
     userDAO.get().save(user);
+  }
+
+  /**
+   * 根据用户名获取用户信息
+   * @param username 用户名
+   * @return 返回与用户名对应的用户信息，若不存在则返回null
+   */
+  protected User getByUsername(@NotNull String username) {
+    return userDAO.get().findByUsername(username).orElse(null);
+  }
+
+  @Override
+  public User getUserByUsername(String username) {
+    return this.getByUsername(username);
   }
 }
