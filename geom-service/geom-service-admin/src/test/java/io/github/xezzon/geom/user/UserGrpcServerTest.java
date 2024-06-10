@@ -17,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@DirtiesContext 
+@DirtiesContext
 class UserGrpcServerTest {
 
   @GrpcClient("inProcess")
