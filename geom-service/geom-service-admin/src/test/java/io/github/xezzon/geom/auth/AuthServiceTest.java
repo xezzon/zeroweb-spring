@@ -16,7 +16,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.geom.auth.domain.BasicAuth;
 import io.github.xezzon.geom.common.config.GeomConfig;
-import io.github.xezzon.geom.common.config.GeomConfig.GeomJwtConfig;
 import io.github.xezzon.geom.common.exception.ErrorCode;
 import io.github.xezzon.geom.crypto.domain.JwtClaimWrapper;
 import io.github.xezzon.geom.crypto.service.KeyLoader;
@@ -47,6 +46,16 @@ class AuthServiceTest {
   private static final String BASIC_LOGIN_URI = "/auth/login/basic";
   private static final GenericContainer<?> redisContainer =
       new GenericContainer<>("redis:7-alpine");
+  @Resource
+  private UserRepository userRepository;
+  @Resource
+  private WebTestClient webTestClient;
+  @Resource
+  private SaTokenConfig saTokenConfig;
+  @Resource
+  private KeyLoader keyLoader;
+  @Resource
+  private GeomConfig geomConfig;
 
   @BeforeAll
   static void beforeAll() {
@@ -61,17 +70,6 @@ class AuthServiceTest {
         "redis://%s:%s", redisContainer.getHost(), redisContainer.getMappedPort(6379)
     ));
   }
-
-  @Resource
-  private UserRepository userRepository;
-  @Resource
-  private WebTestClient webTestClient;
-  @Resource
-  private SaTokenConfig saTokenConfig;
-  @Resource
-  private KeyLoader keyLoader;
-  @Resource
-  private GeomConfig geomConfig;
 
   @Test
   void basicLogin() {
@@ -168,16 +166,15 @@ class AuthServiceTest {
         .getResponseBody();
     assertNotNull(responseBody1);
     assertEquals(HttpHeaders.AUTHORIZATION, responseBody1.getTokenName());
-    DecodedJWT jwt = JWT.decode(responseBody1.getTokenValue());
-    JwtClaim claim = JwtClaimWrapper.from(jwt).get();
-    assertEquals(user.getId(), claim.getSubject());
     byte[] publicKeyByte = keyLoader.read(geomConfig.getJwt().getIssuer() + ".pub");
     ECPublicKey publicKey =
         (ECPublicKey) KeyUtil.generatePublicKey("EC", publicKeyByte);
     JWTVerifier verifier = JWT.require(Algorithm.ECDSA256(publicKey))
         .withIssuer(geomConfig.getJwt().getIssuer())
         .build();
-    assertDoesNotThrow(() -> verifier.verify(jwt));
+    DecodedJWT jwt = assertDoesNotThrow(() -> verifier.verify(responseBody1.getTokenValue()));
+    JwtClaim claim = JwtClaimWrapper.from(jwt).get();
+    assertEquals(user.getId(), claim.getSubject());
   }
 
   private User initUser(String password) {
