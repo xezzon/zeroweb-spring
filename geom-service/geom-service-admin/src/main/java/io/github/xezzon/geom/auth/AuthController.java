@@ -3,8 +3,10 @@ package io.github.xezzon.geom.auth;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.geom.auth.domain.BasicAuth;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,5 +32,18 @@ public class AuthController {
   public SaTokenInfo basicLogin(@RequestBody BasicAuth basicAuth) {
     authService.basicLogin(basicAuth.username(), basicAuth.password());
     return StpUtil.getTokenInfo();
+  }
+
+  /**
+   * 单点登录
+   * @return JWT
+   */
+  @PostMapping("/sso")
+  public SaTokenInfo sso() {
+    String tokenValue = authService.signJwt();
+    SaTokenInfo saTokenInfo = new SaTokenInfo();
+    saTokenInfo.setTokenName(HttpHeaders.AUTHORIZATION);
+    saTokenInfo.setTokenValue(tokenValue);
+    return saTokenInfo;
   }
 }
