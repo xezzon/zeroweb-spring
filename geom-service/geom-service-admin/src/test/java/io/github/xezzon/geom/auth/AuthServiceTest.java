@@ -66,8 +66,8 @@ class AuthServiceTest {
 
   @DynamicPropertySource
   static void redisProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.data.redis.url", () -> String.format(
-        "redis://%s:%s", redisContainer.getHost(), redisContainer.getMappedPort(6379)
+    registry.add("REDIS_URL", () -> String.format(
+        "%s:%s", redisContainer.getHost(), redisContainer.getMappedPort(6379)
     ));
   }
 
