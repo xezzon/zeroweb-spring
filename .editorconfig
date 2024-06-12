@@ -4,7 +4,7 @@ end_of_line = lf
 indent_size = 2
 indent_style = space
 insert_final_newline = true
-max_line_length = 100
+max_line_length = off
 tab_width = 2
 ij_continuation_indent_size = 4
 ij_formatter_off_tag = @formatter:off
@@ -15,6 +15,7 @@ ij_visual_guides =
 ij_wrap_on_typing = false
 
 [*.java]
+max_line_length = 100
 ij_java_align_consecutive_assignments = false
 ij_java_align_consecutive_variable_declarations = false
 ij_java_align_group_field_declarations = false
@@ -277,6 +278,7 @@ ij_java_wrap_long_lines = false
 ij_java_wrap_semicolon_after_call_chain = false
 
 [*.proto]
+max_line_length = 100
 ij_continuation_indent_size = 8
 ij_protobuf_blank_lines_after_imports = 1
 ij_protobuf_blank_lines_after_package = 1
@@ -321,6 +323,7 @@ ij_xml_space_inside_empty_tag = false
 ij_xml_text_wrap = normal
 
 [{*.bash,*.sh,*.zsh}]
+max_line_length = 100
 ij_shell_binary_ops_start_line = false
 ij_shell_keep_column_alignment_padding = false
 ij_shell_minify_program = false
@@ -329,6 +332,7 @@ ij_shell_switch_cases_indented = false
 ij_shell_use_unix_line_separator = true
 
 [{*.gant,*.groovy,*.gy}]
+max_line_length = 100
 indent_size = 4
 tab_width = 4
 ij_continuation_indent_size = 8
@@ -523,6 +527,7 @@ ij_groovy_wrap_chain_calls_after_dot = false
 ij_groovy_wrap_long_lines = false
 
 [{*.gradle.kts,*.kt,*.kts,*.main.kts,*.space.kts}]
+max_line_length = 100
 indent_size = 4
 tab_width = 4
 ij_continuation_indent_size = 8
@@ -654,7 +659,6 @@ ij_html_space_inside_empty_tag = false
 ij_html_text_wrap = normal
 
 [{*.markdown,*.md}]
-max_line_length = off
 ij_continuation_indent_size = 8
 ij_markdown_force_one_space_after_blockquote_symbol = true
 ij_markdown_force_one_space_after_header_symbol = true

@@ -27,11 +27,10 @@ jobs:
           cache: 'maven'
       - name: Test with Maven
         run: mvn -B verify
-      - name: Create test summary
-        uses: test-summary/action@dist
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
         with:
-          paths: '**/target/surefire-reports/*.xml'
-        if: always()
+          token: ${{ secrets.CODECOV_TOKEN }}
   codacy:
     runs-on: ubuntu-latest
     steps:
@@ -47,13 +46,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@main
         with:
           sarif_file: results.sarif
-  codecov:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
   sonarlint:
     runs-on: ubuntu-latest
     steps:
