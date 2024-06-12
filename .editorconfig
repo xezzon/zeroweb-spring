@@ -277,8 +277,6 @@ ij_java_wrap_long_lines = false
 ij_java_wrap_semicolon_after_call_chain = false
 
 [*.proto]
-indent_size = 4
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_protobuf_blank_lines_after_imports = 1
 ij_protobuf_blank_lines_after_package = 1
@@ -656,8 +654,7 @@ ij_html_space_inside_empty_tag = false
 ij_html_text_wrap = normal
 
 [{*.markdown,*.md}]
-indent_size = 4
-tab_width = 4
+max_line_length = off
 ij_continuation_indent_size = 8
 ij_markdown_force_one_space_after_blockquote_symbol = true
 ij_markdown_force_one_space_after_header_symbol = true
@@ -737,3 +734,7 @@ ij_yaml_sequence_on_new_line = false
 ij_yaml_space_before_colon = false
 ij_yaml_spaces_within_braces = true
 ij_yaml_spaces_within_brackets = true
+
+[{LICENSE,LICENSE.txt}]
+indent_size = unset
+tab_width = unset

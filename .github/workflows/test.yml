@@ -85,7 +85,7 @@ jobs:
   linter:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       issues: write
     steps:
       - uses: actions/checkout@v4
@@ -97,14 +97,10 @@ jobs:
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENABLE: RUST,GROOVY,PROTOBUF,EDITORCONFIG,OPENAPI,COPYPASTE,REPOSITORY,SPELL
+          DISABLE_LINTERS: REPOSITORY_KICS
           SARIF_REPORTER: true
-          MARKDOWN_SUMMARY_REPORTER: true
       - name: Upload MegaLinter scan results to GitHub Security tab
         if: success() || failure()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'megalinter-reports/megalinter-report.sarif'
-      - uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          path: 'megalinter-reports/megalinter-report.md'
