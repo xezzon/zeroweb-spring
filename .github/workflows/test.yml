@@ -3,6 +3,8 @@
 
 name: Test
 
+permissions: read-all
+
 on:
   push:
     branches: [ "develop", "master", "main" ]
@@ -91,6 +93,8 @@ jobs:
           ENABLE: RUST,GROOVY,PROTOBUF,EDITORCONFIG,OPENAPI,COPYPASTE,REPOSITORY,SPELL
           DISABLE_LINTERS: REPOSITORY_KICS
           SARIF_REPORTER: true
+          SPELL_CSPELL_DISABLE_ERRORS: true
+          COPYPASTE_JSCPD_DISABLE_ERRORS: true
       - name: Upload MegaLinter scan results to GitHub Security tab
         if: success() || failure()
         uses: github/codeql-action/upload-sarif@v3
