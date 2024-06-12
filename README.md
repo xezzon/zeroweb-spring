@@ -1,6 +1,7 @@
 # Geom
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fxezzon%2Fgeom-spring-boot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fxezzon%2Fgeom-spring-boot?ref=badge_shield)
+[![codecov](https://codecov.io/gh/xezzon/geom-spring-boot/graph/badge.svg?token=3AI8CGW4EY)](https://codecov.io/gh/xezzon/geom-spring-boot)
 
 基于 Spring Boot 框架的一组微服务构件，包含认证、后台管理、开放平台等服务。提供 SDK 与服务进行交互。
 
