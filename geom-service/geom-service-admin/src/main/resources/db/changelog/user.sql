@@ -5,8 +5,8 @@ CREATE TABLE geom_user (
    username VARCHAR(255) NOT NULL,
    nickname VARCHAR(255),
    cipher VARCHAR(255) NOT NULL,
-   create_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-   update_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+   create_time TIMESTAMP NOT NULL,
+   update_time TIMESTAMP NOT NULL,
    CONSTRAINT pk_geom_user PRIMARY KEY (id)
 );
 ALTER TABLE geom_user ADD CONSTRAINT uc_geom_user_username UNIQUE (username);
