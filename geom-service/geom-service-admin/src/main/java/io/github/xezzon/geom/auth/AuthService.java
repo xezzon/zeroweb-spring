@@ -3,15 +3,12 @@ package io.github.xezzon.geom.auth;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import com.auth0.jwt.JWTCreator.Builder;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.util.JsonFormat;
 import io.github.xezzon.geom.auth.util.SecurityUtil;
 import io.github.xezzon.geom.common.exception.InvalidTokenException;
 import io.github.xezzon.geom.crypto.domain.JwtClaimWrapper;
 import io.github.xezzon.geom.crypto.service.JwtCryptoService;
 import io.github.xezzon.geom.user.domain.User;
 import io.github.xezzon.geom.user.service.IUserService4Auth;
-import io.github.xezzon.tao.exception.ServerException;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +45,7 @@ public class AuthService {
     }
     /* 检查是否已存在会话 */
     if (StpUtil.isLogin()) {
-      JwtClaim claim = SecurityUtil.getJwtClaim();
+      JwtClaim claim = SecurityUtil.loadJwtClaim();
       if (Objects.equals(claim.getSubject(), user.getId())) {
         // 原会话是同一个用户，则不作处理
         return;
@@ -64,13 +61,7 @@ public class AuthService {
         .setPreferredUsername(user.getUsername())
         .setNickname(user.getNickname())
         .build();
-    try {
-      StpUtil.getSession()
-          .set(SecurityUtil.CLAIM_NAME, JsonFormat.printer().print(claim));
-    } catch (InvalidProtocolBufferException e) {
-      StpUtil.logout();
-      throw new ServerException("无效的用户信息", e);
-    }
+    SecurityUtil.saveJwtClaim(claim);
   }
 
   /**
@@ -78,7 +69,7 @@ public class AuthService {
    * @return 返回生成的JWT签名字符串
    */
   protected String signJwt() {
-    JwtClaim claim = SecurityUtil.getJwtClaim();
+    JwtClaim claim = SecurityUtil.loadJwtClaim();
     Builder jwtBuilder = new JwtClaimWrapper(claim).into();
     return jwtCryptoService.signJwt(jwtBuilder);
   }

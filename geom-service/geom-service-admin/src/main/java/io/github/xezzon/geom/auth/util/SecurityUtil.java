@@ -21,7 +21,7 @@ public class SecurityUtil {
   /**
    * @return 用户认证信息
    */
-  public static JwtClaim getJwtClaim() {
+  public static JwtClaim loadJwtClaim() {
     Builder builder = JwtClaim.newBuilder();
     String json = StpUtil.getSession()
         .getString(CLAIM_NAME);
@@ -30,6 +30,16 @@ public class SecurityUtil {
       return builder.build();
     } catch (InvalidProtocolBufferException e) {
       throw new ServerException("无效的会话信息", e);
+    }
+  }
+
+  public static void saveJwtClaim(JwtClaim claim) {
+    try {
+      StpUtil.getSession()
+          .set(SecurityUtil.CLAIM_NAME, JsonFormat.printer().print(claim));
+    } catch (InvalidProtocolBufferException e) {
+      StpUtil.logout();
+      throw new ServerException("无效的用户信息", e);
     }
   }
 }

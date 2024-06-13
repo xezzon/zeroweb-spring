@@ -6,11 +6,11 @@ package io.github.xezzon.geom.common.constant;
  */
 public class DatabaseConstant {
 
-  private DatabaseConstant() {
-  }
-
   /**
    * 主键字段长度
    */
   public static final int ID_LENGTH = 64;
+
+  private DatabaseConstant() {
+  }
 }
