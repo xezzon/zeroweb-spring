@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16-alpine:///postgres
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+grpc:
+  server:
+    inProcessName: test
+    port: -1
+  client:
+    inProcess:
+      address: in-process:test

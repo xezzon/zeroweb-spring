@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package io.github.xezzon.geom.auth;
+
+option java_multiple_files = true;
+option java_outer_classname = "AuthenticationProto";
+option java_package = "io.github.xezzon.geom.auth";
+
+// JWT claim
+message JwtClaim {
+  // 用户ID
+  string subject = 1;
+  // 用户名
+  string preferred_username = 2;
+  // 昵称
+  string nickname = 3;
+  // 角色
+  repeated string roles = 4;
+  // 权限
+  repeated string entitlements = 5;
+  // 用户组
+  repeated string groups = 6;
+}

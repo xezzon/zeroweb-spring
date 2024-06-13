@@ -1,6 +1,7 @@
 
 ## PR Checklist
 
+- [ ] base分支是 `develop`。
 - [ ] 选择合适的标签（单选） `feature`/`bug`/`refactor`/`document`。
 - [ ] 关联 Milestone。
 - [ ] 关联 issue（针对`feature`和`bug`）
