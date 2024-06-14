@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.BCrypt;
+import io.github.xezzon.geom.InitializeDataRunner;
 import io.github.xezzon.geom.common.exception.RepeatDataException;
 import io.github.xezzon.geom.user.domain.RegisterUserReq;
 import io.github.xezzon.geom.user.domain.User;
@@ -28,15 +29,17 @@ class UserServiceTest {
   private UserRepository repository;
   @Resource
   private UserService userService;
+  @Resource
+  private InitializeDataRunner dataset;
 
   @Test
   @Transactional
   void addUser() {
     RegisterUserReq req = new RegisterUserReq();
-    req.setUsername(RandomUtil.randomString(8));
-    req.setNickname(RandomUtil.randomString(8));
+    req.setUsername(RandomUtil.randomString(9));
+    req.setNickname(RandomUtil.randomString(9));
     User user = req.into();
-    user.setCipher(BCrypt.hashpw(RandomUtil.randomString(8), BCrypt.gensalt()));
+    user.setCipher(BCrypt.hashpw(RandomUtil.randomString(9), BCrypt.gensalt()));
     userService.addUser(user);
     assertNotNull(user.getId());
     Optional<User> after = repository.findById(user.getId());
@@ -47,16 +50,13 @@ class UserServiceTest {
   @Transactional
   void addUser_repeat() {
     // 数据准备
-    User data = new User();
-    data.setUsername(RandomUtil.randomString(9));
-    data.setNickname(RandomUtil.randomString(9));
-    data.setCipher(RandomUtil.randomString(9));
-    repository.save(data);
+    User data = dataset.getUsers().get(0);
 
     RegisterUserReq req = new RegisterUserReq();
     req.setUsername(data.getUsername());
     req.setNickname(RandomUtil.randomString(8));
     req.setPassword(BCrypt.hashpw(RandomUtil.randomString(8), BCrypt.gensalt()));
-    assertThrows(RepeatDataException.class, () -> userService.addUser(req.into()));
+    User user = req.into();
+    assertThrows(RepeatDataException.class, () -> userService.addUser(user));
   }
 }

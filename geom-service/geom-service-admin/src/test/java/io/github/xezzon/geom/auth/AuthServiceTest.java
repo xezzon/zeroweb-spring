@@ -9,11 +9,11 @@ import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.KeyUtil;
-import cn.hutool.crypto.digest.BCrypt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import io.github.xezzon.geom.InitializeDataRunner;
 import io.github.xezzon.geom.auth.domain.BasicAuth;
 import io.github.xezzon.geom.common.config.GeomConfig;
 import io.github.xezzon.geom.common.exception.ErrorCode;
@@ -56,6 +56,8 @@ class AuthServiceTest {
   private KeyLoader keyLoader;
   @Resource
   private GeomConfig geomConfig;
+  @Resource
+  private InitializeDataRunner dataset;
 
   @BeforeAll
   static void beforeAll() {
@@ -75,8 +77,8 @@ class AuthServiceTest {
   void basicLogin() {
     final String uri = BASIC_LOGIN_URI;
     // 数据准备
-    String password = RandomUtil.randomString(8);
-    User user = this.initUser(password);
+    String password = dataset.getPassword();
+    User user = dataset.getUsers().get(0);
 
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
     SaTokenInfo responseBody = webTestClient.post()
@@ -101,8 +103,8 @@ class AuthServiceTest {
     assertNotNull(responseBody1);
     assertEquals(tokenValue0, responseBody1.getTokenValue());
     // 以不同的用户登录，返回不同的令牌
-    String password2 = RandomUtil.randomString(8);
-    User user2 = this.initUser(password2);
+    String password2 = dataset.getPassword();
+    User user2 = dataset.getUsers().get(1);
     BasicAuth basicAuth2 = new BasicAuth(user2.getUsername(), password2);
     SaTokenInfo responseBody2 = webTestClient.post()
         .uri(uri)
@@ -120,8 +122,8 @@ class AuthServiceTest {
   void basicLogin_invalidToken() {
     final String uri = BASIC_LOGIN_URI;
     // 数据准备
-    String password = RandomUtil.randomString(8);
-    User user = this.initUser(password);
+    String password = dataset.getPassword();
+    User user = dataset.getUsers().get(0);
     // 用户名不正确
     BasicAuth basicAuth1 = new BasicAuth(RandomUtil.randomString(9), password);
     webTestClient.post()
@@ -145,8 +147,8 @@ class AuthServiceTest {
   @Test
   void signJwt() {
     final String uri = "/auth/sso";
-    String password = RandomUtil.randomString(8);
-    User user = this.initUser(password);
+    String password = dataset.getPassword();
+    User user = dataset.getUsers().get(0);
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
     SaTokenInfo responseBody = webTestClient.post()
         .uri(BASIC_LOGIN_URI)
@@ -175,14 +177,5 @@ class AuthServiceTest {
     DecodedJWT jwt = assertDoesNotThrow(() -> verifier.verify(responseBody1.getTokenValue()));
     JwtClaim claim = JwtClaimWrapper.from(jwt).get();
     assertEquals(user.getId(), claim.getSubject());
-  }
-
-  private User initUser(String password) {
-    User user = new User();
-    user.setUsername(RandomUtil.randomString(8));
-    user.setNickname(RandomUtil.randomString(8));
-    user.setCipher(BCrypt.hashpw(password));
-    userRepository.saveAndFlush(user);
-    return user;
   }
 }
