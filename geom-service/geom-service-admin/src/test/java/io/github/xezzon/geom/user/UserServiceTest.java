@@ -1,13 +1,13 @@
 package io.github.xezzon.geom.user;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.crypto.digest.BCrypt;
 import io.github.xezzon.geom.InitializeDataRunner;
-import io.github.xezzon.geom.common.exception.RepeatDataException;
+import io.github.xezzon.geom.common.constant.CharacterConstant;
+import io.github.xezzon.geom.common.domain.Id;
+import io.github.xezzon.geom.common.exception.ErrorCode;
 import io.github.xezzon.geom.user.domain.RegisterUserReq;
 import io.github.xezzon.geom.user.domain.User;
 import io.github.xezzon.geom.user.repository.UserRepository;
@@ -16,19 +16,25 @@ import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * @author xezzon
  */
-@SpringBootTest
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class UserServiceTest {
+@DirtiesContext
+class UserHttpTest {
+
+  private static final String USER_REGISTER_URI = "/user/register";
 
   @Resource
   private UserRepository repository;
   @Resource
-  private UserService userService;
+  private WebTestClient webTestClient;
   @Resource
   private InitializeDataRunner dataset;
 
@@ -38,16 +44,26 @@ class UserServiceTest {
     RegisterUserReq req = new RegisterUserReq();
     req.setUsername(RandomUtil.randomString(9));
     req.setNickname(RandomUtil.randomString(9));
-    User user = req.into();
-    user.setCipher(BCrypt.hashpw(RandomUtil.randomString(9), BCrypt.gensalt()));
-    userService.addUser(user);
-    assertNotNull(user.getId());
-    Optional<User> after = repository.findById(user.getId());
+    req.setPassword(
+        RandomUtil.randomString(String.valueOf(CharacterConstant.LOWERCASE), 4)
+            + RandomUtil.randomString(String.valueOf(CharacterConstant.UPPERCASE), 4)
+            + RandomUtil.randomString(String.valueOf(CharacterConstant.DIGIT), 4)
+    );
+    Id responseBody = webTestClient.post()
+        .uri(USER_REGISTER_URI)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(io.github.xezzon.geom.common.domain.Id.class)
+        .returnResult()
+        .getResponseBody();
+    assertNotNull(responseBody);
+    assertNotNull(responseBody.id());
+    Optional<User> after = repository.findById(responseBody.id());
     assertTrue(after.isPresent());
   }
 
   @Test
-  @Transactional
   void addUser_repeat() {
     // 数据准备
     User data = dataset.getUsers().get(0);
@@ -55,8 +71,17 @@ class UserServiceTest {
     RegisterUserReq req = new RegisterUserReq();
     req.setUsername(data.getUsername());
     req.setNickname(RandomUtil.randomString(8));
-    req.setPassword(BCrypt.hashpw(RandomUtil.randomString(8), BCrypt.gensalt()));
-    User user = req.into();
-    assertThrows(RepeatDataException.class, () -> userService.addUser(user));
+    req.setPassword(
+        RandomUtil.randomString(String.valueOf(CharacterConstant.LOWERCASE), 4)
+            + RandomUtil.randomString(String.valueOf(CharacterConstant.UPPERCASE), 4)
+            + RandomUtil.randomString(String.valueOf(CharacterConstant.DIGIT), 4)
+    );
+    webTestClient.post()
+        .uri(USER_REGISTER_URI)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectBody()
+        .jsonPath("$.code").isEqualTo(ErrorCode.REPEAT_DATA.code());
   }
 }

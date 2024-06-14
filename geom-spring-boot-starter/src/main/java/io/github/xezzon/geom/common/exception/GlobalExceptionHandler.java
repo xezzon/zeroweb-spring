@@ -89,7 +89,7 @@ public class GlobalExceptionHandler {
    * @return 统一异常消息
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseStatus(code = HttpStatus.BAD_REQUEST)
   public Result<Void> handleException(MethodArgumentNotValidException e) {
     log.error(ErrorCode.ARGUMENT_NOT_VALID.message(), e);
     return Result.fail(new ArgumentNotValidException(e));
