@@ -24,6 +24,7 @@ import io.github.xezzon.geom.user.repository.UserRepository;
 import jakarta.annotation.Resource;
 import java.security.interfaces.ECPublicKey;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -144,7 +145,7 @@ class AuthHttpTest {
         .jsonPath("$.code").isEqualTo(ErrorCode.INVALID_TOKEN.code());
   }
 
-  @Test
+  @RepeatedTest(2)
   void signJwt() {
     final String uri = "/auth/sso";
     String password = dataset.getPassword();
