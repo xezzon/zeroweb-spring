@@ -41,7 +41,7 @@ import org.testcontainers.containers.GenericContainer;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @DirtiesContext
-class AuthServiceTest {
+class AuthHttpTest {
 
   private static final String BASIC_LOGIN_URI = "/auth/login/basic";
   private static final GenericContainer<?> redisContainer =

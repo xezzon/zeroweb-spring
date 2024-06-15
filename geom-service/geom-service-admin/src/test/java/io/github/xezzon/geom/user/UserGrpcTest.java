@@ -19,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 @DirtiesContext
-class UserGrpcServerTest {
+class UserGrpcTest {
 
   @GrpcClient("inProcess")
   private UserBlockingStub userBlockingStub;
