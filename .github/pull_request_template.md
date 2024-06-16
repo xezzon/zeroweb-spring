@@ -5,7 +5,7 @@
 - [ ] 选择合适的标签（单选） `feature`/`bug`/`refactor`/`document`。
 - [ ] 关联 Milestone。
 - [ ] 关联 issue（针对`feature`和`bug`）
-- [ ] 关联 Projects（针对`refactor`和`document`）
+- [ ] 关联 Projects（针对`document`）
 
 ## 更新说明
 
