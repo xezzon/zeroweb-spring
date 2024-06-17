@@ -4,7 +4,9 @@ import io.github.xezzon.geom.common.constant.DatabaseConstant;
 import io.github.xezzon.geom.common.domain.Id;
 import io.github.xezzon.geom.dict.domain.AddDictReq;
 import io.github.xezzon.geom.dict.domain.Dict;
+import io.github.xezzon.geom.dict.domain.ModifyDictReq;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,5 +40,15 @@ public class DictController {
     }
     dictService.addDict(dict);
     return Id.of(dict.getId());
+  }
+
+  /**
+   * 更新字典目/字典项
+   * @param req 字典
+   */
+  @PutMapping("/update")
+  public void modifyDict(@RequestBody ModifyDictReq req) {
+    Dict dict = req.into();
+    dictService.modifyDict(dict);
   }
 }
