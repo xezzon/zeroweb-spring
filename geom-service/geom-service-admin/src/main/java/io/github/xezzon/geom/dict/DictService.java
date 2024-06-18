@@ -1,7 +1,6 @@
 package io.github.xezzon.geom.dict;
 
 import io.github.xezzon.geom.common.exception.RepeatDataException;
-import io.github.xezzon.geom.dict.converter.DictCopier;
 import io.github.xezzon.geom.dict.domain.Dict;
 import java.text.MessageFormat;
 import java.util.Objects;
@@ -39,7 +38,7 @@ public class DictService {
    */
   protected void modifyDict(Dict dict) {
     Dict entity = dictDAO.get().getReferenceById(dict.getId());
-    DictCopier.INSTANCE.copy(dict, entity);
+    dictDAO.getCopier().copy(dict, entity);
     /* 前置校验 */
     this.checkRepeat(entity);
     /* 持久化 */

@@ -1,6 +1,7 @@
 package io.github.xezzon.geom.dict.domain;
 
 import io.github.xezzon.geom.common.constant.DatabaseConstant;
+import io.github.xezzon.geom.common.jpa.IEntity;
 import io.github.xezzon.geom.common.jpa.IdGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +21,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "geom_dict")
-public class Dict {
+public class Dict implements IEntity<String> {
 
   public static final String DICT_TAG = "DICT";
 
