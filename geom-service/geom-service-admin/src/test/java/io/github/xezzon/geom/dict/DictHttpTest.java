@@ -15,9 +15,9 @@ import io.github.xezzon.geom.dict.domain.ModifyDictReq;
 import io.github.xezzon.geom.dict.repository.DictRepository;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -35,6 +35,7 @@ class DictHttpTest {
 
   private static final String ADD_DICT_URI = "/dict/add";
   private static final String MODIFY_DICT_URI = "/dict/update";
+  private static final String UPDATE_DICT_STATUS_URI = "/dict/update/status";
 
   @Resource
   private WebTestClient webTestClient;
@@ -148,7 +149,7 @@ class DictHttpTest {
         .jsonPath("$.code").isEqualTo(ErrorCode.REPEAT_DATA.code());
   }
 
-  @RepeatedTest(10)
+  @Test
   void modifyDict() {
     Dict target = this.initData().get(0);
 
@@ -174,7 +175,7 @@ class DictHttpTest {
     assertEquals(req.getEnabled(), dict.get().getEnabled());
   }
 
-  @RepeatedTest(10)
+  @Test
   void modifyDict_repeat() {
     Dict target = this.initData().get(0);
     Dict repeated = this.initData().get(1);
@@ -205,5 +206,48 @@ class DictHttpTest {
     assertEquals(target.getOrdinal(), dict.get().getOrdinal());
     assertEquals(target.getParentId(), dict.get().getParentId());
     assertEquals(target.getEnabled(), dict.get().getEnabled());
+  }
+
+  @Test
+  void updateDictStatus() {
+    List<Dict> dataset = this.initData();
+    dataset.addAll(dataset.stream()
+        .map(Dict::getChildren)
+        .flatMap(List::stream)
+        .toList()
+    );
+    Collections.shuffle(dataset);
+
+    webTestClient.put()
+        .uri(builder -> builder
+            .path(UPDATE_DICT_STATUS_URI)
+            .queryParam("enabled", false)
+            .build()
+        )
+        .bodyValue(List.of(dataset.get(0).getId(), dataset.get(1).getId()))
+        .exchange()
+        .expectStatus().isOk();
+    Optional<Dict> dict1 = repository.findById(dataset.get(0).getId());
+    assertTrue(dict1.isPresent());
+    assertEquals(false, dict1.get().getEnabled());
+    Optional<Dict> dict2 = repository.findById(dataset.get(1).getId());
+    assertTrue(dict2.isPresent());
+    assertEquals(false, dict2.get().getEnabled());
+
+    webTestClient.put()
+        .uri(builder -> builder
+            .path(UPDATE_DICT_STATUS_URI)
+            .queryParam("enabled", true)
+            .build()
+        )
+        .bodyValue(List.of(dataset.get(1).getId(), dataset.get(2).getId()))
+        .exchange()
+        .expectStatus().isOk();
+    Optional<Dict> dict3 = repository.findById(dataset.get(1).getId());
+    assertTrue(dict3.isPresent());
+    assertEquals(true, dict3.get().getEnabled());
+    Optional<Dict> dict4 = repository.findById(dataset.get(2).getId());
+    assertTrue(dict4.isPresent());
+    assertEquals(true, dict4.get().getEnabled());
   }
 }

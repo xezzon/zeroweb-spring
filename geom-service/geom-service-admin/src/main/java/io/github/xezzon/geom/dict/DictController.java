@@ -5,10 +5,12 @@ import io.github.xezzon.geom.common.domain.Id;
 import io.github.xezzon.geom.dict.domain.AddDictReq;
 import io.github.xezzon.geom.dict.domain.Dict;
 import io.github.xezzon.geom.dict.domain.ModifyDictReq;
+import java.util.Collection;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -50,5 +52,18 @@ public class DictController {
   public void modifyDict(@RequestBody ModifyDictReq req) {
     Dict dict = req.into();
     dictService.modifyDict(dict);
+  }
+
+  /**
+   * 批量更新字典状态
+   * @param ids 字典ID集合
+   * @param enabled 更新后的字典启用状态
+   */
+  @PutMapping("/update/status")
+  public void updateDictStatus(
+      @RequestBody Collection<String> ids,
+      @RequestParam Boolean enabled
+  ) {
+    dictService.updateDictStatus(ids, enabled);
   }
 }

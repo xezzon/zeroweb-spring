@@ -3,6 +3,7 @@ package io.github.xezzon.geom.dict;
 import io.github.xezzon.geom.common.exception.RepeatDataException;
 import io.github.xezzon.geom.dict.domain.Dict;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,13 @@ public class DictService {
     this.checkRepeat(entity);
     /* 持久化 */
     dictDAO.get().save(entity);
+  }
+
+  protected void updateDictStatus(Collection<String> ids, Boolean enabled) {
+    if (ids.isEmpty()) {
+      return;
+    }
+    dictDAO.updateStatus(ids, enabled);
   }
 
   private void checkRepeat(Dict dict) {
