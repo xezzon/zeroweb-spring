@@ -2,10 +2,13 @@ package io.github.xezzon.geom.dict;
 
 import io.github.xezzon.geom.common.exception.RepeatDataException;
 import io.github.xezzon.geom.dict.domain.Dict;
+import jakarta.transaction.Transactional;
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
@@ -51,6 +54,17 @@ public class DictService {
       return;
     }
     dictDAO.updateStatus(ids, enabled);
+  }
+
+  @Transactional
+  protected void remove(Collection<String> ids) {
+    while (!ids.isEmpty()) {
+      dictDAO.get().deleteAllByIdInBatch(ids);
+      List<Dict> children = dictDAO.get().findByParentIdIn(ids);
+      ids = children.parallelStream()
+          .map(Dict::getId)
+          .collect(Collectors.toSet());
+    }
   }
 
   private void checkRepeat(Dict dict) {

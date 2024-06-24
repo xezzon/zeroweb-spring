@@ -6,6 +6,7 @@ import io.github.xezzon.geom.dict.domain.AddDictReq;
 import io.github.xezzon.geom.dict.domain.Dict;
 import io.github.xezzon.geom.dict.domain.ModifyDictReq;
 import java.util.Collection;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,5 +66,10 @@ public class DictController {
       @RequestParam Boolean enabled
   ) {
     dictService.updateDictStatus(ids, enabled);
+  }
+
+  @DeleteMapping()
+  public void removeDict(@RequestBody Collection<String> ids) {
+    dictService.remove(ids);
   }
 }

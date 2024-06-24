@@ -2,6 +2,7 @@ package io.github.xezzon.geom.dict;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,6 +22,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -36,6 +38,7 @@ class DictHttpTest {
   private static final String ADD_DICT_URI = "/dict/add";
   private static final String MODIFY_DICT_URI = "/dict/update";
   private static final String UPDATE_DICT_STATUS_URI = "/dict/update/status";
+  private static final String DELETE_DICT_URI = "/dict";
 
   @Resource
   private WebTestClient webTestClient;
@@ -44,7 +47,7 @@ class DictHttpTest {
 
   List<Dict> initData() {
     List<Dict> dataset = new ArrayList<>();
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 4; i++) {
       Dict parent = new Dict();
       parent.setTag(Dict.DICT_TAG);
       parent.setCode(RandomUtil.randomString(8));
@@ -55,7 +58,7 @@ class DictHttpTest {
       repository.save(parent);
       dataset.add(parent);
       List<Dict> children = new ArrayList<>();
-      for (int j = 0; j < 2; j++) {
+      for (int j = 0; j < 4; j++) {
         Dict child = new Dict();
         child.setTag(parent.getCode());
         child.setCode(RandomUtil.randomString(8));
@@ -67,6 +70,16 @@ class DictHttpTest {
         children.add(child);
       }
       parent.setChildren(children);
+      Dict child = children.get(0);
+      Dict grandchild = new Dict();
+      grandchild.setTag(child.getTag());
+      grandchild.setCode(RandomUtil.randomString(8));
+      grandchild.setLabel(RandomUtil.randomString(8));
+      grandchild.setParentId(child.getId());
+      grandchild.setOrdinal(RandomUtil.randomInt());
+      grandchild.setEnabled(true);
+      repository.save(grandchild);
+      child.setChildren(Collections.singletonList(grandchild));
     }
     return dataset;
   }
@@ -249,5 +262,49 @@ class DictHttpTest {
     Optional<Dict> dict4 = repository.findById(dataset.get(2).getId());
     assertTrue(dict4.isPresent());
     assertEquals(true, dict4.get().getEnabled());
+  }
+
+  @Test
+  void removeDictTag() {
+    List<Dict> dataset = this.initData();
+    Collections.shuffle(dataset);
+
+    Dict dict0 = dataset.get(0);
+    Dict dict1 = dataset.get(1);
+    webTestClient.method(HttpMethod.DELETE)
+        .uri(DELETE_DICT_URI)
+        .bodyValue(List.of(dict0.getId(), dict1.getId()))
+        .exchange()
+        .expectStatus().isOk();
+    assertFalse(repository.existsById(dict0.getId()));
+    assertFalse(repository.existsById(dict1.getId()));
+    for (Dict child : dict0.getChildren()) {
+      assertFalse(repository.existsById(child.getId()));
+    }
+  }
+
+  @Test
+  void removeDictItem() {
+    List<Dict> dataset = this.initData();
+    Collections.shuffle(dataset);
+
+    Dict dict20 = dataset.get(2).getChildren().get(0);
+    Dict dict22 = dataset.get(2).getChildren().get(2);
+    Dict dict31 = dataset.get(3).getChildren().get(1);
+    webTestClient.method(HttpMethod.DELETE)
+        .uri(DELETE_DICT_URI)
+        .bodyValue(List.of(
+            dict20.getId(),
+            dict22.getId(),
+            dict31.getId()
+        ))
+        .exchange()
+        .expectStatus().isOk();
+    assertFalse(repository.existsById(dict20.getId()));
+    assertFalse(repository.existsById(dict20.getChildren().get(0).getId())); // 子级被删除
+    assertFalse(repository.existsById(dict22.getId()));
+    assertFalse(repository.existsById(dict31.getId()));
+    assertTrue(repository.existsById(dataset.get(2).getId()));
+    assertTrue(repository.existsById(dataset.get(3).getChildren().get(0).getId()));
   }
 }
