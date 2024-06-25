@@ -67,6 +67,10 @@ public class DictService {
     }
   }
 
+  protected List<Dict> getDictItemList(String tag) {
+    return dictDAO.get().findByTagOrderByOrdinalAsc(tag);
+  }
+
   private void checkRepeat(Dict dict) {
     Optional<Dict> exist = dictDAO.get().findByTagAndCode(dict.getTag(), dict.getCode());
     if (exist.isPresent() && !Objects.equals(dict.getId(), exist.get().getId())) {

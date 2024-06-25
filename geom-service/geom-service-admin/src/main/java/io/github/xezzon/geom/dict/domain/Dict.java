@@ -3,6 +3,8 @@ package io.github.xezzon.geom.dict.domain;
 import io.github.xezzon.geom.common.constant.DatabaseConstant;
 import io.github.xezzon.geom.common.jpa.IEntity;
 import io.github.xezzon.geom.common.jpa.IdGenerator;
+import io.github.xezzon.tao.dict.IDict;
+import io.github.xezzon.tao.tree.TreeNode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -21,7 +23,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "geom_dict")
-public class Dict implements IEntity<String> {
+public class Dict implements IEntity<String>, IDict, TreeNode<Dict, String> {
 
   public static final String DICT_TAG = "DICT";
 
@@ -64,4 +66,8 @@ public class Dict implements IEntity<String> {
    */
   @Transient
   List<Dict> children;
+
+  public int getOrdinal() {
+    return this.ordinal;
+  }
 }

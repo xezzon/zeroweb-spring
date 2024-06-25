@@ -16,8 +16,11 @@ import io.github.xezzon.geom.dict.domain.ModifyDictReq;
 import io.github.xezzon.geom.dict.repository.DictRepository;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +39,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class DictHttpTest {
 
   private static final String ADD_DICT_URI = "/dict/add";
+  private static final String GET_DICT_TREE_BY_TAG_URI = "/dict/tag/{tag}";
   private static final String MODIFY_DICT_URI = "/dict/update";
   private static final String UPDATE_DICT_STATUS_URI = "/dict/update/status";
   private static final String DELETE_DICT_URI = "/dict";
@@ -306,5 +310,39 @@ class DictHttpTest {
     assertFalse(repository.existsById(dict31.getId()));
     assertTrue(repository.existsById(dataset.get(2).getId()));
     assertTrue(repository.existsById(dataset.get(3).getChildren().get(0).getId()));
+  }
+  
+  @Test
+  void getDictTreeByTag() {
+    List<Dict> dataset = this.initData();
+    List<Dict> responseBody = webTestClient.get()
+        .uri(uriBuilder -> uriBuilder
+            .path(GET_DICT_TREE_BY_TAG_URI)
+            .build(dataset.get(0).getCode())
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBodyList(Dict.class)
+        .returnResult().getResponseBody();
+
+    assertNotNull(responseBody);
+    List<Dict> children = dataset.get(0).getChildren();
+    children.sort(Comparator.comparing(Dict::getOrdinal));
+    for (int i = 0, cnt = responseBody.size(); i < cnt; i++) {
+      assertEquals(children.get(i).getId(), responseBody.get(i).getId());
+    }
+    List<Dict> exceptGrandchildren = children.parallelStream()
+        .map(Dict::getChildren)
+        .filter(Objects::nonNull)
+        .flatMap(Collection::stream)
+        .toList();
+    List<Dict> grandchildren = responseBody.parallelStream()
+        .map(Dict::getChildren)
+        .filter(Objects::nonNull)
+        .flatMap(Collection::stream)
+        .toList();
+    for (int i = 0, cnt = exceptGrandchildren.size(); i < cnt; i++) {
+      assertEquals(exceptGrandchildren.get(i).getId(), grandchildren.get(i).getId());
+    }
   }
 }

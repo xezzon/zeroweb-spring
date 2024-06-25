@@ -16,4 +16,6 @@ public interface DictRepository extends JpaRepository<Dict, String> {
   Optional<Dict> findByTagAndCode(String tag, String code);
 
   List<Dict> findByParentIdIn(Collection<String> parentIds);
+
+  List<Dict> findByTagOrderByOrdinalAsc(String tag);
 }

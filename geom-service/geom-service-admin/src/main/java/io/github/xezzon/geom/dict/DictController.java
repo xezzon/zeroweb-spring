@@ -5,8 +5,12 @@ import io.github.xezzon.geom.common.domain.Id;
 import io.github.xezzon.geom.dict.domain.AddDictReq;
 import io.github.xezzon.geom.dict.domain.Dict;
 import io.github.xezzon.geom.dict.domain.ModifyDictReq;
+import io.github.xezzon.tao.tree.Tree;
 import java.util.Collection;
+import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,6 +47,12 @@ public class DictController {
     }
     dictService.addDict(dict);
     return Id.of(dict.getId());
+  }
+
+  @GetMapping("/tag/{tag}")
+  public List<Dict> getDictTreeByTag(@PathVariable String tag) {
+    List<Dict> dictItemList = dictService.getDictItemList(tag);
+    return Tree.fold(dictItemList);
   }
 
   /**
