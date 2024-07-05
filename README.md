@@ -1,8 +1,9 @@
 # Geom
 
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=xezzon_geom-spring-boot)](https://sonarcloud.io/summary/new_code?id=xezzon_geom-spring-boot)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=xezzon_geom-spring-boot&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=xezzon_geom-spring-boot)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xezzon_geom-spring-boot&metric=coverage)](https://sonarcloud.io/summary/new_code?id=xezzon_geom-spring-boot)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/049cec67356449e2a95502b441ad005f)](https://app.codacy.com/gh/xezzon/geom-spring-boot/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=xezzon_geom-spring-boot&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=xezzon_geom-spring-boot)
+
 
 基于 Spring Boot 框架的一组微服务构件，包含认证、后台管理、开放平台等服务。提供 SDK 与服务进行交互。
 

@@ -8,6 +8,7 @@ import io.github.xezzon.geom.user.UserGrpc.UserBlockingStub;
 import io.github.xezzon.geom.user.domain.User;
 import io.github.xezzon.geom.user.repository.UserRepository;
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 import java.util.Optional;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 @DirtiesContext
-class UserGrpcServerTest {
+class UserGrpcTest {
 
   @GrpcClient("inProcess")
   private UserBlockingStub userBlockingStub;
@@ -26,7 +27,7 @@ class UserGrpcServerTest {
   private UserRepository repository;
   
   @Test
-  @DirtiesContext
+  @Transactional
   void addUser() {
     AddUserResp resp = userBlockingStub.addUser(AddUserReq.newBuilder()
       .setUsername(RandomUtil.randomString(8))

@@ -20,7 +20,7 @@ public class RegisterUserReq implements Into<User> {
    * 用户名
    */
   @Pattern(
-      regexp = "^[a-z0-9_-]{3,32}$",
+      regexp = "^\\w{3,32}$",
       message = "用户名必须是3~32位 小写字母/数字/下划线 组成的字符串"
   )
   private String username;
@@ -32,8 +32,8 @@ public class RegisterUserReq implements Into<User> {
    * 密码
    */
   @Pattern(
-      regexp = "^(?!\\d+$)(?![a-zA-Z]+$)(?![@!#$%^&*]+$)[0-9a-zA-Z@!#$%^&*]{8,}$",
-      message = "密码由至少8位有效字符构成，且包含 大小写字符/数字/特殊字符(@!#$%^&*) 中至少两类"
+      regexp = "^(?!^\\d+$)(?!^[a-z]+$)(?!^[A-Z]+$)[\\x21-\\x7E]{8,}$",
+      message = "密码由至少8位有效字符构成，且不允许是纯数字、纯小写或者纯大写字母"
   )
   private String password;
 
