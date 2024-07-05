@@ -153,71 +153,12 @@ Discussion：使用过程中的疑问或对新功能的可行性讨论。
 Target选择`main`，`Publish release`。
 归档Project中非`feature`标签的issue。
 
-## 代码规范
+## 开发规范
+
+- [接口设计规范](doc/develop/Api.md)
+- [Liquibase](doc/develop/Liquibase.md)
 
 ### 引用文档
 
 - [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
 - [阿里巴巴《Java开发手册》](https://github.com/alibaba/p3c/)
-- [Microsoft REST API Guidelines](https://github.com/microsoft/api-guidelines)
-
-### 接口设计规范
-
-#### 前后端接口
-
-- 前后端交互的接口采用HTTP协议，遵顼RESTful命名规范。
-- 路径命名法采用Kebab case。
-- 路径参数都要放在第奇数位。
-- 不能简单地表示为增删查改的复杂指令，非幂等的可以用`POST`方法，幂等的使用`PUT`方法。
-- 更新、删除接口无需返回值（即返回类型为void）。标准新增接口的返回值为：`{"id":""}`，将新增后对象的ID返回，便于进行自动化测试。查询接口的返回值应为对象/对象列表/分页对象。响应码为`200`。
-- 客户端异常（即需要用户处理的异常）响应码为`400`，服务端异常或第三方服务异常响应码为`500`。响应体结构为`{"code":"","message":"","data":{}}`。
-
-以下是合适的接口示例：
-
-- `GET /dict/id/{id}` 根据ID查询字典
-- `GET /dict/page?filter=&pageNum=&pageSize=` 查询字典列表（分页）
-- `GET /dict/tag/{tag}/code/{code}` 根据字典目、字典码查询字典
-- `GET /dict/tag-code?tag=&code=` 根据字典目、字典目查询字典（风格二）
-- `DELETE /dict/id/{id}` 根据ID删除字典
-- `POST /dict/add` 新增字典
-- `PUT /dict/update` 整体更新字典
-- `POST /openapi/audit` 审核接口（审核接口会发起流程，所以是非幂等的）
-- `PUT /openapi/cancel` 作废接口
-
-#### 服务间接口
-
-- 服务间交互的接口（包括geom的后端服务之间、其他服务与geom之间）采用 gRPC 协议。
-
-## DevOps 规范
-
-### Liquibase
-
-版本演进时，如果有数据库表项或数据的调整，应该将对应的SQL语句写在 resource 文件夹的 db/changelog 目录的SQL文件中。
-
-单元测试及线上环境会由[Liquibase](https://www.liquibase.com/)执行。
-
-本项目遵循以下规则维护SQL文件：
-
-- Liquibase 版本控制文件的格式是 SQL。
-- 采用[共享的、面向对象的](https://docs.liquibase.com/start/design-liquibase-project.html)设计范式。即数据库的每一个表对应一个SQL文件。
-- 每一段SQL之前应该有如下内容: `-- changeset ${contributor}:${issue} labels:${milestone}`。
-
-以下是Liquibase的一个示例：
-
-```postgres-sql
--- db/changelog/user.sql
--- changeset xezzon:10 labels:0.1
-CREATE TABLE geom_user (
-  id VARCHAR(64) NOT NULL,
-  username VARCHAR(255) NOT NULL,
-  nickname VARCHAR(255),
-  cipher VARCHAR(255) NOT NULL,
-  create_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  update_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  CONSTRAINT pk_geom_user PRIMARY KEY (id)
-);
-ALTER TABLE geom_user ADD CONSTRAINT uc_geom_user_username UNIQUE (username);
-
-INSERT INTO geom_user(id, username, nickname, cipher, create_time, update_time)
-VALUES ('1', 'root', '超级管理员', '', '1970-01-01 08:00:00', '1970-01-01 08:00:00');
-```

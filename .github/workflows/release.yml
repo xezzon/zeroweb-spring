@@ -28,7 +28,7 @@ jobs:
       - name: Set Version
         run: mvn -B versions:set -DnewVersion=$GITHUB_REF_NAME
       - name: Publish Java package
-        run: mvn -B deploy -pl geom-proto -P release -DskipTests=true
+        run: mvn -B deploy -pl geom-proto,geom-spring-boot-starter -P release -DskipTests=true
         env:
           MAVEN_USERNAME: ${{ vars.MAVEN_USERNAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
