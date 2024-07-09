@@ -32,7 +32,7 @@
     <workdir>/app</workdir>
     <docker.host>${env.DOCKER_REGISTRY}</docker.host>
     <!-- JavaAgent 名称 -->
-    <opentelemetry-javaagent.name>opentelemetry-javaagent-2.2.0.jar</opentelemetry-javaagent.name>
+    <opentelemetry-javaagent.name>opentelemetry-javaagent-2.4.0.jar</opentelemetry-javaagent.name>
     <otel-ali-extension.name>ot-java-agent-extension-1.28.0.jar</otel-ali-extension.name>
   </properties>
 
@@ -160,7 +160,7 @@
               </to>
               <container>
                 <environment>
-                  <OTEL_LOGS_EXPORTER>otlp</OTEL_LOGS_EXPORTER>
+                  <OTEL_EXPORTER_OTLP_PROTOCOL>grpc</OTEL_EXPORTER_OTLP_PROTOCOL>
                   <OTEL_SERVICE_NAME>${project.artifactId}</OTEL_SERVICE_NAME>
                   <OTEL_SDK_DISABLED>true</OTEL_SDK_DISABLED>
                   <OTEL_JAVA_EXTENSIONS>${agent-path}/${otel-ali-extension.name}</OTEL_JAVA_EXTENSIONS>
