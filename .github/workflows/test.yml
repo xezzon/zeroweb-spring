@@ -12,8 +12,7 @@ on:
     # The branches below must be a subset of the branches above
     branches: [ "develop", "master", "main" ]
     types:
-      - opened
-      - synchronize
+      - review_requested
       - ready_for_review
 
 jobs:
