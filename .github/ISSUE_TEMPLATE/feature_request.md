@@ -17,7 +17,8 @@ labels: 'feature'
 ## 需求描述
 
 ```mermaid
-flowchart TB
+C4Dynamic
+  title ''
 ```
 
 ### [接口名称]
