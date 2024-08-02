@@ -18,6 +18,9 @@ public class DictGrpcServer extends DictGrpc.DictImplBase {
     this.dictService = dictService;
   }
 
+  /**
+   * 查询指定字典目下所有字典项的列表（服务间接口）
+   */
   @Override
   public void getDictListByTag(DictReq request, StreamObserver<DictListResp> responseObserver) {
     List<Dict> dictItemList = dictService.getDictItemList(request.getTag());

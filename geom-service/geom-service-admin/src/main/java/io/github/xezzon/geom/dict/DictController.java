@@ -49,6 +49,11 @@ public class DictController {
     return Id.of(dict.getId());
   }
 
+  /**
+   * 查询指定字典目下所有字典项的列表
+   * @param tag 字典目编码
+   * @return 字典项列表（树形结构）
+   */
   @GetMapping("/tag/{tag}")
   public List<Dict> getDictTreeByTag(@PathVariable String tag) {
     List<Dict> dictItemList = dictService.getDictItemList(tag);
@@ -78,6 +83,10 @@ public class DictController {
     dictService.updateDictStatus(ids, enabled);
   }
 
+  /**
+   * 批量删除字典目/字典项
+   * @param ids 字典ID集合
+   */
   @DeleteMapping()
   public void removeDict(@RequestBody Collection<String> ids) {
     dictService.remove(ids);

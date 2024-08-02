@@ -49,6 +49,11 @@ public class DictService {
     dictDAO.get().save(entity);
   }
 
+  /**
+   * 更新字典状态
+   * @param ids 字典ID集合
+   * @param enabled 更新后的字典启用状态
+   */
   protected void updateDictStatus(Collection<String> ids, Boolean enabled) {
     if (ids.isEmpty()) {
       return;
@@ -56,6 +61,10 @@ public class DictService {
     dictDAO.updateStatus(ids, enabled);
   }
 
+  /**
+   * 删除字典，并递归删除其子级
+   * @param ids 字典ID集合
+   */
   @Transactional
   protected void remove(Collection<String> ids) {
     while (!ids.isEmpty()) {
@@ -67,10 +76,20 @@ public class DictService {
     }
   }
 
+  /**
+   * 获取字典目下所有的字典项，按排序号升序排列
+   * @param tag 字典目编码
+   * @return 字典项列表
+   */
   protected List<Dict> getDictItemList(String tag) {
     return dictDAO.get().findByTagOrderByOrdinalAsc(tag);
   }
 
+  /**
+   * 重复性校验
+   * 两个不同的字典之间，不能具有相同的字典目与字典码
+   * @param dict 待检查的字典 至少包含 字典目编码、字典码、ID（可为空）字段
+   */
   private void checkRepeat(Dict dict) {
     Optional<Dict> exist = dictDAO.get().findByTagAndCode(dict.getTag(), dict.getCode());
     if (exist.isPresent() && !Objects.equals(dict.getId(), exist.get().getId())) {
