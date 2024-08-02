@@ -8,7 +8,7 @@
 | DB_USERNAME                 | 数据库连接的用户名。                                                                  |                       |
 | DB_PASSWORD                 | 数据库连接的密码。                                                                   |                       |
 | GEOM_ID_GENERATOR           | 生成主键的策略。<br/>可选值：`UUID`。                                                    | UUID                  |
-| OTEL_SDK_DISABLED           | 是否禁用 OpenTelemetry。仅在 Docker 容器中生效。                                         | true                  |
+| OTEL_SDK_DISABLED           | 是否禁用 OpenTelemetry。                                                         | true                  |
 | OTEL_EXPORTER_OTLP_ENDPOINT | OpenTelemetry Collector 地址                                                  | http://localhost:4317 |
 
-OpenTelemetry 的更多配置项参考[OpenTelemetry SDK Autoconfigure](https://github.com/open-telemetry/opentelemetry-java/tree/main/sdk-extensions/autoconfigure)。
+OpenTelemetry 的更多配置项参考[OpenTelemetry SDK Autoconfigure](https://opentelemetry.io/docs/languages/java/configuration/)。
