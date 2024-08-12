@@ -53,8 +53,7 @@
     </dependency>
     <dependency>
       <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
-      <version>2.5.0</version>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
     </dependency>
     <!-- 数据库相关 -->
     <dependency>
@@ -99,11 +98,6 @@
       <artifactId>postgresql</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-webflux</artifactId>
-      <scope>test</scope>
-    </dependency>
     <!-- 代码生成 -->
     <dependency>
       <groupId>org.mapstruct</groupId>
@@ -129,8 +123,41 @@
           <parameters>true</parameters>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>io.github.xezzon</groupId>
+        <artifactId>smart-doc-maven-plugin</artifactId>
+        <configuration>
+          <outputDirectory>${project.build.outputDirectory}/public/v3/api-docs</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>openapi</goal>
+            </goals>
+            <phase>generate-resources</phase>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>io.github.xezzon</groupId>
+        <artifactId>smart-doc-maven-plugin</artifactId>
+        <version>${smart-doc-maven-plugin.version}</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>html</report>
+              <report>grpc-html</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <profiles>
     <profile>
