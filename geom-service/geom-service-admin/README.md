@@ -35,19 +35,7 @@ service:
 
 其他配置请查看[公共配置清单](../../geom-spring-boot-starter/README.md)。
 
-## 接口清单
+## 接口描述文档
 
-### 前后端接口
-
-| 接口名称 | 请求方法 | 请求路径              |
-|------|------|-------------------|
-| 用户注册 | POST | /user/register    |
-| 用户登录 | POST | /auth/login/basic |
-| 单点登录 | POST | /auth/sso         |
-
-### 服务间接口
-
-| 接口名称 | 服务名称                            | 接口标识    |
-|------|---------------------------------|---------|
-| 新增用户 | io.github.xezzon.geom.user.User | AddUser |
+https://xezzon.github.io/geom-spring-boot/geom-service/geom-service-admin/smart-doc/index/api.html
 

@@ -1,10 +1,63 @@
 # 认证
 
-## 用户登录
+## 引用文档
 
-## 单点登录
+[用户模块](../user/README.md)
 
-### 网关模式（推荐）
+## 术语定义
+
+- `认证`: 用户向系统证明自己身份的过程。该过程需要出示只有该用户自己才能够出示的凭证，最常用的凭证是`口令`。
+- `令牌`: 认证通过后，系统应当向用户颁发令牌。令牌具有与 用户名+口令 同等的效力，但不包含密码之类的隐私信息。
+
+## 功能描述
+
+```mermaid
+C4Dynamic
+  title ''
+```
+
+## 数据字典
+
+## 接口清单
+
+### 用户登录（用户名、口令模式）
+
+#### HTTP接口
+
+POST /auth/login/basic
+
+#### 业务逻辑
+
+```mermaid
+sequenceDiagram
+  participant client AS 客户端
+  participant auth AS 认证中心
+  participant db AS 数据库
+  
+  client ->> auth: 携带 Basic Token 的登录请求
+  auth ->> auth: 解析出 username 和 password
+  auth ->> db: 通过 username 查询对应的用户
+  alt 没查到 
+    db -->> auth: Option::None
+    auth -->> client: 用户不存在
+  else
+    db -->> auth: 返回包含密码的用户信息。
+    auth ->> auth: 对 password 按相同方式进行哈希，并与密码比对
+    alt 比对成功 
+      auth ->> client: Session ID
+    else
+      auth ->> client: 口令不正确
+    end
+  end
+```
+
+### 单点登录
+
+#### HTTP接口
+
+POST /auth/sso
+
+#### 网关模式（推荐）
 
 ```mermaid
 sequenceDiagram
@@ -26,7 +79,7 @@ sequenceDiagram
     service -->> client: 返回请求结果
 ```
 
-### Redis 共享模式
+#### Redis 共享模式
 
 ```mermaid
 sequenceDiagram
@@ -45,7 +98,7 @@ sequenceDiagram
     service -->> client: 返回请求结果
 ```
 
-## 签发 [JWT](https://jwt.io/)
+#### 签发 [JWT](https://jwt.io/)
 
 本系统签发的 JWT 采用 ES256 算法。
 
@@ -64,3 +117,5 @@ claim 命名参照 [IANA 机构](https://www.iana.org/assignments/jwt/jwt.xhtml)
 | roles              | 持有者角色   | 类型为 String[]。            |
 | groups             | 所在用户组   | 类型为 String[]。            |
 | entitlements       | 持有者权限   | 类型为 String[]。            |
+
+#### 操作权限
