@@ -17,6 +17,8 @@ spring:
           max-idle: 10
           max-active: 200
           max-wait: -1ms
+  liquibase:
+    tag: @project.version@
 
 server:
   port: @app.port@
