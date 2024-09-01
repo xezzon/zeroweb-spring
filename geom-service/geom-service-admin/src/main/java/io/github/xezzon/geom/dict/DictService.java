@@ -1,7 +1,9 @@
 package io.github.xezzon.geom.dict;
 
 import io.github.xezzon.geom.common.exception.RepeatDataException;
+import io.github.xezzon.geom.common.odata.ODataQueryOption;
 import io.github.xezzon.geom.dict.domain.Dict;
+import io.github.xezzon.geom.dict.domain.DictSpecs;
 import jakarta.transaction.Transactional;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,6 +36,15 @@ public class DictService {
     checkRepeat(dict);
     /* 持久化 */
     dictDAO.get().save(dict);
+  }
+
+  /**
+   * 根据OData查询选项获取字典分页列表
+   * @param odata OData查询选项
+   * @return 字典分页列表
+   */
+  protected Page<Dict> pagedList(ODataQueryOption odata) {
+      return dictDAO.findAll(odata);
   }
 
   /**

@@ -2,12 +2,14 @@ package io.github.xezzon.geom.dict;
 
 import io.github.xezzon.geom.common.constant.DatabaseConstant;
 import io.github.xezzon.geom.common.domain.Id;
+import io.github.xezzon.geom.common.odata.ODataRequestParam;
 import io.github.xezzon.geom.dict.domain.AddDictReq;
 import io.github.xezzon.geom.dict.domain.Dict;
 import io.github.xezzon.geom.dict.domain.ModifyDictReq;
 import io.github.xezzon.tao.tree.Tree;
 import java.util.Collection;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,6 +49,15 @@ public class DictController {
     }
     dictService.addDict(dict);
     return Id.of(dict.getId());
+  }
+
+  /**
+   * 分页查询字典目列表
+   * @return 字典目列表
+   */
+  @GetMapping()
+  public Page<Dict> getDictTagList(ODataRequestParam odata) {
+    return dictService.pagedList(odata.into());
   }
 
   /**
