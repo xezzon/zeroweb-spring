@@ -1,9 +1,9 @@
 package io.github.xezzon.geom.dict;
 
+import io.github.xezzon.geom.common.constant.DatabaseConstant;
 import io.github.xezzon.geom.common.exception.RepeatDataException;
 import io.github.xezzon.geom.common.odata.ODataQueryOption;
 import io.github.xezzon.geom.dict.domain.Dict;
-import io.github.xezzon.geom.dict.domain.DictSpecs;
 import jakarta.transaction.Transactional;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -95,6 +95,31 @@ public class DictService {
    */
   protected List<Dict> getDictItemList(String tag) {
     return dictDAO.get().findByTagOrderByOrdinalAsc(tag);
+  }
+
+  /**
+   * 批量导入字典
+   * @param dictList 字典列表
+   */
+  protected void importDict(List<Dict> dictList) {
+    List<Dict> tagList = dictList.stream()
+        .filter(o -> Objects.equals(o.getTag(), Dict.DICT_TAG))
+        .toList();
+    for (Dict tag : tagList) {
+      tag.setParentId(DatabaseConstant.ROOT_ID);
+      dictDAO.upsert(tag);
+    }
+    List<Dict> itemList = dictList.parallelStream()
+        .filter(o -> !Objects.equals(o.getTag(), Dict.DICT_TAG))
+        .toList();
+    for (Dict item : itemList) {
+      Optional<Dict> parentDict = dictDAO.get().findByTagAndCode(Dict.DICT_TAG, item.getTag());
+      if (parentDict.isEmpty()) {
+        continue;
+      }
+      item.setParentId(parentDict.get().getId());
+      dictDAO.upsert(item);
+    }
   }
 
   /**

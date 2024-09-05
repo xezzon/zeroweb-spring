@@ -10,3 +10,6 @@ CREATE TABLE geom_dict (
   enabled BOOLEAN NOT NULL,
   CONSTRAINT pk_geom_dict PRIMARY KEY (id)
 );
+
+-- changeset xezzon:32 labels:0.2
+ALTER TABLE geom_dict ADD editable BOOLEAN DEFAULT true NOT NULL;

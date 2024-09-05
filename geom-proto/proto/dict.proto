@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package io.github.xezzon.geom.dict;
 
+import "google/protobuf/empty.proto";
+
 option java_multiple_files = true;
 option java_outer_classname = "DictProto";
 option java_package = "io.github.xezzon.geom.dict";
@@ -31,8 +33,21 @@ message DictListResp {
   repeated DictResp data = 1;
 }
 
+message DictImportReq {
+  optional string tag = 1;
+  string code = 2;
+  optional string label = 3;
+  int32 ordinal = 4;
+}
+
+message DictImportReqList {
+  repeated DictImportReq data = 1;
+}
+
 // 字典相关的服务间接口
 service Dict {
   // 根据字典目获取字典列表
   rpc GetDictListByTag(DictReq) returns (DictListResp);
+  // 导入字典
+  rpc ImportDict(DictImportReqList) returns (google.protobuf.Empty);
 }

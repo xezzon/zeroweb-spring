@@ -62,6 +62,7 @@ class DictHttpTest {
       parent.setParentId(DatabaseConstant.ROOT_ID);
       parent.setOrdinal(RandomUtil.randomInt());
       parent.setEnabled(true);
+      parent.setEditable(true);
       repository.save(parent);
       dataset.add(parent);
       List<Dict> children = new ArrayList<>();
@@ -73,6 +74,7 @@ class DictHttpTest {
         child.setParentId(parent.getId());
         child.setOrdinal(RandomUtil.randomInt());
         child.setEnabled(true);
+        child.setEditable(true);
         repository.save(child);
         children.add(child);
       }
@@ -85,6 +87,7 @@ class DictHttpTest {
       grandchild.setParentId(child.getId());
       grandchild.setOrdinal(RandomUtil.randomInt());
       grandchild.setEnabled(true);
+      grandchild.setEditable(true);
       repository.save(grandchild);
       child.setChildren(Collections.singletonList(grandchild));
     }

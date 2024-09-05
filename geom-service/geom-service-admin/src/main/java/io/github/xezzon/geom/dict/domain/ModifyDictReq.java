@@ -44,6 +44,7 @@ public class ModifyDictReq implements Into<Dict> {
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
+    @Mapping(target = "editable", ignore = true)
     @Mapping(target = "tag", ignore = true)
     @Mapping(target = "children", ignore = true)
     @Override
