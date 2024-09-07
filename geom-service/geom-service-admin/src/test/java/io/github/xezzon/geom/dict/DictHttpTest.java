@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -92,6 +93,11 @@ class DictHttpTest {
       child.setChildren(Collections.singletonList(grandchild));
     }
     return dataset;
+  }
+
+  @AfterEach
+  void tearDown() {
+    repository.deleteAll();
   }
 
   @Test
