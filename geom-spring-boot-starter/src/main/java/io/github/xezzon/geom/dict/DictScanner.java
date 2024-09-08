@@ -5,12 +5,13 @@ import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import io.github.xezzon.geom.dict.DictImportReqList.Builder;
 import io.github.xezzon.tao.dict.IDict;
-import java.io.IOException;
+import jakarta.annotation.Resource;
 import java.lang.annotation.Annotation;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
@@ -20,14 +21,19 @@ import org.springframework.stereotype.Component;
  * @author xezzon
  */
 @Component
-public class DictScanner implements ImportBeanDefinitionRegistrar {
+@Slf4j
+public class DictScanner implements ImportBeanDefinitionRegistrar, CommandLineRunner {
+
+  @Resource
+  private DictImporter dictImporter;
+
+  private static final Builder dictList = DictImportReqList.newBuilder();
 
   @Override
   public void registerBeanDefinitions(
       @NotNull AnnotationMetadata metadata,
       @NotNull BeanDefinitionRegistry registry
   ) {
-    final Builder dictList = DictImportReqList.newBuilder();
     AnnotationDictConfiguration configuration =
         new AnnotationDictConfiguration(metadata, EnableDictScan.class);
     String classpath = configuration.getValue();
@@ -57,11 +63,17 @@ public class DictScanner implements ImportBeanDefinitionRegistrar {
           );
         }
       }
-      DictImporter dictImporter = ((DefaultListableBeanFactory) registry)
-          .getBean(DictImporter.class);
+    } catch (Exception e) {
+      log.warn("Scan Dict failed.", e);
+    }
+  }
+
+  @Override
+  public void run(String... args) throws Exception {
+    try {
       dictImporter.importDict(dictList.build());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (Exception e) {
+      log.warn("Import Dict failed.", e);
     }
   }
 }

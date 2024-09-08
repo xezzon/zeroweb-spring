@@ -1,5 +1,6 @@
 package io.github.xezzon.geom;
 
+import io.github.xezzon.geom.dict.EnableDictScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
@@ -11,6 +12,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerial
  */
 @SpringBootApplication
 @EnableSpringDataWebSupport(pageSerializationMode = PageSerializationMode.VIA_DTO)
+@EnableDictScan
 public class GeomAdminApplication {
 
   /**
