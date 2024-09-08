@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.geom.common.constant.DatabaseConstant;
 import io.github.xezzon.geom.common.domain.Id;
+import io.github.xezzon.geom.common.domain.PagedModel;
 import io.github.xezzon.geom.common.exception.ErrorCode;
 import io.github.xezzon.geom.dict.domain.AddDictReq;
 import io.github.xezzon.geom.dict.domain.Dict;
@@ -22,9 +23,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -43,6 +46,7 @@ class DictHttpTest {
   private static final String MODIFY_DICT_URI = "/dict/update";
   private static final String UPDATE_DICT_STATUS_URI = "/dict/update/status";
   private static final String DELETE_DICT_URI = "/dict";
+  private static final String GET_DICT_URI = "/dict";
 
   @Resource
   private WebTestClient webTestClient;
@@ -51,7 +55,7 @@ class DictHttpTest {
 
   List<Dict> initData() {
     List<Dict> dataset = new ArrayList<>();
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 16; i++) {
       Dict parent = new Dict();
       parent.setTag(Dict.DICT_TAG);
       parent.setCode(RandomUtil.randomString(8));
@@ -59,6 +63,7 @@ class DictHttpTest {
       parent.setParentId(DatabaseConstant.ROOT_ID);
       parent.setOrdinal(RandomUtil.randomInt());
       parent.setEnabled(true);
+      parent.setEditable(true);
       repository.save(parent);
       dataset.add(parent);
       List<Dict> children = new ArrayList<>();
@@ -70,6 +75,7 @@ class DictHttpTest {
         child.setParentId(parent.getId());
         child.setOrdinal(RandomUtil.randomInt());
         child.setEnabled(true);
+        child.setEditable(true);
         repository.save(child);
         children.add(child);
       }
@@ -82,10 +88,16 @@ class DictHttpTest {
       grandchild.setParentId(child.getId());
       grandchild.setOrdinal(RandomUtil.randomInt());
       grandchild.setEnabled(true);
+      grandchild.setEditable(true);
       repository.save(grandchild);
       child.setChildren(Collections.singletonList(grandchild));
     }
     return dataset;
+  }
+
+  @AfterEach
+  void tearDown() {
+    repository.deleteAll();
   }
 
   @Test
@@ -343,6 +355,35 @@ class DictHttpTest {
         .toList();
     for (int i = 0, cnt = exceptGrandchildren.size(); i < cnt; i++) {
       assertEquals(exceptGrandchildren.get(i).getId(), grandchildren.get(i).getId());
+    }
+  }
+
+  @Test
+  void pagedList() {
+    List<Dict> dataset = this.initData();
+
+    PagedModel<Dict> responseBody = webTestClient.get()
+        .uri(builder -> builder
+            .path(GET_DICT_URI)
+            .queryParam("$top", 2)
+            .queryParam("$skip", 4)
+            .build()
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(new ParameterizedTypeReference<PagedModel<Dict>>() {
+        })
+        .returnResult().getResponseBody();
+
+    assertNotNull(responseBody);
+    assertEquals(dataset.size(), responseBody.getPage().getTotalElements());
+    List<Dict> except = dataset.parallelStream()
+        .sorted(Comparator.comparing(Dict::getCode))
+        .skip(4)
+        .limit(2)
+        .toList();
+    for (int i = 0, cnt = responseBody.getContent().size(); i < cnt; i++) {
+      assertEquals(except.get(i).getId(), responseBody.getContent().get(i).getId());
     }
   }
 }

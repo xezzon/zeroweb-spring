@@ -62,6 +62,11 @@ public class Dict implements IEntity<String>, IDict, TreeNode<Dict, String> {
   @Column(name = "enabled", nullable = false)
   Boolean enabled;
   /**
+   * 是否可编辑
+   */
+  @Column(name = "editable", nullable = false)
+  Boolean editable;
+  /**
    * 子级字典
    */
   @Transient

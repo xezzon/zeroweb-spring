@@ -1,6 +1,7 @@
 package io.github.xezzon.geom.dict;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.geom.common.constant.DatabaseConstant;
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 @DirtiesContext
 class DictGrpcServerTest {
 
-  @GrpcClient("inProcess")
+  @GrpcClient("dict")
   private DictBlockingStub dictBlockingStub;
   @Resource
   private DictRepository repository;
@@ -41,6 +44,7 @@ class DictGrpcServerTest {
       parent.setParentId(DatabaseConstant.ROOT_ID);
       parent.setOrdinal(RandomUtil.randomInt());
       parent.setEnabled(true);
+      parent.setEditable(true);
       repository.save(parent);
       dataset.add(parent);
       List<Dict> children = new ArrayList<>();
@@ -52,6 +56,7 @@ class DictGrpcServerTest {
         child.setParentId(parent.getId());
         child.setOrdinal(RandomUtil.randomInt());
         child.setEnabled(true);
+        child.setEditable(true);
         repository.save(child);
         children.add(child);
       }
@@ -64,6 +69,7 @@ class DictGrpcServerTest {
       grandchild.setParentId(child.getId());
       grandchild.setOrdinal(RandomUtil.randomInt());
       grandchild.setEnabled(true);
+      grandchild.setEditable(true);
       repository.save(grandchild);
       child.setChildren(Collections.singletonList(grandchild));
     }
@@ -71,7 +77,6 @@ class DictGrpcServerTest {
   }
 
   @Test
-  @DirtiesContext
   void getDictListByTag() {
     List<Dict> dataset = this.initData();
     DictListResp resp = dictBlockingStub.getDictListByTag(DictReq.newBuilder()
@@ -84,6 +89,86 @@ class DictGrpcServerTest {
     children.sort(Comparator.comparing(Dict::getOrdinal));
     for (int i = 0, cnt = children.size(); i < cnt; i++) {
       assertEquals(children.get(i).getId(), resp.getData(i).getId());
+    }
+  }
+
+  @Test
+  void importDict() {
+    this.initData();
+    final List<Dict> dataset = repository.findAll();
+    int loopTimes = 4;
+    int count = 0;
+    List<DictImportReq> tagList = new ArrayList<>();
+    for (int i = 0; i < loopTimes; i++) {
+      tagList.add(DictImportReq.newBuilder()
+          .setCode(RandomUtil.randomString(8))
+          .setOrdinal(RandomUtil.randomInt())
+          .build()
+      );
+      count++;
+    }
+    List<DictImportReq> itemList = new ArrayList<>();
+    for (DictImportReq tag : tagList) {
+      for (int i = 0; i < loopTimes; i++) {
+        itemList.add(DictImportReq.newBuilder()
+            .setTag(tag.getCode())
+            .setCode(RandomUtil.randomString(8))
+            .setOrdinal(RandomUtil.randomInt())
+            .build()
+        );
+        count++;
+      }
+    }
+    Dict existTag = RandomUtil.randomEle(dataset.parallelStream()
+        .filter(o -> Objects.equals(o.getTag(), Dict.DICT_TAG))
+        .toList()
+    );
+    tagList.add(0, DictImportReq.newBuilder()
+        .setCode(existTag.getCode())
+        .setOrdinal(RandomUtil.randomInt())
+        .build()
+    );
+    List<Dict> existItems = RandomUtil.randomEleList(
+            dataset.parallelStream()
+                .filter(o -> Objects.equals(o.getTag(), existTag.getCode()))
+                .toList(),
+            loopTimes
+        );
+    itemList.addAll(existItems.parallelStream()
+        .map(o -> DictImportReq.newBuilder()
+            .setTag(o.getTag())
+            .setCode(o.getCode())
+            .setOrdinal(RandomUtil.randomInt())
+            .build()
+        )
+        .toList()
+    );
+    for (int i = 0; i < loopTimes; i++) {
+      itemList.add(DictImportReq.newBuilder()
+          .setTag(existTag.getCode())
+          .setCode(RandomUtil.randomString(8))
+          .setOrdinal(RandomUtil.randomInt())
+          .build()
+      );
+      count++;
+    }
+    DictImportReqList dictImportReqList = DictImportReqList.newBuilder()
+        .addAllData(tagList)
+        .addAllData(itemList)
+        .build();
+    dictBlockingStub.importDict(dictImportReqList);
+    assertEquals(dataset.size() + count, repository.count());
+    Optional<Dict> result = repository.findByTagAndCode(
+        Dict.DICT_TAG,
+        tagList.get(0).getCode()
+    );
+    assertTrue(result.isPresent());
+    assertEquals(existTag.getId(), result.get().getId());
+    for (Dict item : existItems) {
+      result = repository.findByTagAndCode(item.getTag(), item.getCode());
+      assertTrue(result.isPresent());
+      assertEquals(item.getId(), result.get().getId());
+      assertEquals(item.getOrdinal(), result.get().getOrdinal());
     }
   }
 }

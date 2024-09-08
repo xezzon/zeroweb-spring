@@ -48,6 +48,7 @@ public class AddDictReq implements Into<Dict> {
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
+    @Mapping(target = "editable", constant = "true")
     @Mapping(target = "enabled", constant = "true")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "children", ignore = true)

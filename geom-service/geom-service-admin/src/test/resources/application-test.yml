@@ -8,5 +8,7 @@ grpc:
     inProcessName: test
     port: -1
   client:
-    inProcess:
+    user:
+      address: in-process:test
+    dict:
       address: in-process:test
