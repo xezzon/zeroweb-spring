@@ -1,6 +1,7 @@
 package io.github.xezzon.geom.dict;
 
 import com.google.protobuf.Empty;
+import io.github.xezzon.geom.dict.converter.DictImportReqConverter;
 import io.github.xezzon.geom.dict.converter.DictRespConverter;
 import io.github.xezzon.geom.dict.domain.Dict;
 import io.grpc.stub.StreamObserver;
@@ -14,11 +15,9 @@ import net.devh.boot.grpc.server.service.GrpcService;
 public class DictGrpcServer extends DictGrpc.DictImplBase {
 
   private final DictService dictService;
-  private final DictImporter dictImporter;
 
-  public DictGrpcServer(DictService dictService, DictDbHandler dictImporter) {
+  public DictGrpcServer(DictService dictService) {
     this.dictService = dictService;
-    this.dictImporter = dictImporter;
   }
 
   /**
@@ -39,7 +38,10 @@ public class DictGrpcServer extends DictGrpc.DictImplBase {
 
   @Override
   public void importDict(DictImportReqList request, StreamObserver<Empty> responseObserver) {
-    dictImporter.importDict(request);
+    List<Dict> dictList = request.getDataList().parallelStream()
+        .map(DictImportReqConverter.INSTANCE::from)
+        .toList();
+    dictService.importDict(dictList);
     responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
   }

@@ -13,6 +13,8 @@ on:
     branches: [ "develop", "master", "main" ]
     # [Don't run actions on draft pull requests](https://github.com/orgs/community/discussions/25722)
     types:
+      - opened
+      - reopened
       - review_requested
       - ready_for_review
 
