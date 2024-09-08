@@ -1,5 +1,6 @@
 package io.github.xezzon.geom.dict;
 
+import io.github.xezzon.geom.common.constant.DatabaseConstant;
 import io.github.xezzon.geom.common.exception.RepeatDataException;
 import io.github.xezzon.geom.common.odata.ODataQueryOption;
 import io.github.xezzon.geom.dict.domain.Dict;
@@ -94,6 +95,27 @@ public class DictService {
    */
   protected List<Dict> getDictItemList(String tag) {
     return dictDAO.get().findByTagOrderByOrdinalAsc(tag);
+  }
+
+  protected void importDict(List<Dict> dictList) {
+    List<Dict> tagList = dictList.stream()
+        .filter(o -> Objects.equals(o.getTag(), Dict.DICT_TAG))
+        .toList();
+    for (Dict tag : tagList) {
+      tag.setParentId(DatabaseConstant.ROOT_ID);
+      dictDAO.upsert(tag);
+    }
+    List<Dict> itemList = dictList.parallelStream()
+        .filter(o -> !Objects.equals(o.getTag(), Dict.DICT_TAG))
+        .toList();
+    for (Dict item : itemList) {
+      Optional<Dict> parentDict = dictDAO.get().findByTagAndCode(Dict.DICT_TAG, item.getTag());
+      if (parentDict.isEmpty()) {
+        continue;
+      }
+      item.setParentId(parentDict.get().getId());
+      dictDAO.upsert(item);
+    }
   }
 
   /**

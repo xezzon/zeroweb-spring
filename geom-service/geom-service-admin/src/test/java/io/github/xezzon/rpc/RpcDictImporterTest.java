@@ -1,13 +1,15 @@
-package io.github.xezzon.geom.dict.rpc;
+package io.github.xezzon.rpc;
 
-import io.github.xezzon.geom.dict.DictDbHandler;
 import io.github.xezzon.geom.dict.DictImporter;
+import io.github.xezzon.geom.dict.DictRpcHandler;
 import io.github.xezzon.geom.dict.TestEnum;
 import io.github.xezzon.geom.dict.domain.Dict;
 import io.github.xezzon.geom.dict.repository.DictRepository;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 /**
  * @author xezzon
  */
+@Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
 @DirtiesContext
@@ -28,8 +31,10 @@ class RpcDictImporterTest {
   private DictRepository repository;
 
   @Test
-  void importDict() {
-    Assertions.assertInstanceOf(DictDbHandler.class, dictImporter);
+  void importDict() throws InterruptedException {
+    Assertions.assertInstanceOf(DictRpcHandler.class, dictImporter);
+
+    ((DictRpcHandler) dictImporter).getCountDownLatch().await(30, TimeUnit.SECONDS);
     List<Dict> reqList = repository.findAll();
     Assertions.assertTrue(reqList.parallelStream()
         .anyMatch(o -> Objects.equals(o.getCode(), TestEnum.class.getSimpleName()))
