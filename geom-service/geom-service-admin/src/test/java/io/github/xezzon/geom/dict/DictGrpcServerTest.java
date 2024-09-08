@@ -29,7 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 @DirtiesContext
 class DictGrpcServerTest {
 
-  @GrpcClient("inProcess")
+  @GrpcClient("dict")
   private DictBlockingStub dictBlockingStub;
   @Resource
   private DictRepository repository;
