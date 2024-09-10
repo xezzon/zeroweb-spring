@@ -22,7 +22,6 @@ import org.bouncycastle.math.ec.ECPoint;
 import org.springframework.stereotype.Component;
 
 /**
- * TODO 优化扩展性 以便兼容其他加密算法
  * @author xezzon
  */
 @Component
@@ -30,6 +29,7 @@ import org.springframework.stereotype.Component;
 public class KeyManager {
 
   public static final String ALGORITHM = "EC";
+  private static final String EC_SPEC = "secp256k1";
   private final GeomJwtConfig geomJwtConfig;
   private PrivateKey privateKey;
   private final KeyLoader keyLoader;
@@ -55,7 +55,7 @@ public class KeyManager {
       KeySpec keySpec = new X509EncodedKeySpec(pemContent);
       this.privateKey = keyFactory.generatePrivate(keySpec);
       /* 从私钥中提取公钥 */
-      ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("secp256k1");
+      ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(EC_SPEC);
       ECPoint qPoint = ecSpec.getG().multiply(((ECPrivateKey) this.privateKey).getD());
       ECPublicKeySpec pubSpec = new ECPublicKeySpec(qPoint, ecSpec);
       publicKey = KeyUtil.generatePublicKey(ALGORITHM, pubSpec);

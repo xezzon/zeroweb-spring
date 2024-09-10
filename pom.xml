@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.github.xezzon</groupId>
     <artifactId>xezzon-java</artifactId>
-    <version>3.5</version>
+    <version>4.0</version>
   </parent>
   <artifactId>geom</artifactId>
   <version>1.0-SNAPSHOT</version>
@@ -56,7 +56,6 @@
     <grpc-spring-boot-starter.version>3.1.0.RELEASE</grpc-spring-boot-starter.version>
     <lombok.version>1.18.32</lombok.version>
     <sa-token.version>1.38.0</sa-token.version>
-    <therapi-runtime-javadoc.version>0.15.0</therapi-runtime-javadoc.version>
     <!-- 插件版本 -->
     <jacoco.version>0.8.12</jacoco.version>
   </properties>

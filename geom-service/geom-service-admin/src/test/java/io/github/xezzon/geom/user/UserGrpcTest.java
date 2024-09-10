@@ -21,7 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 @DirtiesContext
 class UserGrpcTest {
 
-  @GrpcClient("inProcess")
+  @GrpcClient("user")
   private UserBlockingStub userBlockingStub;
   @Resource
   private UserRepository repository;

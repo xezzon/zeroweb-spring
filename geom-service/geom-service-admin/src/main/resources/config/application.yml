@@ -8,7 +8,7 @@ spring:
       - ${SPRING_ENVIRONMENT:prod}
   data:
     redis:
-      url: redis://${REDIS_URL:localhost:6379}
+      url: redis://${REDIS_URL:redis:6379}
       database: ${REDIS_DATABASE:0}
       timeout: 10s
       lettuce:
@@ -17,9 +17,8 @@ spring:
           max-idle: 10
           max-active: 200
           max-wait: -1ms
-  jackson:
-    deserialization:
-      fail-on-unknown-properties: false
+  liquibase:
+    tag: @project.version@
 
 server:
   port: @app.port@

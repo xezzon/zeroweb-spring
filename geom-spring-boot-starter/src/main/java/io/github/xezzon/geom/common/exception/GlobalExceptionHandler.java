@@ -4,6 +4,7 @@ import io.github.xezzon.tao.exception.ClientException;
 import io.github.xezzon.tao.exception.ServerException;
 import io.github.xezzon.tao.exception.ThirdPartyException;
 import io.github.xezzon.tao.web.Result;
+import jakarta.servlet.ServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -78,7 +79,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(Exception.class)
   @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-  public Result<Void> handleException(Exception e) {
+  public Result<Void> handleException(Exception e, ServletRequest request) {
     log.error("未知故障", e);
     return Result.fail(new ServerException(e.getMessage(), e), errorMessage);
   }
