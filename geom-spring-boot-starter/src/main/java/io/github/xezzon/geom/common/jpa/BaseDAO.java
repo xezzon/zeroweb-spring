@@ -57,14 +57,15 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<T
   }
 
   public T partialUpdate(T target) {
-    T entity = this.get().getReferenceById(target.getId());
+    T entity = this.get().findById(target.getId())
+        .orElseThrow();
     this.getCopier().copy(target, entity);
     this.get().save(entity);
     return entity;
   }
 
   public Page<T> findAll(ODataQueryOption odata) {
-    return this.findAll(odata, BaseSpecs.TRUE(), Sort.unsorted());
+    return this.findAll(odata, null, null);
   }
 
   protected Page<T> findAll(
