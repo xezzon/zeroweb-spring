@@ -5,7 +5,6 @@ import io.github.xezzon.geom.common.trait.RpcTrait;
 import io.github.xezzon.geom.dict.DictGrpc.DictStub;
 import io.grpc.stub.StreamObserver;
 import java.util.concurrent.CountDownLatch;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.jetbrains.annotations.TestOnly;
@@ -19,11 +18,15 @@ import org.springframework.stereotype.Component;
 public class DictRpcHandler implements DictImporter, RpcTrait {
 
   @TestOnly
-  @Getter(onMethod_ = {@TestOnly})
   private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
   @GrpcClient("dict")
   private DictStub dictStub;
+
+  @TestOnly
+  public CountDownLatch getCountDownLatch() {
+    return this.countDownLatch;
+  }
 
   @Override
   public void importDict(DictImportReqList reqList) {
