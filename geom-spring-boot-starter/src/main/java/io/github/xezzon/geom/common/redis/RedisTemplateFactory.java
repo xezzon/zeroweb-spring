@@ -1,9 +1,9 @@
 package io.github.xezzon.geom.common.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -15,7 +15,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * @author xezzon
  */
 @Configuration
-@ConditionalOnExpression("!'${REDIS_URL:}'.empty")
+@Profile("redis")
 public class RedisTemplateFactory {
 
   private final RedisConnectionFactory connectionFactory;

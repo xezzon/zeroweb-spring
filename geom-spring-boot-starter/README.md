@@ -7,6 +7,9 @@
 | DB_URL                      | 数据库连接地址。格式为`${host}:${port}/${database}`                                    | postgres:5432/geom    |
 | DB_USERNAME                 | 数据库连接的用户名。                                                                  |                       |
 | DB_PASSWORD                 | 数据库连接的密码。                                                                   |                       |
+| CACHE_TYPE                  | KV数据库类型。若以集群模式部署，则此项必填。<br/>可选值：`in-memory`, `redis`。                       | in-memory             |
+| REDIS_URL                   | REDIS 连接信息。如果以集群模式部署该服务，则此项必填。格式为：`user:password@host:port`或`host:port`     |                       |
+| REDIS_DATABASE              | REDIS 使用的库号。                                                                | 0                     |
 | GEOM_ID_GENERATOR           | 生成主键的策略。<br/>可选值：`UUID`。                                                    | UUID                  |
 | OTEL_SDK_DISABLED           | 是否禁用 OpenTelemetry。                                                         | true                  |
 | OTEL_EXPORTER_OTLP_ENDPOINT | OpenTelemetry Collector 地址                                                  | http://localhost:4317 |
