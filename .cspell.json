@@ -1,0 +1,18 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "xezzon",
+    "odata"
+  ],
+  "flagWords": [],
+  "ignorePaths": [
+    ".github/**",
+    "/*",
+    "**/*.md",
+    "**/pom.xml",
+    "**/application*.yml",
+    "**/application*.yaml",
+    "**/application*.properties"
+  ]
+}

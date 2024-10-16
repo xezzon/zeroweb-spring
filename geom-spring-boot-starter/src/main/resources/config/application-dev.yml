@@ -5,3 +5,7 @@ spring:
       ddl-auto: update
   liquibase:
     enabled: false
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace

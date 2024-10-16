@@ -72,4 +72,24 @@ class BaseDAOTest {
     Assertions.assertEquals(pageSize, page1.getSize());
     Assertions.assertEquals(pageNum, page1.getNumber());
   }
+
+  @Test
+  void update() {
+    TestEntity testEntity1 = new TestEntity();
+    testEntity1.setField1(RandomUtil.randomString(8));
+    testEntity1.setField2(RandomUtil.randomString(8));
+    repository.save(testEntity1);
+    TestEntity testEntity2 = new TestEntity();
+    testEntity2.setField1(RandomUtil.randomString(8));
+    testEntity2.setField2(RandomUtil.randomString(8));
+    repository.save(testEntity2);
+
+    String newValue = RandomUtil.randomString(7);
+    int updated = testEntityDAO.updateField2ByField1(testEntity1.getField1(), newValue);
+    Assertions.assertEquals(1, updated);
+    TestEntity result = repository.findById(testEntity1.getId()).get();
+    Assertions.assertEquals(newValue, result.getField2());
+    TestEntity another = repository.findById(testEntity2.getId()).get();
+    Assertions.assertEquals(testEntity2.getField2(), another.getField2());
+  }
 }

@@ -5,7 +5,6 @@ import io.github.xezzon.geom.common.odata.ODataQueryOption;
 import io.github.xezzon.geom.dict.domain.Dict;
 import io.github.xezzon.geom.dict.domain.DictSpecs;
 import io.github.xezzon.geom.dict.domain.Dict_;
-import io.github.xezzon.geom.dict.domain.QDict;
 import io.github.xezzon.geom.dict.repository.DictRepository;
 import jakarta.transaction.Transactional;
 import java.util.Collection;
@@ -25,17 +24,12 @@ import org.springframework.stereotype.Repository;
 public class DictDAO extends BaseDAO<Dict, String, DictRepository> {
 
   DictDAO(DictRepository repository) {
-    super(repository);
+    super(repository, Dict.class);
   }
 
   @Override
   public ICopier<Dict> getCopier() {
     return Copier.INSTANCE;
-  }
-
-  @Override
-  protected QDict getQuery() {
-    return QDict.dict;
   }
 
   /**
@@ -62,15 +56,18 @@ public class DictDAO extends BaseDAO<Dict, String, DictRepository> {
     this.get().save(dict);
   }
 
+  /**
+   * 更新字典项的状态
+   * @param ids 需要更新的字典项ID集合
+   * @param enabled 更新后的启用状态，true为启用，false为禁用
+   * @return 更新影响的行数
+   */
   @Transactional
   public long updateStatus(Collection<String> ids, Boolean enabled) {
-    QDict qDict = this.getQuery();
-    return this.getQueryFactory()
-        .update(qDict)
-        .set(qDict.enabled, enabled)
-        .where(qDict.id.in(ids))
-        .execute()
-    ;
+    return super.update((root, criteriaUpdate, cb) -> criteriaUpdate
+        .set(Dict_.enabled, enabled)
+        .where(root.get(Dict_.id).in(ids))
+    );
   }
 
   @Mapper
