@@ -3,9 +3,9 @@ package io.github.xezzon.geom.common.jpa;
 import io.github.xezzon.geom.common.odata.ODataQueryOption;
 import io.github.xezzon.tao.trait.NewType;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Root;
-import java.util.function.BiConsumer;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -108,10 +108,10 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<T
    * @return 更新影响的行数
    */
   protected int update(UpdateCriteriaBuilder<T> predicate) {
-    CriteriaUpdate<T> criteriaUpdate = em.getCriteriaBuilder()
-        .createCriteriaUpdate(typeToken);
+    CriteriaBuilder cb = em.getCriteriaBuilder();
+    CriteriaUpdate<T> criteriaUpdate = cb.createCriteriaUpdate(typeToken);
     Root<T> root = criteriaUpdate.from(typeToken);
-    predicate.accept(root, criteriaUpdate);
+    predicate.accept(root, criteriaUpdate, cb);
     return em.createQuery(criteriaUpdate).executeUpdate();
   }
 
@@ -135,7 +135,8 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<T
    * @param <T> 实体类型
    */
   @FunctionalInterface
-  public interface UpdateCriteriaBuilder<T> extends BiConsumer<Root<T>, CriteriaUpdate<T>> {
+  public interface UpdateCriteriaBuilder<T> {
 
+    void accept(Root<T> root, CriteriaUpdate<T> query, CriteriaBuilder criteriaBuilder);
   }
 }

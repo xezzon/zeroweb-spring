@@ -64,7 +64,7 @@ public class DictDAO extends BaseDAO<Dict, String, DictRepository> {
    */
   @Transactional
   public long updateStatus(Collection<String> ids, Boolean enabled) {
-    return super.update((root, criteriaUpdate) -> criteriaUpdate
+    return super.update((root, criteriaUpdate, cb) -> criteriaUpdate
         .set(Dict_.enabled, enabled)
         .where(root.get(Dict_.id).in(ids))
     );
