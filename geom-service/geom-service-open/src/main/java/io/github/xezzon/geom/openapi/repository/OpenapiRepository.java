@@ -13,4 +13,5 @@ public interface OpenapiRepository extends
     JpaRepository<Openapi, String>,
     JpaSpecificationExecutor<Openapi> {
 
+  Openapi findByCode(String code);
 }
