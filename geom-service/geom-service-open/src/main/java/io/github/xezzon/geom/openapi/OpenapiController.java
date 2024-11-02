@@ -1,9 +1,12 @@
 package io.github.xezzon.geom.openapi;
 
 import io.github.xezzon.geom.common.domain.Id;
+import io.github.xezzon.geom.core.odata.ODataRequestParam;
 import io.github.xezzon.geom.openapi.domain.AddOpenapiReq;
 import io.github.xezzon.geom.openapi.domain.Openapi;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,5 +35,15 @@ public class OpenapiController {
     Openapi openapi = req.into();
     openapiService.addOpenapi(openapi);
     return Id.of(openapi.getId());
+  }
+
+  /**
+   * 获取`对外接口`列表的分页数据
+   * @param odata OData查询参数，用于分页和排序
+   * @return 包含`对外接口`列表的分页对象
+   */
+  @GetMapping()
+  public Page<Openapi> getOpenapiList(ODataRequestParam odata) {
+    return openapiService.pageList(odata);
   }
 }
