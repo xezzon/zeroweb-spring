@@ -4,6 +4,7 @@ import io.github.xezzon.geom.common.PublishedOpenapiCannotBeModifyException;
 import io.github.xezzon.geom.common.exception.RepeatDataException;
 import io.github.xezzon.geom.core.odata.ODataRequestParam;
 import io.github.xezzon.geom.openapi.domain.Openapi;
+import io.github.xezzon.geom.openapi.domain.OpenapiStatus;
 import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,12 @@ public class OpenapiService {
       throw new PublishedOpenapiCannotBeModifyException();
     }
     openapiDAO.partialUpdate(openapi);
+  }
+
+  protected void publishOpenapi(String id) {
+    Openapi entity = openapiDAO.get().getReferenceById(id);
+    entity.setStatus(OpenapiStatus.PUBLISHED);
+    openapiDAO.get().save(entity);
   }
 
   private void checkRepeat(Openapi openapi) {

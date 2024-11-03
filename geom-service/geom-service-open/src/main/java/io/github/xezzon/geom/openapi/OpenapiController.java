@@ -8,6 +8,7 @@ import io.github.xezzon.geom.openapi.domain.Openapi;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * 对外接口管理
  * @author xezzon
  */
 @RestController
@@ -57,5 +59,14 @@ public class OpenapiController {
   public void modifyDict(@RequestBody ModifyOpenapiReq req) {
     Openapi openapi = req.into();
     openapiService.modifyOpenapi(openapi);
+  }
+
+  /**
+   * 发布指定的`对外接口`
+   * @param id 要发布的`对外接口`的唯一标识符
+   */
+  @PutMapping("/publish/{id}")
+  public void publishOpenapi(@PathVariable String id) {
+    openapiService.publishOpenapi(id);
   }
 }

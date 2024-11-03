@@ -40,7 +40,7 @@ public enum ErrorCode implements IErrorCode {
   ;
 
   /**
-   * 错误码
+   * 错误来源类型
    */
   private final ErrorSourceType sourceType;
   /**

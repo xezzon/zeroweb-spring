@@ -39,6 +39,7 @@ class OpenapiHttpTest {
   private static final String OPENAPI_ADD_URI = "/openapi/add";
   private static final String GET_OPENAPI_URI = "/openapi";
   private static final String MODIFY_OPENAPI_URI = "/openapi/update";
+  private static final String PUBLISH_OPENAPI_URI = "/openapi/publish/{id}";
 
   @Resource
   private OpenapiRepository repository;
@@ -129,10 +130,17 @@ class OpenapiHttpTest {
 
   @Test
   void modifyDict() {
-    Openapi target = this.initData().get(0);
+    Openapi draftOne = null;
+    while (draftOne == null) {
+      List<Openapi> dataset = this.initData();
+      draftOne = dataset.parallelStream()
+          .filter(openapi -> openapi.getStatus() == OpenapiStatus.DRAFT)
+          .findAny()
+          .orElse(null);
+    }
 
     ModifyOpenapiReq req = new ModifyOpenapiReq(
-        target.getId(),
+        draftOne.getId(),
         RandomUtil.randomString(8)
     );
     webTestClient.put()
@@ -140,10 +148,10 @@ class OpenapiHttpTest {
         .bodyValue(req)
         .exchange()
         .expectStatus().isOk();
-    Optional<Openapi> openapi = repository.findById(target.getId());
+    Optional<Openapi> openapi = repository.findById(draftOne.getId());
     assertTrue(openapi.isPresent());
     assertEquals(req.code(), openapi.get().getCode());
-    assertEquals(target.getStatus(), openapi.get().getStatus());
+    assertEquals(draftOne.getStatus(), openapi.get().getStatus());
   }
 
   @Test
@@ -208,5 +216,33 @@ class OpenapiHttpTest {
         .expectStatus().isBadRequest()
         .expectBody()
         .jsonPath("$.code").isEqualTo(OpenErrorCode.PUBLISHED_OPENAPI_CANNOT_BE_MODIFY.code());
+  }
+
+  @Test
+  void publishOpenapi() {
+    Openapi target = this.initData().get(0);
+
+    webTestClient.put()
+        .uri(builder -> builder.path(PUBLISH_OPENAPI_URI)
+            .build(target.getId())
+        )
+        .exchange()
+        .expectStatus().isOk();
+    Optional<Openapi> openapi = repository.findById(target.getId());
+    assertEquals(OpenapiStatus.PUBLISHED, openapi.get().getStatus());
+  }
+
+  @Test
+  void publishOpenapi_noSuchData() {
+    this.initData();
+
+    webTestClient.put()
+        .uri(builder -> builder.path(PUBLISH_OPENAPI_URI)
+            .build(RandomUtil.randomString(8))
+        )
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectBody()
+        .jsonPath("$.code").isEqualTo(ErrorCode.NO_SUCH_DATA.code());
   }
 }

@@ -100,10 +100,14 @@ PUT /openapi/update
 
 #### HTTP接口
 
-PUT /openapi/publish
+PUT /openapi/publish/{id}
 
 #### 输入输出1
 
 输入：
 
 - 接口标识
+
+#### 异常输出
+
+- 数据不存在或已删除。
