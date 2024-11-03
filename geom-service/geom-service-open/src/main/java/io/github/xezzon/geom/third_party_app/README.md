@@ -32,7 +32,7 @@ classDiagram
 
 #### HTTP接口
 
-POST /third-part-app/add
+POST /third-party-app/add
 
 #### 输入输出1
 
@@ -48,7 +48,7 @@ POST /third-part-app/add
 
 #### HTTP接口
 
-GET /third-part-app/mine
+GET /third-party-app/mine
 
 #### 输入输出1
 
@@ -69,7 +69,7 @@ GET /third-part-app/mine
 
 #### HTTP接口
 
-GET /third-part-app
+GET /third-party-app
 
 #### 输入输出1
 
