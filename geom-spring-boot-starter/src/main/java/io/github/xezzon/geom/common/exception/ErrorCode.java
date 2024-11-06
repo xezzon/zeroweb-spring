@@ -25,6 +25,10 @@ public enum ErrorCode implements IErrorCode {
    * 数据不存在或已删除
    */
   NO_SUCH_DATA(CLIENT, "数据不存在或已删除"),
+  /**
+   * 资源不存在
+   */
+  NOT_FOUND(CLIENT, "资源不存在")
   ;
 
   /**
