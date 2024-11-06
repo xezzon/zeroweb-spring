@@ -1,7 +1,6 @@
 package io.github.xezzon.geom.common.exception;
 
 import static io.github.xezzon.geom.core.error.ErrorSourceType.CLIENT;
-import static io.github.xezzon.geom.core.error.ErrorSourceType.SERVER;
 
 import io.github.xezzon.geom.core.error.ErrorSourceType;
 import io.github.xezzon.geom.core.error.IErrorCode;
@@ -10,21 +9,12 @@ import io.github.xezzon.geom.core.error.IErrorCode;
  * 错误码分配中心
  * @author xezzon
  */
-public enum ErrorCode implements IErrorCode {
+public enum AdminErrorCode implements IErrorCode {
 
-  UNKNOWN(SERVER, "未知错误"),
   /**
-   * 唯一键冲突
+   * 用户名或密码错误
    */
-  REPEAT_DATA(CLIENT, "数据重复"),
-  /**
-   * HTTP请求参数不符合校验规则
-   */
-  ARGUMENT_NOT_VALID(CLIENT, "参数错误"),
-  /**
-   * 数据不存在或已删除
-   */
-  NO_SUCH_DATA(CLIENT, "数据不存在或已删除"),
+  INVALID_TOKEN(CLIENT, "用户名或密码错误"),
   ;
 
   /**
@@ -36,7 +26,7 @@ public enum ErrorCode implements IErrorCode {
    */
   private final String message;
 
-  ErrorCode(ErrorSourceType sourceType, String message) {
+  AdminErrorCode(ErrorSourceType sourceType, String message) {
     this.sourceType = sourceType;
     this.message = message;
   }
@@ -48,12 +38,10 @@ public enum ErrorCode implements IErrorCode {
 
   @Override
   public byte moduleCode() {
-    return 0;
+    return 1;
   }
 
-  /**
-   * @return 错误默认消息
-   */
+  @Override
   public String message() {
     return this.message;
   }
