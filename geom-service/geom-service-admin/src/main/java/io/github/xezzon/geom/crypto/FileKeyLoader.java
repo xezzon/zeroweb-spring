@@ -1,8 +1,8 @@
 package io.github.xezzon.geom.crypto;
 
+import io.github.xezzon.geom.common.exception.InvalidSecureKeyOperationException;
 import io.github.xezzon.geom.common.util.ResourceUtil;
 import io.github.xezzon.geom.crypto.service.KeyLoader;
-import io.github.xezzon.tao.exception.ServerException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -26,7 +26,7 @@ public class FileKeyLoader implements KeyLoader {
       PemObject pemObject = pemReader.readPemObject();
       return pemObject.getContent();
     } catch (IOException e) {
-      throw new ServerException("读取密钥失败：" + id, e);
+      throw new InvalidSecureKeyOperationException("读取密钥失败：" + id, e);
     }
   }
 
@@ -36,7 +36,7 @@ public class FileKeyLoader implements KeyLoader {
     try (PemWriter pemWriter = new PemWriter(new FileWriter(keyFile))) {
       pemWriter.writeObject(new PemObject(header, content));
     } catch (IOException e) {
-      throw new ServerException("写入密钥文件失败：" + id, e);
+      throw new InvalidSecureKeyOperationException("写入密钥文件失败：" + id, e);
     }
   }
 }

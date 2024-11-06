@@ -5,7 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import io.github.xezzon.geom.auth.JwtClaim;
 import io.github.xezzon.geom.auth.JwtClaim.Builder;
-import io.github.xezzon.tao.exception.ServerException;
+import io.github.xezzon.geom.common.exception.InvalidSessionException;
 
 /**
  * @author xezzon
@@ -29,7 +29,7 @@ public class SecurityUtil {
       JsonFormat.parser().merge(json, builder);
       return builder.build();
     } catch (InvalidProtocolBufferException e) {
-      throw new ServerException("无效的会话信息", e);
+      throw new InvalidSessionException(e);
     }
   }
 
@@ -39,7 +39,7 @@ public class SecurityUtil {
           .set(SecurityUtil.CLAIM_NAME, JsonFormat.printer().print(claim));
     } catch (InvalidProtocolBufferException e) {
       StpUtil.logout();
-      throw new ServerException("无效的用户信息", e);
+      throw new InvalidSessionException(e);
     }
   }
 }

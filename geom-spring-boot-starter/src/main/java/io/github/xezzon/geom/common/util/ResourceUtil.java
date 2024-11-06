@@ -1,6 +1,6 @@
 package io.github.xezzon.geom.common.util;
 
-import io.github.xezzon.tao.exception.ServerException;
+import io.github.xezzon.geom.common.exception.NoValidClasspathException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -32,7 +32,7 @@ public class ResourceUtil {
       }
       return paths;
     } catch (URISyntaxException | IllegalArgumentException e) {
-      throw new ServerException("获取不到有效的 classpath", e);
+      throw new NoValidClasspathException(e);
     }
   }
 
