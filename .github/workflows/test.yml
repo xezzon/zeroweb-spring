@@ -62,13 +62,15 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ENABLE: RUST,GROOVY,PROTOBUF,EDITORCONFIG,OPENAPI,COPYPASTE,REPOSITORY,SPELL
+          ENABLE: JAVA,GROOVY,SQL,PROTOBUF,EDITORCONFIG,OPENAPI,COPYPASTE,REPOSITORY,SPELL
           DISABLE_LINTERS: REPOSITORY_KICS,REPOSITORY_GRYPE,REPOSITORY_DEVSKIM
           SARIF_REPORTER: true
           MARKDOWN_SUMMARY_REPORTER: true
           SPELL_CSPELL_DISABLE_ERRORS: true
           COPYPASTE_JSCPD_DISABLE_ERRORS: true
           EDITORCONFIG_EDITORCONFIG_CHECKER_DISABLE_ERRORS: true
+          JAVA_CHECKSTYLE_DISABLE_ERRORS: true
+          JAVA_CHECKSTYLE_CONFIG_FILE: google_checks.xml
       - name: Upload MegaLinter scan results to GitHub Security tab
         if: success() || failure()
         uses: github/codeql-action/upload-sarif@v3
