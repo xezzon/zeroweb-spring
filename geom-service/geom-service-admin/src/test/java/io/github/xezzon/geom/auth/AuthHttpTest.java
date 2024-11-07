@@ -16,7 +16,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.geom.InitializeDataRunner;
 import io.github.xezzon.geom.auth.domain.BasicAuth;
 import io.github.xezzon.geom.common.config.GeomConfig;
-import io.github.xezzon.geom.common.exception.ErrorCode;
+import io.github.xezzon.geom.common.exception.AdminErrorCode;
 import io.github.xezzon.geom.crypto.domain.JwtClaimWrapper;
 import io.github.xezzon.geom.crypto.service.KeyLoader;
 import io.github.xezzon.geom.user.domain.User;
@@ -133,7 +133,7 @@ class AuthHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
-        .jsonPath("$.code").isEqualTo(ErrorCode.INVALID_TOKEN.code());
+        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_TOKEN.code());
     // 密码不正确
     BasicAuth basicAuth2 = new BasicAuth(user.getUsername(), RandomUtil.randomString(9));
     webTestClient.post()
@@ -142,7 +142,7 @@ class AuthHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
-        .jsonPath("$.code").isEqualTo(ErrorCode.INVALID_TOKEN.code());
+        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_TOKEN.code());
   }
 
   @RepeatedTest(2)

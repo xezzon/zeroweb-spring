@@ -1,16 +1,18 @@
 package io.github.xezzon.geom.common.exception;
 
-import io.github.xezzon.tao.exception.ClientException;
-import io.github.xezzon.tao.exception.ServerException;
-import io.github.xezzon.tao.exception.ThirdPartyException;
-import io.github.xezzon.tao.web.Result;
-import jakarta.servlet.ServletRequest;
+import io.github.xezzon.geom.core.error.ErrorDetail;
+import io.github.xezzon.geom.core.error.ErrorResponse;
+import io.github.xezzon.geom.core.error.IErrorCode;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * @author xezzon
@@ -19,80 +21,64 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
-  protected final String errorMessage;
+  public static final String ERROR_CODE_HEADER = "X-Error-Code";
+  private static final Map<Class<? extends Throwable>, IErrorCode> ERROR_CODE_MAP = Map.ofEntries(
+      Map.entry(NoSuchElementException.class, ErrorCode.NO_SUCH_DATA)
+  );
 
   /**
-   * 初始化全局异常处理器（服务端错误使用默认消息）
+   * 自发抛出的异常
    */
-  public GlobalExceptionHandler() {
-    this("服务器开小差了，请稍后重试");
+  @ExceptionHandler(GeomRuntimeException.class)
+  public ErrorResponse handleException(GeomRuntimeException e, HttpServletResponse response) {
+    IErrorCode errorCode = e.errorCode();
+    response.setStatus(errorCode.sourceType().getResponseCode());
+    response.setHeader(ERROR_CODE_HEADER, errorCode.code());
+    ErrorDetail errorDetail = new ErrorDetail(errorCode.name(), e.getMessage());
+    return new ErrorResponse(errorCode.code(), errorDetail);
   }
 
   /**
-   * 初始化全局异常处理器
-   * @param errorMessage 服务端错误默认消息
+   * 框架抛出的异常
    */
-  protected GlobalExceptionHandler(String errorMessage) {
-    this.errorMessage = errorMessage;
+  @ExceptionHandler(Throwable.class)
+  public ErrorResponse handleException(Throwable e, HttpServletResponse response) {
+    IErrorCode errorCode = this.getErrorCode(e);
+    response.setStatus(errorCode.sourceType().getResponseCode());
+    response.setHeader(ERROR_CODE_HEADER, errorCode.code());
+    ErrorDetail errorDetail = new ErrorDetail(e.getClass().getSimpleName(), errorCode.message());
+    return new ErrorResponse(errorCode.code(), errorDetail);
   }
 
   /**
-   * 处理客户端异常
-   * @param e 客户端错误
-   * @return 统一异常消息
-   */
-  @ExceptionHandler(ClientException.class)
-  @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-  public Result<Void> handleClientException(ClientException e) {
-    log.trace("客户端错误", e);
-    return Result.fail(e);
-  }
-
-  /**
-   * 处理服务端错误
-   * @param e 服务端错误
-   * @return 统一异常消息
-   */
-  @ExceptionHandler(ServerException.class)
-  @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-  public Result<Void> handleServerException(ServerException e) {
-    log.warn("服务端错误", e);
-    return Result.fail(e, errorMessage);
-  }
-
-  /**
-   * 处理第三方服务故障
-   * @param e 第三方服务故障
-   * @return 统一异常消息
-   */
-  @ExceptionHandler(ThirdPartyException.class)
-  @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-  public Result<Void> handleThirdPartyException(ThirdPartyException e) {
-    log.warn("第三方服务故障", e);
-    return Result.fail(e, errorMessage);
-  }
-
-  /**
-   * 默认捕获所有未知的故障
-   * @param e 未知故障
-   * @return 统一异常消息
-   */
-  @ExceptionHandler(Exception.class)
-  @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-  public Result<Void> handleException(Exception e, ServletRequest request) {
-    log.error("未知故障", e);
-    return Result.fail(new ServerException(e.getMessage(), e), errorMessage);
-  }
-
-  /**
-   * HTTP接口请求参数异常
-   * @param e 异常信息
-   * @return 统一异常消息
+   * 参数校验不通过
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-  public Result<Void> handleException(MethodArgumentNotValidException e) {
-    log.error(ErrorCode.ARGUMENT_NOT_VALID.message(), e);
-    return Result.fail(new ArgumentNotValidException(e));
+  public ErrorResponse handleException(
+      MethodArgumentNotValidException e,
+      HttpServletResponse response
+  ) {
+    IErrorCode errorCode = ErrorCode.ARGUMENT_NOT_VALID;
+    response.setStatus(errorCode.sourceType().getResponseCode());
+    response.setHeader(ERROR_CODE_HEADER, errorCode.code());
+    List<ErrorDetail> details = e.getFieldErrors().parallelStream()
+        .map(error -> new ErrorDetail(error.getCode(), error.getDefaultMessage()))
+        .toList();
+    String errorName = e.getClass().getSimpleName();
+    ErrorDetail errorDetail = new ErrorDetail(errorName, errorCode.message(), details);
+    return new ErrorResponse(errorCode.code(), errorDetail);
+  }
+
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ErrorResponse handleException(NoResourceFoundException e, HttpServletResponse response) {
+    ErrorCode errorCode = ErrorCode.NOT_FOUND;
+    response.setStatus(HttpResponseStatus.NOT_FOUND.code());
+    response.setHeader(ERROR_CODE_HEADER, errorCode.code());
+    ErrorDetail errorDetail = new ErrorDetail(errorCode.name(), e.getMessage());
+    return new ErrorResponse(errorCode.code(), errorDetail);
+  }
+
+  protected IErrorCode getErrorCode(Throwable e) {
+    return ERROR_CODE_MAP.getOrDefault(e.getClass(), ErrorCode.UNKNOWN);
   }
 }

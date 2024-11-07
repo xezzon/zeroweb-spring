@@ -41,7 +41,7 @@ public class AuthService {
       throw new InvalidTokenException();
     }
     if (!BCrypt.checkpw(password, user.getCipher())) {
-      throw new InvalidTokenException("用户名或密码错误");
+      throw new InvalidTokenException();
     }
     /* 检查是否已存在会话 */
     if (StpUtil.isLogin()) {
