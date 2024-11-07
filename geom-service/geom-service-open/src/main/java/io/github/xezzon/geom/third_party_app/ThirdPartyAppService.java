@@ -1,5 +1,6 @@
 package io.github.xezzon.geom.third_party_app;
 
+import io.github.xezzon.geom.third_party_app.domain.ThirdPartyApp;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,5 +13,9 @@ public class ThirdPartyAppService {
 
   public ThirdPartyAppService(ThirdPartyAppDAO thirdPartyAppDAO) {
     this.thirdPartyAppDAO = thirdPartyAppDAO;
+  }
+
+  protected void addThirdPartyApp(ThirdPartyApp thirdPartyApp) {
+    thirdPartyAppDAO.get().save(thirdPartyApp);
   }
 }
