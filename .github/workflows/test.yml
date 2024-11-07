@@ -65,6 +65,7 @@ jobs:
           ENABLE: RUST,GROOVY,PROTOBUF,EDITORCONFIG,OPENAPI,COPYPASTE,REPOSITORY,SPELL
           DISABLE_LINTERS: REPOSITORY_KICS,REPOSITORY_GRYPE,REPOSITORY_DEVSKIM
           SARIF_REPORTER: true
+          MARKDOWN_SUMMARY_REPORTER: true
           SPELL_CSPELL_DISABLE_ERRORS: true
           COPYPASTE_JSCPD_DISABLE_ERRORS: true
           EDITORCONFIG_EDITORCONFIG_CHECKER_DISABLE_ERRORS: true
@@ -73,3 +74,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'megalinter-reports/megalinter-report.sarif'
+      - name: Write to workflow job summary
+        run: |
+          cat megalinter-reports/megalinter-report.md > $GITHUB_STEP_SUMMARY
