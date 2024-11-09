@@ -157,7 +157,7 @@ class AuthHttpTest {
         .getResponseBody();
     assertNotNull(responseBody);
 
-    SaTokenInfo responseBody1 = webTestClient.post()
+    SaTokenInfo responseBody1 = webTestClient.get()
         .uri(uri)
         .header(responseBody.getTokenName(), responseBody.getTokenValue())
         .exchange()

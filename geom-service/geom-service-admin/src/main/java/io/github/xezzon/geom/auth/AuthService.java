@@ -3,7 +3,6 @@ package io.github.xezzon.geom.auth;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import com.auth0.jwt.JWTCreator.Builder;
-import io.github.xezzon.geom.auth.domain.JwtAuth;
 import io.github.xezzon.geom.auth.domain.JwtClaimWrapper;
 import io.github.xezzon.geom.common.exception.InvalidTokenException;
 import io.github.xezzon.geom.crypto.service.JwtCryptoService;
@@ -55,12 +54,12 @@ public class AuthService {
       }
     }
     /* 写入 Session */
-    StpUtil.login(user.getId());
     JwtClaim claim = JwtClaim.newBuilder()
         .setSubject(user.getId())
         .setPreferredUsername(user.getUsername())
         .setNickname(user.getNickname())
         .build();
+    StpUtil.login(claim.getSubject());
     JwtAuth.saveJwtClaim(claim);
   }
 

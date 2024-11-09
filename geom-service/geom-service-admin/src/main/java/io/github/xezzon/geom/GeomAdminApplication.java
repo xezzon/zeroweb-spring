@@ -1,8 +1,11 @@
 package io.github.xezzon.geom;
 
+import io.github.xezzon.geom.auth.JwtFilter;
 import io.github.xezzon.geom.dict.EnableDictScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode;
 
@@ -11,6 +14,9 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerial
  * @author xezzon
  */
 @SpringBootApplication
+@ComponentScan(excludeFilters = {
+    @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class)
+})
 @EnableSpringDataWebSupport(pageSerializationMode = PageSerializationMode.VIA_DTO)
 @EnableDictScan
 public class GeomAdminApplication {

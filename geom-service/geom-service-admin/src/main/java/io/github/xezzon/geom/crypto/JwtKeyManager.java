@@ -1,8 +1,7 @@
 package io.github.xezzon.geom.crypto;
 
-import cn.hutool.crypto.KeyUtil;
 import com.auth0.jwt.JWTCreator;
-import io.github.xezzon.geom.auth.domain.JwtAuth;
+import io.github.xezzon.geom.auth.JwtAuth;
 import io.github.xezzon.geom.common.config.GeomConfig;
 import io.github.xezzon.geom.common.config.GeomConfig.GeomJwtConfig;
 import io.github.xezzon.geom.core.crypto.ASN1PublicKeyWriter;
@@ -13,6 +12,8 @@ import io.github.xezzon.geom.crypto.service.JwtCryptoService;
 import io.github.xezzon.tao.observer.ObserverContext;
 import jakarta.annotation.PostConstruct;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.Instant;
@@ -56,7 +57,14 @@ public class JwtKeyManager implements JwtCryptoService {
     }
     if (this.privateKey == null) {
       /* 获取不到文件或解析不了 则生成一对密钥 */
-      KeyPair ecc = KeyUtil.generateKeyPair(ALGORITHM);
+      KeyPairGenerator keyPairGenerator;
+      try {
+        keyPairGenerator = KeyPairGenerator.getInstance("EC");
+      } catch (NoSuchAlgorithmException e) {
+        log.error("Cannot create key pair.", e);
+        return;
+      }
+      KeyPair ecc = keyPairGenerator.generateKeyPair();
       this.privateKey = ecc.getPrivate();
       this.publicKey = ecc.getPublic();
       /* 保存私钥 */

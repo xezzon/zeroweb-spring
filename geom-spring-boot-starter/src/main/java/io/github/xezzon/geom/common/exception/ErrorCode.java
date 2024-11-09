@@ -33,6 +33,10 @@ public enum ErrorCode implements IErrorCode {
    * 未登录
    */
   NOT_LOGIN(CLIENT, "未登录"),
+  /**
+   * 无效的token
+   */
+  INVALID_TOKEN(SERVER, "无效的token"),
   ;
 
   /**
