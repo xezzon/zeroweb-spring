@@ -1,5 +1,6 @@
 package io.github.xezzon.geom.common.exception;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import io.github.xezzon.geom.core.error.ErrorDetail;
 import io.github.xezzon.geom.core.error.ErrorResponse;
 import io.github.xezzon.geom.core.error.IErrorCode;
@@ -69,12 +70,27 @@ public class GlobalExceptionHandler {
     return new ErrorResponse(errorCode.code(), errorDetail);
   }
 
+  /**
+   * 请求资源不存在
+   */
   @ExceptionHandler(NoResourceFoundException.class)
   public ErrorResponse handleException(NoResourceFoundException e, HttpServletResponse response) {
     ErrorCode errorCode = ErrorCode.NOT_FOUND;
     response.setStatus(HttpResponseStatus.NOT_FOUND.code());
     response.setHeader(ERROR_CODE_HEADER, errorCode.code());
     ErrorDetail errorDetail = new ErrorDetail(errorCode.name(), e.getMessage());
+    return new ErrorResponse(errorCode.code(), errorDetail);
+  }
+
+  /**
+   * 未登录
+   */
+  @ExceptionHandler(NotLoginException.class)
+  public ErrorResponse handleException(NotLoginException e, HttpServletResponse response) {
+    ErrorCode errorCode = ErrorCode.NOT_LOGIN;
+    response.setStatus(HttpResponseStatus.UNAUTHORIZED.code());
+    response.setHeader(ERROR_CODE_HEADER, errorCode.code());
+    ErrorDetail errorDetail = new ErrorDetail(errorCode.name(), errorCode.message());
     return new ErrorResponse(errorCode.code(), errorDetail);
   }
 

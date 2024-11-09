@@ -8,19 +8,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.crypto.KeyUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.geom.InitializeDataRunner;
 import io.github.xezzon.geom.auth.domain.BasicAuth;
+import io.github.xezzon.geom.auth.domain.JwtClaimWrapper;
 import io.github.xezzon.geom.common.config.GeomConfig;
 import io.github.xezzon.geom.common.exception.AdminErrorCode;
-import io.github.xezzon.geom.crypto.domain.JwtClaimWrapper;
-import io.github.xezzon.geom.crypto.service.KeyLoader;
+import io.github.xezzon.geom.crypto.JwtKeyManager;
 import io.github.xezzon.geom.user.domain.User;
-import io.github.xezzon.geom.user.repository.UserRepository;
 import jakarta.annotation.Resource;
 import java.security.interfaces.ECPublicKey;
 import org.junit.jupiter.api.BeforeAll;
@@ -47,14 +45,13 @@ class AuthHttpTest {
   private static final String BASIC_LOGIN_URI = "/auth/login/basic";
   private static final GenericContainer<?> redisContainer =
       new GenericContainer<>("redis:7-alpine");
-  @Resource
-  private UserRepository userRepository;
+
   @Resource
   private WebTestClient webTestClient;
   @Resource
   private SaTokenConfig saTokenConfig;
   @Resource
-  private KeyLoader keyLoader;
+  private JwtKeyManager keyManager;
   @Resource
   private GeomConfig geomConfig;
   @Resource
@@ -169,9 +166,8 @@ class AuthHttpTest {
         .getResponseBody();
     assertNotNull(responseBody1);
     assertEquals(HttpHeaders.AUTHORIZATION, responseBody1.getTokenName());
-    byte[] publicKeyByte = keyLoader.read(geomConfig.getJwt().getIssuer() + ".pub");
-    ECPublicKey publicKey =
-        (ECPublicKey) KeyUtil.generatePublicKey("EC", publicKeyByte);
+
+    ECPublicKey publicKey = keyManager.getPublicKey();
     JWTVerifier verifier = JWT.require(Algorithm.ECDSA256(publicKey))
         .withIssuer(geomConfig.getJwt().getIssuer())
         .build();

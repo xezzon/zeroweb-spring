@@ -28,7 +28,11 @@ public enum ErrorCode implements IErrorCode {
   /**
    * 资源不存在
    */
-  NOT_FOUND(CLIENT, "资源不存在")
+  NOT_FOUND(CLIENT, "资源不存在"),
+  /**
+   * 未登录
+   */
+  NOT_LOGIN(CLIENT, "未登录"),
   ;
 
   /**
