@@ -4,10 +4,10 @@ import io.github.xezzon.geom.core.error.ErrorDetail;
 import io.github.xezzon.geom.core.error.ErrorResponse;
 import io.github.xezzon.geom.core.error.IErrorCode;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
 
   public static final String ERROR_CODE_HEADER = "X-Error-Code";
   private static final Map<Class<? extends Throwable>, IErrorCode> ERROR_CODE_MAP = Map.ofEntries(
-      Map.entry(NoSuchElementException.class, ErrorCode.NO_SUCH_DATA)
+      Map.entry(EntityNotFoundException.class, ErrorCode.NO_SUCH_DATA)
   );
 
   /**

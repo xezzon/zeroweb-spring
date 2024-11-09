@@ -1,8 +1,8 @@
 package io.github.xezzon.geom.common.jpa;
 
 import cn.hutool.core.util.RandomUtil;
-import io.github.xezzon.geom.common.odata.ODataQueryOption;
-import io.github.xezzon.geom.common.odata.ODataRequestParam;
+import io.github.xezzon.geom.core.odata.ODataQueryOption;
+import io.github.xezzon.geom.core.odata.ODataRequestParam;
 import jakarta.annotation.Resource;
 import java.util.Optional;
 import java.util.UUID;

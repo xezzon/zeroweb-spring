@@ -2,7 +2,7 @@ package io.github.xezzon.geom.dict;
 
 import io.github.xezzon.geom.common.constant.DatabaseConstant;
 import io.github.xezzon.geom.common.exception.RepeatDataException;
-import io.github.xezzon.geom.common.odata.ODataQueryOption;
+import io.github.xezzon.geom.core.odata.ODataQueryOption;
 import io.github.xezzon.geom.dict.domain.Dict;
 import jakarta.transaction.Transactional;
 import java.text.MessageFormat;

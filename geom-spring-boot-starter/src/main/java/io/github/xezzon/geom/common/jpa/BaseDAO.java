@@ -1,6 +1,6 @@
 package io.github.xezzon.geom.common.jpa;
 
-import io.github.xezzon.geom.common.odata.ODataQueryOption;
+import io.github.xezzon.geom.core.odata.ODataQueryOption;
 import io.github.xezzon.tao.trait.NewType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;

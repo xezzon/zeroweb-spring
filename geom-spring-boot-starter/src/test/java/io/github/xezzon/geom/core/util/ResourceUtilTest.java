@@ -1,4 +1,4 @@
-package io.github.xezzon.geom.common.util;
+package io.github.xezzon.geom.core.util;
 
 import java.io.IOException;
 import java.nio.file.Files;

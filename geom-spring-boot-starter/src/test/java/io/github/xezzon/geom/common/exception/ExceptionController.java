@@ -1,6 +1,6 @@
 package io.github.xezzon.geom.common.exception;
 
-import java.util.NoSuchElementException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +22,9 @@ public class ExceptionController {
     throw new NoValidClasspathException(new RuntimeException());
   }
 
-  @RequestMapping("/NoSuchElementException")
-  public void noSuchElementException() {
-    throw new NoSuchElementException();
+  @RequestMapping("/EntityNotFoundException")
+  public void entityNotFoundException() {
+    throw new EntityNotFoundException();
   }
 
   @RequestMapping("/UnsupportedOperationException")

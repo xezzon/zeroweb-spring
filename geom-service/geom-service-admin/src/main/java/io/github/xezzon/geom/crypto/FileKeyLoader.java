@@ -1,7 +1,7 @@
 package io.github.xezzon.geom.crypto;
 
 import io.github.xezzon.geom.common.exception.InvalidSecureKeyOperationException;
-import io.github.xezzon.geom.common.util.ResourceUtil;
+import io.github.xezzon.geom.core.util.ResourceUtil;
 import io.github.xezzon.geom.crypto.service.KeyLoader;
 import java.io.File;
 import java.io.FileReader;
