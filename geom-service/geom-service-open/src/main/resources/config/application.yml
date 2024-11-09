@@ -12,17 +12,3 @@ spring:
 
 server:
   port: @app.port@
-
-grpc:
-  server:
-    port: @grpc.port@
-
-sa-token:
-  token-name: X-SESSION-ID
-  token-style: tik
-  timeout: ${SA_TOKEN_TIMEOUT:2592000}
-
-geom:
-  jwt:
-    issuer: ${GEOM_JWT_ISSUER:xezzon.github.io}
-    timeout: ${GEOM_JWT_TIMEOUT:120}

@@ -3,9 +3,8 @@ package io.github.xezzon.geom.auth;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import com.auth0.jwt.JWTCreator.Builder;
-import io.github.xezzon.geom.auth.util.SecurityUtil;
+import io.github.xezzon.geom.auth.domain.JwtClaimWrapper;
 import io.github.xezzon.geom.common.exception.InvalidTokenException;
-import io.github.xezzon.geom.crypto.domain.JwtClaimWrapper;
 import io.github.xezzon.geom.crypto.service.JwtCryptoService;
 import io.github.xezzon.geom.user.domain.User;
 import io.github.xezzon.geom.user.service.IUserService4Auth;
@@ -45,7 +44,7 @@ public class AuthService {
     }
     /* 检查是否已存在会话 */
     if (StpUtil.isLogin()) {
-      JwtClaim claim = SecurityUtil.loadJwtClaim();
+      JwtClaim claim = JwtAuth.loadJwtClaim();
       if (Objects.equals(claim.getSubject(), user.getId())) {
         // 原会话是同一个用户，则不作处理
         return;
@@ -55,13 +54,13 @@ public class AuthService {
       }
     }
     /* 写入 Session */
-    StpUtil.login(user.getId());
     JwtClaim claim = JwtClaim.newBuilder()
         .setSubject(user.getId())
         .setPreferredUsername(user.getUsername())
         .setNickname(user.getNickname())
         .build();
-    SecurityUtil.saveJwtClaim(claim);
+    StpUtil.login(claim.getSubject());
+    JwtAuth.saveJwtClaim(claim);
   }
 
   /**
@@ -69,7 +68,7 @@ public class AuthService {
    * @return 返回生成的JWT签名字符串
    */
   protected String signJwt() {
-    JwtClaim claim = SecurityUtil.loadJwtClaim();
+    JwtClaim claim = JwtAuth.loadJwtClaim();
     Builder jwtBuilder = new JwtClaimWrapper(claim).into();
     return jwtCryptoService.signJwt(jwtBuilder);
   }

@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.geom.auth.domain.BasicAuth;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +39,7 @@ public class AuthController {
    * 单点登录
    * @return JWT
    */
-  @PostMapping("/sso")
+  @GetMapping("/sso")
   public SaTokenInfo sso() {
     String tokenValue = authService.signJwt();
     SaTokenInfo saTokenInfo = new SaTokenInfo();

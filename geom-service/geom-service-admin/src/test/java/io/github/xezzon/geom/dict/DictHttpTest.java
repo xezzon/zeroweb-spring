@@ -365,8 +365,8 @@ class DictHttpTest {
     PagedModel<Dict> responseBody = webTestClient.get()
         .uri(builder -> builder
             .path(GET_DICT_URI)
-            .queryParam("$top", 2)
-            .queryParam("$skip", 4)
+            .queryParam("top", 2)
+            .queryParam("skip", 4)
             .build()
         )
         .exchange()

@@ -1,4 +1,4 @@
-package io.github.xezzon.geom.common.odata;
+package io.github.xezzon.geom.core.odata;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +19,7 @@ public class ODataQueryOption {
    */
   private final String filter;
   /**
-   *
+   * <a href="https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_SystemQueryOptionorderby">System Query Option $orderby</a>
    */
   private final String orderby;
   /**

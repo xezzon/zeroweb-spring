@@ -5,9 +5,9 @@ import static io.github.xezzon.geom.common.exception.GlobalExceptionHandler.ERRO
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.geom.core.error.ErrorResponse;
 import jakarta.annotation.Resource;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -63,10 +63,10 @@ class GlobalExceptionHandlerTest {
   }
 
   @Test
-  void noSuchElementException() {
+  void entityNotFoundException() {
     ErrorCode errorCode = ErrorCode.NO_SUCH_DATA;
     ErrorResponse responseBody = webTestClient.get()
-        .uri("/NoSuchElementException")
+        .uri("/EntityNotFoundException")
         .exchange()
         .expectStatus().isEqualTo(errorCode.sourceType().getResponseCode())
         .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
@@ -75,7 +75,7 @@ class GlobalExceptionHandlerTest {
     Assertions.assertNotNull(responseBody);
     Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
-        NoSuchElementException.class.getSimpleName(),
+        EntityNotFoundException.class.getSimpleName(),
         responseBody.error().code()
     );
     Assertions.assertEquals(errorCode.message(), responseBody.error().message());

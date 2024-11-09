@@ -1,4 +1,4 @@
-package io.github.xezzon.geom.crypto.domain;
+package io.github.xezzon.geom.auth.domain;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
@@ -9,16 +9,32 @@ import io.github.xezzon.tao.trait.Into;
 import io.github.xezzon.tao.trait.NewType;
 
 /**
+ * JWT载荷包装器
  * @author xezzon
  */
 public record JwtClaimWrapper(JwtClaim value) implements
     NewType<JwtClaim>,
     Into<JWTCreator.Builder> {
 
+  /**
+   * 用户名
+   */
   public static final String USERNAME_CLAIM = "preferred_username";
+  /**
+   * 昵称
+   */
   public static final String NICKNAME_CLAIM = "nickname";
+  /**
+   * 角色
+   */
   public static final String ROLES_CLAIM = "roles";
+  /**
+   * 用户组
+   */
   public static final String GROUPS_CLAIM = "groups";
+  /**
+   * 权限
+   */
   public static final String PERMISSION_CLAIM = "entitlements";
 
   @Override

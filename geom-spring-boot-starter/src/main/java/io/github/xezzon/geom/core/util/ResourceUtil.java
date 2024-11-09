@@ -1,4 +1,4 @@
-package io.github.xezzon.geom.common.util;
+package io.github.xezzon.geom.core.util;
 
 import io.github.xezzon.geom.common.exception.NoValidClasspathException;
 import java.net.URISyntaxException;
@@ -18,6 +18,11 @@ public class ResourceUtil {
   private ResourceUtil() {
   }
 
+  /**
+   * 从所有的文件系统的classpath中获取资源
+   * @param resourceName 资源名称
+   * @return 资源路径列表
+   */
   public static List<Path> getResourcesFromClasspath(String resourceName) {
     try {
       List<Path> paths = new ArrayList<>();
@@ -36,6 +41,11 @@ public class ResourceUtil {
     }
   }
 
+  /**
+   * 从首个文件系统的classpath中获取资源
+   * @param resourceName 资源名称
+   * @return 资源路径
+   */
   public static Path getResourceFromClasspath(String resourceName) {
     List<Path> paths = getResourcesFromClasspath(resourceName);
     return paths.get(0);

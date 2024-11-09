@@ -2,7 +2,7 @@ package io.github.xezzon.geom.dict;
 
 import io.github.xezzon.geom.common.constant.DatabaseConstant;
 import io.github.xezzon.geom.common.domain.Id;
-import io.github.xezzon.geom.common.odata.ODataRequestParam;
+import io.github.xezzon.geom.core.odata.ODataRequestParam;
 import io.github.xezzon.geom.dict.domain.AddDictReq;
 import io.github.xezzon.geom.dict.domain.Dict;
 import io.github.xezzon.geom.dict.domain.ModifyDictReq;

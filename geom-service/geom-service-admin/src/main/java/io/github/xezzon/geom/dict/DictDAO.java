@@ -1,7 +1,7 @@
 package io.github.xezzon.geom.dict;
 
 import io.github.xezzon.geom.common.jpa.BaseDAO;
-import io.github.xezzon.geom.common.odata.ODataQueryOption;
+import io.github.xezzon.geom.core.odata.ODataQueryOption;
 import io.github.xezzon.geom.dict.domain.Dict;
 import io.github.xezzon.geom.dict.domain.DictSpecs;
 import io.github.xezzon.geom.dict.domain.Dict_;

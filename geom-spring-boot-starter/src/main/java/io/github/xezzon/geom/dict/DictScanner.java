@@ -3,6 +3,8 @@ package io.github.xezzon.geom.dict;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
+import io.github.xezzon.geom.common.exception.ErrorCode;
+import io.github.xezzon.geom.common.exception.GeomRuntimeException;
 import io.github.xezzon.geom.dict.DictImportReqList.Builder;
 import io.github.xezzon.tao.dict.IDict;
 import jakarta.annotation.Resource;
@@ -96,7 +98,7 @@ class AnnotationDictConfiguration {
     try {
       this.applicationClass = Class.forName(metadata.getClassName());
     } catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
+      throw new GeomRuntimeException(ErrorCode.UNKNOWN, e);
     }
     this.attributes = new AnnotationAttributes(attributesSource);
   }

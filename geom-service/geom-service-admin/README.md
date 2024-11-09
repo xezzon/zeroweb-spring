@@ -27,8 +27,6 @@ service:
 
 | 变量               | 描述                                                                      | 默认值              |
 |------------------|-------------------------------------------------------------------------|------------------|
-| REDIS_URL        | REDIS 连接信息。如果以集群模式部署该服务，则此项必填。格式为：`user:password@host:port`或`host:port` |                  |
-| REDIS_DATABASE   | REDIS 使用的库号。                                                            | 0                |
 | SA_TOKEN_TIMEOUT | Session 有效时长。单位 秒。                                                      | 2592000（30天）     |
 | GEOM_JWT_ISSUER  | JWT签发机构。建议设置为域名。                                                        | xezzon.github.io |
 | GEOM_JWT_TIMEOUT | JWT 有效时长。单位 秒。                                                          | 120              |

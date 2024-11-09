@@ -16,6 +16,7 @@
 
   <modules>
     <module>geom-service-admin</module>
+    <module>geom-service-open</module>
   </modules>
 
   <properties>
