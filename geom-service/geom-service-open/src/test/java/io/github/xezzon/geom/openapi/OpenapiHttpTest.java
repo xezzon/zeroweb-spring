@@ -5,10 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.hutool.core.util.RandomUtil;
+import io.github.xezzon.geom.common.OpenErrorCode;
 import io.github.xezzon.geom.common.domain.Id;
 import io.github.xezzon.geom.common.domain.PagedModel;
 import io.github.xezzon.geom.common.exception.ErrorCode;
 import io.github.xezzon.geom.openapi.domain.AddOpenapiReq;
+import io.github.xezzon.geom.openapi.domain.ModifyOpenapiReq;
 import io.github.xezzon.geom.openapi.domain.Openapi;
 import io.github.xezzon.geom.openapi.domain.OpenapiStatus;
 import io.github.xezzon.geom.openapi.repository.OpenapiRepository;
@@ -36,6 +38,7 @@ class OpenapiHttpTest {
 
   private static final String OPENAPI_ADD_URI = "/openapi/add";
   private static final String GET_OPENAPI_URI = "/openapi";
+  private static final String MODIFY_OPENAPI_URI = "/openapi/update";
 
   @Resource
   private OpenapiRepository repository;
@@ -122,5 +125,88 @@ class OpenapiHttpTest {
     for (int i = 0, cnt = responseBody.getContent().size(); i < cnt; i++) {
       assertEquals(except.get(i).getId(), responseBody.getContent().get(i).getId());
     }
+  }
+
+  @Test
+  void modifyDict() {
+    Openapi target = this.initData().get(0);
+
+    ModifyOpenapiReq req = new ModifyOpenapiReq(
+        target.getId(),
+        RandomUtil.randomString(8)
+    );
+    webTestClient.put()
+        .uri(MODIFY_OPENAPI_URI)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isOk();
+    Optional<Openapi> openapi = repository.findById(target.getId());
+    assertTrue(openapi.isPresent());
+    assertEquals(req.code(), openapi.get().getCode());
+    assertEquals(target.getStatus(), openapi.get().getStatus());
+  }
+
+  @Test
+  void modifyDict_repeat() {
+    List<Openapi> dataset = this.initData();
+    Openapi target = dataset.get(0);
+    Openapi repeated = dataset.get(1);
+
+    ModifyOpenapiReq req = new ModifyOpenapiReq(
+        target.getId(),
+        repeated.getCode()
+    );
+    webTestClient.put()
+        .uri(MODIFY_OPENAPI_URI)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectBody()
+        .jsonPath("$.code").isEqualTo(ErrorCode.REPEAT_DATA.code());
+    Optional<Openapi> dict = repository.findById(target.getId());
+    assertTrue(dict.isPresent());
+    assertEquals(target.getCode(), dict.get().getCode());
+    assertEquals(target.getStatus(), dict.get().getStatus());
+  }
+
+  @Test
+  void modifyDict_noSuchData() {
+    this.initData();
+
+    ModifyOpenapiReq req = new ModifyOpenapiReq(
+        RandomUtil.randomString(8),
+        RandomUtil.randomString(8)
+    );
+    webTestClient.put()
+        .uri(MODIFY_OPENAPI_URI)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectBody()
+        .jsonPath("$.code").isEqualTo(ErrorCode.NO_SUCH_DATA.code());
+  }
+
+  @Test
+  void modifyDict_publishedApiCannotBeModify() {
+    Openapi publishedOpenapi = null;
+    while (publishedOpenapi == null) {
+      List<Openapi> dataset = this.initData();
+      publishedOpenapi = dataset.parallelStream()
+          .filter(openapi -> openapi.getStatus() == OpenapiStatus.PUBLISHED)
+          .findAny()
+          .orElse(null);
+    }
+
+    ModifyOpenapiReq req = new ModifyOpenapiReq(
+        publishedOpenapi.getId(),
+        RandomUtil.randomString(8)
+    );
+    webTestClient.put()
+        .uri(MODIFY_OPENAPI_URI)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectBody()
+        .jsonPath("$.code").isEqualTo(OpenErrorCode.PUBLISHED_OPENAPI_CANNOT_BE_MODIFY.code());
   }
 }

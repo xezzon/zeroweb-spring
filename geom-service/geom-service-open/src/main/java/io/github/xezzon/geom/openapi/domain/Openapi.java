@@ -39,4 +39,8 @@ public class Openapi implements IEntity<String> {
    */
   @Column(name = "status", nullable = false)
   OpenapiStatus status;
+
+  public boolean isPublished() {
+    return status == OpenapiStatus.PUBLISHED;
+  }
 }

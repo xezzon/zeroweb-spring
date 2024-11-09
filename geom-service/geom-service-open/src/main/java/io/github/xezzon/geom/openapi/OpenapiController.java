@@ -3,11 +3,13 @@ package io.github.xezzon.geom.openapi;
 import io.github.xezzon.geom.common.domain.Id;
 import io.github.xezzon.geom.core.odata.ODataRequestParam;
 import io.github.xezzon.geom.openapi.domain.AddOpenapiReq;
+import io.github.xezzon.geom.openapi.domain.ModifyOpenapiReq;
 import io.github.xezzon.geom.openapi.domain.Openapi;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,5 +47,15 @@ public class OpenapiController {
   @GetMapping()
   public Page<Openapi> getOpenapiList(ODataRequestParam odata) {
     return openapiService.pageList(odata);
+  }
+
+  /**
+   * 更新`对外接口`信息
+   * @param req 包含更新`对外接口`请求数据的请求体
+   */
+  @PutMapping("/update")
+  public void modifyDict(@RequestBody ModifyOpenapiReq req) {
+    Openapi openapi = req.into();
+    openapiService.modifyOpenapi(openapi);
   }
 }
