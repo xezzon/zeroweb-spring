@@ -1,15 +1,10 @@
 package io.github.xezzon.geom.auth;
 
 import static com.google.auth.http.AuthHttpConstants.BEARER;
-import static io.github.xezzon.geom.auth.domain.JwtClaimWrapper.GROUPS_CLAIM;
-import static io.github.xezzon.geom.auth.domain.JwtClaimWrapper.NICKNAME_CLAIM;
-import static io.github.xezzon.geom.auth.domain.JwtClaimWrapper.PERMISSION_CLAIM;
-import static io.github.xezzon.geom.auth.domain.JwtClaimWrapper.ROLES_CLAIM;
-import static io.github.xezzon.geom.auth.domain.JwtClaimWrapper.USERNAME_CLAIM;
 
 import cn.hutool.core.util.RandomUtil;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.JWTCreator.Builder;
+import io.github.xezzon.geom.auth.domain.JwtClaimWrapper;
 import io.github.xezzon.geom.common.exception.ErrorCode;
 import io.github.xezzon.geom.common.exception.GeomRuntimeException;
 import java.security.KeyPair;
@@ -20,7 +15,6 @@ import java.security.interfaces.ECPublicKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.UUID;
 import org.jetbrains.annotations.TestOnly;
 
@@ -53,17 +47,21 @@ public class TestJwtGenerator {
   }
 
   public static String generateJwt() {
-    return JWT.create()
-        .withSubject(UUID.randomUUID().toString())
-        .withClaim(USERNAME_CLAIM, RandomUtil.randomString(8))
-        .withClaim(NICKNAME_CLAIM, RandomUtil.randomString(8))
-        .withClaim(ROLES_CLAIM, Collections.emptyList())
-        .withClaim(GROUPS_CLAIM, Collections.emptyList())
-        .withClaim(PERMISSION_CLAIM, Collections.emptyList())
+    JwtClaim claim = JwtClaim.newBuilder()
+        .setSubject(UUID.randomUUID().toString())
+        .setPreferredUsername(RandomUtil.randomString(8))
+        .setNickname(RandomUtil.randomString(8))
+        .build();
+    return generateJwt(claim);
+  }
+
+  public static String generateJwt(JwtClaim claim) {
+    Builder jwtBuilder = new JwtClaimWrapper(claim)
+        .into()
         .withIssuedAt(Instant.now())
-        .withExpiresAt(Instant.now().minus(1, ChronoUnit.HOURS))
-        .withJWTId(UUID.randomUUID().toString())
-        .sign(Algorithm.ECDSA256(PRIVATE_KEY));
+        .withExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
+        .withJWTId(UUID.randomUUID().toString());
+    return new JwtAuth(PRIVATE_KEY).sign(jwtBuilder);
   }
 
   public static String getPublicKey() {
