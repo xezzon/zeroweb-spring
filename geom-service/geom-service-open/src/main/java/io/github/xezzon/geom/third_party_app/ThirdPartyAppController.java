@@ -49,4 +49,9 @@ public class ThirdPartyAppController {
     String userId = StpUtil.getLoginIdAsString();
     return thirdPartyAppService.listThirdPartyAppByUser(odata.into(), userId);
   }
+
+  @GetMapping()
+  public Page<ThirdPartyApp> listThirdPartyApp(ODataRequestParam odata) {
+    return thirdPartyAppService.listThirdPartyApp(odata.into());
+  }
 }

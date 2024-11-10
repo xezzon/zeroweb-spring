@@ -360,13 +360,15 @@ class DictHttpTest {
 
   @Test
   void pagedList() {
+    final int top = 2;
+    final int skip = top * 2;
     List<Dict> dataset = this.initData();
 
     PagedModel<Dict> responseBody = webTestClient.get()
         .uri(builder -> builder
             .path(GET_DICT_URI)
-            .queryParam("top", 2)
-            .queryParam("skip", 4)
+            .queryParam("top", top)
+            .queryParam("skip", skip)
             .build()
         )
         .exchange()
@@ -379,8 +381,8 @@ class DictHttpTest {
     assertEquals(dataset.size(), responseBody.getPage().getTotalElements());
     List<Dict> except = dataset.parallelStream()
         .sorted(Comparator.comparing(Dict::getCode))
-        .skip(4)
-        .limit(2)
+        .skip(skip)
+        .limit(top)
         .toList();
     for (int i = 0, cnt = responseBody.getContent().size(); i < cnt; i++) {
       assertEquals(except.get(i).getId(), responseBody.getContent().get(i).getId());

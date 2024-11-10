@@ -24,4 +24,8 @@ public class ThirdPartyAppService {
   protected Page<ThirdPartyApp> listThirdPartyAppByUser(ODataQueryOption odata, String userId) {
     return thirdPartyAppDAO.findAllWithUserId(odata, userId);
   }
+
+  protected Page<ThirdPartyApp> listThirdPartyApp(ODataQueryOption odata) {
+    return thirdPartyAppDAO.findAll(odata);
+  }
 }
