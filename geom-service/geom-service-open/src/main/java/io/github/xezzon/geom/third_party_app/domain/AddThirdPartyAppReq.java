@@ -24,6 +24,7 @@ public record AddThirdPartyAppReq(
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
+    @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "ownerId", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Override

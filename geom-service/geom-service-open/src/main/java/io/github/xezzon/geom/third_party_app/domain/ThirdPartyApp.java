@@ -7,9 +7,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 
 /**
  * 第三方应用
@@ -39,4 +41,10 @@ public class ThirdPartyApp implements IEntity<String> {
    */
   @Column(name = "owner_id", nullable = false, length = DatabaseConstant.ID_LENGTH)
   String ownerId;
+  /**
+   * 创建时间
+   */
+  @Column(name = "create_time", nullable = false, updatable = false)
+  @CreationTimestamp
+  Instant createTime;
 }

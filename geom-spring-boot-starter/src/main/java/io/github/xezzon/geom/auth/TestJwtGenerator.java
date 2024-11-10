@@ -43,19 +43,19 @@ public class TestJwtGenerator {
   }
 
   public static String generateBearer() {
-    return BEARER + " " + generateJwt();
+    return generateBearer(UUID.randomUUID().toString());
   }
 
-  public static String generateJwt() {
+  public static String generateBearer(String userId) {
+    return BEARER + " " + generateJwt(userId);
+  }
+
+  public static String generateJwt(String userId) {
     JwtClaim claim = JwtClaim.newBuilder()
-        .setSubject(UUID.randomUUID().toString())
+        .setSubject(userId)
         .setPreferredUsername(RandomUtil.randomString(8))
         .setNickname(RandomUtil.randomString(8))
         .build();
-    return generateJwt(claim);
-  }
-
-  public static String generateJwt(JwtClaim claim) {
     Builder jwtBuilder = new JwtClaimWrapper(claim)
         .into()
         .withIssuedAt(Instant.now())

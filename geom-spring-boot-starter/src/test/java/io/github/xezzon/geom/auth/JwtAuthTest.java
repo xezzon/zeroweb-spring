@@ -5,7 +5,8 @@ import static com.google.auth.http.AuthHttpConstants.BEARER;
 import static io.github.xezzon.geom.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static io.github.xezzon.geom.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 
-import cn.hutool.core.util.RandomUtil;
+import com.auth0.jwt.JWT;
+import io.github.xezzon.geom.auth.domain.JwtClaimWrapper;
 import io.github.xezzon.geom.common.exception.ErrorCode;
 import io.github.xezzon.geom.core.error.ErrorResponse;
 import jakarta.annotation.Resource;
@@ -29,12 +30,9 @@ class JwtAuthTest {
 
   @Test
   void login() {
-    JwtClaim claim = JwtClaim.newBuilder()
-        .setSubject(UUID.randomUUID().toString())
-        .setPreferredUsername(RandomUtil.randomString(8))
-        .setNickname(RandomUtil.randomString(8))
-        .build();
-    String encodedJwt = TestJwtGenerator.generateJwt(claim);
+    String userId = UUID.randomUUID().toString();
+    String encodedJwt = TestJwtGenerator.generateJwt(userId);
+    String username = JWT.decode(encodedJwt).getClaim(JwtClaimWrapper.USERNAME_CLAIM).asString();
     String bearer = BEARER + " " + encodedJwt;
     String responseBody = webTestClient.get()
         .uri("/jwt")
@@ -44,7 +42,7 @@ class JwtAuthTest {
         .expectStatus().isOk()
         .expectBody(String.class)
         .returnResult().getResponseBody();
-    Assertions.assertEquals(claim.getPreferredUsername(), responseBody);
+    Assertions.assertEquals(username, responseBody);
   }
 
   @Test
