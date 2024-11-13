@@ -53,11 +53,11 @@ public class JwtFilter implements Filter {
         JwtClaim claim = new JwtAuth(publicKey).decode(token);
         StpUtil.login(claim.getSubject());
         JwtAuth.saveJwtClaim(claim);
-        chain.doFilter(request, response);
       } catch (Exception e) {
         log.error("Failed to parse the JWT. token: {}; key: {}", token, publicKeyASN1, e);
         throw new GeomRuntimeException(ErrorCode.INVALID_TOKEN, e);
       }
+      chain.doFilter(request, response);
     }
   }
 }

@@ -5,13 +5,3 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-
-grpc:
-  server:
-    inProcessName: test
-    port: -1
-  client:
-    user:
-      address: in-process:test
-    dict:
-      address: in-process:test

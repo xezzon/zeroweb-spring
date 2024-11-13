@@ -39,8 +39,8 @@ class GlobalExceptionHandlerTest {
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
     Assertions.assertEquals(errorCode.code(), responseBody.code());
-    Assertions.assertEquals(errorCode.name(), responseBody.error().code());
-    Assertions.assertEquals(errorCode.message(), responseBody.error().message());
+    Assertions.assertEquals(errorCode.name(), responseBody.error().getCode());
+    Assertions.assertEquals(errorCode.message(), responseBody.error().getMessage());
   }
 
   @Test
@@ -57,9 +57,9 @@ class GlobalExceptionHandlerTest {
     Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
         NoValidClasspathException.class.getSimpleName(),
-        responseBody.error().code()
+        responseBody.error().getCode()
     );
-    Assertions.assertEquals(errorCode.message(), responseBody.error().message());
+    Assertions.assertEquals(errorCode.message(), responseBody.error().getMessage());
   }
 
   @Test
@@ -76,9 +76,9 @@ class GlobalExceptionHandlerTest {
     Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
         EntityNotFoundException.class.getSimpleName(),
-        responseBody.error().code()
+        responseBody.error().getCode()
     );
-    Assertions.assertEquals(errorCode.message(), responseBody.error().message());
+    Assertions.assertEquals(errorCode.message(), responseBody.error().getMessage());
   }
 
   @Test
@@ -95,9 +95,9 @@ class GlobalExceptionHandlerTest {
     Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
         UnsupportedOperationException.class.getSimpleName(),
-        responseBody.error().code()
+        responseBody.error().getCode()
     );
-    Assertions.assertEquals(errorCode.message(), responseBody.error().message());
+    Assertions.assertEquals(errorCode.message(), responseBody.error().getMessage());
   }
 
   @Test
@@ -118,14 +118,14 @@ class GlobalExceptionHandlerTest {
     Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
         MethodArgumentNotValidException.class.getSimpleName(),
-        responseBody.error().code()
+        responseBody.error().getCode()
     );
-    Assertions.assertEquals(errorCode.message(), responseBody.error().message());
-    Assertions.assertTrue(responseBody.error().details().parallelStream()
-        .anyMatch(detail -> Objects.equals(Email.class.getSimpleName(), detail.code()))
+    Assertions.assertEquals(errorCode.message(), responseBody.error().getMessage());
+    Assertions.assertTrue(responseBody.error().getDetails().parallelStream()
+        .anyMatch(detail -> Objects.equals(Email.class.getSimpleName(), detail.getCode()))
     );
-    Assertions.assertTrue(responseBody.error().details().parallelStream()
-        .anyMatch(detail -> Objects.equals(Size.class.getSimpleName(), detail.code()))
+    Assertions.assertTrue(responseBody.error().getDetails().parallelStream()
+        .anyMatch(detail -> Objects.equals(Size.class.getSimpleName(), detail.getCode()))
     );
   }
 
@@ -142,10 +142,10 @@ class GlobalExceptionHandlerTest {
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
     Assertions.assertEquals(errorCode.code(), responseBody.code());
-    Assertions.assertEquals(errorCode.name(), responseBody.error().code());
+    Assertions.assertEquals(errorCode.name(), responseBody.error().getCode());
     Assertions.assertEquals(
         String.format("No static resource %s.", uri),
-        responseBody.error().message()
+        responseBody.error().getMessage()
     );
   }
 }

@@ -6,6 +6,7 @@ import io.github.xezzon.geom.core.error.ErrorResponse;
 import io.github.xezzon.geom.core.error.IErrorCode;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,12 @@ public class GlobalExceptionHandler {
    * 自发抛出的异常
    */
   @ExceptionHandler(GeomRuntimeException.class)
-  public ErrorResponse handleException(GeomRuntimeException e, HttpServletResponse response) {
+  public ErrorResponse handleException(
+      GeomRuntimeException e,
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) {
+    log(e, request);
     IErrorCode errorCode = e.errorCode();
     response.setStatus(errorCode.sourceType().getResponseCode());
     response.setHeader(ERROR_CODE_HEADER, errorCode.code());
@@ -43,7 +49,12 @@ public class GlobalExceptionHandler {
    * 框架抛出的异常
    */
   @ExceptionHandler(Throwable.class)
-  public ErrorResponse handleException(Throwable e, HttpServletResponse response) {
+  public ErrorResponse handleException(
+      Throwable e,
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) {
+    log(e, request);
     IErrorCode errorCode = this.getErrorCode(e);
     response.setStatus(errorCode.sourceType().getResponseCode());
     response.setHeader(ERROR_CODE_HEADER, errorCode.code());
@@ -57,8 +68,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ErrorResponse handleException(
       MethodArgumentNotValidException e,
+      HttpServletRequest request,
       HttpServletResponse response
   ) {
+    log(e, request);
     IErrorCode errorCode = ErrorCode.ARGUMENT_NOT_VALID;
     response.setStatus(errorCode.sourceType().getResponseCode());
     response.setHeader(ERROR_CODE_HEADER, errorCode.code());
@@ -66,7 +79,8 @@ public class GlobalExceptionHandler {
         .map(error -> new ErrorDetail(error.getCode(), error.getDefaultMessage()))
         .toList();
     String errorName = e.getClass().getSimpleName();
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorCode.message(), details);
+    ErrorDetail errorDetail = new ErrorDetail(errorName, errorCode.message())
+        .setDetails(details);
     return new ErrorResponse(errorCode.code(), errorDetail);
   }
 
@@ -74,7 +88,12 @@ public class GlobalExceptionHandler {
    * 请求资源不存在
    */
   @ExceptionHandler(NoResourceFoundException.class)
-  public ErrorResponse handleException(NoResourceFoundException e, HttpServletResponse response) {
+  public ErrorResponse handleException(
+      NoResourceFoundException e,
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) {
+    log(e, request);
     ErrorCode errorCode = ErrorCode.NOT_FOUND;
     response.setStatus(HttpResponseStatus.NOT_FOUND.code());
     response.setHeader(ERROR_CODE_HEADER, errorCode.code());
@@ -86,7 +105,12 @@ public class GlobalExceptionHandler {
    * 未登录
    */
   @ExceptionHandler(NotLoginException.class)
-  public ErrorResponse handleException(NotLoginException e, HttpServletResponse response) {
+  public ErrorResponse handleException(
+      NotLoginException e,
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) {
+    log(e, request);
     ErrorCode errorCode = ErrorCode.NOT_LOGIN;
     response.setStatus(HttpResponseStatus.UNAUTHORIZED.code());
     response.setHeader(ERROR_CODE_HEADER, errorCode.code());
@@ -96,5 +120,9 @@ public class GlobalExceptionHandler {
 
   protected IErrorCode getErrorCode(Throwable e) {
     return ERROR_CODE_MAP.getOrDefault(e.getClass(), ErrorCode.UNKNOWN);
+  }
+
+  protected void log(Throwable e, HttpServletRequest request) {
+    log.error("Request processing failed: {}", request.getRequestURI(), e);
   }
 }

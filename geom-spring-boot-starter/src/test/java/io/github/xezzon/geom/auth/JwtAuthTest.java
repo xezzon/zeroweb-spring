@@ -61,7 +61,7 @@ class JwtAuthTest {
     Assertions.assertNotNull(responseBody);
     Assertions.assertNotNull(responseBody.error());
     Assertions.assertEquals(errorCode.code(), responseBody.code());
-    Assertions.assertEquals(errorCode.name(), responseBody.error().code());
-    Assertions.assertEquals(errorCode.message(), responseBody.error().message());
+    Assertions.assertEquals(errorCode.name(), responseBody.error().getCode());
+    Assertions.assertEquals(errorCode.message(), responseBody.error().getMessage());
   }
 }
