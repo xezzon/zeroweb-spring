@@ -48,7 +48,7 @@ public class OpenapiController {
    */
   @GetMapping()
   public Page<Openapi> getOpenapiList(ODataRequestParam odata) {
-    return openapiService.pageList(odata);
+    return openapiService.pageList(odata.into());
   }
 
   /**

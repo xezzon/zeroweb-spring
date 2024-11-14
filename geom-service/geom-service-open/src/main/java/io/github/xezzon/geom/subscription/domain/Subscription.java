@@ -53,9 +53,9 @@ public class Subscription implements IEntity<String> {
    */
   @Column(name = "status", nullable = false)
   @Enumerated(EnumType.STRING)
-  OpenapiSubscriptionStatus status;
+  SubscriptionStatus status;
   /**
-   * 订阅的接口详情
+   * 对外接口详情
    */
   @ManyToOne
   @JoinColumn(
@@ -66,4 +66,11 @@ public class Subscription implements IEntity<String> {
       foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
   )
   Openapi openapi;
+
+  public SubscriptionStatus getSubscriptionStatus() {
+    if (this.status == null) {
+      return SubscriptionStatus.NONE;
+    }
+    return this.status;
+  }
 }

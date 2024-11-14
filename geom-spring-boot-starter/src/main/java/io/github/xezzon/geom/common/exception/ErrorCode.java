@@ -37,6 +37,10 @@ public enum ErrorCode implements IErrorCode {
    * 无效的token
    */
   INVALID_TOKEN(SERVER, "无效的token"),
+  /**
+   * 数据权限无效
+   */
+  DATA_PERMISSION_FORBIDDEN(CLIENT, "禁止访问: %s"),
   ;
 
   /**

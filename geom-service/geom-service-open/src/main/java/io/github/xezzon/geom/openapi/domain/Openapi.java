@@ -24,19 +24,20 @@ import lombok.ToString;
 @Table(name = "geom_openapi")
 public class Openapi implements IEntity<String> {
 
+  public static final String ID_COLUMN = "id";
   public static final String CODE_COLUMN = "code";
 
   /**
    * 对外接口标识
    */
   @Id
-  @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
+  @Column(name = ID_COLUMN, nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   @IdGenerator
   String id;
   /**
    * 接口编码
    */
-  @Column(name = CODE_COLUMN, nullable = false)
+  @Column(name = CODE_COLUMN, nullable = false, unique = true)
   String code;
   /**
    * 接口状态
@@ -46,6 +47,6 @@ public class Openapi implements IEntity<String> {
   OpenapiStatus status;
 
   public boolean isPublished() {
-    return status == OpenapiStatus.PUBLISHED;
+    return this.status == OpenapiStatus.PUBLISHED;
   }
 }

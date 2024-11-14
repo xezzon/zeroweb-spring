@@ -46,12 +46,13 @@ classDiagram
 
 #### HTTP接口
 
-GET /subscription
+GET /third-party-app/{appId}/subscription
 
 #### 输入输出1
 
 输入：
 
+- `appId`: 应用标识
 - `$top`: 数据量
 - `$skip`: 数据量*(页码-1)
 

@@ -2,9 +2,10 @@ package io.github.xezzon.geom.openapi;
 
 import io.github.xezzon.geom.common.PublishedOpenapiCannotBeModifyException;
 import io.github.xezzon.geom.common.exception.RepeatDataException;
-import io.github.xezzon.geom.core.odata.ODataRequestParam;
+import io.github.xezzon.geom.core.odata.ODataQueryOption;
 import io.github.xezzon.geom.openapi.domain.Openapi;
 import io.github.xezzon.geom.openapi.domain.OpenapiStatus;
+import io.github.xezzon.geom.openapi.service.IOpenapiService4ThirdPartApp;
 import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @author xezzon
  */
 @Service
-public class OpenapiService {
+public class OpenapiService implements IOpenapiService4ThirdPartApp {
 
   private final OpenapiDAO openapiDAO;
 
@@ -26,8 +27,8 @@ public class OpenapiService {
     openapiDAO.get().save(openapi);
   }
 
-  protected Page<Openapi> pageList(ODataRequestParam odata) {
-    return openapiDAO.findAll(odata.into());
+  protected Page<Openapi> pageList(ODataQueryOption odata) {
+    return openapiDAO.findAll(odata);
   }
 
   protected void modifyOpenapi(Openapi openapi) {
@@ -50,5 +51,10 @@ public class OpenapiService {
     if (exist != null && !Objects.equals(exist.getId(), openapi.getId())) {
       throw new RepeatDataException("接口已存在");
     }
+  }
+
+  @Override
+  public Page<Openapi> listPublishedOpenapi(ODataQueryOption odata) {
+    return openapiDAO.listPublishedOpenapi(odata);
   }
 }

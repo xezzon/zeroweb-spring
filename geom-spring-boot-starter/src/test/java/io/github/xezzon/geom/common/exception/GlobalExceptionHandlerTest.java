@@ -148,4 +148,20 @@ class GlobalExceptionHandlerTest {
         responseBody.error().getMessage()
     );
   }
+
+  @Test
+  void dataPermissionForbiddenException() {
+    ErrorCode errorCode = ErrorCode.DATA_PERMISSION_FORBIDDEN;
+    ErrorResponse responseBody = webTestClient.get()
+        .uri("/DataPermissionForbiddenException")
+        .exchange()
+        .expectStatus().isForbidden()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
+        .expectBody(ErrorResponse.class)
+        .returnResult().getResponseBody();
+    Assertions.assertNotNull(responseBody);
+    Assertions.assertEquals(errorCode.code(), responseBody.code());
+    Assertions.assertEquals(errorCode.name(), responseBody.error().getCode());
+    Assertions.assertEquals("禁止访问: 无权访问该应用", responseBody.error().getMessage());
+  }
 }

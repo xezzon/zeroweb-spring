@@ -5,7 +5,7 @@ import io.github.xezzon.tao.dict.IDict;
 /**
  * @author xezzon
  */
-public enum OpenapiSubscriptionStatus implements IDict {
+public enum SubscriptionStatus implements IDict {
 
   NONE("未订阅"),
   AUDITING("审核中"),
@@ -14,13 +14,13 @@ public enum OpenapiSubscriptionStatus implements IDict {
 
   private final String label;
 
-  OpenapiSubscriptionStatus(String label) {
+  SubscriptionStatus(String label) {
     this.label = label;
   }
 
   @Override
   public String getTag() {
-    return OpenapiSubscriptionStatus.class.getSimpleName();
+    return "OpenapiSubscription";
   }
 
   @Override
