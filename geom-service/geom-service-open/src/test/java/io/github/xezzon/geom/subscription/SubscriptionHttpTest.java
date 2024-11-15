@@ -6,11 +6,14 @@ import static io.github.xezzon.geom.common.exception.GlobalExceptionHandler.ERRO
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.geom.auth.TestJwtGenerator;
+import io.github.xezzon.geom.common.OpenErrorCode;
+import io.github.xezzon.geom.common.domain.Id;
 import io.github.xezzon.geom.common.domain.PagedModel;
 import io.github.xezzon.geom.common.exception.ErrorCode;
 import io.github.xezzon.geom.openapi.domain.Openapi;
 import io.github.xezzon.geom.openapi.domain.OpenapiStatus;
 import io.github.xezzon.geom.openapi.repository.OpenapiRepository;
+import io.github.xezzon.geom.subscription.domain.AddSubscriptionReq;
 import io.github.xezzon.geom.subscription.domain.Subscription;
 import io.github.xezzon.geom.subscription.domain.SubscriptionStatus;
 import io.github.xezzon.geom.subscription.repository.SubscriptionRepository;
@@ -41,6 +44,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class SubscriptionHttpTest {
 
   private static final String SUBSCRIPTION_LIST_URI = "/third-party-app/{appId}/subscription";
+  private static final String SUBSCRIBE_URI = "/subscription";
   private static final String THIRD_PARTY_APP_OWNER = RandomUtil.randomString(8);
 
   @Resource
@@ -154,5 +158,75 @@ class SubscriptionHttpTest {
         Assertions.assertEquals(SubscriptionStatus.NONE, actual.getSubscriptionStatus());
       }
     }
+  }
+
+  @Test
+  void subscribe() {
+    Openapi openapi;
+    do {
+      this.initData();
+      openapi = openapiRepository.findAll().parallelStream()
+          .filter(Openapi::isPublished)
+          .findAny()
+          .orElse(null);
+    } while (openapi == null);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+
+    AddSubscriptionReq req = new AddSubscriptionReq(thirdPartyApp.getId(), openapi.getCode());
+    Id responseBody = webTestClient.post()
+        .uri(SUBSCRIBE_URI)
+        .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.generateBearer(THIRD_PARTY_APP_OWNER))
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(Id.class)
+        .returnResult().getResponseBody();
+    Assertions.assertNotNull(responseBody);
+    Optional<Subscription> actual = repository.findById(responseBody.id());
+    Assertions.assertTrue(actual.isPresent());
+  }
+
+  @Test
+  void subscribe_unpublishedOpenapi() {
+    Openapi openapi;
+    do {
+      this.initData();
+      openapi = openapiRepository.findAll().parallelStream()
+          .filter(o -> !o.isPublished())
+          .findAny()
+          .orElse(null);
+    } while (openapi == null);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+
+    AddSubscriptionReq req = new AddSubscriptionReq(thirdPartyApp.getId(), openapi.getCode());
+    webTestClient.post()
+        .uri(SUBSCRIBE_URI)
+        .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.generateBearer(THIRD_PARTY_APP_OWNER))
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectHeader().valueEquals(
+            ERROR_CODE_HEADER,
+            OpenErrorCode.UNPUBLISHED_OPENAPI_CANNOT_BE_SUBSCRIBE.code()
+        );
+  }
+
+  @Test
+  void subscribe_dataPermissionForbidden() {
+    this.initData();
+    Openapi openapi = openapiRepository.findAll().get(0);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+
+    AddSubscriptionReq req = new AddSubscriptionReq(thirdPartyApp.getId(), openapi.getCode());
+    webTestClient.post()
+        .uri(SUBSCRIBE_URI)
+        .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.generateBearer(RandomUtil.randomString(8)))
+        .exchange()
+        .expectStatus().isForbidden()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCode.DATA_PERMISSION_FORBIDDEN.code());
   }
 }

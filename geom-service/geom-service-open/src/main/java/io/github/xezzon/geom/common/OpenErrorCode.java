@@ -12,6 +12,7 @@ import io.github.xezzon.geom.core.error.IErrorCode;
 public enum OpenErrorCode implements IErrorCode {
 
   PUBLISHED_OPENAPI_CANNOT_BE_MODIFY(CLIENT, "已发布的开放接口不能修改"),
+  UNPUBLISHED_OPENAPI_CANNOT_BE_SUBSCRIBE(CLIENT, "不能订阅未发布的接口"),
   ;
 
   /**

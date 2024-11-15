@@ -8,6 +8,7 @@ import io.github.xezzon.geom.openapi.service.IOpenapiService4ThirdPartApp;
 import io.github.xezzon.geom.subscription.domain.Subscription;
 import io.github.xezzon.geom.subscription.service.ISubscriptionService4ThirdPartyApp;
 import io.github.xezzon.geom.third_party_app.domain.ThirdPartyApp;
+import io.github.xezzon.geom.third_party_app.service.IThirdPartyAppService;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Service;
  * @author xezzon
  */
 @Service
-public class ThirdPartyAppService {
+public class ThirdPartyAppService implements IThirdPartyAppService {
 
   private final ThirdPartyAppDAO thirdPartyAppDAO;
   private final ISubscriptionService4ThirdPartyApp subscriptionService;
@@ -31,7 +32,7 @@ public class ThirdPartyAppService {
 
   public ThirdPartyAppService(
       ThirdPartyAppDAO thirdPartyAppDAO,
-      ISubscriptionService4ThirdPartyApp subscriptionService,
+      @Lazy ISubscriptionService4ThirdPartyApp subscriptionService,
       @Lazy IOpenapiService4ThirdPartApp openapiService
   ) {
     this.thirdPartyAppDAO = thirdPartyAppDAO;
@@ -52,12 +53,7 @@ public class ThirdPartyAppService {
   }
 
   protected Page<Subscription> listSubscription(ODataQueryOption odata, String appId) {
-    Optional<ThirdPartyApp> thirdPartyApp = thirdPartyAppDAO.get().findById(appId);
-    if (thirdPartyApp.isEmpty()
-        || !Objects.equals(thirdPartyApp.get().getOwnerId(), StpUtil.getLoginId())
-    ) {
-      throw new DataPermissionForbiddenException("应用不存在或无权访问");
-    }
+    this.checkPermission(appId);
     Page<Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
     Set<String> openapiCodes = openapiPage.getContent().parallelStream()
         .map(Openapi::getCode)
@@ -77,5 +73,15 @@ public class ThirdPartyAppService {
         })
         .toList();
     return new PageImpl<>(subscriptions, openapiPage.getPageable(), openapiPage.getTotalElements());
+  }
+
+  @Override
+  public void checkPermission(String appId) {
+    Optional<ThirdPartyApp> thirdPartyApp = thirdPartyAppDAO.get().findById(appId);
+    if (thirdPartyApp.isEmpty()
+        || !Objects.equals(thirdPartyApp.get().getOwnerId(), StpUtil.getLoginId())
+    ) {
+      throw new DataPermissionForbiddenException("应用不存在或无权访问");
+    }
   }
 }

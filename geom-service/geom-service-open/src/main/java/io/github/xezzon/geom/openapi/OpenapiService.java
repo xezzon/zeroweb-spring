@@ -5,8 +5,10 @@ import io.github.xezzon.geom.common.exception.RepeatDataException;
 import io.github.xezzon.geom.core.odata.ODataQueryOption;
 import io.github.xezzon.geom.openapi.domain.Openapi;
 import io.github.xezzon.geom.openapi.domain.OpenapiStatus;
+import io.github.xezzon.geom.openapi.service.IOpenapiService4Subscription;
 import io.github.xezzon.geom.openapi.service.IOpenapiService4ThirdPartApp;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,7 @@ import org.springframework.stereotype.Service;
  * @author xezzon
  */
 @Service
-public class OpenapiService implements IOpenapiService4ThirdPartApp {
+public class OpenapiService implements IOpenapiService4ThirdPartApp, IOpenapiService4Subscription {
 
   private final OpenapiDAO openapiDAO;
 
@@ -56,5 +58,10 @@ public class OpenapiService implements IOpenapiService4ThirdPartApp {
   @Override
   public Page<Openapi> listPublishedOpenapi(ODataQueryOption odata) {
     return openapiDAO.listPublishedOpenapi(odata);
+  }
+
+  @Override
+  public @Nullable Openapi getByCode(String openapiCode) {
+    return openapiDAO.get().findByCode(openapiCode);
   }
 }
