@@ -4,7 +4,9 @@ import io.github.xezzon.geom.common.domain.Id;
 import io.github.xezzon.geom.subscription.domain.AddSubscriptionReq;
 import io.github.xezzon.geom.subscription.domain.Subscription;
 import io.github.xezzon.geom.subscription.domain.SubscriptionStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,5 +30,10 @@ public class SubscriptionController {
     subscription.setStatus(SubscriptionStatus.AUDITING);
     subscriptionService.addSubscription(subscription);
     return Id.of(subscription.getId());
+  }
+
+  @PutMapping("/audit/{id}")
+  public void auditSubscription(@PathVariable String id) {
+    subscriptionService.auditSubscription(id);
   }
 }

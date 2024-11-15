@@ -48,7 +48,6 @@ public class JwtFilter implements Filter {
       String token = authorization.substring(BEARER.length()).trim();
       try {
         ASN1PublicKeyReader asn1Reader = new DerStringReader(publicKeyASN1);
-        SecretKeyUtil.readPublicKey(asn1Reader);
         ECPublicKey publicKey = (ECPublicKey) SecretKeyUtil.readPublicKey(asn1Reader);
         JwtClaim claim = new JwtAuth(publicKey).decode(token);
         StpUtil.login(claim.getSubject());

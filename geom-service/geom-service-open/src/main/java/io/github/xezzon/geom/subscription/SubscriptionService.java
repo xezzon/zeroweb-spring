@@ -5,6 +5,7 @@ import io.github.xezzon.geom.openapi.domain.Openapi;
 import io.github.xezzon.geom.openapi.domain.OpenapiStatus;
 import io.github.xezzon.geom.openapi.service.IOpenapiService4Subscription;
 import io.github.xezzon.geom.subscription.domain.Subscription;
+import io.github.xezzon.geom.subscription.domain.SubscriptionStatus;
 import io.github.xezzon.geom.subscription.service.ISubscriptionService4ThirdPartyApp;
 import io.github.xezzon.geom.third_party_app.service.IThirdPartyAppService;
 import java.util.Collection;
@@ -48,6 +49,16 @@ public class SubscriptionService implements ISubscriptionService4ThirdPartyApp {
       return;
     }
     subscriptionDAO.get().save(subscription);
+  }
+
+  protected void auditSubscription(String id) {
+    Subscription entity = subscriptionDAO.get().getReferenceById(id);
+    if (!Objects.equals(entity.getSubscriptionStatus(), SubscriptionStatus.AUDITING)) {
+      // 不是审核中，不变更状态
+      return;
+    }
+    entity.setStatus(SubscriptionStatus.SUBSCRIBED);
+    subscriptionDAO.get().save(entity);
   }
 
   @Override

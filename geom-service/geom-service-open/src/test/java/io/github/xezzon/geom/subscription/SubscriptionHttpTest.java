@@ -45,6 +45,7 @@ class SubscriptionHttpTest {
 
   private static final String SUBSCRIPTION_LIST_URI = "/third-party-app/{appId}/subscription";
   private static final String SUBSCRIBE_URI = "/subscription";
+  private static final String AUDIT_SUBSCRIPTION_URI = "/subscription/audit/{id}";
   private static final String THIRD_PARTY_APP_OWNER = RandomUtil.randomString(8);
 
   @Resource
@@ -228,5 +229,25 @@ class SubscriptionHttpTest {
         .exchange()
         .expectStatus().isForbidden()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCode.DATA_PERMISSION_FORBIDDEN.code());
+  }
+
+  @Test
+  void auditSubscription() {
+    Subscription target = this.initData().get(0);
+
+    webTestClient.put()
+        .uri(builder -> builder
+            .path(AUDIT_SUBSCRIPTION_URI)
+            .build(target.getId())
+        )
+        .exchange()
+        .expectStatus().isOk();
+
+    Subscription actual = repository.findById(target.getId()).get();
+    if (Objects.equals(target.getSubscriptionStatus(), SubscriptionStatus.AUDITING)) {
+      Assertions.assertEquals(SubscriptionStatus.SUBSCRIBED, actual.getSubscriptionStatus());
+    } else {
+      Assertions.assertEquals(target.getSubscriptionStatus(), actual.getSubscriptionStatus());
+    }
   }
 }
