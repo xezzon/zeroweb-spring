@@ -36,4 +36,9 @@ public class ExceptionController {
   public void methodArgumentNotValidException(@RequestBody @Validated ValidEntity entity) {
     throw new UnsupportedOperationException(entity.getName());
   }
+
+  @RequestMapping("/DataPermissionForbiddenException")
+  public void dataPermissionForbiddenException() {
+    throw new DataPermissionForbiddenException("无权访问该应用");
+  }
 }

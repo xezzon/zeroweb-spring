@@ -118,6 +118,23 @@ public class GlobalExceptionHandler {
     return new ErrorResponse(errorCode.code(), errorDetail);
   }
 
+  /**
+   * 数据权限不足
+   */
+  @ExceptionHandler(DataPermissionForbiddenException.class)
+  public ErrorResponse handleException(
+      DataPermissionForbiddenException e,
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) {
+    log(e, request);
+    IErrorCode errorCode = e.errorCode();
+    response.setStatus(HttpResponseStatus.FORBIDDEN.code());
+    response.setHeader(ERROR_CODE_HEADER, errorCode.code());
+    ErrorDetail errorDetail = new ErrorDetail(errorCode.name(), e.getMessage());
+    return new ErrorResponse(errorCode.code(), errorDetail);
+  }
+
   protected IErrorCode getErrorCode(Throwable e) {
     return ERROR_CODE_MAP.getOrDefault(e.getClass(), ErrorCode.UNKNOWN);
   }

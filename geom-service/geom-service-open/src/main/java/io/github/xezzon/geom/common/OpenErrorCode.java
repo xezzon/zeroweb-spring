@@ -1,4 +1,4 @@
-package io.github.xezzon.geom.common.exception;
+package io.github.xezzon.geom.common;
 
 import static io.github.xezzon.geom.core.error.ErrorSourceType.CLIENT;
 
@@ -9,12 +9,10 @@ import io.github.xezzon.geom.core.error.IErrorCode;
  * 错误码分配中心
  * @author xezzon
  */
-public enum AdminErrorCode implements IErrorCode {
+public enum OpenErrorCode implements IErrorCode {
 
-  /**
-   * 用户名或密码错误
-   */
-  INVALID_TOKEN(CLIENT, "用户名或密码错误"),
+  PUBLISHED_OPENAPI_CANNOT_BE_MODIFY(CLIENT, "已发布的开放接口不能修改"),
+  UNPUBLISHED_OPENAPI_CANNOT_BE_SUBSCRIBE(CLIENT, "不能订阅未发布的接口"),
   ;
 
   /**
@@ -26,7 +24,7 @@ public enum AdminErrorCode implements IErrorCode {
    */
   private final String message;
 
-  AdminErrorCode(ErrorSourceType sourceType, String message) {
+  OpenErrorCode(ErrorSourceType sourceType, String message) {
     this.sourceType = sourceType;
     this.message = message;
   }
@@ -38,7 +36,7 @@ public enum AdminErrorCode implements IErrorCode {
 
   @Override
   public byte moduleCode() {
-    return 1;
+    return 2;
   }
 
   @Override
