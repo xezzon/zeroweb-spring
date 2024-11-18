@@ -41,6 +41,7 @@
     <module>geom-spring-boot-starter</module>
     <module>geom-service</module>
     <module>report-aggregate</module>
+    <module>geom-open-sdk</module>
   </modules>
 
   <properties>
