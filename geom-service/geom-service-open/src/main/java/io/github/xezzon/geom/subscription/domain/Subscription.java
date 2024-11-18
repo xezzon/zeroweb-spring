@@ -41,7 +41,7 @@ public class Subscription implements IEntity<String> {
   /**
    * 第三方应用标识
    */
-  @Column(name = "app_id", nullable = false, updatable = false)
+  @Column(name = "app_id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   String appId;
   /**
    * 对外接口编码

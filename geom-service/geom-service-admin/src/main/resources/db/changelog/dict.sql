@@ -6,7 +6,7 @@ CREATE TABLE geom_dict (
   code VARCHAR(255) NOT NULL,
   label VARCHAR(255),
   ordinal INTEGER NOT NULL,
-  parent_id VARCHAR(255) NOT NULL,
+  parent_id VARCHAR(64) NOT NULL,
   enabled BOOLEAN NOT NULL,
   CONSTRAINT pk_geom_dict PRIMARY KEY (id)
 );
