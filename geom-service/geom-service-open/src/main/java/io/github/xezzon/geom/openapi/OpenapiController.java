@@ -56,7 +56,7 @@ public class OpenapiController {
    * @param req 包含更新`对外接口`请求数据的请求体
    */
   @PutMapping("/update")
-  public void modifyDict(@RequestBody ModifyOpenapiReq req) {
+  public void modifyOpenapi(@RequestBody ModifyOpenapiReq req) {
     Openapi openapi = req.into();
     openapiService.modifyOpenapi(openapi);
   }

@@ -59,7 +59,7 @@ public class JwtKeyManager implements JwtCryptoService {
       /* 获取不到文件或解析不了 则生成一对密钥 */
       KeyPairGenerator keyPairGenerator;
       try {
-        keyPairGenerator = KeyPairGenerator.getInstance("EC");
+        keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
       } catch (NoSuchAlgorithmException e) {
         log.error("Cannot create key pair.", e);
         return;

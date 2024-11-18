@@ -21,14 +21,22 @@ import org.hibernate.annotations.CreationTimestamp;
 @Setter
 @ToString
 @Entity
-@Table(name = "geom_third_party_app")
+@Table(name = ThirdPartyApp.TABLE_NAME)
 public class ThirdPartyApp implements IEntity<String> {
+
+  public static final String TABLE_NAME = "geom_third_party_app";
+  public static final String ID_COLUMN = "id";
 
   /**
    * 第三方应用标识
    */
   @Id
-  @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
+  @Column(
+      name = ID_COLUMN,
+      nullable = false,
+      updatable = false,
+      length = DatabaseConstant.ID_LENGTH
+  )
   @IdGenerator
   String id;
   /**
