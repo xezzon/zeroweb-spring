@@ -54,7 +54,7 @@ public class Dict implements IEntity<String>, IDict, TreeNode<Dict, String> {
   /**
    * 上级字典ID
    */
-  @Column(name = "parent_id", nullable = false)
+  @Column(name = "parent_id", nullable = false, length = DatabaseConstant.ID_LENGTH)
   String parentId;
   /**
    * 启用状态
