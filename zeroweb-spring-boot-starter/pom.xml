@@ -31,6 +31,12 @@
       <version>${grpc-spring-boot-starter.version}</version>
     </dependency>
     <dependency>
+      <groupId>net.devh</groupId>
+      <artifactId>grpc-server-spring-boot-starter</artifactId>
+      <version>${grpc-spring-boot-starter.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <optional>true</optional>
