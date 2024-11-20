@@ -32,13 +32,12 @@ public class TestController {
   public String test(
       @RequestBody byte[] body,
       @RequestHeader(GeomOpenRequestBuilder.ACCESS_KEY_HEADER) String accessKey,
-      @RequestHeader(GeomOpenRequestBuilder.TIMESTAMP_HEADER) Long timestamp,
+      @RequestHeader(GeomOpenRequestBuilder.TIMESTAMP_HEADER) Instant timestamp,
       @RequestHeader(GeomOpenRequestBuilder.SIGNATURE_HEADER) String signature
   ) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
     Assertions.assertEquals("hello", accessKey);
-    Instant instant = Instant.ofEpochSecond(timestamp);
-    Assertions.assertTrue(instant.isBefore(Instant.now()));
-    Assertions.assertTrue(Duration.between(instant, Instant.now()).toMinutes() < 2);
+    Assertions.assertTrue(timestamp.isBefore(Instant.now()));
+    Assertions.assertTrue(Duration.between(timestamp, Instant.now()).toMinutes() < 2);
     Mac mac = Mac.getInstance(DIGEST_ALGORITHM);
     mac.init(new SecretKeySpec(Base64.getDecoder().decode(SECRET_KEY), DIGEST_ALGORITHM));
     mac.update(body);

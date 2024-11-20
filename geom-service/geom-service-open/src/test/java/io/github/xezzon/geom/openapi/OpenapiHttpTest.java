@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.hutool.core.util.RandomUtil;
-import io.github.xezzon.geom.common.OpenErrorCode;
+import io.github.xezzon.geom.common.exception.OpenErrorCode;
 import io.github.xezzon.geom.common.domain.Id;
 import io.github.xezzon.geom.common.domain.PagedModel;
 import io.github.xezzon.geom.common.exception.ErrorCode;
@@ -229,7 +229,7 @@ class OpenapiHttpTest {
         .exchange()
         .expectStatus().isOk();
     Optional<Openapi> openapi = repository.findById(target.getId());
-    assertEquals(OpenapiStatus.PUBLISHED, openapi.get().getStatus());
+    assertEquals(OpenapiStatus.PUBLISHED, openapi.orElseThrow().getStatus());
   }
 
   @Test

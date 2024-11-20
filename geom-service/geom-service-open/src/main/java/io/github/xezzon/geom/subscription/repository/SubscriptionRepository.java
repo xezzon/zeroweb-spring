@@ -13,4 +13,6 @@ public interface SubscriptionRepository extends
     JpaSpecificationExecutor<Subscription> {
 
   List<Subscription> findByAppIdAndOpenapiCodeIn(String appId, Collection<String> openapiCodes);
+
+  List<Subscription> findByAppId(String appId);
 }

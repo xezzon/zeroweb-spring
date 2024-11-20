@@ -139,7 +139,7 @@ public class GlobalExceptionHandler {
     return ERROR_CODE_MAP.getOrDefault(e.getClass(), ErrorCode.UNKNOWN);
   }
 
-  protected void log(Throwable e, HttpServletRequest request) {
+  protected final void log(Throwable e, HttpServletRequest request) {
     log.error("Request processing failed: {}", request.getRequestURI(), e);
   }
 }

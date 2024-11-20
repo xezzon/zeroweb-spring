@@ -1,7 +1,9 @@
 package io.github.xezzon.geom.third_party_app;
 
 import cn.dev33.satoken.stp.StpUtil;
+import io.github.xezzon.geom.GeomOpenRequestBuilder;
 import io.github.xezzon.geom.common.exception.DataPermissionForbiddenException;
+import io.github.xezzon.geom.common.exception.InvalidAccessKeyException;
 import io.github.xezzon.geom.core.odata.ODataQueryOption;
 import io.github.xezzon.geom.third_party_app.domain.AccessSecret;
 import io.github.xezzon.geom.third_party_app.domain.ThirdPartyApp;
@@ -13,7 +15,9 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -84,5 +88,33 @@ public class ThirdPartyAppService implements IThirdPartyAppService {
     ) {
       throw new DataPermissionForbiddenException("应用不存在或无权访问");
     }
+  }
+
+  @Override
+  public void validateSignature(String appId, byte[] body, String signature) {
+    AccessSecret accessSecret = accessSecretRepository.findById(appId)
+        .orElseThrow(InvalidAccessKeyException::new);
+    try {
+      Mac mac = Mac.getInstance(GeomOpenRequestBuilder.DIGEST_ALGORITHM);
+      byte[] secretKey = Base64.getDecoder().decode(accessSecret.getSecretKey());
+      mac.init(new SecretKeySpec(secretKey, GeomOpenRequestBuilder.DIGEST_ALGORITHM));
+      mac.update(body);
+      if (!Objects.equals(
+          signature,
+          Base64.getEncoder().encodeToString(mac.doFinal())
+      )) {
+        throw new InvalidAccessKeyException();
+      }
+    } catch (InvalidAccessKeyException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new InvalidAccessKeyException();
+    }
+  }
+
+  @Override
+  public ThirdPartyApp findById(String appId) {
+    return thirdPartyAppDAO.get()
+        .getReferenceById(appId);
   }
 }

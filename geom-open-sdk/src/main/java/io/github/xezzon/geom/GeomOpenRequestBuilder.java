@@ -50,7 +50,7 @@ public class GeomOpenRequestBuilder {
       // 应用标识
       requestTemplate.header(ACCESS_KEY_HEADER, accessKey);
       // 时间戳
-      long timestamp = Instant.now().getEpochSecond();
+      long timestamp = Instant.now().toEpochMilli();
       requestTemplate.header(TIMESTAMP_HEADER, String.valueOf(timestamp));
       // 摘要
       byte[] body = requestTemplate.body();

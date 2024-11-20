@@ -1,20 +1,19 @@
 package io.github.xezzon.geom.subscription;
 
-import io.github.xezzon.geom.common.UnpublishedOpenapiCannotBeSubscribeException;
+import io.github.xezzon.geom.common.exception.UnpublishedOpenapiCannotBeSubscribeException;
 import io.github.xezzon.geom.core.odata.ODataQueryOption;
 import io.github.xezzon.geom.openapi.domain.Openapi;
 import io.github.xezzon.geom.openapi.domain.OpenapiStatus;
 import io.github.xezzon.geom.openapi.service.IOpenapiService4Subscription;
 import io.github.xezzon.geom.subscription.domain.Subscription;
 import io.github.xezzon.geom.subscription.domain.SubscriptionStatus;
+import io.github.xezzon.geom.subscription.service.ISubscriptionService4Call;
 import io.github.xezzon.geom.subscription.service.ISubscriptionService4ThirdPartyApp;
 import io.github.xezzon.geom.third_party_app.service.IThirdPartyAppService;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,7 +23,9 @@ import org.springframework.stereotype.Service;
  * @author xezzon
  */
 @Service
-public class SubscriptionService implements ISubscriptionService4ThirdPartyApp {
+public class SubscriptionService implements
+    ISubscriptionService4ThirdPartyApp,
+    ISubscriptionService4Call {
 
   private final SubscriptionDAO subscriptionDAO;
   private final IThirdPartyAppService thirdPartyAppService;
@@ -71,10 +72,7 @@ public class SubscriptionService implements ISubscriptionService4ThirdPartyApp {
   public Page<Subscription> listSubscription(ODataQueryOption odata, String appId) {
     thirdPartyAppService.checkPermission(appId);
     Page<Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
-    Set<String> openapiCodes = openapiPage.getContent().parallelStream()
-        .map(Openapi::getCode)
-        .collect(Collectors.toSet());
-    List<Subscription> subscriptions = this.listSubscriptionsOfApp(appId, openapiCodes);
+    List<Subscription> subscriptions = this.listSubscriptionsOfApp(appId);
     Map<String, Subscription> subscriptionMap = subscriptions.parallelStream()
         .collect(Collectors.toMap(Subscription::getOpenapiCode, s -> s));
     subscriptions = openapiPage.getContent().parallelStream()
@@ -91,7 +89,7 @@ public class SubscriptionService implements ISubscriptionService4ThirdPartyApp {
   }
 
   @Override
-  public List<Subscription> listSubscriptionsOfApp(String appId, Collection<String> openapiCodes) {
-    return subscriptionDAO.get().findByAppIdAndOpenapiCodeIn(appId, openapiCodes);
+  public List<Subscription> listSubscriptionsOfApp(String appId) {
+    return subscriptionDAO.get().findByAppId(appId);
   }
 }

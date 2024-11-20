@@ -1,6 +1,6 @@
 package io.github.xezzon.geom.openapi;
 
-import io.github.xezzon.geom.common.PublishedOpenapiCannotBeModifyException;
+import io.github.xezzon.geom.common.exception.PublishedOpenapiCannotBeModifyException;
 import io.github.xezzon.geom.common.exception.RepeatDataException;
 import io.github.xezzon.geom.core.odata.ODataQueryOption;
 import io.github.xezzon.geom.openapi.domain.Openapi;

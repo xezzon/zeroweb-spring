@@ -1,6 +1,5 @@
-package io.github.xezzon.geom.common;
+package io.github.xezzon.geom.common.exception;
 
-import io.github.xezzon.geom.common.exception.GeomRuntimeException;
 import io.github.xezzon.geom.core.error.IErrorCode;
 
 /**

@@ -6,7 +6,7 @@ import static io.github.xezzon.geom.common.exception.GlobalExceptionHandler.ERRO
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.geom.auth.TestJwtGenerator;
-import io.github.xezzon.geom.common.OpenErrorCode;
+import io.github.xezzon.geom.common.exception.OpenErrorCode;
 import io.github.xezzon.geom.common.domain.Id;
 import io.github.xezzon.geom.common.domain.PagedModel;
 import io.github.xezzon.geom.common.exception.ErrorCode;
@@ -243,7 +243,7 @@ class SubscriptionHttpTest {
         .exchange()
         .expectStatus().isOk();
 
-    Subscription actual = repository.findById(target.getId()).get();
+    Subscription actual = repository.findById(target.getId()).orElseThrow();
     if (Objects.equals(target.getSubscriptionStatus(), SubscriptionStatus.AUDITING)) {
       Assertions.assertEquals(SubscriptionStatus.SUBSCRIBED, actual.getSubscriptionStatus());
     } else {
