@@ -3,6 +3,7 @@ package io.github.xezzon.geom.third_party_app;
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.geom.core.odata.ODataRequestParam;
 import io.github.xezzon.geom.subscription.domain.Subscription;
+import io.github.xezzon.geom.subscription.service.ISubscriptionService4ThirdPartyApp;
 import io.github.xezzon.geom.third_party_app.domain.AccessSecret;
 import io.github.xezzon.geom.third_party_app.domain.AddThirdPartyAppReq;
 import io.github.xezzon.geom.third_party_app.domain.ThirdPartyApp;
@@ -24,9 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class ThirdPartyAppController {
 
   private final ThirdPartyAppService thirdPartyAppService;
+  private final ISubscriptionService4ThirdPartyApp subscriptionService;
 
-  public ThirdPartyAppController(ThirdPartyAppService thirdPartyAppService) {
+  public ThirdPartyAppController(
+      ThirdPartyAppService thirdPartyAppService,
+      ISubscriptionService4ThirdPartyApp subscriptionService
+  ) {
     this.thirdPartyAppService = thirdPartyAppService;
+    this.subscriptionService = subscriptionService;
   }
 
   /**
@@ -70,7 +76,7 @@ public class ThirdPartyAppController {
    */
   @GetMapping("/{appId}/subscription")
   public Page<Subscription> listSubscription(ODataRequestParam odata, @PathVariable String appId) {
-    return thirdPartyAppService.listSubscription(odata.into(), appId);
+    return subscriptionService.listSubscription(odata.into(), appId);
   }
 
   /**
