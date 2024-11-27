@@ -123,5 +123,9 @@
       <artifactId>sa-token-spring-boot3-starter</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-api</artifactId>
+    </dependency>
   </dependencies>
 </project>
