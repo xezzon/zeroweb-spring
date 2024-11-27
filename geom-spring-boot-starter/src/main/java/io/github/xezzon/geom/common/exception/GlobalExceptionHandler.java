@@ -5,6 +5,7 @@ import io.github.xezzon.geom.core.error.ErrorDetail;
 import io.github.xezzon.geom.core.error.ErrorResponse;
 import io.github.xezzon.geom.core.error.IErrorCode;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.opentelemetry.api.trace.Span;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -141,5 +142,6 @@ public class GlobalExceptionHandler {
 
   protected void log(Throwable e, HttpServletRequest request) {
     log.error("Request processing failed: {}", request.getRequestURI(), e);
+    Span.current().recordException(e);
   }
 }
