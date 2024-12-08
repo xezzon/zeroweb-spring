@@ -176,7 +176,33 @@ class SubscriptionCallHttpTest {
             .queryParam("path", dataset.getT2().getOpenapiCode())
             .build()
         )
-        .header(GeomOpenRequestBuilder.ACCESS_KEY_HEADER, RandomUtil.randomString(8))
+        .header(GeomOpenRequestBuilder.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
+        .header(GeomOpenRequestBuilder.TIMESTAMP_HEADER, String.valueOf(timestamp))
+        .header(GeomOpenRequestBuilder.SIGNATURE_HEADER, signature)
+        .bodyValue(rawBody)
+        .exchange()
+        .expectStatus().isForbidden()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, OpenErrorCode.INVALID_ACCESS_KEY.code());
+  }
+
+  @Test
+  void validate_mismatchSignature() throws NoSuchAlgorithmException, InvalidKeyException {
+    final String rawBody = "{\"id\":\"1234567890\"}";
+    long timestamp = Instant.now().toEpochMilli();
+    Tuple3<ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
+    Mac mac = Mac.getInstance(GeomOpenRequestBuilder.DIGEST_ALGORITHM);
+    byte[] secretKey = Base64.getDecoder().decode(dataset.getT3().getSecretKey());
+    mac.init(new SecretKeySpec(secretKey, GeomOpenRequestBuilder.DIGEST_ALGORITHM));
+    mac.update("tampered message".getBytes());
+    String signature = Base64.getEncoder().encodeToString(mac.doFinal());
+
+    webTestClient.post()
+        .uri(builder -> builder
+            .path("/subscription-call/validate")
+            .queryParam("path", dataset.getT2().getOpenapiCode())
+            .build()
+        )
+        .header(GeomOpenRequestBuilder.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
         .header(GeomOpenRequestBuilder.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(GeomOpenRequestBuilder.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)

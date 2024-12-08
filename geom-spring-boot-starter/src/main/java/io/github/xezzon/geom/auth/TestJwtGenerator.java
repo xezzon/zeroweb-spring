@@ -16,6 +16,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.UUID;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import org.jetbrains.annotations.TestOnly;
 
 /**
@@ -27,6 +29,7 @@ public class TestJwtGenerator {
   private static final Base64.Encoder ENCODER = Base64.getEncoder();
   private static final ECPrivateKey PRIVATE_KEY;
   private static final ECPublicKey PUBLIC_KEY;
+  private static final SecretKey SECRET_KEY;
 
   static {
     try {
@@ -34,6 +37,9 @@ public class TestJwtGenerator {
       KeyPair keyPair = keyPairGenerator.generateKeyPair();
       PRIVATE_KEY = (ECPrivateKey) keyPair.getPrivate();
       PUBLIC_KEY = (ECPublicKey) keyPair.getPublic();
+      KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+      keyGenerator.init(256);
+      SECRET_KEY = keyGenerator.generateKey();
     } catch (NoSuchAlgorithmException e) {
       throw new GeomRuntimeException(ErrorCode.UNKNOWN, e);
     }
@@ -64,7 +70,25 @@ public class TestJwtGenerator {
     return new JwtAuth(PRIVATE_KEY).sign(jwtBuilder);
   }
 
+  public static String generateJwt4App(String appId) {
+    JwtClaim claim = JwtClaim.newBuilder()
+        .setSubject(appId)
+        .setPreferredUsername(RandomUtil.randomString(8))
+        .setNickname(RandomUtil.randomString(8))
+        .build();
+    Builder builder = new JwtClaimWrapper(claim)
+        .into()
+        .withIssuedAt(Instant.now())
+        .withExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
+        .withJWTId(UUID.randomUUID().toString());
+    return new JwtAuth(SECRET_KEY.getEncoded()).sign(builder);
+  }
+
   public static String getPublicKey() {
     return ENCODER.encodeToString(PUBLIC_KEY.getEncoded());
+  }
+
+  public static String getSecretKey() {
+    return ENCODER.encodeToString(SECRET_KEY.getEncoded());
   }
 }
