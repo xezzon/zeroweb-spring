@@ -1,0 +1,24 @@
+zeroweb:
+  id-generator: ${ZEROWEB_ID_GENERATOR:UUID}
+
+spring:
+  datasource:
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      maxLifetime: 1800000
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+  jpa:
+    properties:
+      hibernate:
+        # 处理 N+1 问题
+        default_batch_fetch_size: 1000
+
+logging:
+  level:
+    root: info
+    io.github.xezzon: debug
