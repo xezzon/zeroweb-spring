@@ -2,7 +2,7 @@ package io.github.xezzon.geom.call;
 
 import static com.google.auth.http.AuthHttpConstants.BEARER;
 
-import io.github.xezzon.geom.GeomOpenRequestBuilder;
+import io.github.xezzon.geom.GeomOpenConstant;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import org.springframework.http.HttpHeaders;
@@ -31,9 +31,9 @@ public class SubscriptionCallController {
   public void validateCall(
       @RequestBody byte[] body,
       @RequestParam("path") String path,
-      @RequestHeader(GeomOpenRequestBuilder.ACCESS_KEY_HEADER) String accessKey,
-      @RequestHeader(GeomOpenRequestBuilder.TIMESTAMP_HEADER) Instant timestamp,
-      @RequestHeader(GeomOpenRequestBuilder.SIGNATURE_HEADER) String signature,
+      @RequestHeader(GeomOpenConstant.ACCESS_KEY_HEADER) String accessKey,
+      @RequestHeader(GeomOpenConstant.TIMESTAMP_HEADER) Instant timestamp,
+      @RequestHeader(GeomOpenConstant.SIGNATURE_HEADER) String signature,
       HttpServletResponse response
   ) {
     /* 所有校验通过后发放令牌 */

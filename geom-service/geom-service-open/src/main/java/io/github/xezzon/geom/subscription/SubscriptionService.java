@@ -69,6 +69,11 @@ public class SubscriptionService implements
   }
 
   @Override
+  public List<Subscription> listSubscriptionsOfApp(String appId) {
+    return subscriptionDAO.get().findByAppId(appId);
+  }
+
+  @Override
   public Page<Subscription> listSubscription(ODataQueryOption odata, String appId) {
     thirdPartyAppService.checkPermission(appId);
     Page<Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
@@ -86,10 +91,5 @@ public class SubscriptionService implements
         })
         .toList();
     return new PageImpl<>(subscriptions, openapiPage.getPageable(), openapiPage.getTotalElements());
-  }
-
-  @Override
-  public List<Subscription> listSubscriptionsOfApp(String appId) {
-    return subscriptionDAO.get().findByAppId(appId);
   }
 }

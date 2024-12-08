@@ -1,6 +1,6 @@
 package io.github.xezzon.geom;
 
-import static io.github.xezzon.geom.GeomOpenRequestBuilder.DIGEST_ALGORITHM;
+import static io.github.xezzon.geom.GeomOpenConstant.DIGEST_ALGORITHM;
 import static io.github.xezzon.geom.TestApplication.SECRET_KEY;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,9 +31,9 @@ public class TestController {
   @PostMapping("/test")
   public String test(
       @RequestBody byte[] body,
-      @RequestHeader(GeomOpenRequestBuilder.ACCESS_KEY_HEADER) String accessKey,
-      @RequestHeader(GeomOpenRequestBuilder.TIMESTAMP_HEADER) Instant timestamp,
-      @RequestHeader(GeomOpenRequestBuilder.SIGNATURE_HEADER) String signature
+      @RequestHeader(GeomOpenConstant.ACCESS_KEY_HEADER) String accessKey,
+      @RequestHeader(GeomOpenConstant.TIMESTAMP_HEADER) Instant timestamp,
+      @RequestHeader(GeomOpenConstant.SIGNATURE_HEADER) String signature
   ) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
     Assertions.assertEquals("hello", accessKey);
     Assertions.assertTrue(timestamp.isBefore(Instant.now()));

@@ -5,7 +5,7 @@ import static com.google.auth.http.AuthHttpConstants.BEARER;
 import static io.github.xezzon.geom.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 
 import cn.hutool.core.util.RandomUtil;
-import io.github.xezzon.geom.GeomOpenRequestBuilder;
+import io.github.xezzon.geom.GeomOpenConstant;
 import io.github.xezzon.geom.auth.JwtAuth;
 import io.github.xezzon.geom.auth.JwtClaim;
 import io.github.xezzon.geom.common.exception.OpenErrorCode;
@@ -75,9 +75,9 @@ class SubscriptionCallHttpTest {
     final String rawBody = "{\"id\":\"1234567890\"}";
     long timestamp = Instant.now().toEpochMilli();
     Tuple3<ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
-    Mac mac = Mac.getInstance(GeomOpenRequestBuilder.DIGEST_ALGORITHM);
+    Mac mac = Mac.getInstance(GeomOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(dataset.getT3().getSecretKey());
-    mac.init(new SecretKeySpec(secretKey, GeomOpenRequestBuilder.DIGEST_ALGORITHM));
+    mac.init(new SecretKeySpec(secretKey, GeomOpenConstant.DIGEST_ALGORITHM));
     mac.update(rawBody.getBytes());
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
@@ -87,9 +87,9 @@ class SubscriptionCallHttpTest {
             .queryParam("path", dataset.getT2().getOpenapiCode())
             .build()
         )
-        .header(GeomOpenRequestBuilder.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
-        .header(GeomOpenRequestBuilder.TIMESTAMP_HEADER, String.valueOf(timestamp))
-        .header(GeomOpenRequestBuilder.SIGNATURE_HEADER, signature)
+        .header(GeomOpenConstant.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
+        .header(GeomOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
+        .header(GeomOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
         .exchange()
         .expectStatus().isOk()
@@ -112,9 +112,9 @@ class SubscriptionCallHttpTest {
     final String rawBody = "{\"id\":\"1234567890\"}";
     long timestamp = Instant.now().toEpochMilli();
     Tuple3<ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
-    Mac mac = Mac.getInstance(GeomOpenRequestBuilder.DIGEST_ALGORITHM);
+    Mac mac = Mac.getInstance(GeomOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(dataset.getT3().getSecretKey());
-    mac.init(new SecretKeySpec(secretKey, GeomOpenRequestBuilder.DIGEST_ALGORITHM));
+    mac.init(new SecretKeySpec(secretKey, GeomOpenConstant.DIGEST_ALGORITHM));
     mac.update(rawBody.getBytes());
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
@@ -124,9 +124,9 @@ class SubscriptionCallHttpTest {
             .queryParam("path", RandomUtil.randomString(8))
             .build()
         )
-        .header(GeomOpenRequestBuilder.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
-        .header(GeomOpenRequestBuilder.TIMESTAMP_HEADER, String.valueOf(timestamp))
-        .header(GeomOpenRequestBuilder.SIGNATURE_HEADER, signature)
+        .header(GeomOpenConstant.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
+        .header(GeomOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
+        .header(GeomOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
         .exchange()
         .expectStatus().isForbidden()
@@ -138,9 +138,9 @@ class SubscriptionCallHttpTest {
     final String rawBody = "{\"id\":\"1234567890\"}";
     long timestamp = Instant.now().toEpochMilli();
     Tuple3<ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
-    Mac mac = Mac.getInstance(GeomOpenRequestBuilder.DIGEST_ALGORITHM);
+    Mac mac = Mac.getInstance(GeomOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(dataset.getT3().getSecretKey());
-    mac.init(new SecretKeySpec(secretKey, GeomOpenRequestBuilder.DIGEST_ALGORITHM));
+    mac.init(new SecretKeySpec(secretKey, GeomOpenConstant.DIGEST_ALGORITHM));
     mac.update(rawBody.getBytes());
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
@@ -150,9 +150,9 @@ class SubscriptionCallHttpTest {
             .queryParam("path", dataset.getT2().getOpenapiCode())
             .build()
         )
-        .header(GeomOpenRequestBuilder.ACCESS_KEY_HEADER, RandomUtil.randomString(8))
-        .header(GeomOpenRequestBuilder.TIMESTAMP_HEADER, String.valueOf(timestamp))
-        .header(GeomOpenRequestBuilder.SIGNATURE_HEADER, signature)
+        .header(GeomOpenConstant.ACCESS_KEY_HEADER, RandomUtil.randomString(8))
+        .header(GeomOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
+        .header(GeomOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
         .exchange()
         .expectStatus().isForbidden()
@@ -164,9 +164,9 @@ class SubscriptionCallHttpTest {
     final String rawBody = "{\"id\":\"1234567890\"}";
     long timestamp = Instant.now().toEpochMilli();
     Tuple3<ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
-    Mac mac = Mac.getInstance(GeomOpenRequestBuilder.DIGEST_ALGORITHM);
+    Mac mac = Mac.getInstance(GeomOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(RandomUtil.randomString(8));
-    mac.init(new SecretKeySpec(secretKey, GeomOpenRequestBuilder.DIGEST_ALGORITHM));
+    mac.init(new SecretKeySpec(secretKey, GeomOpenConstant.DIGEST_ALGORITHM));
     mac.update(rawBody.getBytes());
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
@@ -176,9 +176,9 @@ class SubscriptionCallHttpTest {
             .queryParam("path", dataset.getT2().getOpenapiCode())
             .build()
         )
-        .header(GeomOpenRequestBuilder.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
-        .header(GeomOpenRequestBuilder.TIMESTAMP_HEADER, String.valueOf(timestamp))
-        .header(GeomOpenRequestBuilder.SIGNATURE_HEADER, signature)
+        .header(GeomOpenConstant.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
+        .header(GeomOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
+        .header(GeomOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
         .exchange()
         .expectStatus().isForbidden()
@@ -190,9 +190,9 @@ class SubscriptionCallHttpTest {
     final String rawBody = "{\"id\":\"1234567890\"}";
     long timestamp = Instant.now().toEpochMilli();
     Tuple3<ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
-    Mac mac = Mac.getInstance(GeomOpenRequestBuilder.DIGEST_ALGORITHM);
+    Mac mac = Mac.getInstance(GeomOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(dataset.getT3().getSecretKey());
-    mac.init(new SecretKeySpec(secretKey, GeomOpenRequestBuilder.DIGEST_ALGORITHM));
+    mac.init(new SecretKeySpec(secretKey, GeomOpenConstant.DIGEST_ALGORITHM));
     mac.update("tampered message".getBytes());
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
@@ -202,9 +202,9 @@ class SubscriptionCallHttpTest {
             .queryParam("path", dataset.getT2().getOpenapiCode())
             .build()
         )
-        .header(GeomOpenRequestBuilder.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
-        .header(GeomOpenRequestBuilder.TIMESTAMP_HEADER, String.valueOf(timestamp))
-        .header(GeomOpenRequestBuilder.SIGNATURE_HEADER, signature)
+        .header(GeomOpenConstant.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
+        .header(GeomOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
+        .header(GeomOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
         .exchange()
         .expectStatus().isForbidden()
@@ -216,9 +216,9 @@ class SubscriptionCallHttpTest {
     final String rawBody = "{\"id\":\"1234567890\"}";
     long timestamp = Instant.now().getEpochSecond();
     Tuple3<ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
-    Mac mac = Mac.getInstance(GeomOpenRequestBuilder.DIGEST_ALGORITHM);
+    Mac mac = Mac.getInstance(GeomOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(dataset.getT3().getSecretKey());
-    mac.init(new SecretKeySpec(secretKey, GeomOpenRequestBuilder.DIGEST_ALGORITHM));
+    mac.init(new SecretKeySpec(secretKey, GeomOpenConstant.DIGEST_ALGORITHM));
     mac.update(rawBody.getBytes());
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
@@ -228,9 +228,9 @@ class SubscriptionCallHttpTest {
             .queryParam("path", dataset.getT2().getOpenapiCode())
             .build()
         )
-        .header(GeomOpenRequestBuilder.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
-        .header(GeomOpenRequestBuilder.TIMESTAMP_HEADER, String.valueOf(timestamp))
-        .header(GeomOpenRequestBuilder.SIGNATURE_HEADER, signature)
+        .header(GeomOpenConstant.ACCESS_KEY_HEADER, dataset.getT3().getAccessKey())
+        .header(GeomOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
+        .header(GeomOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
         .exchange()
         .expectStatus().isOk()

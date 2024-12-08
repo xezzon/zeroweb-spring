@@ -1,7 +1,7 @@
 package io.github.xezzon.geom.third_party_app;
 
 import cn.dev33.satoken.stp.StpUtil;
-import io.github.xezzon.geom.GeomOpenRequestBuilder;
+import io.github.xezzon.geom.GeomOpenConstant;
 import io.github.xezzon.geom.common.exception.DataPermissionForbiddenException;
 import io.github.xezzon.geom.common.exception.InvalidAccessKeyException;
 import io.github.xezzon.geom.core.odata.ODataQueryOption;
@@ -95,9 +95,9 @@ public class ThirdPartyAppService implements IThirdPartyAppService {
     AccessSecret accessSecret = accessSecretRepository.findById(appId)
         .orElseThrow(InvalidAccessKeyException::new);
     try {
-      Mac mac = Mac.getInstance(GeomOpenRequestBuilder.DIGEST_ALGORITHM);
+      Mac mac = Mac.getInstance(GeomOpenConstant.DIGEST_ALGORITHM);
       byte[] secretKey = Base64.getDecoder().decode(accessSecret.getSecretKey());
-      mac.init(new SecretKeySpec(secretKey, GeomOpenRequestBuilder.DIGEST_ALGORITHM));
+      mac.init(new SecretKeySpec(secretKey, GeomOpenConstant.DIGEST_ALGORITHM));
       mac.update(body);
       if (!Objects.equals(
           signature,
