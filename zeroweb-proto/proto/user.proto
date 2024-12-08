@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package io.github.xezzon.zeroweb.user;
+
+option java_multiple_files = true;
+option java_outer_classname = "UserProto";
+option java_package = "io.github.xezzon.zeroweb.user";
+
+// 新增用户接口的参数
+message AddUserReq {
+  // 用户名
+  string username = 1;
+  // 昵称
+  optional string nickname = 2;
+  // 密码
+  string password = 3;
+}
+
+// 新增用户接口的返回值
+message AddUserResp {
+  // 用户ID
+  string id = 1;
+}
+
+// 用户相关的服务间接口
+service User {
+  // 新增用户
+  rpc AddUser (AddUserReq) returns (AddUserResp);
+}
+

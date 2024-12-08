@@ -8,7 +8,7 @@
     <artifactId>xezzon-java</artifactId>
     <version>4.0</version>
   </parent>
-  <artifactId>geom</artifactId>
+  <artifactId>zeroweb</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
@@ -16,7 +16,7 @@
   <description>
     基于 Spring Boot 框架的一组微服务构件，包含认证、后台管理、开放平台等服务。提供 SDK 与服务进行交互。
   </description>
-  <url>https://github.com/xezzon/geom-spring-boot</url>
+  <url>https://github.com/xezzon/zeroweb-spring</url>
   <licenses>
     <license>
       <name>GNU Lesser General Public License v3.0</name>
@@ -31,17 +31,17 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:https://github.com/xezzon/geom-spring-boot.git</connection>
-    <developerConnection>scm:git:git@github.com:xezzon/geom-spring-boot.git</developerConnection>
+    <connection>scm:git:https://github.com/xezzon/zeroweb-spring.git</connection>
+    <developerConnection>scm:git:git@github.com:xezzon/zeroweb-spring.git</developerConnection>
     <url>${project.url}/tree/main</url>
   </scm>
 
   <modules>
-    <module>geom-proto</module>
-    <module>geom-spring-boot-starter</module>
-    <module>geom-service</module>
+    <module>zeroweb-proto</module>
+    <module>zeroweb-spring-boot-starter</module>
+    <module>zeroweb-service</module>
     <module>report-aggregate</module>
-    <module>geom-open-sdk</module>
+    <module>zeroweb-open-sdk</module>
   </modules>
 
   <properties>
@@ -162,7 +162,7 @@
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
           <licenseName>lgpl_v3</licenseName>
-          <organizationName>geom</organizationName>
+          <organizationName>ZeroWeb</organizationName>
           <inceptionYear>2024</inceptionYear>
           <extraExtensions>
             <proto>java</proto>
@@ -185,7 +185,7 @@
     <site>
       <id>github</id>
       <name>Github Pages</name>
-      <url>https://xezzon.github.io/geom-spring-boot</url>
+      <url>https://xezzon.github.io/zeroweb-spring</url>
     </site>
   </distributionManagement>
 </project>

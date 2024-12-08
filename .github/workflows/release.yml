@@ -55,7 +55,7 @@ jobs:
       - name: Build the project
         run: mvn -B install
       - name: Publish Docker image
-        run: mvn -B jib:build -P docker -rf geom-service
+        run: mvn -B jib:build -P docker -rf zeroweb-service
         env:
           DOCKER_REGISTRY: ${{ env.DOCKER_HOST }}/${{ github.repository_owner }}
           DOCKER_USERNAME: ${{ github.repository_owner }}

@@ -6,21 +6,22 @@
 
 ## 项目结构
 
-- `geom-proto`: 通过protobuf定义的服务间交互的结构体与接口。
-- `geom-spring-boot-starter`: 所有服务间共享的配置与工具。
-- `geom-service`: 包含若干子模块，每一个模块是一个微服务构件。
-  - `geom-service-admin`: 后台管理服务
+- `zeroweb-proto`: 通过protobuf定义的服务间交互的结构体与接口。
+- `zeroweb-spring-boot-starter`: 所有服务间共享的配置与工具。
+- `zeroweb-service`: 包含若干子模块，每一个模块是一个微服务构件。
+  - `zeroweb-service-admin`: 后台管理服务
+  - `zeroweb-service-open`: 开放平台服务
 
 ### 包名
 
-本项目的基础包为`io.github.xezzon.geom`，采用结构化设计。目录结构如下：
+本项目的基础包为`io.github.xezzon.zeroweb`，采用结构化设计。目录结构如下：
 
 ```
-geom-service-admin
+zeroweb-service-admin
 ├── src
 │   ├── main
 │   │   ├── java
-│   │   │   └── io/github/xezzon/geom
+│   │   │   └── io/github/xezzon/zeroweb
 │   │   │       ├── user  # 用户功能
 │   │   │       │   ├── UserService.java  # 该功能的逻辑运转中枢
 │   │   │       │   ├── UserHttpController.java  # 提供前端调用的 HTTP 接口
@@ -56,7 +57,7 @@ geom-service-admin
 ### 获取项目源代码
 
 ```shell
-git clone https://github.com/xezzon/geom-spring-boot.git
+git clone https://github.com/xezzon/zeroweb-spring.git
 ```
 
 ### 项目配置文件
@@ -91,7 +92,7 @@ Discussion：使用过程中的疑问或对新功能的可行性讨论。
 
 角色：所有人
 
-视图：[New issue](https://github.com/xezzon/geom-spring-boot/issues/new?assignees=&labels=feature&projects=&template=feature_request.md)
+视图：[New issue](https://github.com/xezzon/zeroweb-spring/issues/new?assignees=&labels=feature&projects=&template=feature_request.md)
 
 操作：撰写系统需求规格说明书。
 
@@ -99,7 +100,7 @@ Discussion：使用过程中的疑问或对新功能的可行性讨论。
 
 角色：所有人
 
-视图：[New issue](https://github.com/xezzon/geom-spring-boot/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml)
+视图：[New issue](https://github.com/xezzon/zeroweb-spring/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml)
 
 操作：填写运行环境、复现步骤等表单项。
 
@@ -107,7 +108,7 @@ Discussion：使用过程中的疑问或对新功能的可行性讨论。
 
 角色：需求管理员
 
-视图：[Issues](https://github.com/xezzon/geom-spring-boot/issues)
+视图：[Issues](https://github.com/xezzon/zeroweb-spring/issues)
 
 #### 评审通过
 
@@ -122,7 +123,7 @@ Discussion：使用过程中的疑问或对新功能的可行性讨论。
 
 角色：软件开发人员
 
-视图：[Projects](https://github.com/xezzon/geom-spring-boot/projects)/[Project]/Overview
+视图：[Projects](https://github.com/xezzon/zeroweb-spring/projects)/[Project]/Overview
 
 操作：分配人员Assignees。将状态改为`In Progress`。
 
@@ -130,7 +131,7 @@ Discussion：使用过程中的疑问或对新功能的可行性讨论。
 
 角色：软件开发人员
 
-视图：[New pull request](https://github.com/xezzon/geom-spring-boot/pulls)
+视图：[New pull request](https://github.com/xezzon/zeroweb-spring/pulls)
 
 操作：完成 [PR Checklist](.github/pull_request_template.md)。
 
@@ -138,7 +139,7 @@ Discussion：使用过程中的疑问或对新功能的可行性讨论。
 
 角色：所有人
 
-视图：[Projects](https://github.com/xezzon/geom-spring-boot/projects)/[Project]/Overview
+视图：[Projects](https://github.com/xezzon/zeroweb-spring/projects)/[Project]/Overview
 
 操作：评审代码。合并代码。
 
@@ -146,7 +147,7 @@ Discussion：使用过程中的疑问或对新功能的可行性讨论。
 
 角色：项目管理员
 
-视图：[Create a new release](https://github.com/xezzon/geom-spring-boot/releases/new)
+视图：[Create a new release](https://github.com/xezzon/zeroweb-spring/releases/new)
 
 操作：新建标签，标签命名规则遵循语义化版本。
 `Generate release note`，生成`feature`、`bug`标签的PR的更新日志。如果有其他说明如破坏性变更，则将其完善。

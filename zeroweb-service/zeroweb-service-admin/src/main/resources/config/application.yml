@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    include:
+      - common
+      - ${JDBC_TYPE:postgresql}
+      - ${SPRING_ENVIRONMENT:prod}
+      - ${CACHE_TYPE:in-memory}
+  liquibase:
+    tag: @project.version@
+
+server:
+  port: @app.port@
+
+grpc:
+  server:
+    port: @grpc.port@
+
+sa-token:
+  token-name: X-SESSION-ID
+  token-style: tik
+  timeout: ${SA_TOKEN_TIMEOUT:2592000}
+
+zeroweb:
+  jwt:
+    issuer: ${ZEROWEB_JWT_ISSUER:xezzon.github.io}
+    timeout: ${ZEROWEB_JWT_TIMEOUT:120}
