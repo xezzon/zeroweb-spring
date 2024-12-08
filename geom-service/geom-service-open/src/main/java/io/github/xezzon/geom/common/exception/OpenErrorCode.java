@@ -1,4 +1,4 @@
-package io.github.xezzon.geom.common;
+package io.github.xezzon.geom.common.exception;
 
 import static io.github.xezzon.geom.core.error.ErrorSourceType.CLIENT;
 
@@ -13,6 +13,8 @@ public enum OpenErrorCode implements IErrorCode {
 
   PUBLISHED_OPENAPI_CANNOT_BE_MODIFY(CLIENT, "已发布的开放接口不能修改"),
   UNPUBLISHED_OPENAPI_CANNOT_BE_SUBSCRIBE(CLIENT, "不能订阅未发布的接口"),
+  INVALID_ACCESS_KEY(CLIENT, "无效的访问密钥"),
+  UNSUBSCRIBED_OPENAPI(CLIENT, "不能调用未订阅的接口"),
   ;
 
   /**

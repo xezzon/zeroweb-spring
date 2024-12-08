@@ -1,12 +1,11 @@
 package io.github.xezzon.geom.openapi;
 
-import io.github.xezzon.geom.common.PublishedOpenapiCannotBeModifyException;
+import io.github.xezzon.geom.common.exception.PublishedOpenapiCannotBeModifyException;
 import io.github.xezzon.geom.common.exception.RepeatDataException;
 import io.github.xezzon.geom.core.odata.ODataQueryOption;
 import io.github.xezzon.geom.openapi.domain.Openapi;
 import io.github.xezzon.geom.openapi.domain.OpenapiStatus;
 import io.github.xezzon.geom.openapi.service.IOpenapiService4Subscription;
-import io.github.xezzon.geom.openapi.service.IOpenapiService4ThirdPartApp;
 import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Service;
  * @author xezzon
  */
 @Service
-public class OpenapiService implements IOpenapiService4ThirdPartApp, IOpenapiService4Subscription {
+public class OpenapiService implements IOpenapiService4Subscription {
 
   private final OpenapiDAO openapiDAO;
 

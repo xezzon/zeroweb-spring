@@ -1,6 +1,4 @@
-package io.github.xezzon.geom.common;
-
-import io.github.xezzon.geom.common.exception.GeomRuntimeException;
+package io.github.xezzon.geom.common.exception;
 
 /**
  * @author xezzon

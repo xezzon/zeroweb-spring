@@ -28,6 +28,11 @@ service:
 
 ## 配置清单
 
+| 变量               | 描述               | 默认值              |
+|------------------|------------------|------------------|
+| GEOM_JWT_ISSUER  | JWT签发机构。建议设置为域名。 | xezzon.github.io |
+| GEOM_JWT_TIMEOUT | JWT 有效时长。单位 秒。   | 120              |
+
 其他配置请查看[公共配置清单](../../geom-spring-boot-starter/README.md)。
 
 ## 接口描述文档

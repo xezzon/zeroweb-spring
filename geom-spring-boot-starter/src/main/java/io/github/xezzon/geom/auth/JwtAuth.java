@@ -41,6 +41,10 @@ public class JwtAuth {
     this.algorithm = Algorithm.ECDSA256(publicKey);
   }
 
+  public JwtAuth(byte[] secretKey) {
+    this.algorithm = Algorithm.HMAC256(secretKey);
+  }
+
   /**
    * @return 用户认证信息
    */

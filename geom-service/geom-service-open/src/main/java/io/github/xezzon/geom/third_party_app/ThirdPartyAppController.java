@@ -1,13 +1,15 @@
 package io.github.xezzon.geom.third_party_app;
 
 import cn.dev33.satoken.stp.StpUtil;
-import io.github.xezzon.geom.common.domain.Id;
 import io.github.xezzon.geom.core.odata.ODataRequestParam;
 import io.github.xezzon.geom.subscription.domain.Subscription;
+import io.github.xezzon.geom.subscription.service.ISubscriptionService4ThirdPartyApp;
+import io.github.xezzon.geom.third_party_app.domain.AccessSecret;
 import io.github.xezzon.geom.third_party_app.domain.AddThirdPartyAppReq;
 import io.github.xezzon.geom.third_party_app.domain.ThirdPartyApp;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,9 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class ThirdPartyAppController {
 
   private final ThirdPartyAppService thirdPartyAppService;
+  private final ISubscriptionService4ThirdPartyApp subscriptionService;
 
-  public ThirdPartyAppController(ThirdPartyAppService thirdPartyAppService) {
+  public ThirdPartyAppController(
+      ThirdPartyAppService thirdPartyAppService,
+      ISubscriptionService4ThirdPartyApp subscriptionService
+  ) {
     this.thirdPartyAppService = thirdPartyAppService;
+    this.subscriptionService = subscriptionService;
   }
 
   /**
@@ -34,11 +41,10 @@ public class ThirdPartyAppController {
    * @return 添加成功后返回的第三方应用ID
    */
   @PostMapping("/add")
-  public Id add(@RequestBody AddThirdPartyAppReq req) {
+  public AccessSecret add(@RequestBody AddThirdPartyAppReq req) {
     ThirdPartyApp thirdPartyApp = req.into();
     thirdPartyApp.setOwnerId(StpUtil.getLoginIdAsString());
-    thirdPartyAppService.addThirdPartyApp(thirdPartyApp);
-    return Id.of(thirdPartyApp.getId());
+    return thirdPartyAppService.addThirdPartyApp(thirdPartyApp);
   }
 
 
@@ -70,6 +76,16 @@ public class ThirdPartyAppController {
    */
   @GetMapping("/{appId}/subscription")
   public Page<Subscription> listSubscription(ODataRequestParam odata, @PathVariable String appId) {
-    return thirdPartyAppService.listSubscription(odata.into(), appId);
+    return subscriptionService.listSubscription(odata.into(), appId);
+  }
+
+  /**
+   * 更新第三方应用的密钥
+   * @param appId 第三方应用ID
+   * @return 更新后的第三方应用的凭据与密钥
+   */
+  @PatchMapping("/{appId}/roll")
+  public AccessSecret rollAccessSecret(@PathVariable String appId) {
+    return thirdPartyAppService.rollAccessSecret(appId);
   }
 }

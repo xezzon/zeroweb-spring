@@ -1,47 +1,51 @@
 package io.github.xezzon.geom.third_party_app;
 
 import cn.dev33.satoken.stp.StpUtil;
+import io.github.xezzon.geom.GeomOpenConstant;
 import io.github.xezzon.geom.common.exception.DataPermissionForbiddenException;
+import io.github.xezzon.geom.common.exception.InvalidAccessKeyException;
 import io.github.xezzon.geom.core.odata.ODataQueryOption;
-import io.github.xezzon.geom.openapi.domain.Openapi;
-import io.github.xezzon.geom.openapi.service.IOpenapiService4ThirdPartApp;
-import io.github.xezzon.geom.subscription.domain.Subscription;
-import io.github.xezzon.geom.subscription.service.ISubscriptionService4ThirdPartyApp;
+import io.github.xezzon.geom.third_party_app.domain.AccessSecret;
 import io.github.xezzon.geom.third_party_app.domain.ThirdPartyApp;
+import io.github.xezzon.geom.third_party_app.repository.AccessSecretRepository;
 import io.github.xezzon.geom.third_party_app.service.IThirdPartyAppService;
-import java.util.List;
-import java.util.Map;
+import jakarta.transaction.Transactional;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.springframework.context.annotation.Lazy;
+import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
 /**
  * @author xezzon
  */
 @Service
+@Slf4j
 public class ThirdPartyAppService implements IThirdPartyAppService {
 
+  public static final String ALGORITHM = "AES";
+  private static final int AES_KEY_LENGTH = 256;
   private final ThirdPartyAppDAO thirdPartyAppDAO;
-  private final ISubscriptionService4ThirdPartyApp subscriptionService;
-  private final IOpenapiService4ThirdPartApp openapiService;
+  private final AccessSecretRepository accessSecretRepository;
 
   public ThirdPartyAppService(
       ThirdPartyAppDAO thirdPartyAppDAO,
-      @Lazy ISubscriptionService4ThirdPartyApp subscriptionService,
-      @Lazy IOpenapiService4ThirdPartApp openapiService
+      AccessSecretRepository accessSecretRepository
   ) {
     this.thirdPartyAppDAO = thirdPartyAppDAO;
-    this.subscriptionService = subscriptionService;
-    this.openapiService = openapiService;
+    this.accessSecretRepository = accessSecretRepository;
   }
 
-  protected void addThirdPartyApp(ThirdPartyApp thirdPartyApp) {
+  @Transactional()
+  protected AccessSecret addThirdPartyApp(ThirdPartyApp thirdPartyApp) {
     thirdPartyAppDAO.get().save(thirdPartyApp);
+    return this.rollAccessSecret(thirdPartyApp.getId());
   }
 
   protected Page<ThirdPartyApp> listThirdPartyAppByUser(ODataQueryOption odata, String userId) {
@@ -52,27 +56,28 @@ public class ThirdPartyAppService implements IThirdPartyAppService {
     return thirdPartyAppDAO.findAll(odata);
   }
 
-  protected Page<Subscription> listSubscription(ODataQueryOption odata, String appId) {
+  /**
+   * 更新密钥
+   * @param appId 应用标识
+   * @return 更新后的应用访问凭据与密钥
+   */
+  protected AccessSecret rollAccessSecret(String appId) {
     this.checkPermission(appId);
-    Page<Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
-    Set<String> openapiCodes = openapiPage.getContent().parallelStream()
-        .map(Openapi::getCode)
-        .collect(Collectors.toSet());
-    List<Subscription> subscriptions =
-        subscriptionService.listSubscriptionsOfApp(appId, openapiCodes);
-    Map<String, Subscription> subscriptionMap = subscriptions.parallelStream()
-        .collect(Collectors.toMap(Subscription::getOpenapiCode, s -> s));
-    subscriptions = openapiPage.getContent().parallelStream()
-        .map(openapi -> {
-          Subscription subscription = subscriptionMap.get(openapi.getCode());
-          if (subscription == null) {
-            subscription = new Subscription();
-          }
-          subscription.setOpenapi(openapi);
-          return subscription;
-        })
-        .toList();
-    return new PageImpl<>(subscriptions, openapiPage.getPageable(), openapiPage.getTotalElements());
+    try {
+      KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
+      keyGenerator.init(AES_KEY_LENGTH);
+      SecretKey secretKey = keyGenerator.generateKey();
+      AccessSecret accessSecret = new AccessSecret();
+      accessSecret.setId(appId);
+      accessSecret.setSecretKey(Base64.getEncoder()
+          .encodeToString(secretKey.getEncoded())
+      );
+      accessSecretRepository.updateSecretKeyById(accessSecret.getId(), accessSecret.getSecretKey());
+      return accessSecret;
+    } catch (NoSuchAlgorithmException e) {
+      log.error("Cannot create key pair.", e);
+    }
+    return null;
   }
 
   @Override
@@ -83,5 +88,33 @@ public class ThirdPartyAppService implements IThirdPartyAppService {
     ) {
       throw new DataPermissionForbiddenException("应用不存在或无权访问");
     }
+  }
+
+  @Override
+  public void validateSignature(String appId, byte[] body, String signature) {
+    AccessSecret accessSecret = accessSecretRepository.findById(appId)
+        .orElseThrow(InvalidAccessKeyException::new);
+    try {
+      Mac mac = Mac.getInstance(GeomOpenConstant.DIGEST_ALGORITHM);
+      byte[] secretKey = Base64.getDecoder().decode(accessSecret.getSecretKey());
+      mac.init(new SecretKeySpec(secretKey, GeomOpenConstant.DIGEST_ALGORITHM));
+      mac.update(body);
+      if (!Objects.equals(
+          signature,
+          Base64.getEncoder().encodeToString(mac.doFinal())
+      )) {
+        throw new InvalidAccessKeyException();
+      }
+    } catch (InvalidAccessKeyException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new InvalidAccessKeyException();
+    }
+  }
+
+  @Override
+  public ThirdPartyApp findById(String appId) {
+    return thirdPartyAppDAO.get()
+        .getReferenceById(appId);
   }
 }
