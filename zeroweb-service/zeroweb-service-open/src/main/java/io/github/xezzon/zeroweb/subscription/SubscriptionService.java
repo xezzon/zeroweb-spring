@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.subscription;
 
 import io.github.xezzon.zeroweb.common.exception.UnpublishedOpenapiCannotBeSubscribeException;
+import io.github.xezzon.zeroweb.common.exception.UnsubscribeOpenapiException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.openapi.domain.Openapi;
 import io.github.xezzon.zeroweb.openapi.domain.OpenapiStatus;
@@ -69,15 +70,10 @@ public class SubscriptionService implements
   }
 
   @Override
-  public List<Subscription> listSubscriptionsOfApp(String appId) {
-    return subscriptionDAO.get().findByAppId(appId);
-  }
-
-  @Override
   public Page<Subscription> listSubscription(ODataQueryOption odata, String appId) {
     thirdPartyAppService.checkPermission(appId);
     Page<Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
-    List<Subscription> subscriptions = this.listSubscriptionsOfApp(appId);
+    List<Subscription> subscriptions = subscriptionDAO.get().findByAppId(appId);
     Map<String, Subscription> subscriptionMap = subscriptions.parallelStream()
         .collect(Collectors.toMap(Subscription::getOpenapiCode, s -> s));
     subscriptions = openapiPage.getContent().parallelStream()
@@ -92,5 +88,22 @@ public class SubscriptionService implements
         })
         .toList();
     return new PageImpl<>(subscriptions, openapiPage.getPageable(), openapiPage.getTotalElements());
+  }
+
+  @Override
+  public Subscription getSubscription(String appId, String openapiCode)
+      throws UnsubscribeOpenapiException {
+    List<Subscription> subscriptions = subscriptionDAO.get()
+        .findByAppIdAndOpenapiCodeIn(appId, Collections.singleton(openapiCode));
+    if (subscriptions.isEmpty()) {
+      throw new UnsubscribeOpenapiException();
+    }
+    Subscription subscription = subscriptions.get(0);
+    if (subscription.getSubscriptionStatus() != SubscriptionStatus.SUBSCRIBED) {
+      throw new UnsubscribeOpenapiException();
+    }
+    Openapi openapi = openapiService.getByCode(subscription.getOpenapiCode());
+    subscription.setOpenapi(openapi);
+    return subscription;
   }
 }

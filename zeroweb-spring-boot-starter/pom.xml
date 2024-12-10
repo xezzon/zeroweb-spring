@@ -91,10 +91,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>cn.dev33</groupId>
-      <artifactId>sa-token-core</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk18on</artifactId>
       <version>${bouncy-castle.version}</version>
@@ -106,7 +102,6 @@
     <dependency>
       <groupId>cn.dev33</groupId>
       <artifactId>sa-token-spring-boot3-starter</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.opentelemetry</groupId>
