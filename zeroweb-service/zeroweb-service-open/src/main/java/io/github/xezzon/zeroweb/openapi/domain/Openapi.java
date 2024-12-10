@@ -36,9 +36,22 @@ public class Openapi implements IEntity<String> {
   String id;
   /**
    * 接口编码
+   * 即第三方接口调用的路径
    */
   @Column(name = CODE_COLUMN, nullable = false, unique = true)
   String code;
+  /**
+   * 后端地址
+   * 即该接口应该转发到的后端地址
+   */
+  @Column(name = "destination", nullable = false, length = 2048)
+  String destination;
+  /**
+   * 请求接口的HTTP方法
+   */
+  @Column(name = "http_method", nullable = false, length = 16)
+  @Enumerated(EnumType.STRING)
+  HttpMethod httpMethod;
   /**
    * 接口状态
    */

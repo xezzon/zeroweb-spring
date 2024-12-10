@@ -87,6 +87,7 @@ public class SubscriptionService implements
             subscription = new Subscription();
           }
           subscription.setOpenapi(openapi);
+          openapi.setDestination(null);  // 内部路径不允许暴露给订阅者
           return subscription;
         })
         .toList();

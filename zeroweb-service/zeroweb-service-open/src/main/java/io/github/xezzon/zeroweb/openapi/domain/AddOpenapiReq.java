@@ -21,6 +21,14 @@ public class AddOpenapiReq implements Into<Openapi> {
    */
   @Alphanumeric
   private String code;
+  /**
+   * 后端地址
+   */
+  private String destination;
+  /**
+   * 请求接口的HTTP方法
+   */
+  private HttpMethod httpMethod;
 
   @Override
   public Openapi into() {
