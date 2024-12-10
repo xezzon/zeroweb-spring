@@ -45,9 +45,9 @@ class UserHttpTest {
     req.setUsername(RandomUtil.randomString(9));
     req.setNickname(RandomUtil.randomString(9));
     req.setPassword(
-        RandomUtil.randomString(String.valueOf(CharacterConstant.LOWERCASE), 4)
-            + RandomUtil.randomString(String.valueOf(CharacterConstant.UPPERCASE), 4)
-            + RandomUtil.randomString(String.valueOf(CharacterConstant.DIGIT), 4)
+        RandomUtil.randomString(String.valueOf(CharacterConstant.getLowercase()), 4)
+            + RandomUtil.randomString(String.valueOf(CharacterConstant.getUppercase()), 4)
+            + RandomUtil.randomString(String.valueOf(CharacterConstant.getDigit()), 4)
     );
     Id responseBody = webTestClient.post()
         .uri(USER_REGISTER_URI)
@@ -72,9 +72,9 @@ class UserHttpTest {
     req.setUsername(data.getUsername());
     req.setNickname(RandomUtil.randomString(8));
     req.setPassword(
-        RandomUtil.randomString(String.valueOf(CharacterConstant.LOWERCASE), 4)
-            + RandomUtil.randomString(String.valueOf(CharacterConstant.UPPERCASE), 4)
-            + RandomUtil.randomString(String.valueOf(CharacterConstant.DIGIT), 4)
+        RandomUtil.randomString(String.valueOf(CharacterConstant.getLowercase()), 4)
+            + RandomUtil.randomString(String.valueOf(CharacterConstant.getUppercase()), 4)
+            + RandomUtil.randomString(String.valueOf(CharacterConstant.getDigit()), 4)
     );
     webTestClient.post()
         .uri(USER_REGISTER_URI)
