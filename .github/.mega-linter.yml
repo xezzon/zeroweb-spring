@@ -2,23 +2,25 @@
 # See all available variables at https://mega-linter.github.io/configuration.html and in linters documentation
 
 ENABLE:
-  # - JAVA
-  - GROOVY
-  - SQL
+  - JAVA
   - PROTOBUF
   - EDITORCONFIG
   - COPYPASTE
   - REPOSITORY
-  - SPELL
+ENABLE_LINTERS:
+  - SQL_SQLFLUFF
+  - SPELL_CSPELL
 DISABLE_LINTERS:
   - REPOSITORY_KICS
   - REPOSITORY_GRYPE
   - REPOSITORY_DEVSKIM
-  - SPELL_LYCHEE
 DISABLE_ERRORS_LINTERS:
   - SPELL_CSPELL
   - COPYPASTE_JSCPD
   - EDITORCONFIG_EDITORCONFIG_CHECKER
+  - REPOSITORY_TRIVY
+  - JAVA_PMD
+  - JAVA_CHECKSTYLE
 
 SARIF_REPORTER: true
 
@@ -27,4 +29,3 @@ PRE_COMMANDS:
 
 LINTER_RULES_PATH: .github/linters
 JAVA_CHECKSTYLE_FILE_NAME: google_checks.xml
-

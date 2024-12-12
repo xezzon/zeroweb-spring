@@ -1,18 +1,20 @@
 {
   "version": "0.2",
   "language": "en",
+  "dictionaries": [
+    "dictionaries",
+    "fonts",
+    "companies",
+    "softwareTerms",
+    "misc"
+  ],
   "words": [
     "xezzon",
-    "odata"
+    "odata",
+    "zeroweb"
   ],
   "flagWords": [],
-  "ignorePaths": [
-    ".github/**",
-    "/*",
-    "**/*.md",
-    "**/pom.xml",
-    "**/application*.yml",
-    "**/application*.yaml",
-    "**/application*.properties"
+  "files": [
+    "**/*.{java,md,proto}"
   ]
 }

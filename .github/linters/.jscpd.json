@@ -1,5 +1,5 @@
 {
-  "threshold": 12,
+  "minLines": 12,
   "reporters": [
     "html",
     "markdown"
