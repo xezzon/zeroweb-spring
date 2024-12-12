@@ -9,6 +9,7 @@ import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import io.github.xezzon.zeroweb.core.crypto.ASN1PublicKeyReader;
 import io.github.xezzon.zeroweb.core.crypto.DerStringReader;
 import io.github.xezzon.zeroweb.core.crypto.SecretKeyUtil;
+import io.github.xezzon.zeroweb.core.error.BreakException;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -40,7 +41,7 @@ public class JwtFilter implements Filter {
       if (request instanceof HttpServletRequest httpRequest) {
         String authorization = httpRequest.getHeader(AUTHORIZATION);
         if (authorization == null || !authorization.startsWith(BEARER)) {
-          return;
+          throw new BreakException();
         }
         String token = authorization.substring(BEARER.length()).trim();
         String publicKeyASN1 = httpRequest.getHeader(PUBLIC_KEY_HEADER);
@@ -53,14 +54,18 @@ public class JwtFilter implements Filter {
           // 第三方系统调用经过网关验证，使用AccessKey验证
           claim = validateWithAccessKey(token, accessKey);
         } else {
-          return;
+          throw new BreakException();
         }
         StpUtil.login(claim.getSubject());
         JwtAuth.saveJwtClaim(claim);
       }
-    } finally {
-      chain.doFilter(request, response);
+    } catch (BreakException | ZerowebRuntimeException ignored) {
+      // 流程控制中断，无需任何处理
+    } catch (Exception e) {
+      // 解析JWT失败，视为没有携带Token，不影响正常的流程执行
+      log.error("Failed to parse the JWT", e);
     }
+    chain.doFilter(request, response);
   }
 
   public JwtClaim validateWithPublicKey(String token, String publicKeyASN1) {
