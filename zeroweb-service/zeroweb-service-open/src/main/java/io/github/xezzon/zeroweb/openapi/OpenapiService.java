@@ -35,7 +35,11 @@ public class OpenapiService implements IOpenapiService4Subscription {
   protected void modifyOpenapi(Openapi openapi) {
     this.checkRepeat(openapi);
     Openapi entity = openapiDAO.get().getReferenceById(openapi.getId());
-    if (entity.isPublished()) {
+    if (entity.isPublished()
+        && openapi.getCode() != null
+        && !Objects.equals(entity.getCode(), openapi.getCode())
+    ) {
+      // 已发布的接口不能修改编码（即对外的路径）
       throw new PublishedOpenapiCannotBeModifyException();
     }
     openapiDAO.partialUpdate(openapi);

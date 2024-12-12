@@ -10,6 +10,7 @@ import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.ErrorCode;
 import io.github.xezzon.zeroweb.common.exception.OpenErrorCode;
+import io.github.xezzon.zeroweb.openapi.domain.HttpMethod;
 import io.github.xezzon.zeroweb.openapi.domain.Openapi;
 import io.github.xezzon.zeroweb.openapi.domain.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
@@ -62,6 +63,8 @@ class SubscriptionHttpTest {
     for (int i = 0, cnt = 16; i < cnt; i++) {
       Openapi openapi = new Openapi();
       openapi.setCode(RandomUtil.randomString(8));
+      openapi.setDestination(RandomUtil.randomString(8));
+      openapi.setHttpMethod(RandomUtil.randomEle(HttpMethod.values()));
       openapi.setStatus(RandomUtil.randomEle(OpenapiStatus.values()));
       openapiList.add(openapi);
     }
@@ -140,6 +143,7 @@ class SubscriptionHttpTest {
       Openapi openapi = openapiDataset.get(i);
       Assertions.assertEquals(openapi.getId(), actual.getOpenapi().getId());
       Assertions.assertTrue(actual.getOpenapi().isPublished());
+      Assertions.assertNull(actual.getOpenapi().getDestination());
       Optional<Subscription> except = dataset.parallelStream()
           .filter(o -> Objects.equals(o.getAppId(), dataset.get(0).getAppId()))
           .filter(o -> Objects.equals(o.getOpenapiCode(), openapi.getCode()))
