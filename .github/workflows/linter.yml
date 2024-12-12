@@ -1,0 +1,36 @@
+# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
+
+name: Lint
+
+permissions: read-all
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "master", "main" ]
+
+jobs:
+  linter:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: MegaLinter
+        uses: oxsecurity/megalinter@v8
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MEGALINTER_CONFIG: .github/.mega-linter.yml
+      - name: Upload MegaLinter scan results to GitHub Security tab
+        if: success() || failure()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'megalinter-reports/megalinter-report.sarif'

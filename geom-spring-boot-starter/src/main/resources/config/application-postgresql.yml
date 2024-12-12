@@ -1,4 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://${DB_URL:postgres:5432/geom}
-    driver-class-name: org.postgresql.Driver

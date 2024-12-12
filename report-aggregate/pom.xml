@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.xezzon</groupId>
-    <artifactId>geom</artifactId>
+    <artifactId>zeroweb</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>report-aggregate</artifactId>
@@ -20,12 +20,22 @@
   <dependencies>
     <dependency>
       <groupId>io.github.xezzon</groupId>
-      <artifactId>geom-spring-boot-starter</artifactId>
+      <artifactId>zeroweb-spring-boot-starter</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <artifactId>zeroweb-service-admin</artifactId>
+      <groupId>io.github.xezzon</groupId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <artifactId>zeroweb-service-open</artifactId>
+      <groupId>io.github.xezzon</groupId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.github.xezzon</groupId>
-      <artifactId>geom-service-admin</artifactId>
+      <artifactId>zeroweb-open-sdk</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
@@ -35,7 +45,6 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>${jacoco.version}</version>
         <executions>
           <execution>
             <id>report</id>

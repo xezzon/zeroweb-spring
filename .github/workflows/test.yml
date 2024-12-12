@@ -11,16 +11,10 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "develop", "master", "main" ]
-    # [Don't run actions on draft pull requests](https://github.com/orgs/community/discussions/25722)
-    types:
-      - opened
-      - reopened
-      - review_requested
-      - ready_for_review
 
 jobs:
   unit-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,30 +41,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=xezzon_geom-spring-boot
-  linter:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: write
-      security-events: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: MegaLinter
-        uses: oxsecurity/megalinter@v7
-        env:
-          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ENABLE: RUST,GROOVY,PROTOBUF,EDITORCONFIG,OPENAPI,COPYPASTE,REPOSITORY,SPELL
-          DISABLE_LINTERS: REPOSITORY_KICS
-          SARIF_REPORTER: true
-          SPELL_CSPELL_DISABLE_ERRORS: true
-          COPYPASTE_JSCPD_DISABLE_ERRORS: true
-      - name: Upload MegaLinter scan results to GitHub Security tab
-        if: success() || failure()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'megalinter-reports/megalinter-report.sarif'
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=xezzon_zeroweb-spring
