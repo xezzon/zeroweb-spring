@@ -1,22 +1,24 @@
 package io.github.xezzon.zeroweb.call;
 
 import static com.google.auth.http.AuthHttpConstants.BEARER;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 import com.auth0.jwt.JWT;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
 import io.github.xezzon.zeroweb.auth.JwtFilter;
 import io.github.xezzon.zeroweb.subscription.domain.Subscription;
 import io.github.xezzon.zeroweb.subscription.service.ISubscriptionService4Call;
+import io.github.xezzon.zeroweb.third_party_app.service.IThirdPartyAppService4Call;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,20 +30,53 @@ import org.springframework.web.client.RestClient;
  * 订阅服务调用记录
  * @author xezzon
  */
-@Slf4j
 @RestController
 @RequestMapping("/call")
 public class SubscriptionCallController {
 
-  private final SubscriptionCallService subscriptionCallService;
   private final ISubscriptionService4Call subscriptionService;
+  private final IThirdPartyAppService4Call thirdPartyAppService;
 
   public SubscriptionCallController(
-      SubscriptionCallService subscriptionCallService,
-      ISubscriptionService4Call subscriptionService
+      ISubscriptionService4Call subscriptionService,
+      IThirdPartyAppService4Call thirdPartyAppService
   ) {
-    this.subscriptionCallService = subscriptionCallService;
     this.subscriptionService = subscriptionService;
+    this.thirdPartyAppService = thirdPartyAppService;
+  }
+
+  /**
+   * 转发 GET 请求
+   */
+  @GetMapping(value = "/{openapiCode}")
+  public ResponseEntity<byte[]> forwardForSafe(
+      @PathVariable String openapiCode,
+      @RequestBody(required = false) byte[] body,
+      @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) String accessKey,
+      @RequestHeader(ZerowebOpenConstant.TIMESTAMP_HEADER) Instant timestamp,
+      @RequestHeader(ZerowebOpenConstant.SIGNATURE_HEADER) String signature,
+      @RequestHeader HttpHeaders headers,
+      HttpServletRequest request
+  ) {
+    Map<String, String[]> parameterMap = request.getParameterMap();
+    return forward(openapiCode, body, accessKey, timestamp, signature, headers, parameterMap);
+  }
+
+  /**
+   * 转发非 GET 请求
+   */
+  @RequestMapping(value = "/{openapiCode}", method = {POST, PUT, DELETE, PATCH})
+  public ResponseEntity<byte[]> forwardForUnsafe(
+      @PathVariable String openapiCode,
+      @RequestBody(required = false) byte[] body,
+      @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) String accessKey,
+      @RequestHeader(ZerowebOpenConstant.TIMESTAMP_HEADER) Instant timestamp,
+      @RequestHeader(ZerowebOpenConstant.SIGNATURE_HEADER) String signature,
+      @RequestHeader HttpHeaders headers,
+      HttpServletRequest request
+  ) {
+    Map<String, String[]> parameterMap = request.getParameterMap();
+    return forward(openapiCode, body, accessKey, timestamp, signature, headers, parameterMap);
   }
 
   /**
@@ -52,21 +87,15 @@ public class SubscriptionCallController {
    * @param accessKey AccessKey（请求头）
    * @param timestamp 时间戳（请求头）
    * @param signature 签名（请求头）
-   * @param request 原始请求
+   * @param parameterMap 原始请求参数
    * @return 响应体
    */
-  @RequestMapping("/{openapiCode}")
-  public ResponseEntity<byte[]> redirect(
-      @PathVariable String openapiCode,
-      @RequestBody(required = false) byte[] body,
-      @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) String accessKey,
-      @RequestHeader(ZerowebOpenConstant.TIMESTAMP_HEADER) Instant timestamp,
-      @RequestHeader(ZerowebOpenConstant.SIGNATURE_HEADER) String signature,
-      @RequestHeader HttpHeaders originalHeaders,
-      HttpServletRequest request
+  private ResponseEntity<byte[]> forward(
+      String openapiCode, byte[] body, String accessKey, Instant timestamp, String signature,
+      HttpHeaders originalHeaders, Map<String, String[]> parameterMap
   ) {
     /* 签发JWT */
-    String jwt = subscriptionCallService.signJwt(accessKey, body, signature, timestamp);
+    String jwt = thirdPartyAppService.signJwt(accessKey, body, signature, timestamp);
     /* 获取相应的后端地址 */
     String appId = JWT.decode(jwt).getSubject();
     Subscription subscription = subscriptionService.getSubscription(appId, openapiCode);
@@ -83,7 +112,6 @@ public class SubscriptionCallController {
         // 请求路径由目标地址定义
         .uri(subscription.getOpenapi().getDestination(), uri -> {
           // 请求参数与路径参数都由原始请求的请求参数提供
-          Map<String, String[]> parameterMap = request.getParameterMap();
           parameterMap.forEach(uri::queryParam);
           Map<String, String> pathVariableMap = parameterMap.entrySet().parallelStream()
               .collect(Collectors.toMap(

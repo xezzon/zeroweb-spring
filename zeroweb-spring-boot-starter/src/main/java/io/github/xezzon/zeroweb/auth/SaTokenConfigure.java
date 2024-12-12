@@ -1,14 +1,14 @@
-package io.github.xezzon.zeroweb.common.satoken;
+package io.github.xezzon.zeroweb.auth;
 
 import cn.dev33.satoken.interceptor.SaInterceptor;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Sa-Token 相关配置
  */
-@Component
+@Configuration
 public class SaTokenConfigure implements WebMvcConfigurer {
 
   /**

@@ -66,10 +66,11 @@ class OpenapiHttpTest {
 
   @Test
   void addOpenapi() {
-    AddOpenapiReq req = new AddOpenapiReq();
-    req.setCode(RandomUtil.randomString(8));
-    req.setDestination(RandomUtil.randomString(8));
-    req.setHttpMethod(RandomUtil.randomEle(HttpMethod.values()));
+    AddOpenapiReq req = new AddOpenapiReq(
+        RandomUtil.randomString(8),
+        RandomUtil.randomString(8),
+        RandomUtil.randomEle(HttpMethod.values())
+    );
     Id responseBody = webTestClient.post()
         .uri(OPENAPI_ADD_URI)
         .bodyValue(req)
@@ -80,9 +81,9 @@ class OpenapiHttpTest {
     assertNotNull(responseBody);
     assertNotNull(responseBody.id());
     Openapi openapi = repository.findById(responseBody.id()).orElseThrow();
-    assertEquals(req.getCode(), openapi.getCode());
-    assertEquals(req.getDestination(), openapi.getDestination());
-    assertEquals(req.getHttpMethod(), openapi.getHttpMethod());
+    assertEquals(req.code(), openapi.getCode());
+    assertEquals(req.destination(), openapi.getDestination());
+    assertEquals(req.httpMethod(), openapi.getHttpMethod());
     assertEquals(OpenapiStatus.DRAFT, openapi.getStatus());
   }
 
@@ -91,10 +92,11 @@ class OpenapiHttpTest {
     this.initData();
     Openapi exist = repository.findAll().get(0);
 
-    AddOpenapiReq req = new AddOpenapiReq();
-    req.setCode(exist.getCode());
-    req.setDestination(RandomUtil.randomString(8));
-    req.setHttpMethod(RandomUtil.randomEle(HttpMethod.values()));
+    AddOpenapiReq req = new AddOpenapiReq(
+        exist.getCode(),
+        RandomUtil.randomString(8),
+        RandomUtil.randomEle(HttpMethod.values())
+    );
     webTestClient.post()
         .uri(OPENAPI_ADD_URI)
         .bodyValue(req)

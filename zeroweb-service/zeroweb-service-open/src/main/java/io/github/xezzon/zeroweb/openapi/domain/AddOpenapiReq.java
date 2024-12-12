@@ -3,32 +3,21 @@ package io.github.xezzon.zeroweb.openapi.domain;
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.tao.trait.Into;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
-import lombok.Getter;
-import lombok.Setter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 /**
+ * @param code 接口编码
+ * @param destination 后端地址
+ * @param httpMethod 请求接口的HTTP方法
  * @author xezzon
  */
-@Getter
-@Setter
-public class AddOpenapiReq implements Into<Openapi> {
-
-  /**
-   * 接口编码
-   */
-  @Alphanumeric
-  private String code;
-  /**
-   * 后端地址
-   */
-  private String destination;
-  /**
-   * 请求接口的HTTP方法
-   */
-  private HttpMethod httpMethod;
+public record AddOpenapiReq(
+    @Alphanumeric String code,
+    String destination,
+    HttpMethod httpMethod
+) implements Into<Openapi> {
 
   @Override
   public Openapi into() {
