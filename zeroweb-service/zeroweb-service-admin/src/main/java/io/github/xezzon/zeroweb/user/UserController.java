@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.user;
 
-import cn.hutool.crypto.digest.BCrypt;
+import cn.dev33.satoken.secure.BCrypt;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.user.domain.RegisterUserReq;
 import io.github.xezzon.zeroweb.user.domain.User;

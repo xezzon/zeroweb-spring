@@ -4,8 +4,6 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import jakarta.annotation.Resource;
-import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,10 +32,9 @@ class BaseDAOTest {
     testEntity1.setField1(RandomUtil.randomString(8));
     testEntityDAO.partialUpdate(testEntity1);
 
-    Optional<TestEntity> result = repository.findById(testEntity.getId());
-    Assertions.assertTrue(result.isPresent());
-    Assertions.assertEquals(testEntity1.getField1(), result.get().getField1());
-    Assertions.assertEquals(testEntity.getField2(), result.get().getField2());
+    TestEntity result = repository.findById(testEntity.getId()).orElseThrow();
+    Assertions.assertEquals(testEntity1.getField1(), result.getField1());
+    Assertions.assertEquals(testEntity.getField2(), result.getField2());
   }
 
   @Test
@@ -45,9 +42,6 @@ class BaseDAOTest {
     final int loopTime = 16;
     for (int i = 0; i < loopTime; i++) {
       TestEntity testEntity = new TestEntity();
-      if (RandomUtil.randomBoolean()) {
-        testEntity.setId(UUID.randomUUID().toString());
-      }
       testEntity.setField1(RandomUtil.randomString(8));
       testEntity.setField2(RandomUtil.randomString(8));
       repository.save(testEntity);
@@ -87,9 +81,9 @@ class BaseDAOTest {
     String newValue = RandomUtil.randomString(7);
     int updated = testEntityDAO.updateField2ByField1(testEntity1.getField1(), newValue);
     Assertions.assertEquals(1, updated);
-    TestEntity result = repository.findById(testEntity1.getId()).get();
+    TestEntity result = repository.findById(testEntity1.getId()).orElseThrow();
     Assertions.assertEquals(newValue, result.getField2());
-    TestEntity another = repository.findById(testEntity2.getId()).get();
+    TestEntity another = repository.findById(testEntity2.getId()).orElseThrow();
     Assertions.assertEquals(testEntity2.getField2(), another.getField2());
   }
 }

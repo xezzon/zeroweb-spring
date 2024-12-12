@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.auth;
 
+import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.crypto.digest.BCrypt;
 import com.auth0.jwt.JWTCreator.Builder;
 import io.github.xezzon.zeroweb.auth.domain.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.exception.InvalidTokenException;

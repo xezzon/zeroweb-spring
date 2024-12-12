@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb;
 
+import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.crypto.digest.BCrypt;
 import io.github.xezzon.zeroweb.user.domain.User;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;

@@ -28,7 +28,6 @@
     <dependency>
       <artifactId>bcpkix-jdk18on</artifactId>
       <groupId>org.bouncycastle</groupId>
-      <version>1.78.1</version>
     </dependency>
     <dependency>
       <artifactId>feign-jackson</artifactId>
