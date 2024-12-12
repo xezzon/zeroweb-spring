@@ -1,7 +1,6 @@
 package io.github.xezzon.zeroweb.dict;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
@@ -14,7 +13,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -158,17 +156,15 @@ class DictGrpcServerTest {
         .build();
     dictBlockingStub.importDict(dictImportReqList);
     assertEquals(dataset.size() + count, repository.count());
-    Optional<Dict> result = repository.findByTagAndCode(
+    Dict result = repository.findByTagAndCode(
         Dict.DICT_TAG,
         tagList.get(0).getCode()
-    );
-    assertTrue(result.isPresent());
-    assertEquals(existTag.getId(), result.get().getId());
+    ).orElseThrow();
+    assertEquals(existTag.getId(), result.getId());
     for (Dict item : existItems) {
-      result = repository.findByTagAndCode(item.getTag(), item.getCode());
-      assertTrue(result.isPresent());
-      assertEquals(item.getId(), result.get().getId());
-      assertEquals(item.getOrdinal(), result.get().getOrdinal());
+      result = repository.findByTagAndCode(item.getTag(), item.getCode()).orElseThrow();
+      assertEquals(item.getId(), result.getId());
+      assertEquals(item.getOrdinal(), result.getOrdinal());
     }
   }
 }

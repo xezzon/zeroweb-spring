@@ -19,7 +19,6 @@ import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -89,10 +88,9 @@ class ThirdPartyAppHttpTest {
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
     Assertions.assertNotNull(responseBody.getId());
-    Optional<ThirdPartyApp> thirdPartyApp = repository.findById(responseBody.getId());
-    Assertions.assertTrue(thirdPartyApp.isPresent());
-    Assertions.assertEquals(req.name(), thirdPartyApp.get().getName());
-    AccessSecret accessSecret = accessSecretRepository.findById(responseBody.getId()).get();
+    ThirdPartyApp thirdPartyApp = repository.findById(responseBody.getId()).orElseThrow();
+    Assertions.assertEquals(req.name(), thirdPartyApp.getName());
+    AccessSecret accessSecret = accessSecretRepository.findById(responseBody.getId()).orElseThrow();
     Assertions.assertEquals(accessSecret.getSecretKey(), responseBody.getSecretKey());
     Assertions.assertArrayEquals(
         responseBody.getId().getBytes(StandardCharsets.UTF_8),
@@ -188,7 +186,7 @@ class ThirdPartyAppHttpTest {
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
     Assertions.assertNotNull(responseBody.getId());
-    AccessSecret accessSecret = accessSecretRepository.findById(responseBody.getId()).get();
+    AccessSecret accessSecret = accessSecretRepository.findById(responseBody.getId()).orElseThrow();
     Assertions.assertEquals(accessSecret.getSecretKey(), responseBody.getSecretKey());
     Assertions.assertArrayEquals(
         responseBody.getId().getBytes(StandardCharsets.UTF_8),

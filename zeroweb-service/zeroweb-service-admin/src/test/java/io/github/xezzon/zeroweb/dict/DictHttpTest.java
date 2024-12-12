@@ -114,10 +114,9 @@ class DictHttpTest {
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
     assertNotNull(responseBody.id());
-    Optional<Dict> dict = repository.findById(responseBody.id());
-    assertTrue(dict.isPresent());
-    assertEquals(Dict.DICT_TAG, dict.get().getTag());
-    assertEquals(DatabaseConstant.ROOT_ID, dict.get().getParentId());
+    Dict dict = repository.findById(responseBody.id()).orElseThrow();
+    assertEquals(Dict.DICT_TAG, dict.getTag());
+    assertEquals(DatabaseConstant.ROOT_ID, dict.getParentId());
   }
 
   @Test
@@ -194,14 +193,13 @@ class DictHttpTest {
         .bodyValue(req)
         .exchange()
         .expectStatus().isOk();
-    Optional<Dict> dict = repository.findById(target.getId());
-    assertTrue(dict.isPresent());
-    assertEquals(req.getCode(), dict.get().getCode());
-    assertEquals(target.getTag(), dict.get().getTag());
-    assertEquals(req.getLabel(), dict.get().getLabel());
-    assertEquals(req.getOrdinal(), dict.get().getOrdinal());
-    assertEquals(target.getParentId(), dict.get().getParentId());
-    assertEquals(req.getEnabled(), dict.get().getEnabled());
+    Dict dict = repository.findById(target.getId()).orElseThrow();
+    assertEquals(req.getCode(), dict.getCode());
+    assertEquals(target.getTag(), dict.getTag());
+    assertEquals(req.getLabel(), dict.getLabel());
+    assertEquals(req.getOrdinal(), dict.getOrdinal());
+    assertEquals(target.getParentId(), dict.getParentId());
+    assertEquals(req.getEnabled(), dict.getEnabled());
   }
 
   @Test
@@ -227,14 +225,13 @@ class DictHttpTest {
         .expectStatus().isBadRequest()
         .expectBody()
         .jsonPath("$.code").isEqualTo(ErrorCode.REPEAT_DATA.code());
-    Optional<Dict> dict = repository.findById(target.getId());
-    assertTrue(dict.isPresent());
-    assertEquals(target.getCode(), dict.get().getCode());
-    assertEquals(target.getTag(), dict.get().getTag());
-    assertEquals(target.getLabel(), dict.get().getLabel());
-    assertEquals(target.getOrdinal(), dict.get().getOrdinal());
-    assertEquals(target.getParentId(), dict.get().getParentId());
-    assertEquals(target.getEnabled(), dict.get().getEnabled());
+    Dict dict = repository.findById(target.getId()).orElseThrow();
+    assertEquals(target.getCode(), dict.getCode());
+    assertEquals(target.getTag(), dict.getTag());
+    assertEquals(target.getLabel(), dict.getLabel());
+    assertEquals(target.getOrdinal(), dict.getOrdinal());
+    assertEquals(target.getParentId(), dict.getParentId());
+    assertEquals(target.getEnabled(), dict.getEnabled());
   }
 
   @Test
@@ -256,12 +253,10 @@ class DictHttpTest {
         .bodyValue(List.of(dataset.get(0).getId(), dataset.get(1).getId()))
         .exchange()
         .expectStatus().isOk();
-    Optional<Dict> dict1 = repository.findById(dataset.get(0).getId());
-    assertTrue(dict1.isPresent());
-    assertEquals(false, dict1.get().getEnabled());
-    Optional<Dict> dict2 = repository.findById(dataset.get(1).getId());
-    assertTrue(dict2.isPresent());
-    assertEquals(false, dict2.get().getEnabled());
+    Dict dict1 = repository.findById(dataset.get(0).getId()).orElseThrow();
+    assertEquals(false, dict1.getEnabled());
+    Dict dict2 = repository.findById(dataset.get(1).getId()).orElseThrow();
+    assertEquals(false, dict2.getEnabled());
 
     webTestClient.put()
         .uri(builder -> builder
@@ -272,12 +267,10 @@ class DictHttpTest {
         .bodyValue(List.of(dataset.get(1).getId(), dataset.get(2).getId()))
         .exchange()
         .expectStatus().isOk();
-    Optional<Dict> dict3 = repository.findById(dataset.get(1).getId());
-    assertTrue(dict3.isPresent());
-    assertEquals(true, dict3.get().getEnabled());
-    Optional<Dict> dict4 = repository.findById(dataset.get(2).getId());
-    assertTrue(dict4.isPresent());
-    assertEquals(true, dict4.get().getEnabled());
+    Dict dict3 = repository.findById(dataset.get(1).getId()).orElseThrow();
+    assertEquals(true, dict3.getEnabled());
+    Dict dict4 = repository.findById(dataset.get(2).getId()).orElseThrow();
+    assertEquals(true, dict4.getEnabled());
   }
 
   @Test
