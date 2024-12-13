@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * 接口订阅管理
  * @author xezzon
  */
 @RestController
@@ -24,6 +25,11 @@ public class SubscriptionController {
     this.subscriptionService = subscriptionService;
   }
 
+  /**
+   * 订阅对外接口
+   * @param req 接口订阅信息
+   * @return 订阅标识
+   */
   @PostMapping()
   public Id subscribe(@RequestBody AddSubscriptionReq req) {
     Subscription subscription = req.into();
@@ -32,6 +38,11 @@ public class SubscriptionController {
     return Id.of(subscription.getId());
   }
 
+  /**
+   * 审核订阅
+   * 审核后第三方应用即可调用该接口
+   * @param id 订阅标识
+   */
   @PutMapping("/audit/{id}")
   public void auditSubscription(@PathVariable String id) {
     subscriptionService.auditSubscription(id);
