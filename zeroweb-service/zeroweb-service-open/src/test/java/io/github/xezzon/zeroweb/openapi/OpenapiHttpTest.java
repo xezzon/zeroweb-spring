@@ -24,13 +24,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * @author xezzon
  */
-@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext
 class OpenapiHttpTest {
@@ -108,8 +106,8 @@ class OpenapiHttpTest {
 
   @Test
   void pagedList() {
-    final int top = 2;
-    final int skip = 4;
+    final int top = 5;
+    final int skip = top * 2;
     List<Openapi> dataset = this.initData();
 
     PagedModel<Openapi> responseBody = webTestClient.get()

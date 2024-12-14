@@ -5,8 +5,8 @@ spring:
     include:
       - common
       - ${JDBC_TYPE:postgresql}
-      - ${SPRING_ENVIRONMENT:prod}
       - ${CACHE_TYPE:in-memory}
+      - ${SPRING_ENVIRONMENT:prod}
   liquibase:
     tag: @project.version@
 

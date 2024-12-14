@@ -27,11 +27,11 @@ public class ZerowebConfig {
   /**
    * ID生成策略
    */
-  protected IdGeneratorEnum idGenerator;
+  protected IdGeneratorEnum idGenerator = IdGeneratorEnum.UUID;
   /**
    * JWT 相关配置
    */
-  protected ZerowebJwtConfig jwt;
+  protected ZerowebJwtConfig jwt = new ZerowebJwtConfig();
 
   /**
    * JWT 相关配置
@@ -43,11 +43,11 @@ public class ZerowebConfig {
     /**
      * JWT 签发机构
      */
-    protected String issuer;
+    protected String issuer = "xezzon.github.io";
     /**
      * JWT 有效时长，单位 秒
      */
-    protected Long timeout;
+    protected Long timeout = 120L;
   }
 
   /**

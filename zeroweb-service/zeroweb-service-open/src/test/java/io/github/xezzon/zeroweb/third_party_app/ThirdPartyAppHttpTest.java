@@ -27,13 +27,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * @author xezzon
  */
-@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext
 class ThirdPartyAppHttpTest {
@@ -100,7 +98,7 @@ class ThirdPartyAppHttpTest {
 
   @Test
   void listMyThirdPartyApp() {
-    final int top = 2;
+    final int top = 5;
     final int skip = top * 2;
     List<ThirdPartyApp> dataset = this.initData();
     String me = dataset.get(0).getOwnerId();

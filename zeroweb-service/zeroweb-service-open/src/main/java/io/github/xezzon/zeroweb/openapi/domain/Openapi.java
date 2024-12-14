@@ -44,7 +44,7 @@ public class Openapi implements IEntity<String> {
    * 后端地址
    * 即该接口应该转发到的后端地址
    */
-  @Column(name = "destination", nullable = false, length = 2048)
+  @Column(name = "destination", nullable = false, length = 2083)
   String destination;
   /**
    * 请求接口的HTTP方法
