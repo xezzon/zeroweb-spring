@@ -1,0 +1,2 @@
+SPRING_ENVIRONMENT: test
+JDBC_TYPE: @db.type@

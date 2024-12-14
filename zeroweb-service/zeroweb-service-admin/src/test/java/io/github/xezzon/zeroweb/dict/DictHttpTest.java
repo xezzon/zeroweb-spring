@@ -30,14 +30,12 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * @author xezzon
  */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
 @DirtiesContext
 class DictHttpTest {
 
@@ -353,7 +351,7 @@ class DictHttpTest {
 
   @Test
   void pagedList() {
-    final int top = 2;
+    final int top = 5;
     final int skip = top * 2;
     List<Dict> dataset = this.initData();
 

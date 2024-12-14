@@ -1,5 +1,15 @@
+"$schema": "https://json.schemastore.org/liquibase-3.2.json"
+
 databaseChangeLog:
   - includeAll:
       path: ./
       relativeToChangelogFile: true
       endsWithFilter: .sql
+  - includeAll:
+      path: ./
+      relativeToChangelogFile: true
+      endsWithFilter: .xml
+  - includeAll:
+      path: ./
+      relativeToChangelogFile: true
+      endsWithFilter: .yml

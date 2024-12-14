@@ -1,0 +1,12 @@
+SPRING_ENVIRONMENT: test
+JDBC_TYPE: @db.type@
+
+grpc:
+  server:
+    inProcessName: test
+    port: -1
+  client:
+    user:
+      address: in-process:test
+    dict:
+      address: in-process:test

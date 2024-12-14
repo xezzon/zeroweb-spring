@@ -26,9 +26,9 @@ jobs:
           server-password: MAVEN_CENTRAL_TOKEN
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
       - name: Set Version
-        run: mvn -B versions:set -DnewVersion=$GITHUB_REF_NAME
+        run: mvn -B versions:set -D newVersion=$GITHUB_REF_NAME
       - name: Publish Java package
-        run: mvn -B deploy -P release -DskipTests=true
+        run: mvn -B deploy -P release -D skipTests=true
         env:
           MAVEN_USERNAME: ${{ vars.MAVEN_USERNAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
@@ -51,9 +51,9 @@ jobs:
           server-username: DOCKER_USERNAME
           server-password: DOCKER_TOKEN
       - name: Set Version
-        run: mvn -B versions:set -DnewVersion=$GITHUB_REF_NAME
+        run: mvn -B versions:set -D newVersion=$GITHUB_REF_NAME
       - name: Publish Docker image
-        run: mvn -B deploy -P docker
+        run: mvn -B deploy -P docker -D skipTests=true
         env:
           DOCKER_REGISTRY: ${{ env.DOCKER_HOST }}/${{ github.repository_owner }}
           DOCKER_USERNAME: ${{ github.repository_owner }}
@@ -76,7 +76,7 @@ jobs:
           java-version: '17'
           cache: 'maven'
       - name: Set Version
-        run: mvn -B versions:set -DnewVersion=$GITHUB_REF_NAME
+        run: mvn -B versions:set -D newVersion=$GITHUB_REF_NAME
       - name: Generate the report
         run: mvn -B site site:stage -P report
       - name: Setup Pages

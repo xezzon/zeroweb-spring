@@ -9,19 +9,15 @@ import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 
 /**
  * @author xezzon
  */
-@Slf4j
 @SpringBootTest
-@ActiveProfiles("test")
 @DirtiesContext
 class RpcDictImporterTest {
 
