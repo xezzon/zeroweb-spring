@@ -13,7 +13,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: VARCHAR(64)
-                  remarks: "订阅标识"
+                  remarks: "用户标识"
                   constraints:
                     primaryKey: true
                     nullable: false

@@ -65,6 +65,6 @@ databaseChangeLog:
               - column:
                   name: editable
                   type: BOOLEAN
-                  remarks: "后端地址"
+                  remarks: "是否可编辑"
                   constraints:
                     nullable: false
