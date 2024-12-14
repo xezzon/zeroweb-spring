@@ -167,6 +167,18 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <configuration>
+          <excludeArtifacts>
+            <excludeArtifact>report-aggregate</excludeArtifact>
+            <excludeArtifact>zeroweb-service</excludeArtifact>
+            <excludeArtifact>zeroweb-service-admin</excludeArtifact>
+            <excludeArtifact>zeroweb-service-open</excludeArtifact>
+          </excludeArtifacts>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

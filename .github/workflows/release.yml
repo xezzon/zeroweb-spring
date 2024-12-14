@@ -11,7 +11,7 @@ env:
   DOCKER_HOST: ghcr.io
 
 jobs:
-  publish-proto:
+  publish-sdk:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
