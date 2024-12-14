@@ -13,10 +13,10 @@ spring:
     deserialization:
       fail-on-unknown-properties: false
   jpa:
+    hibernate:
+      ddl-auto: validate
     properties:
-      hibernate:
-        # 处理 N+1 问题
-        "[default_batch_fetch_size]": 1000
+      "[hibernate.default_batch_fetch_size]": 1000  # 处理 N+1 问题
 
 logging:
   level:

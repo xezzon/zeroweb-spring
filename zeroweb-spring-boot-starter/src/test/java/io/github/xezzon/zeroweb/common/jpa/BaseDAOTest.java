@@ -8,11 +8,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.test.annotation.DirtiesContext;
 
 /**
  * @author xezzon
  */
 @SpringBootTest
+@DirtiesContext
 class BaseDAOTest {
 
   @Resource

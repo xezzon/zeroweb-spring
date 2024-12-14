@@ -2,3 +2,6 @@ spring:
   datasource:
     url: jdbc:postgresql://${DB_URL:postgres:5432/zeroweb}
     driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      "[hibernate.type.preferred_boolean_jdbc_type]": BIT

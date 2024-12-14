@@ -1,0 +1,10 @@
+"$schema": "https://json.schemastore.org/liquibase-3.2.json"
+
+databaseChangeLog:
+  - changeSet:
+      id: "0"
+      author: "xezzon"
+      changes:
+        - dropView:
+            viewName: "test"
+            ifExists: true

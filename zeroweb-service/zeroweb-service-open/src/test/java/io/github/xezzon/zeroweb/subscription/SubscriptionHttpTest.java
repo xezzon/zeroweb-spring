@@ -33,13 +33,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * @author xezzon
  */
-@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext
 class SubscriptionHttpTest {
@@ -102,18 +100,6 @@ class SubscriptionHttpTest {
     final int skip = 0;
     List<Subscription> dataset = this.initData();
 
-    webTestClient.get()
-        .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
-            .queryParam("top", top)
-            .queryParam("skip", skip)
-            .build(dataset.get(0).getAppId())
-        )
-        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-        .header(AUTHORIZATION, TestJwtGenerator.generateBearer(RandomUtil.randomString(6)))
-        .exchange()
-        .expectStatus().isForbidden()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCode.DATA_PERMISSION_FORBIDDEN.code());
-
     PagedModel<Subscription> responseBody = webTestClient.get()
         .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
             .queryParam("top", top)
@@ -163,6 +149,25 @@ class SubscriptionHttpTest {
         Assertions.assertEquals(SubscriptionStatus.NONE, actual.getSubscriptionStatus());
       }
     }
+  }
+
+  @Test
+  void listSubscription_dataPermission() {
+    final int top = 2000;
+    final int skip = 0;
+    List<Subscription> dataset = this.initData();
+
+    webTestClient.get()
+      .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
+        .queryParam("top", top)
+        .queryParam("skip", skip)
+        .build(dataset.get(0).getAppId())
+      )
+      .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+      .header(AUTHORIZATION, TestJwtGenerator.generateBearer(RandomUtil.randomString(6)))
+      .exchange()
+      .expectStatus().isForbidden()
+      .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCode.DATA_PERMISSION_FORBIDDEN.code());
   }
 
   @Test

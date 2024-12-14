@@ -17,13 +17,11 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 
 /**
  * @author xezzon
  */
 @SpringBootTest
-@ActiveProfiles("test")
 @DirtiesContext
 class DictGrpcServerTest {
 

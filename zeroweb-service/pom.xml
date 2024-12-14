@@ -35,6 +35,8 @@
     <!-- JavaAgent 名称 -->
     <opentelemetry-javaagent.name>opentelemetry-javaagent-2.4.0.jar</opentelemetry-javaagent.name>
     <otel-ali-extension.name>ot-java-agent-extension-1.28.0.jar</otel-ali-extension.name>
+    <!-- Testcontainers -->
+    <testcontainers.postgresql.url>jdbc:tc:postgresql:16-alpine:///postgres</testcontainers.postgresql.url>
   </properties>
 
   <dependencies>
@@ -68,6 +70,10 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
     </dependency>
     <dependency>
       <groupId>org.liquibase</groupId>
@@ -140,6 +146,13 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
@@ -157,13 +170,6 @@
             </reports>
           </reportSet>
         </reportSets>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
       </plugin>
     </plugins>
   </reporting>
@@ -235,6 +241,51 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>default-test-db</id>
+      <activation>
+        <property>
+          <name>!db.type</name>
+        </property>
+      </activation>
+      <properties>
+        <db.type>postgresql</db.type>
+        <db.url>${testcontainers.postgresql.url}</db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>postgresql</id>
+      <activation>
+        <property>
+          <name>db.type</name>
+          <value>postgresql</value>
+        </property>
+      </activation>
+      <properties>
+        <db.type>postgresql</db.type>
+        <db.url>${testcontainers.postgresql.url}</db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>mysql</id>
+      <activation>
+        <property>
+          <name>db.type</name>
+          <value>mysql</value>
+        </property>
+      </activation>
+      <properties>
+        <db.type>mysql</db.type>
+        <db.url>jdbc:tc:mysql:8:///test?TC_MY_CNF=mysql</db.url>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.testcontainers</groupId>
+          <artifactId>mysql</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 </project>
