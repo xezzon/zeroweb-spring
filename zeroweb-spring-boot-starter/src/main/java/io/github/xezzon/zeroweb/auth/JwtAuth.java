@@ -9,7 +9,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import io.github.xezzon.zeroweb.auth.JwtClaim.Builder;
-import io.github.xezzon.zeroweb.auth.domain.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.exception.InvalidSessionException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -87,9 +86,8 @@ public class JwtAuth {
    * @param token 待解码的JWT令牌字符串
    * @return 解码后的JwtClaim对象
    */
-  public JwtClaim decode(String token) {
+  public DecodedJWT decode(String token) {
     JWTVerifier verifier = JWT.require(algorithm).build();
-    DecodedJWT jwt = verifier.verify(token);
-    return JwtClaimWrapper.from(jwt).get();
+    return verifier.verify(token);
   }
 }
