@@ -1,23 +1,25 @@
+<!-- 请先阅览 [开发者指南](https://github.com/xezzon/zeroweb-spring/CONTRIBUTING.md) -->
 
-## PR Checklist
+## Pull Request Checklist
 
 - [ ] base分支是 `develop`。
 - [ ] 选择合适的标签（单选） `feature`/`bug`/`refactor`/`document`。
-- [ ] 关联 Milestone。
-- [ ] 关联 issue（针对`feature`和`bug`）
-- [ ] 关联 Projects（针对`document`）
+- [ ] 关联 issue。
+- [ ] 代码经过了格式化。
+- [ ] 没有引入编译警告。
+- [ ] 功能已完成。
 
-## 更新说明
+## Description
 
-## CR Checklist
+## Code Review Checklist
 
+- [ ] 已通过单元测试与 SAST。（由 CI 自动完成）
 - [ ] 满足需求规格说明书中的功能性需求、非功能性需求。
-  - [ ] 
 - [ ] 文档已更新。
-  - [ ] 接口清单
   - [ ] 详细设计文档
-  - [ ] Javadoc
+  - [ ] 代码注释
 - [ ] 对外接口保持兼容。
-- [ ] 代码风格符合规范。
-- [ ] 不存在不可接受的安全风险、性能风险。
-- [ ] ...
+- [ ] 代码风格与现有代码一致。
+- [ ] 不存在的安全风险、性能风险。
+- [ ] 没有引入不受信任的依赖。
+- [ ] Code Review 后，审批或驳回 PR。
