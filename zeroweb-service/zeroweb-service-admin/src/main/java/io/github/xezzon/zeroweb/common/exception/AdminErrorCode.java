@@ -38,7 +38,7 @@ public enum AdminErrorCode implements IErrorCode {
 
   @Override
   public byte moduleCode() {
-    return 1;
+    return -1;
   }
 
   @Override

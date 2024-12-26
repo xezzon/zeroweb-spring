@@ -38,7 +38,7 @@ public enum OpenErrorCode implements IErrorCode {
 
   @Override
   public byte moduleCode() {
-    return 2;
+    return -2;
   }
 
   @Override
