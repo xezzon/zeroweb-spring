@@ -20,7 +20,7 @@ public class ZerowebOpenRequestBuilder {
   }
 
   /**
-   * 应用标识
+   * 应用访问凭据
    */
   private final String accessKey;
   /**
@@ -28,6 +28,10 @@ public class ZerowebOpenRequestBuilder {
    */
   private final byte[] secretKey;
 
+  /**
+   * @param accessKey 应用访问凭据
+   * @param secretKey 应用密钥
+   */
   public ZerowebOpenRequestBuilder(String accessKey, String secretKey) {
     this.accessKey = accessKey;
     this.secretKey = Base64.getDecoder().decode(secretKey);
@@ -38,11 +42,14 @@ public class ZerowebOpenRequestBuilder {
         .requestInterceptor(new ZerowebOpenRequestInterceptor());
   }
 
+  /**
+   * OpenFeign 请求拦截器。向请求头中添加应用访问凭据、时间戳、摘要。
+   */
   class ZerowebOpenRequestInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate requestTemplate) {
-      // 应用标识
+      // 应用访问凭据
       requestTemplate.header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessKey);
       // 时间戳
       long timestamp = Instant.now().toEpochMilli();
