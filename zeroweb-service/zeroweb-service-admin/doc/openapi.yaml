@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 tags: []
 paths:
-  /dict/add:
+  /dict:
     post:
       summary: 新增字典目/字典项
       deprecated: false
@@ -75,7 +75,6 @@ paths:
                 properties: {}
           headers: {}
       security: []
-  /dict:
     delete:
       summary: 批量删除字典目/字典项
       deprecated: false
@@ -205,42 +204,6 @@ paths:
                   - content
           headers: {}
       security: []
-  /dict/tag/{tag}:
-    get:
-      summary: 查询指定字典目下所有字典项的列表
-      deprecated: false
-      description: 按ordinal升序排列
-      operationId: dict-tag-{tag}-GET
-      tags: []
-      parameters:
-        - name: tag
-          in: path
-          description: 字典目编码
-          required: true
-          example: ''
-          schema:
-            format: string
-            type: string
-        - name: X-PUBLIC-KEY
-          in: header
-          description: ''
-          example: '{{JWT_PUBLIC_KEY}}'
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items: &ref_1
-                  $ref: '#/components/schemas/Dict'
-                minItems: 0
-                uniqueItems: true
-          headers: {}
-      security: []
-  /dict/update:
     put:
       summary: 更新字典目/字典项
       deprecated: false
@@ -317,7 +280,42 @@ paths:
                 properties: {}
           headers: {}
       security: []
-  /dict/update/status:
+  /dict/tag/{tag}:
+    get:
+      summary: 查询指定字典目下所有字典项的列表
+      deprecated: false
+      description: 按ordinal升序排列
+      operationId: dict-tag-{tag}-GET
+      tags: []
+      parameters:
+        - name: tag
+          in: path
+          description: 字典目编码
+          required: true
+          example: ''
+          schema:
+            format: string
+            type: string
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items: &ref_1
+                  $ref: '#/components/schemas/Dict'
+                minItems: 0
+                uniqueItems: true
+          headers: {}
+      security: []
+  /dict/update-status:
     put:
       summary: 批量更新字典状态
       deprecated: false

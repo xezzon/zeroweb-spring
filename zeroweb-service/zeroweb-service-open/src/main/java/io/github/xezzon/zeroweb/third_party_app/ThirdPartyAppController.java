@@ -40,7 +40,7 @@ public class ThirdPartyAppController {
    * @param req 请求体，包含要添加的第三方应用信息
    * @return 添加成功后返回的第三方应用ID
    */
-  @PostMapping("/add")
+  @PostMapping()
   public AccessSecret add(@RequestBody AddThirdPartyAppReq req) {
     ThirdPartyApp thirdPartyApp = req.into();
     thirdPartyApp.setOwnerId(StpUtil.getLoginIdAsString());

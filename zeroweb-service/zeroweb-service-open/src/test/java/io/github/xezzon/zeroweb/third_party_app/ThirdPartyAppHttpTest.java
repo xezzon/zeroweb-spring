@@ -36,7 +36,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @DirtiesContext
 class ThirdPartyAppHttpTest {
 
-  private static final String THIRD_PARTY_APP_ADD_URI = "/third-party-app/add";
+  private static final String THIRD_PARTY_APP_ADD_URI = "/third-party-app";
   private static final String THIRD_PARTY_LIST_MINE_API = "/third-party-app/mine";
   private static final String THIRD_PARTY_LIST_API = "/third-party-app";
   private static final String ROLL_ACCESS_SECRET_URI = "/third-party-app/{appId}/roll";

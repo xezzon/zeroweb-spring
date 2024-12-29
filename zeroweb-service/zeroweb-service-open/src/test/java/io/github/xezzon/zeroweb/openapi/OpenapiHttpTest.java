@@ -33,9 +33,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @DirtiesContext
 class OpenapiHttpTest {
 
-  private static final String OPENAPI_ADD_URI = "/openapi/add";
+  private static final String OPENAPI_ADD_URI = "/openapi";
   private static final String GET_OPENAPI_URI = "/openapi";
-  private static final String MODIFY_OPENAPI_URI = "/openapi/update";
+  private static final String MODIFY_OPENAPI_URI = "/openapi";
   private static final String PUBLISH_OPENAPI_URI = "/openapi/publish/{id}";
 
   @Resource

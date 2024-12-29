@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 tags: []
 paths:
-  /openapi/add:
+  /openapi:
     post:
       summary: 新增对外接口
       deprecated: false
@@ -53,7 +53,6 @@ paths:
           headers: {}
       security:
         - bearer: []
-  /openapi:
     get:
       summary: 查询对外接口列表
       deprecated: false
@@ -119,7 +118,6 @@ paths:
           headers: {}
       security:
         - bearer: []
-  /openapi/update:
     put:
       summary: 编辑对外接口
       deprecated: false
@@ -228,7 +226,7 @@ paths:
           headers: {}
       security:
         - bearer: []
-  /third-party-app/add:
+  /third-party-app:
     post:
       summary: 新增第三方应用
       deprecated: false
@@ -258,6 +256,72 @@ paths:
           content:
             application/json:
               schema: *ref_0
+          headers: {}
+      security:
+        - bearer: []
+    get:
+      summary: 查询应用列表
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: $top
+          in: query
+          description: ''
+          required: true
+          example: 0
+          schema:
+            type: integer
+            format: uint32
+            minimum: 0
+            maximum: 2000
+            exclusiveMinimum: true
+        - name: $skip
+          in: query
+          description: ''
+          required: true
+          example: 0
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            multipleOf: 5
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ThirdPartApp'
+                    title: 内容
+                  number:
+                    type: integer
+                    title: 页码
+                    minimum: 1
+                  size:
+                    type: integer
+                    title: 页大小
+                    minimum: 5
+                    maximum: 2000
+                    multipleOf: 5
+                  totalElements:
+                    type: integer
+                    title: 总数量
+                    minimum: 0
+                    maximum: 2000000
+                required:
+                  - content
           headers: {}
       security:
         - bearer: []
@@ -412,73 +476,6 @@ paths:
                         - id
                         - name
                         - ownerId
-                    title: 内容
-                  number:
-                    type: integer
-                    title: 页码
-                    minimum: 1
-                  size:
-                    type: integer
-                    title: 页大小
-                    minimum: 5
-                    maximum: 2000
-                    multipleOf: 5
-                  totalElements:
-                    type: integer
-                    title: 总数量
-                    minimum: 0
-                    maximum: 2000000
-                required:
-                  - content
-          headers: {}
-      security:
-        - bearer: []
-  /third-party-app:
-    get:
-      summary: 查询应用列表
-      deprecated: false
-      description: ''
-      tags: []
-      parameters:
-        - name: $top
-          in: query
-          description: ''
-          required: true
-          example: 0
-          schema:
-            type: integer
-            format: uint32
-            minimum: 0
-            maximum: 2000
-            exclusiveMinimum: true
-        - name: $skip
-          in: query
-          description: ''
-          required: true
-          example: 0
-          schema:
-            type: integer
-            minimum: 0
-            maximum: 10000
-            multipleOf: 5
-        - name: X-PUBLIC-KEY
-          in: header
-          description: ''
-          example: '{{JWT_PUBLIC_KEY}}'
-          schema:
-            type: string
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ThirdPartApp'
                     title: 内容
                   number:
                     type: integer

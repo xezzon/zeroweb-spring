@@ -39,7 +39,7 @@ public class DictController {
    * @param req 对于字典项，字典目、上级ID不能为空
    * @return 字典ID
    */
-  @PostMapping("/add")
+  @PostMapping()
   public Id addDict(@RequestBody AddDictReq req) {
     Dict dict = req.into();
     if (dict.getTag() == null || dict.getParentId() == null) {
@@ -75,7 +75,7 @@ public class DictController {
    * 更新字典目/字典项
    * @param req 字典
    */
-  @PutMapping("/update")
+  @PutMapping()
   public void modifyDict(@RequestBody ModifyDictReq req) {
     Dict dict = req.into();
     dictService.modifyDict(dict);
@@ -86,7 +86,7 @@ public class DictController {
    * @param ids 字典ID集合
    * @param enabled 更新后的字典启用状态
    */
-  @PutMapping("/update/status")
+  @PutMapping("/update-status")
   public void updateDictStatus(
       @RequestBody Collection<String> ids,
       @RequestParam Boolean enabled
