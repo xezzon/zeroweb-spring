@@ -138,7 +138,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <parameters>true</parameters>
+          <parameters>true</parameters>  <!-- 使用该配置，@RequestParam 会默认以字段名作为 value 属性的值 -->
         </configuration>
       </plugin>
       <plugin>
@@ -175,9 +175,11 @@
 
   <profiles>
     <profile>
+      <!-- 发布微服务应用时使用的配置。 -->
       <id>docker</id>
       <build>
         <plugins>
+          <!-- 使用 jib-maven-plugin 将微服务发布到 Docker registry -->
           <plugin>
             <groupId>com.google.cloud.tools</groupId>
             <artifactId>jib-maven-plugin</artifactId>
@@ -242,6 +244,7 @@
       </build>
     </profile>
     <profile>
+      <!-- 未指定测试数据库类型时，默认使用 PostgreSQL，使用该配置方便开发者本地运行单元测试。 -->
       <id>default-test-db</id>
       <activation>
         <property>
@@ -254,6 +257,7 @@
       </properties>
     </profile>
     <profile>
+      <!-- 使用 PostgreSQL 数据库进行单元测试时使用的配置文件 -->
       <id>postgresql</id>
       <activation>
         <property>
@@ -267,6 +271,7 @@
       </properties>
     </profile>
     <profile>
+      <!-- 使用 MySQL 数据库进行单元测试时使用的配置文件 -->
       <id>mysql</id>
       <activation>
         <property>

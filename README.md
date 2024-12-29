@@ -32,40 +32,9 @@ ZeroWeb 是一组 BaaS(Backend as a Service)，可以低成本地实现认证授
 
 ## 应用架构
 
-```mermaid
-C4Component
-  title 部署架构（参考）
-  Node(browser, "浏览器", "Google Chrome, Mozilla Firefox, Apple Safari or Microsoft Edge") {
-    Container(spa, "前端应用", "React")
-  }
-  Node(cf, "DNS", "cloudflare") {
-    Container(CDN, "CDN")
-    Container(gw, "公网网关")
-  }
-  Node(app, "后端应用") {
-    Container(api, "API网关", "river", "后端应用唯一对外暴露的节点")
-    Container(zeroweb-service-admin, "后台管理服务", "Spring Boot")
-    Container(zeroweb-service-openapi, "开放平台服务", "Spring Boot")
-    Container(service-a, "业务应用1")
-    
-    Rel_D(api, zeroweb-service-admin, "admin.domain.com", "json/HTTP")
-    Rel_D(api, zeroweb-service-openapi, "openapi.domain.com", "json/HTTP")
-    Rel_D(api, service-a, "a.domain.com", "json/HTTP")
-          
-    Rel(zeroweb-service-openapi, zeroweb-service-admin, "RPC调用", "protobuf/gRPC")
-    Rel(service-a, zeroweb-service-admin, "RPC调用", "protobuf/gRPC")
-  }
-  Node(dep, "中间件") {
-    Container(db, "关系型数据库", "PostgreSQL")
-    Container(kv, "键值数据库", "Redis")
-  }
-  Rel_D(spa, CDN, "www.domain.com", "html/HTTPs")
-  Rel_D(spa, gw, "*.domain.com", "json/HTTPs")
-  Rel_D(gw, api, "*.domain.com", "json/HTTPs")
-  Rel_D(zeroweb-service-admin, db, "持久化数据", "JDBC")
-  Rel_D(service-a, db, "持久化数据", "JDBC")
-  Rel_D(zeroweb-service-admin, kv, "数据共享", "Lettuce")
-```
+![应用架构](./doc/excalidraw/component.svg)
+
+![部署架构](./doc/excalidraw/deploy.svg)
 
 ## [开发者手册](./CONTRIBUTING.md)
 
