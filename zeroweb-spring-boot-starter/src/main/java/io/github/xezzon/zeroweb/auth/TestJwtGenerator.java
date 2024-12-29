@@ -4,7 +4,7 @@ import static com.google.auth.http.AuthHttpConstants.BEARER;
 
 import cn.hutool.core.util.RandomUtil;
 import com.auth0.jwt.JWTCreator.Builder;
-import io.github.xezzon.zeroweb.auth.domain.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.exception.ErrorCode;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import java.security.KeyPair;

@@ -1,4 +1,4 @@
-package io.github.xezzon.zeroweb.auth.domain;
+package io.github.xezzon.zeroweb.auth.entity;
 
 /**
  * @param username 用户名

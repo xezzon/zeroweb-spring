@@ -1,4 +1,4 @@
-package io.github.xezzon.zeroweb.auth.domain;
+package io.github.xezzon.zeroweb.auth.entity;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;

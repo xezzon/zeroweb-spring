@@ -1,8 +1,10 @@
-package io.github.xezzon.zeroweb.openapi.domain;
+package io.github.xezzon.zeroweb.openapi.entity;
 
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.tao.trait.Into;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
+import io.github.xezzon.zeroweb.openapi.domain.HttpMethod;
+import io.github.xezzon.zeroweb.openapi.domain.Openapi;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.auth;
 
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
-import io.github.xezzon.zeroweb.auth.domain.BasicAuth;
+import io.github.xezzon.zeroweb.auth.entity.BasicAuth;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

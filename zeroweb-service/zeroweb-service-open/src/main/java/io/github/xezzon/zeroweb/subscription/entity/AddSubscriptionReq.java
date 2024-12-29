@@ -1,7 +1,8 @@
-package io.github.xezzon.zeroweb.subscription.domain;
+package io.github.xezzon.zeroweb.subscription.entity;
 
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.tao.trait.Into;
+import io.github.xezzon.zeroweb.subscription.domain.Subscription;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

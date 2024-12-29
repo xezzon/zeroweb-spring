@@ -1,7 +1,8 @@
-package io.github.xezzon.zeroweb.user.domain;
+package io.github.xezzon.zeroweb.user.entity;
 
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.tao.trait.Into;
+import io.github.xezzon.zeroweb.user.domain.User;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;

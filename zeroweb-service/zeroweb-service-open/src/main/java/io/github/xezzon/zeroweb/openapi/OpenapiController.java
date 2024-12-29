@@ -2,9 +2,9 @@ package io.github.xezzon.zeroweb.openapi;
 
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
-import io.github.xezzon.zeroweb.openapi.domain.AddOpenapiReq;
-import io.github.xezzon.zeroweb.openapi.domain.ModifyOpenapiReq;
 import io.github.xezzon.zeroweb.openapi.domain.Openapi;
+import io.github.xezzon.zeroweb.openapi.entity.AddOpenapiReq;
+import io.github.xezzon.zeroweb.openapi.entity.ModifyOpenapiReq;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,7 +1,8 @@
-package io.github.xezzon.zeroweb.dict.domain;
+package io.github.xezzon.zeroweb.dict.entity;
 
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.tao.trait.Into;
+import io.github.xezzon.zeroweb.dict.domain.Dict;
 import lombok.Getter;
 import lombok.Setter;
 import org.mapstruct.Mapper;

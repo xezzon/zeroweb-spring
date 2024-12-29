@@ -5,7 +5,7 @@ import com.auth0.jwt.JWTCreator.Builder;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
-import io.github.xezzon.zeroweb.auth.domain.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig.ZerowebJwtConfig;
 import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
