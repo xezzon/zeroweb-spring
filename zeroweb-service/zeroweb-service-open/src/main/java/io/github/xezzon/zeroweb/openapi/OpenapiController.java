@@ -2,9 +2,9 @@ package io.github.xezzon.zeroweb.openapi;
 
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
-import io.github.xezzon.zeroweb.openapi.domain.AddOpenapiReq;
-import io.github.xezzon.zeroweb.openapi.domain.ModifyOpenapiReq;
 import io.github.xezzon.zeroweb.openapi.domain.Openapi;
+import io.github.xezzon.zeroweb.openapi.entity.AddOpenapiReq;
+import io.github.xezzon.zeroweb.openapi.entity.ModifyOpenapiReq;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +34,7 @@ public class OpenapiController {
    * @param req 包含添加`对外接口`请求数据的请求体
    * @return 添加的`对外接口`的唯一标识符
    */
-  @PostMapping("/add")
+  @PostMapping()
   public Id addOpenapi(@RequestBody @Valid AddOpenapiReq req) {
     Openapi openapi = req.into();
     openapiService.addOpenapi(openapi);
@@ -55,7 +55,7 @@ public class OpenapiController {
    * 更新`对外接口`信息
    * @param req 包含更新`对外接口`请求数据的请求体
    */
-  @PutMapping("/update")
+  @PutMapping()
   public void modifyOpenapi(@RequestBody ModifyOpenapiReq req) {
     Openapi openapi = req.into();
     openapiService.modifyOpenapi(openapi);

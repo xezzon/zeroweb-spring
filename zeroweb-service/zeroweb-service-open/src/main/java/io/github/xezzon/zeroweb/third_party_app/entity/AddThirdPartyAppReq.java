@@ -1,7 +1,8 @@
-package io.github.xezzon.zeroweb.third_party_app.domain;
+package io.github.xezzon.zeroweb.third_party_app.entity;
 
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.tao.trait.Into;
+import io.github.xezzon.zeroweb.third_party_app.domain.ThirdPartyApp;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

@@ -7,7 +7,7 @@ import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 
 import com.auth0.jwt.JWT;
-import io.github.xezzon.zeroweb.auth.domain.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.exception.ErrorCode;
 import io.github.xezzon.zeroweb.core.error.ErrorResponse;
 import jakarta.annotation.Resource;

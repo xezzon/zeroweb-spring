@@ -125,11 +125,11 @@ class DictGrpcServerTest {
         .build()
     );
     List<Dict> existItems = RandomUtil.randomEleList(
-            dataset.parallelStream()
-                .filter(o -> Objects.equals(o.getTag(), existTag.getCode()))
-                .toList(),
-            loopTimes
-        );
+        dataset.parallelStream()
+            .filter(o -> Objects.equals(o.getTag(), existTag.getCode()))
+            .toList(),
+        loopTimes
+    );
     itemList.addAll(existItems.parallelStream()
         .map(o -> DictImportReq.newBuilder()
             .setTag(o.getTag())

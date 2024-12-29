@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.xezzon</groupId>
@@ -88,6 +88,11 @@
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.github.therapi</groupId>
+      <artifactId>therapi-runtime-javadoc</artifactId>
+      <version>${therapi-runtime-javadoc.version}</version>
+    </dependency>
     <!-- 运维相关 -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -120,6 +125,11 @@
       <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-jpamodelgen</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.github.therapi</groupId>
+      <artifactId>therapi-runtime-javadoc-scribe</artifactId>
+      <version>${therapi-runtime-javadoc.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -128,23 +138,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <parameters>true</parameters>
+          <parameters>true</parameters>  <!-- 使用该配置，@RequestParam 会默认以字段名作为 value 属性的值 -->
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>io.github.xezzon</groupId>
-        <artifactId>smart-doc-maven-plugin</artifactId>
-        <configuration>
-          <outputDirectory>${project.build.outputDirectory}/public/v3/api-docs</outputDirectory>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>openapi</goal>
-            </goals>
-            <phase>generate-resources</phase>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -180,9 +175,11 @@
 
   <profiles>
     <profile>
+      <!-- 发布微服务应用时使用的配置。 -->
       <id>docker</id>
       <build>
         <plugins>
+          <!-- 使用 jib-maven-plugin 将微服务发布到 Docker registry -->
           <plugin>
             <groupId>com.google.cloud.tools</groupId>
             <artifactId>jib-maven-plugin</artifactId>
@@ -247,6 +244,7 @@
       </build>
     </profile>
     <profile>
+      <!-- 未指定测试数据库类型时，默认使用 PostgreSQL，使用该配置方便开发者本地运行单元测试。 -->
       <id>default-test-db</id>
       <activation>
         <property>
@@ -259,6 +257,7 @@
       </properties>
     </profile>
     <profile>
+      <!-- 使用 PostgreSQL 数据库进行单元测试时使用的配置文件 -->
       <id>postgresql</id>
       <activation>
         <property>
@@ -272,6 +271,7 @@
       </properties>
     </profile>
     <profile>
+      <!-- 使用 MySQL 数据库进行单元测试时使用的配置文件 -->
       <id>mysql</id>
       <activation>
         <property>

@@ -1,0 +1,634 @@
+openapi: 3.0.1
+info:
+  title: ZeroWeb
+  description: ''
+  version: 1.0.0
+tags: []
+paths:
+  /dict:
+    post:
+      summary: 新增字典目/字典项
+      deprecated: false
+      description: ''
+      operationId: dict-add-POST
+      tags: []
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tag:
+                  type: string
+                  title: 字典目
+                code:
+                  type: string
+                  title: 字典键
+                label:
+                  type: string
+                  title: 字典值
+                  nullable: true
+                ordinal:
+                  type: integer
+                  title: 排序号
+                parentId:
+                  type: string
+                  title: 上级字典标识
+              required:
+                - tag
+                - code
+                - label
+                - ordinal
+                - parentId
+            example:
+              tag: ''
+              code: ''
+              label: ''
+              ordinal: 0
+              parentId: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema: &ref_0
+                $ref: '#/components/schemas/Id'
+              examples:
+                '1':
+                  summary: test data
+                  value:
+                    id: ''
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security: []
+    delete:
+      summary: 批量删除字典目/字典项
+      deprecated: false
+      description: ''
+      operationId: dict-DELETE
+      tags: []
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+          headers: {}
+      security: []
+    get:
+      summary: 分页查询字典目列表
+      deprecated: false
+      description: ''
+      operationId: dict-GET
+      tags: []
+      parameters:
+        - name: $top
+          in: query
+          description: ''
+          required: false
+          example: 0
+          schema:
+            type: integer
+            format: uint32
+            minimum: 1
+            maximum: 2000
+        - name: $skip
+          in: query
+          description: ''
+          required: false
+          example: 0
+          schema:
+            type: integer
+            format: uint32
+            minimum: 0
+            maximum: 10000
+            multipleOf: 5
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        tag:
+                          type: string
+                          title: 字典目
+                        code:
+                          type: string
+                          title: 字典键
+                        label:
+                          type: string
+                          title: 字典值
+                          nullable: true
+                        ordinal:
+                          type: integer
+                          title: 排序号
+                        parentId:
+                          type: string
+                          title: 上级字典标识
+                        enabled:
+                          type: boolean
+                          title: 启用状态
+                        editable:
+                          type: boolean
+                          title: 是否可编辑
+                      required:
+                        - id
+                        - tag
+                        - code
+                        - label
+                        - ordinal
+                        - parentId
+                        - enabled
+                        - editable
+                    title: 内容
+                  number:
+                    type: integer
+                    title: 页码
+                    minimum: 1
+                  size:
+                    type: integer
+                    title: 页大小
+                    minimum: 5
+                    maximum: 2000
+                    multipleOf: 5
+                  totalElements:
+                    type: integer
+                    title: 总数量
+                    minimum: 0
+                    maximum: 2000000
+                required:
+                  - content
+          headers: {}
+      security: []
+    put:
+      summary: 更新字典目/字典项
+      deprecated: false
+      description: ''
+      operationId: dict-update-PUT
+      tags: []
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                code:
+                  type: string
+                  title: 字典键
+                label:
+                  type: string
+                  title: 字典值
+                  nullable: true
+                ordinal:
+                  type: integer
+                  title: 排序号
+                parentId:
+                  type: string
+                  title: 上级字典标识
+                enabled:
+                  type: boolean
+                  title: 启用状态
+              required:
+                - id
+                - code
+                - label
+                - ordinal
+                - parentId
+                - enabled
+            example:
+              id: ''
+              code: ''
+              label: ''
+              ordinal: 0
+              parentId: ''
+              enabled: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: 'null'
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        x-400:数据不存在或已删除:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security: []
+  /dict/tag/{tag}:
+    get:
+      summary: 查询指定字典目下所有字典项的列表
+      deprecated: false
+      description: 按ordinal升序排列
+      operationId: dict-tag-{tag}-GET
+      tags: []
+      parameters:
+        - name: tag
+          in: path
+          description: 字典目编码
+          required: true
+          example: ''
+          schema:
+            format: string
+            type: string
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items: &ref_1
+                  $ref: '#/components/schemas/Dict'
+                minItems: 0
+                uniqueItems: true
+          headers: {}
+      security: []
+  /dict/update-status:
+    put:
+      summary: 批量更新字典状态
+      deprecated: false
+      description: ''
+      operationId: dict-update-status-PUT
+      tags: []
+      parameters:
+        - name: enabled
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: boolean
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+            example: |-
+              [
+                ""
+              ]&true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+              examples:
+                '1':
+                  summary: test data
+                  value: Return void.
+          headers: {}
+      security: []
+  /auth/login/basic:
+    post:
+      summary: 用户名口令认证
+      deprecated: false
+      description: ''
+      operationId: auth-login-basic-POST
+      tags: []
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                  format: password
+              required:
+                - username
+                - password
+            example:
+              username: ''
+              password: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  tokenName:
+                    type: string
+                  tokenValue:
+                    type: string
+                required:
+                  - tokenName
+                  - tokenValue
+          headers: {}
+      security: []
+  /auth/sso:
+    get:
+      summary: 单点登录
+      deprecated: false
+      description: ''
+      operationId: auth-sso-POST
+      tags: []
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  tokenName:
+                    type: string
+                  tokenValue:
+                    type: string
+                required:
+                  - tokenName
+                  - tokenValue
+          headers: {}
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+                required:
+                  - code
+                  - message
+          headers: {}
+      security: []
+  /user/register:
+    post:
+      summary: 用户注册
+      deprecated: false
+      description: ''
+      operationId: user-register-POST
+      tags: []
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 32
+                nickname:
+                  type: string
+                password:
+                  type: string
+                  format: password
+              required:
+                - username
+                - password
+                - nickname
+            example:
+              username: ''
+              nickname: ''
+              password: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema: *ref_0
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        x-400:参数未通过校验:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security: []
+components:
+  schemas:
+    Dict:
+      type: object
+      properties:
+        id:
+          type: string
+        tag:
+          type: string
+          title: 字典目
+        code:
+          type: string
+          title: 字典键
+        label:
+          type: string
+          title: 字典值
+          nullable: true
+        ordinal:
+          type: integer
+          title: 排序号
+        parentId:
+          type: string
+          title: 上级字典标识
+        enabled:
+          type: boolean
+          title: 启用状态
+        editable:
+          type: boolean
+          title: 是否可编辑
+        children:
+          type: array
+          items: *ref_1
+          title: 子级字典
+      title: 字典
+      required:
+        - id
+        - tag
+        - code
+        - label
+        - editable
+        - enabled
+        - ordinal
+        - children
+        - parentId
+    Page:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            type: string
+          title: 内容
+        number:
+          type: integer
+          title: 页码
+          minimum: 1
+        size:
+          type: integer
+          title: 页大小
+          minimum: 5
+          maximum: 2000
+          multipleOf: 5
+        totalElements:
+          type: integer
+          title: 总数量
+          minimum: 0
+          maximum: 2000000
+      title: 分页信息
+      x--orders:
+        - content
+        - number
+        - totalElements
+        - size
+      required:
+        - content
+    Result:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 与请求头中的错误码一致
+          title: 错误编码
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              title: 错误名称
+            message:
+              type: string
+              title: 错误的可读表述
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    title: 错误名称
+                  message:
+                    type: string
+                    title: 错误的可读表述
+                required:
+                  - code
+                  - message
+              title: 有关导致该报告错误的具体错误的详细信息数组
+          title: 错误详情
+          required:
+            - code
+            - message
+      title: 异常信息
+      required:
+        - code
+        - error
+    Id:
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+        - id
+  securitySchemes: {}
+servers: []

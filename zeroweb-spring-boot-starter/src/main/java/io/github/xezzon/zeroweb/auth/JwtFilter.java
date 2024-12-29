@@ -5,7 +5,7 @@ import static com.google.auth.http.AuthHttpConstants.BEARER;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import io.github.xezzon.zeroweb.auth.domain.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.exception.ErrorCode;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import io.github.xezzon.zeroweb.core.crypto.ASN1PublicKeyReader;

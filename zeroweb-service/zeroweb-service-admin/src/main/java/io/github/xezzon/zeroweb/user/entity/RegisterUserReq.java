@@ -1,7 +1,8 @@
-package io.github.xezzon.zeroweb.user.domain;
+package io.github.xezzon.zeroweb.user.entity;
 
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.tao.trait.Into;
+import io.github.xezzon.zeroweb.user.domain.User;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +31,7 @@ public class RegisterUserReq implements Into<User> {
   private String nickname;
   /**
    * 密码
+   * 为了防止身份被冒用，由用户设置的、只有用户自己知晓的口令。
    */
   @Pattern(
       regexp = "^(?!^\\d+$)(?!^[a-z]+$)(?!^[A-Z]+$)[\\x21-\\x7E]{8,}$",

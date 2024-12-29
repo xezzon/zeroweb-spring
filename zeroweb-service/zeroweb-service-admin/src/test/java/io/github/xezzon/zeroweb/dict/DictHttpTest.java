@@ -11,9 +11,9 @@ import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.ErrorCode;
-import io.github.xezzon.zeroweb.dict.domain.AddDictReq;
 import io.github.xezzon.zeroweb.dict.domain.Dict;
-import io.github.xezzon.zeroweb.dict.domain.ModifyDictReq;
+import io.github.xezzon.zeroweb.dict.entity.AddDictReq;
+import io.github.xezzon.zeroweb.dict.entity.ModifyDictReq;
 import io.github.xezzon.zeroweb.dict.repository.DictRepository;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -39,10 +39,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @DirtiesContext
 class DictHttpTest {
 
-  private static final String ADD_DICT_URI = "/dict/add";
+  private static final String ADD_DICT_URI = "/dict";
   private static final String GET_DICT_TREE_BY_TAG_URI = "/dict/tag/{tag}";
-  private static final String MODIFY_DICT_URI = "/dict/update";
-  private static final String UPDATE_DICT_STATUS_URI = "/dict/update/status";
+  private static final String MODIFY_DICT_URI = "/dict";
+  private static final String UPDATE_DICT_STATUS_URI = "/dict/update-status";
   private static final String DELETE_DICT_URI = "/dict";
   private static final String GET_DICT_URI = "/dict";
 
@@ -314,7 +314,7 @@ class DictHttpTest {
     assertTrue(repository.existsById(dataset.get(2).getId()));
     assertTrue(repository.existsById(dataset.get(3).getChildren().get(0).getId()));
   }
-  
+
   @Test
   void getDictTreeByTag() {
     List<Dict> dataset = this.initData();

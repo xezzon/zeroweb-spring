@@ -16,6 +16,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * 字典
+ * 字典是一组提供给用户选择的值。
  * @author xezzon
  */
 @Getter
@@ -33,11 +35,15 @@ public class Dict implements IEntity<String>, IDict, TreeNode<Dict, String> {
   String id;
   /**
    * 字典目
+   * 字典目用于区分不同字典的命名空间。
+   * 字典目本身可以视为特殊的字典项，该值为`DICT`。
    */
   @Column(name = "tag", nullable = false, updatable = false)
   String tag;
   /**
    * 字典键
+   * 同一字典目下，键值唯一。
+   * 约定：由用户定义的字典键，应该以小写字母开头；由系统生成的字典键，应该以大写字母开头。
    */
   @Column(name = "code", nullable = false)
   String code;
@@ -48,21 +54,26 @@ public class Dict implements IEntity<String>, IDict, TreeNode<Dict, String> {
   String label;
   /**
    * 排序号
+   * 数值越小，顺序越靠前。
    */
   @Column(name = "ordinal", nullable = false)
   Integer ordinal;
   /**
    * 上级字典ID
+   * 用于将字典组织成树形结构。
+   * 字典目可视为特殊的字典项，该值为`0`。
    */
   @Column(name = "parent_id", nullable = false, length = DatabaseConstant.ID_LENGTH)
   String parentId;
   /**
    * 启用状态
+   * 约定：前端的新增表单应该只显示启用状态为`是`的数据。
    */
   @Column(name = "enabled", nullable = false)
   Boolean enabled;
   /**
    * 是否可编辑
+   * 是否可编辑为`否`的数据，不允许修改字典键，不允许删除，否则会造成反序列化问题。
    */
   @Column(name = "editable", nullable = false)
   Boolean editable;

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * ID 生成器
+ * 生成规则取决于配置 ${zeroweb.id-generator}
  * @author xezzon
  */
 @Component

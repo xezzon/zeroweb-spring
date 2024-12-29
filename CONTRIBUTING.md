@@ -1,6 +1,6 @@
-# 开发者手册
+# 开发者指南
 
-首先为您对本项目的贡献表示感谢。
+首先感谢每一位对本项目做出贡献的开发者。您的努力和智慧是项目成功的关键。
 
 本文档希望能帮助您写出高质量的、运维友好的设计与代码，更好地参与本项目的开发。
 
@@ -25,8 +25,9 @@ zeroweb-service-admin
 │   │   │       ├── user  # 用户功能
 │   │   │       │   ├── UserService.java  # 该功能的逻辑运转中枢
 │   │   │       │   ├── UserHttpController.java  # 提供前端调用的 HTTP 接口
-│   │   │       │   ├── UserGrpcController.java  # 服务间调用的 GRPC 接口服务端
-│   │   │       │   ├── domain  # 模型
+│   │   │       │   ├── UserGrpcServer.java  # 服务间调用的 GRPC 接口服务端
+│   │   │       │   ├── domain  # 充血模型。
+│   │   │       │   ├── entity  # 贫血模型。
 │   │   │       │   ├── convert  # MapStruct 接口
 │   │   │       │   ├── repository  # DAO 接口
 │   │   │       │   ├── service   # 向其他包提供的功能的接口定义
@@ -52,7 +53,7 @@ zeroweb-service-admin
 - [Git](https://git-scm.com/downloads)
 - [OpenJDK 17](https://adoptium.net/zh-CN/temurin/releases/?version=17&package=jdk)
 - [Maven](https://maven.apache.org/download.cgi)
-- PostgreSQL
+- [Docker](https://www.docker.com)/[Podman](https://podman.io/)
 
 ### 获取项目源代码
 
@@ -78,88 +79,14 @@ JDBC_TYPE=postgresql
 
 ## 工程规范
 
-Project：需求、Bug 管理的各种视图。每一个功能对应一个 Project。可关联多个仓库。
-
-Milestone：构件的版本号。按语义化版本，取`主版本号.次版本号`，修订版本号不参与命名。
-
-Issue：需求或线上Bug。
-
-Discussion：使用过程中的疑问或对新功能的可行性讨论。
-
-### 提需求
-
-需求包括新功能、原有功能的新需求、原有需求变更等。
-
-角色：所有人
-
-视图：[New issue](https://github.com/xezzon/zeroweb-spring/issues/new?assignees=&labels=feature&projects=&template=feature_request.md)
-
-操作：撰写系统需求规格说明书。
-
-### 提Bug
-
-角色：所有人
-
-视图：[New issue](https://github.com/xezzon/zeroweb-spring/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml)
-
-操作：填写运行环境、复现步骤等表单项。
-
-### issue评审
-
-角色：需求管理员
-
-视图：[Issues](https://github.com/xezzon/zeroweb-spring/issues)
-
-#### 评审通过
-
-关联Milestone，关联Project，选择优先级。
-完善需求规格说明书，将其中的术语定义与概览图复制到Project的README。
-
-#### 驳回
-
-选择标签`duplicate`/`invalid`/`wontfix`。 关闭issue `Close as not planned`。
-
-### 任务分配
-
-角色：软件开发人员
-
-视图：[Projects](https://github.com/xezzon/zeroweb-spring/projects)/[Project]/Overview
-
-操作：分配人员Assignees。将状态改为`In Progress`。
-
-### Pull Request
-
-角色：软件开发人员
-
-视图：[New pull request](https://github.com/xezzon/zeroweb-spring/pulls)
-
-操作：完成 [PR Checklist](.github/pull_request_template.md)。
-
-### 代码评审
-
-角色：所有人
-
-视图：[Projects](https://github.com/xezzon/zeroweb-spring/projects)/[Project]/Overview
-
-操作：评审代码。合并代码。
-
-### 软件发布
-
-角色：项目管理员
-
-视图：[Create a new release](https://github.com/xezzon/zeroweb-spring/releases/new)
-
-操作：新建标签，标签命名规则遵循语义化版本。
-`Generate release note`，生成`feature`、`bug`标签的PR的更新日志。如果有其他说明如破坏性变更，则将其完善。
-Target选择`main`，`Publish release`。
-归档Project中非`feature`标签的issue。
+`TODO`
 
 ## 开发规范
 
-- [接口设计规范](doc/develop/Api.md)
-- [Liquibase](doc/develop/Liquibase.md)
+`TODO`
 
 ### 引用文档
 
 - [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
 - [阿里巴巴《Java开发手册》](https://github.com/alibaba/p3c/)
+- [Microsoft REST API Guidelines](https://github.com/microsoft/api-guidelines)

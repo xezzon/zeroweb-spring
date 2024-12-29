@@ -19,6 +19,9 @@ public class UserGrpcServer extends UserGrpc.UserImplBase {
     this.userService = userService;
   }
 
+  /**
+   * 新增用户（服务间接口）
+   */
   @Override
   public void addUser(AddUserReq request, StreamObserver<AddUserResp> responseObserver) {
     User user = AddUserReqConverter.INSTANCE.from(request);

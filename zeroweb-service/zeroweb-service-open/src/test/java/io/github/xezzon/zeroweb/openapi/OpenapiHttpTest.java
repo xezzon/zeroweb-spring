@@ -8,11 +8,11 @@ import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.ErrorCode;
 import io.github.xezzon.zeroweb.common.exception.OpenErrorCode;
-import io.github.xezzon.zeroweb.openapi.domain.AddOpenapiReq;
 import io.github.xezzon.zeroweb.openapi.domain.HttpMethod;
-import io.github.xezzon.zeroweb.openapi.domain.ModifyOpenapiReq;
 import io.github.xezzon.zeroweb.openapi.domain.Openapi;
 import io.github.xezzon.zeroweb.openapi.domain.OpenapiStatus;
+import io.github.xezzon.zeroweb.openapi.entity.AddOpenapiReq;
+import io.github.xezzon.zeroweb.openapi.entity.ModifyOpenapiReq;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -33,9 +33,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @DirtiesContext
 class OpenapiHttpTest {
 
-  private static final String OPENAPI_ADD_URI = "/openapi/add";
+  private static final String OPENAPI_ADD_URI = "/openapi";
   private static final String GET_OPENAPI_URI = "/openapi";
-  private static final String MODIFY_OPENAPI_URI = "/openapi/update";
+  private static final String MODIFY_OPENAPI_URI = "/openapi";
   private static final String PUBLISH_OPENAPI_URI = "/openapi/publish/{id}";
 
   @Resource
