@@ -97,6 +97,11 @@ public class DictService {
     return dictDAO.get().findByTagOrderByOrdinalAsc(tag);
   }
 
+  /**
+   * 批量导入字典。
+   * 先给导入字典目，得到字典目的ID，再给字典项的parentId赋值。
+   * @param dictList 字典列表
+   */
   protected void importDict(List<Dict> dictList) {
     List<Dict> tagList = dictList.stream()
         .filter(o -> Objects.equals(o.getTag(), Dict.DICT_TAG))

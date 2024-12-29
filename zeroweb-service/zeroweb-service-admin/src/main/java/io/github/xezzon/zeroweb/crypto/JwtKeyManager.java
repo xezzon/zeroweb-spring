@@ -94,7 +94,7 @@ public class JwtKeyManager implements JwtCryptoService {
    * 获取私钥
    * @return 返回ECPrivateKey类型的私钥
    */
-  public java.security.interfaces.ECPrivateKey getPrivateKey() {
+  java.security.interfaces.ECPrivateKey getPrivateKey() {
     return (java.security.interfaces.ECPrivateKey) this.privateKey;
   }
 

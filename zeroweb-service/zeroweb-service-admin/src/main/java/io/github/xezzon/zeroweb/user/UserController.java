@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 用户功能HTTP接口
+ * 用户管理
  * @author xezzon
  */
 @RequestMapping("/user")

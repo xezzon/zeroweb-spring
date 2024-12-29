@@ -1,15 +1,15 @@
 # 后台管理服务
 
-## 如何使用
+## 安装
 
-服务构件以 Docker 镜像的形式被发布到 [ghcr](https://ghcr.io)，可以参考如下的 Docker Compose 进行部署。
+### Docker Compose 示例配置
 
 ```yaml
 # docker-compose.yml
 version: 3
 service:
   pgsql:
-    image: postgres:16  # 关系数据库，强依赖，目前支持 PostgreSQL
+    image: postgres:16  # 关系数据库，强依赖
     name: pgsql
     environment:
       POSTGRES_PASSWORD: postgres@123

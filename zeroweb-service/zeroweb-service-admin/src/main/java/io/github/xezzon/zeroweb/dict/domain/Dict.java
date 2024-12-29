@@ -16,6 +16,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * 字典
+ * 字典是一组提供给用户选择的值。
  * @author xezzon
  */
 @Getter
