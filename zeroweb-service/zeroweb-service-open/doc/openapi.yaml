@@ -1,0 +1,781 @@
+openapi: 3.0.1
+info:
+  title: ZeroWeb
+  description: ''
+  version: 1.0.0
+tags: []
+paths:
+  /openapi/add:
+    post:
+      summary: 新增对外接口
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  title: 接口编码
+                destination:
+                  type: string
+                httpMethod:
+                  type: string
+              required:
+                - code
+                - destination
+                - httpMethod
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: &ref_0
+                $ref: '#/components/schemas/Id'
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security:
+        - bearer: []
+  /openapi:
+    get:
+      summary: 查询对外接口列表
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: $top
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+            format: uint32
+            minimum: 0
+            maximum: 2000
+            exclusiveMinimum: true
+        - name: $skip
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+            format: uint32
+            minimum: 0
+            maximum: 10000
+            multipleOf: 5
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items: &ref_1
+                      $ref: '#/components/schemas/Openapi'
+                    title: 内容
+                  number:
+                    type: integer
+                    title: 页码
+                    minimum: 1
+                  size:
+                    type: integer
+                    title: 页大小
+                    minimum: 5
+                    maximum: 2000
+                    multipleOf: 5
+                  totalElements:
+                    type: integer
+                    title: 总数量
+                    minimum: 0
+                    maximum: 2000000
+                required:
+                  - content
+          headers: {}
+      security:
+        - bearer: []
+  /openapi/update:
+    put:
+      summary: 编辑对外接口
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                code:
+                  type: string
+                  title: 接口编码
+                destination:
+                  type: string
+                httpMethod:
+                  type: string
+              required:
+                - id
+                - code
+                - destination
+                - httpMethod
+      responses:
+        '200':
+          description: ''
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema: &ref_2
+                $ref: '#/components/schemas/Result'
+                required:
+                  - code
+                  - message
+          headers: {}
+        x-400:重复数据:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        x-400:数据不存在或已删除:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security:
+        - bearer: []
+  /openapi/publish/{id}:
+    put:
+      summary: 发布对外接口
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: '{{OPENAPI_ID}}'
+          schema:
+            type: string
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security:
+        - bearer: []
+  /third-party-app/add:
+    post:
+      summary: 新增第三方应用
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  title: 应用名称
+              required:
+                - name
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: *ref_0
+          headers: {}
+      security:
+        - bearer: []
+  /third-party-app/{appId}/subscription:
+    get:
+      summary: 查询已发布接口及指定应用的订阅状态
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: appId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: top
+          in: query
+          description: 每页数量
+          required: true
+          example: 0
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 2000
+            exclusiveMinimum: true
+        - name: skip
+          in: query
+          description: 翻页数量
+          required: true
+          example: 0
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            multipleOf: 5
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          title: 主键
+                          nullable: true
+                        openapiCode:
+                          type: string
+                          title: 接口编码
+                          nullable: true
+                        appId:
+                          type: string
+                          title: 订阅者
+                          nullable: true
+                        openapi: *ref_1
+                      required:
+                        - id
+                        - openapiCode
+                        - appId
+                        - openapi
+                    title: 内容
+                  number:
+                    type: integer
+                    title: 页码
+                    minimum: 1
+                  size:
+                    type: integer
+                    title: 页大小
+                    minimum: 5
+                    maximum: 2000
+                    multipleOf: 5
+                  totalElements:
+                    type: integer
+                    title: 总数量
+                    minimum: 0
+                    maximum: 2000000
+                required:
+                  - content
+          headers: {}
+      security:
+        - bearer: []
+  /third-party-app/mine:
+    get:
+      summary: 查询我的应用列表
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: $top
+          in: query
+          description: ''
+          required: true
+          example: 0
+          schema:
+            type: integer
+            format: uint32
+            minimum: 0
+            maximum: 2000
+            exclusiveMinimum: true
+        - name: $skip
+          in: query
+          description: ''
+          required: true
+          example: 0
+          schema:
+            type: integer
+            maximum: 10000
+            multipleOf: 5
+            minimum: 0
+            format: uint32
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                          title: 应用名称
+                        ownerId:
+                          type: string
+                          title: 第三方应用所有者标识
+                      required:
+                        - id
+                        - name
+                        - ownerId
+                    title: 内容
+                  number:
+                    type: integer
+                    title: 页码
+                    minimum: 1
+                  size:
+                    type: integer
+                    title: 页大小
+                    minimum: 5
+                    maximum: 2000
+                    multipleOf: 5
+                  totalElements:
+                    type: integer
+                    title: 总数量
+                    minimum: 0
+                    maximum: 2000000
+                required:
+                  - content
+          headers: {}
+      security:
+        - bearer: []
+  /third-party-app:
+    get:
+      summary: 查询应用列表
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: $top
+          in: query
+          description: ''
+          required: true
+          example: 0
+          schema:
+            type: integer
+            format: uint32
+            minimum: 0
+            maximum: 2000
+            exclusiveMinimum: true
+        - name: $skip
+          in: query
+          description: ''
+          required: true
+          example: 0
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            multipleOf: 5
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ThirdPartApp'
+                    title: 内容
+                  number:
+                    type: integer
+                    title: 页码
+                    minimum: 1
+                  size:
+                    type: integer
+                    title: 页大小
+                    minimum: 5
+                    maximum: 2000
+                    multipleOf: 5
+                  totalElements:
+                    type: integer
+                    title: 总数量
+                    minimum: 0
+                    maximum: 2000000
+                required:
+                  - content
+          headers: {}
+      security:
+        - bearer: []
+  /subscription:
+    post:
+      summary: 订阅接口
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                openapiCode:
+                  type: string
+                  title: 接口编码
+                  nullable: true
+                appId:
+                  type: string
+                  title: 订阅者
+              required:
+                - openapiCode
+                - appId
+      responses:
+        '200':
+          description: ''
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema: *ref_2
+          headers: {}
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema: *ref_2
+          headers: {}
+      security:
+        - bearer: []
+  /subscription/audit/{id}:
+    put:
+      summary: 审核接口
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: '{{$database.mongodbObjectId}}'
+          schema:
+            type: string
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security:
+        - bearer: []
+  /call/{openapiCode}:
+    get:
+      summary: 校验并转发第三方应用的HTTP请求
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: openapiCode
+          in: path
+          description: ''
+          required: true
+          example: ''
+          schema:
+            type: string
+        - name: X-Access-Key
+          in: header
+          description: ''
+          required: false
+          example: ''
+          schema:
+            type: string
+        - name: X-Signature
+          in: header
+          description: ''
+          required: false
+          example: ''
+          schema:
+            type: string
+        - name: X-Timestamp
+          in: header
+          description: ''
+          required: false
+          example: ''
+          schema:
+            type: string
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      security:
+        - bearer: []
+components:
+  schemas:
+    Openapi:
+      type: object
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+          title: 接口编码
+        destination:
+          type: string
+        httpMethod:
+          type: string
+        status:
+          type: string
+          enum:
+            - DRAFT
+            - PUBLISHED
+      required:
+        - id
+        - code
+        - status
+        - destination
+        - httpMethod
+      title: 对外接口
+    OpenapiSubscription:
+      type: object
+      properties:
+        id:
+          type: string
+          title: 主键
+        openapiCode:
+          type: string
+          title: 接口编码
+          nullable: true
+        appId:
+          type: string
+          title: 订阅者
+        openapi: *ref_1
+      title: 对外接口实例
+      required:
+        - id
+        - openapiCode
+        - appId
+        - openapi
+    ThirdPartApp:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          title: 应用名称
+        ownerId:
+          type: string
+          title: 第三方应用所有者标识
+      title: 第三方应用
+      required:
+        - id
+        - name
+        - ownerId
+    Page:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            type: string
+          title: 内容
+        number:
+          type: integer
+          title: 页码
+          minimum: 1
+        size:
+          type: integer
+          title: 页大小
+          minimum: 5
+          maximum: 2000
+          multipleOf: 5
+        totalElements:
+          type: integer
+          title: 总数量
+          minimum: 0
+          maximum: 2000000
+      title: 分页信息
+      x--orders:
+        - content
+        - number
+        - totalElements
+        - size
+      required:
+        - content
+    Result:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 与请求头中的错误码一致
+          title: 错误编码
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              title: 错误名称
+            message:
+              type: string
+              title: 错误的可读表述
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    title: 错误名称
+                  message:
+                    type: string
+                    title: 错误的可读表述
+                required:
+                  - code
+                  - message
+              title: 有关导致该报告错误的具体错误的详细信息数组
+          title: 错误详情
+          required:
+            - code
+            - message
+      title: 异常信息
+      required:
+        - code
+        - error
+    Id:
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+        - id
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+servers: []

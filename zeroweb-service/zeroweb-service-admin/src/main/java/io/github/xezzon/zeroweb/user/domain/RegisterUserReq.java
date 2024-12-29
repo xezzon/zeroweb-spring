@@ -30,6 +30,7 @@ public class RegisterUserReq implements Into<User> {
   private String nickname;
   /**
    * 密码
+   * 为了防止身份被冒用，由用户设置的、只有用户自己知晓的口令。
    */
   @Pattern(
       regexp = "^(?!^\\d+$)(?!^[a-z]+$)(?!^[A-Z]+$)[\\x21-\\x7E]{8,}$",

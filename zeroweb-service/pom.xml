@@ -88,6 +88,11 @@
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.github.therapi</groupId>
+      <artifactId>therapi-runtime-javadoc</artifactId>
+      <version>${therapi-runtime-javadoc.version}</version>
+    </dependency>
     <!-- 运维相关 -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -120,6 +125,11 @@
       <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-jpamodelgen</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.github.therapi</groupId>
+      <artifactId>therapi-runtime-javadoc-scribe</artifactId>
+      <version>${therapi-runtime-javadoc.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -130,21 +140,6 @@
         <configuration>
           <parameters>true</parameters>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>io.github.xezzon</groupId>
-        <artifactId>smart-doc-maven-plugin</artifactId>
-        <configuration>
-          <outputDirectory>${project.build.outputDirectory}/public/v3/api-docs</outputDirectory>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>openapi</goal>
-            </goals>
-            <phase>generate-resources</phase>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

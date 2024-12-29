@@ -12,15 +12,16 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 
 /**
+ * 认证服务
  * @author xezzon
  */
 @Service
-public class AuthService {
+public class AuthNService {
 
   private final IUserService4Auth userService;
   private final JwtCryptoService jwtCryptoService;
 
-  public AuthService(IUserService4Auth userService, JwtCryptoService jwtCryptoService) {
+  public AuthNService(IUserService4Auth userService, JwtCryptoService jwtCryptoService) {
     this.userService = userService;
     this.jwtCryptoService = jwtCryptoService;
   }

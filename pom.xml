@@ -57,6 +57,7 @@
     <grpc-spring-boot-starter.version>3.1.0.RELEASE</grpc-spring-boot-starter.version>
     <sa-token.version>1.39.0</sa-token.version>
     <!-- 插件版本 -->
+    <therapi-runtime-javadoc.version>0.15.0</therapi-runtime-javadoc.version>
   </properties>
 
   <dependencyManagement>
