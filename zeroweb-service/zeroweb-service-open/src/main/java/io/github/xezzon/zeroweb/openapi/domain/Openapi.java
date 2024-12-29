@@ -1,5 +1,7 @@
 package io.github.xezzon.zeroweb.openapi.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.jpa.IEntity;
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
@@ -45,6 +47,7 @@ public class Openapi implements IEntity<String> {
    * 即该接口应该转发到的后端地址
    */
   @Column(name = "destination", nullable = false, length = 2083)
+  @JsonInclude(Include.NON_NULL)
   String destination;
   /**
    * 请求接口的HTTP方法
