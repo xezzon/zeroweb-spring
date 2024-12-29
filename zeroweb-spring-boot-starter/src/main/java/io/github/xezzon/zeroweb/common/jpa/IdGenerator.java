@@ -8,11 +8,12 @@ import org.hibernate.annotations.IdGeneratorType;
 
 /**
  * 标记实体类的 id 以自定义的方式生成
- * @see HibernateIdGenerator
  * @author xezzon
+ * @see HibernateIdGenerator
  */
 @IdGeneratorType(HibernateIdGenerator.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface IdGenerator {
+
 }

@@ -6,4 +6,5 @@ package io.github.xezzon.zeroweb.auth.entity;
  * @author xezzon
  */
 public record BasicAuth(String username, String password) {
+
 }

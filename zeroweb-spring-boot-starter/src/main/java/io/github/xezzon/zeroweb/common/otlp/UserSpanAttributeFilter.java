@@ -33,7 +33,7 @@ public class UserSpanAttributeFilter implements Filter {
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-    throws IOException, ServletException {
+      throws IOException, ServletException {
     try {
       if (StpUtil.isLogin()) {
         Span span = Span.current();
@@ -41,8 +41,8 @@ public class UserSpanAttributeFilter implements Filter {
         JwtClaim jwtClaim = JwtAuth.loadJwtClaim();
         span.setAttribute(USER_NAME, jwtClaim.getPreferredUsername());
         span.setAttribute(
-          AttributeKey.stringArrayKey(USER_ROLES),
-          jwtClaim.getRolesList().parallelStream().toList()
+            AttributeKey.stringArrayKey(USER_ROLES),
+            jwtClaim.getRolesList().parallelStream().toList()
         );
         span.setAttribute(USER_FULL_NAME, jwtClaim.getNickname());
       }

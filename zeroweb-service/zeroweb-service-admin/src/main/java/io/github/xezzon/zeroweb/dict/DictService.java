@@ -44,7 +44,7 @@ public class DictService {
    * @return 字典分页列表
    */
   protected Page<Dict> pagedList(ODataQueryOption odata) {
-      return dictDAO.findAll(odata);
+    return dictDAO.findAll(odata);
   }
 
   /**

@@ -158,16 +158,16 @@ class SubscriptionHttpTest {
     List<Subscription> dataset = this.initData();
 
     webTestClient.get()
-      .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
-        .queryParam("top", top)
-        .queryParam("skip", skip)
-        .build(dataset.get(0).getAppId())
-      )
-      .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-      .header(AUTHORIZATION, TestJwtGenerator.generateBearer(RandomUtil.randomString(6)))
-      .exchange()
-      .expectStatus().isForbidden()
-      .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCode.DATA_PERMISSION_FORBIDDEN.code());
+        .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
+            .queryParam("top", top)
+            .queryParam("skip", skip)
+            .build(dataset.get(0).getAppId())
+        )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.generateBearer(RandomUtil.randomString(6)))
+        .exchange()
+        .expectStatus().isForbidden()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCode.DATA_PERMISSION_FORBIDDEN.code());
   }
 
   @Test

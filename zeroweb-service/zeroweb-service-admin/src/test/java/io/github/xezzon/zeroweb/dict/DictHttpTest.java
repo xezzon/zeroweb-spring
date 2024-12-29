@@ -314,7 +314,7 @@ class DictHttpTest {
     assertTrue(repository.existsById(dataset.get(2).getId()));
     assertTrue(repository.existsById(dataset.get(3).getChildren().get(0).getId()));
   }
-  
+
   @Test
   void getDictTreeByTag() {
     List<Dict> dataset = this.initData();
