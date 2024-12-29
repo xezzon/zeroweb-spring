@@ -20,6 +20,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.stereotype.Component;
 
 /**
+ * 在 Bean 注册阶段扫描 classpath 下所有实现了 IDict 接口的枚举类，并在用用启动时将其注册到数据库中。
  * @author xezzon
  */
 @Component
@@ -31,13 +32,15 @@ public class DictScanner implements ImportBeanDefinitionRegistrar, CommandLineRu
 
   private static final Builder dictList = DictImportReqList.newBuilder();
 
+  /**
+   * Bean 注册阶段，扫描 classpath 下所有实现了 IDict 接口的枚举类。
+   */
   @Override
   public void registerBeanDefinitions(
       @NotNull AnnotationMetadata metadata,
       @NotNull BeanDefinitionRegistry registry
   ) {
-    AnnotationDictConfiguration configuration =
-        new AnnotationDictConfiguration(metadata, EnableDictScan.class);
+    AnnotationDictConfiguration configuration = new AnnotationDictConfiguration(metadata);
     String classpath = configuration.getValue();
     try {
       ImmutableSet<ClassInfo> classInfos = ClassPath.from(ClassLoader.getSystemClassLoader())
@@ -70,6 +73,10 @@ public class DictScanner implements ImportBeanDefinitionRegistrar, CommandLineRu
     }
   }
 
+  /**
+   * 应用启动阶段，将扫描到的枚举类注册到数据库中。
+   * 不影响应用正常启动。
+   */
   @Override
   public void run(String... args) {
     try {
@@ -80,15 +87,22 @@ public class DictScanner implements ImportBeanDefinitionRegistrar, CommandLineRu
   }
 }
 
+/**
+ * {@link EnableDictScan} 注解的配置信息
+ */
 class AnnotationDictConfiguration {
 
+  /**
+   * 被注解的类
+   */
   private final Class<?> applicationClass;
+  /**
+   * 注解内容
+   */
   private final AnnotationAttributes attributes;
 
-  AnnotationDictConfiguration(
-      @NotNull AnnotationMetadata metadata,
-      @NotNull Class<? extends Annotation> annotation
-  ) {
+  AnnotationDictConfiguration(@NotNull AnnotationMetadata metadata) {
+    Class<? extends Annotation> annotation = EnableDictScan.class;
     Map<String, Object> attributesSource = metadata.getAnnotationAttributes(annotation.getName());
     if (attributesSource == null) {
       throw new IllegalArgumentException(
@@ -103,6 +117,10 @@ class AnnotationDictConfiguration {
     this.attributes = new AnnotationAttributes(attributesSource);
   }
 
+  /**
+   * 获取 {@link EnableDictScan#value()} 的值，如果没有设置则返回当前类的包路径。
+   * @return classpath 路径
+   */
   public String getValue() {
     String classpath = this.attributes.getString("value");
     if (classpath.isEmpty()) {

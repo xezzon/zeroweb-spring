@@ -11,6 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 数据校验：仅允许字母、数字、下划线
  * @author xezzon
  */
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE,

@@ -4,17 +4,17 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xezzon_zeroweb-spring&metric=coverage)](https://sonarcloud.io/summary/new_code?id=xezzon_zeroweb-spring)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=xezzon_zeroweb-spring&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=xezzon_zeroweb-spring)
 
-
-基于 Spring Boot 框架的一组微服务构件，包含认证、后台管理、开放平台等服务。提供 SDK 与服务进行交互。
-
-不同于市面上主流的后台管理系统，本项目的定位不是脚手架。本项目希望使用者通过独立部署服务的方式，作为一个系统的一部分提供功能。对于使用者而言，本项目的内部实现应视为黑箱。使用者无需（也不应该）对本项目的源代码进行二次开发，而是通过SDK提供的API与服务进行交互。
+ZeroWeb 是一组 BaaS(Backend as a Service)，可以低成本地实现认证授权、后台管理、开放平台等功能。提供 gRPC 接口 SDK（后端集成）与 HTTP 接口 SDK（前端集成）。
 
 ## 功能特性
 
 - [后台管理服务](zeroweb-service/zeroweb-service-admin/README.md)
   - 认证
   - 单点登录
+  - 字典管理
 - [服务间接口SDK](zeroweb-proto/README.md)
+  - 第三方应用管理
+  - 对外接口的管理、订阅、调用
 
 ## 使用方式
 

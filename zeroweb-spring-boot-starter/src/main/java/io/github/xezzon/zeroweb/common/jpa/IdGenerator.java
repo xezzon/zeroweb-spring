@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 import org.hibernate.annotations.IdGeneratorType;
 
 /**
+ * 标记实体类的 id 以自定义的方式生成
+ * @see HibernateIdGenerator
  * @author xezzon
  */
 @IdGeneratorType(HibernateIdGenerator.class)
