@@ -35,3 +35,12 @@ databaseChangeLog:
                   remarks: "订阅状态"
                   constraints:
                     nullable: false
+        - createIndex:
+            unique: true
+            tableName: zeroweb_openapi_subscription
+            indexName: UK_os_app_id_openapi_code
+            columns:
+              - column:
+                  name: app_id
+              - column:
+                  name: openapi_code

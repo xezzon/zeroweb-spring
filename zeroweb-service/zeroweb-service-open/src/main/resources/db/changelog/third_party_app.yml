@@ -35,6 +35,12 @@ databaseChangeLog:
                   remarks: "创建时间"
                   constraints:
                     nullable: false
+        - createIndex:
+            tableName: zeroweb_third_party_app
+            indexName: IDX_tpa_owner_id
+            columns:
+              - column:
+                  name: owner_id
 
   - changeSet:
       id: "49"
