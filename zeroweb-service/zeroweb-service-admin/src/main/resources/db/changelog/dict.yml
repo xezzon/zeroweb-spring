@@ -53,6 +53,15 @@ databaseChangeLog:
                   remarks: "启用状态"
                   constraints:
                     nullable: false
+        - createIndex:
+            unique: true
+            tableName: zeroweb_dict
+            indexName: UK_d_tag_code
+            columns:
+              - column:
+                  name: tag
+              - column:
+                  name: code
 
   - changeSet:
       id: "32"
