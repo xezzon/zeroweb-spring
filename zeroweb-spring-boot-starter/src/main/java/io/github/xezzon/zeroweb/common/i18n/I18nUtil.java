@@ -2,9 +2,11 @@ package io.github.xezzon.zeroweb.common.i18n;
 
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 国际化相关方法
@@ -53,7 +55,8 @@ public class I18nUtil {
    * @param locale 语言
    * @return 语言包
    */
-  public static ResourceBundle readResourceBundle(String basename, Locale locale) {
+  public static ResourceBundle readResourceBundle(@NotNull String basename, @NotNull Locale locale)
+      throws MissingResourceException {
     return ResourceBundle.getBundle(BASE_DIR + basename, locale);
   }
 
@@ -62,7 +65,7 @@ public class I18nUtil {
    * @param basename 命名空间
    * @return 消息格式化器
    */
-  public static I18nMessageFormatter formatter(String basename) {
+  public static I18nMessageFormatter formatter(@NotNull String basename) {
     return new I18nMessageFormatter(basename);
   }
 
@@ -115,19 +118,26 @@ public class I18nUtil {
      * @return 对应的国际化文本。如果没有找到语言包或对应的键值则返回 null
      */
     private String getMessageTemplate(String key) {
-      ResourceBundle resourceBundle = readResourceBundle(basename, locale);
-      if (!resourceBundle.containsKey(key)) {
-        log.warn("The key {} of resource bundle {} does not exist", key, getResourceBundleName());
+      ResourceBundle resourceBundle;
+      try {
+        resourceBundle = readResourceBundle(basename, locale);
+      } catch (MissingResourceException e) {
+        log.warn("The resource bundle {} does not exist", resourceBundleName());
         return null;
       }
-      return resourceBundle.getString(key);
+      String notNullKey = Optional.ofNullable(key).orElse("");
+      if (!resourceBundle.containsKey(notNullKey)) {
+        log.warn("The key {} of resource bundle {} does not exist", key, resourceBundleName());
+        return null;
+      }
+      return resourceBundle.getString(notNullKey);
     }
 
     /**
      * `i18n/${命名空间}_${语言标签}.properties`
      * @return 语言包名称
      */
-    private String getResourceBundleName() {
+    private String resourceBundleName() {
       return BASE_DIR + basename + "_" + locale + ".properties";
     }
   }

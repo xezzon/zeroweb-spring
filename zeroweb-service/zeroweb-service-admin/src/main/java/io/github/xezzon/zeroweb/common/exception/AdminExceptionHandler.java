@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * @author xezzon
  */
 @RestControllerAdvice
-public class OpenExceptionHandler extends GlobalExceptionHandler {
+public class AdminExceptionHandler extends GlobalExceptionHandler {
 
   @Override
   protected IErrorCode getErrorCode(Throwable e) {
     return Optional.of(e.getClass())
-        .map(OpenErrorCode::mapping)
+        .map(AdminErrorCode::mapping)
         .orElseGet(() -> super.getErrorCode(e));
   }
 }

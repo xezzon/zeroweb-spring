@@ -14,7 +14,7 @@ public class ExceptionController {
 
   @RequestMapping("/RepeatDataException")
   public void repeatDataException() {
-    throw new RepeatDataException("数据已存在");
+    throw new RepeatDataException("数据");
   }
 
   @RequestMapping("/NoValidClasspathException")

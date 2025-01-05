@@ -4,7 +4,7 @@ import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import com.auth0.jwt.JWTCreator.Builder;
 import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
-import io.github.xezzon.zeroweb.common.exception.InvalidTokenException;
+import io.github.xezzon.zeroweb.common.exception.InvalidPasswordException;
 import io.github.xezzon.zeroweb.crypto.service.JwtCryptoService;
 import io.github.xezzon.zeroweb.user.domain.User;
 import io.github.xezzon.zeroweb.user.service.IUserService4Auth;
@@ -31,17 +31,17 @@ public class AuthNService {
    * 校验通过后将用户信息写入 Session
    * @param username 用户名
    * @param password 口令
-   * @throws InvalidTokenException 用户不存在时抛出异常
-   * @throws InvalidTokenException 用户名、密码不匹配时抛出异常
+   * @throws InvalidPasswordException 用户不存在时抛出异常
+   * @throws InvalidPasswordException 用户名、密码不匹配时抛出异常
    */
   protected void basicLogin(String username, String password) {
     User user = userService.getUserByUsername(username);
     /* 校验用户名、口令 */
     if (user == null) {
-      throw new InvalidTokenException();
+      throw new InvalidPasswordException();
     }
     if (!BCrypt.checkpw(password, user.getCipher())) {
-      throw new InvalidTokenException();
+      throw new InvalidPasswordException();
     }
     /* 检查是否已存在会话 */
     if (StpUtil.isLogin()) {

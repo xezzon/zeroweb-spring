@@ -4,13 +4,9 @@ package io.github.xezzon.zeroweb.common.exception;
  * 唯一键冲突
  * @author xezzon
  */
-public class RepeatDataException extends ZerowebRuntimeException {
+public class RepeatDataException extends ZerowebBusinessException {
 
-  /**
-   * 初始化异常
-   * @param message 异常消息
-   */
-  public RepeatDataException(String message) {
-    super(ErrorCode.REPEAT_DATA);
+  public RepeatDataException(String key) {
+    super(key);
   }
 }

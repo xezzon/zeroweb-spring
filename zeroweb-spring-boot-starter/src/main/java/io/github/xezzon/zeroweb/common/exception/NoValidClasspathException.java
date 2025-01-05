@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author xezzon
  */
 @Slf4j
-public class NoValidClasspathException extends RuntimeException {
+public class NoValidClasspathException extends ZerowebRuntimeException {
 
   public NoValidClasspathException(Throwable cause) {
     super("No valid classpath found", cause);

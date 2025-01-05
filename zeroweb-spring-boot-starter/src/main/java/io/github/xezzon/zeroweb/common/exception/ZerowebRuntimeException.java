@@ -1,30 +1,37 @@
 package io.github.xezzon.zeroweb.common.exception;
 
+import io.github.xezzon.zeroweb.common.i18n.I18nUtil;
 import io.github.xezzon.zeroweb.core.error.IErrorCode;
 
 /**
- * ZeroWeb系统自发抛出的异常
+ * 将受检异常包装成非受检异常
  * @author xezzon
  */
 public class ZerowebRuntimeException extends RuntimeException {
 
-  private final transient IErrorCode errorCode;
-
-  public ZerowebRuntimeException(IErrorCode errorCode, Object... args) {
-    super(formatMessage(errorCode, args));
-    this.errorCode = errorCode;
+  public ZerowebRuntimeException() {
+    super();
   }
 
-  public ZerowebRuntimeException(IErrorCode errorCode, Throwable cause, Object... args) {
-    super(formatMessage(errorCode, args), cause);
-    this.errorCode = errorCode;
+  public ZerowebRuntimeException(String message, Throwable cause) {
+    super(message, cause);
   }
 
-  public static String formatMessage(IErrorCode errorCode, Object... args) {
-    return String.format(errorCode.message(), args);
+  public ZerowebRuntimeException(Throwable cause) {
+    super(cause);
   }
 
-  public IErrorCode errorCode() {
-    return this.errorCode;
+  @Override
+  public String getMessage() {
+    return I18nUtil.formatter(IErrorCode.I18N_BASENAME)
+        .format(getErrorName(), super.getMessage());
+  }
+
+  /**
+   * 子类需要以 {@link IErrorCode#name()} 覆盖该方法
+   * @return 异常名称，用于后端内容的国际化
+   */
+  protected String getErrorName() {
+    return ZerowebRuntimeException.class.getSimpleName();
   }
 }

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import io.github.xezzon.tao.dict.IDict;
-import io.github.xezzon.zeroweb.common.exception.ErrorCode;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import io.github.xezzon.zeroweb.dict.DictImportReqList.Builder;
 import jakarta.annotation.Resource;
@@ -112,7 +111,7 @@ class AnnotationDictConfiguration {
     try {
       this.applicationClass = Class.forName(metadata.getClassName());
     } catch (ClassNotFoundException e) {
-      throw new ZerowebRuntimeException(ErrorCode.UNKNOWN, e);
+      throw new ZerowebRuntimeException(e);
     }
     this.attributes = new AnnotationAttributes(attributesSource);
   }

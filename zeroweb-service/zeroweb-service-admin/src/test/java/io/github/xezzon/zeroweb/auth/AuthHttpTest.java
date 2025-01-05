@@ -128,7 +128,7 @@ class AuthHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
-        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_TOKEN.code());
+        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_PASSWORD.code());
     // 密码不正确
     BasicAuth basicAuth2 = new BasicAuth(user.getUsername(), RandomUtil.randomString(9));
     webTestClient.post()
@@ -137,7 +137,7 @@ class AuthHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
-        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_TOKEN.code());
+        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_PASSWORD.code());
   }
 
   @RepeatedTest(2)

@@ -1,10 +1,12 @@
 package io.github.xezzon.zeroweb.core.error;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
+import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
+import java.util.Set;
 import lombok.Getter;
 
 /**
@@ -24,6 +26,10 @@ public enum ErrorSourceType {
    */
   CLIENT("C", BAD_REQUEST),
   /**
+   * 授权异常
+   */
+  AUTHORIZATION("A", FORBIDDEN),
+  /**
    * 服务端异常
    * 通常由代码、配置等错误引起，需要通知开发人员处理
    */
@@ -41,5 +47,19 @@ public enum ErrorSourceType {
   ErrorSourceType(String code, HttpResponseStatus responseStatus) {
     this.responseCode = responseStatus.code();
     this.code = code;
+  }
+
+  /**
+   * @return 是否系统异常
+   */
+  public boolean isServer() {
+    return Set.of(SERVER, THIRD_PARTY).contains(this);
+  }
+
+  /**
+   * @return 是否业务异常
+   */
+  public boolean isClient() {
+    return Set.of(CLIENT, AUTHORIZATION).contains(this);
   }
 }
