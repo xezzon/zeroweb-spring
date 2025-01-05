@@ -1,4 +1,4 @@
-package io.github.xezzon.zeroweb.common.trait;
+package io.github.xezzon.zeroweb.common.marker;
 
 import jakarta.annotation.Priority;
 

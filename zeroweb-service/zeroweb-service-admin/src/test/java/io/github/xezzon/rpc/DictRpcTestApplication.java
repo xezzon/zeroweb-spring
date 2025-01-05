@@ -1,6 +1,6 @@
 package io.github.xezzon.rpc;
 
-import io.github.xezzon.zeroweb.common.trait.ExcludeDbTrait;
+import io.github.xezzon.zeroweb.common.marker.ExcludeDbTrait;
 import io.github.xezzon.zeroweb.dict.EnableDictScan;
 import io.github.xezzon.zeroweb.dict.db.DictDbTestApplication;
 import org.springframework.boot.SpringApplication;

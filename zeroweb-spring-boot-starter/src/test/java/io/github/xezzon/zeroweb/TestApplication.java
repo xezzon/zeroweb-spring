@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb;
 
-import io.github.xezzon.zeroweb.common.trait.ExcludeDbTrait;
+import io.github.xezzon.zeroweb.common.marker.ExcludeDbTrait;
 import io.github.xezzon.zeroweb.dict.EnableDictScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
