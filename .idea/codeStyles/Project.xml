@@ -1,0 +1,40 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <option name="LINE_SEPARATOR" value="&#10;" />
+    <option name="RIGHT_MARGIN" value="100" />
+    <JavaCodeStyleSettings>
+      <option name="JD_ALIGN_PARAM_COMMENTS" value="false" />
+      <option name="JD_ALIGN_EXCEPTION_COMMENTS" value="false" />
+      <option name="JD_ADD_BLANK_AFTER_DESCRIPTION" value="false" />
+    </JavaCodeStyleSettings>
+    <ScalaCodeStyleSettings>
+      <option name="MULTILINE_STRING_CLOSING_QUOTES_ON_NEW_LINE" value="true" />
+    </ScalaCodeStyleSettings>
+    <SqlCodeStyleSettings version="6">
+      <option name="KEYWORD_CASE" value="2" />
+      <option name="TYPE_CASE" value="3" />
+      <option name="ALIAS_CASE" value="4" />
+    </SqlCodeStyleSettings>
+    <codeStyleSettings language="JAVA">
+      <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
+      <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
+      <indentOptions>
+        <option name="CONTINUATION_INDENT_SIZE" value="4" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="SQL">
+      <option name="KEEP_LINE_BREAKS" value="false" />
+      <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+    </codeStyleSettings>
+    <codeStyleSettings language="Scala">
+      <indentOptions>
+        <option name="SMART_TABS" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="XML">
+      <indentOptions>
+        <option name="CONTINUATION_INDENT_SIZE" value="4" />
+      </indentOptions>
+    </codeStyleSettings>
+  </code_scheme>
+</component>
