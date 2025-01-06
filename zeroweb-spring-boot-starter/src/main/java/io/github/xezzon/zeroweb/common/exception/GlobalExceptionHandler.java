@@ -18,6 +18,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
+ * 全局异常处理
+ * 错误码: 依据`异常类-错误码`映射查找。
+ * {@link <a href="https://developer.mozilla.org/docs/Web/HTTP/Status"></a>}: 由错误码描述。
+ * 异常名称: 异常类的简写名。
+ * 异常消息: 客户端异常的异常消息由异常名称国际化（语言由 HTTP 请求头定义）得到。服务端异常则返回统一的消息，以便向客户端隐藏细节。
+ * 日志：通常的异常日志级别为 WARN，部分异常可视情况提高或降低日志级别。日志的异常消息取自 {@link Throwable#getMessage()}，自行实现的异常会依据异常类名对内容进行国际化。
  * @author xezzon
  */
 @RestControllerAdvice
