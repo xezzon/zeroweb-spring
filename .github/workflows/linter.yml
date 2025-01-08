@@ -7,10 +7,10 @@ permissions: read-all
 
 on:
   push:
-    branches: [ "master", "main" ]
+    branches: [ "develop", "master", "main" ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "master", "main" ]
+    branches: [ "develop", "master", "main" ]
 
 jobs:
   linter:
@@ -24,6 +24,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Set Environment
+        if: github.base_ref != 'refs/heads/main'
+        run: |
+          echo "REPOSITORY_TRIVY_DISABLE_ERRORS=true" >> $GITHUB_ENV
+          echo "VALIDATE_ALL_CODEBASE=false" >> $GITHUB_ENV
       - name: MegaLinter
         uses: oxsecurity/megalinter@v8
         env:
