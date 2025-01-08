@@ -11,7 +11,7 @@ public class InvalidTokenException extends ZerowebRuntimeException {
   @Serial
   private static final long serialVersionUID = 4676151668260963197L;
 
-  public InvalidTokenException() {
-    super(AdminErrorCode.INVALID_TOKEN);
+  public InvalidTokenException(Throwable e) {
+    super(e);
   }
 }

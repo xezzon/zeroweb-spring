@@ -1,4 +1,4 @@
-package io.github.xezzon.zeroweb.core.error;
+package io.github.xezzon.zeroweb.common.exception;
 
 /**
  * API异常响应体

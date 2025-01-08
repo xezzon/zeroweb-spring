@@ -1,4 +1,4 @@
-package io.github.xezzon.zeroweb.core.error;
+package io.github.xezzon.zeroweb.common.exception;
 
 import java.util.Collections;
 import java.util.List;

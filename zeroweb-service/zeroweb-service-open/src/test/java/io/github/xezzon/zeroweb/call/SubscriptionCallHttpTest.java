@@ -4,9 +4,8 @@ import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.E
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
-import io.github.xezzon.zeroweb.common.exception.ErrorCode;
+import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import io.github.xezzon.zeroweb.common.exception.OpenErrorCode;
-import io.github.xezzon.zeroweb.core.error.ErrorResponse;
 import io.github.xezzon.zeroweb.openapi.domain.HttpMethod;
 import io.github.xezzon.zeroweb.openapi.domain.Openapi;
 import io.github.xezzon.zeroweb.openapi.domain.OpenapiStatus;
@@ -240,8 +239,8 @@ class SubscriptionCallHttpTest {
     mac.update(rawBody.getBytes());
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
-    final ErrorCode errorCode = ErrorCode.NOT_LOGIN;
-    ErrorResponse responseBody = webTestClient.post()
+    final CommonErrorCode errorCode = CommonErrorCode.NOT_LOGIN;
+    webTestClient.post()
         .uri(builder -> builder
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
@@ -253,13 +252,6 @@ class SubscriptionCallHttpTest {
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
         .exchange()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
-        .expectBody(ErrorResponse.class)
-        .returnResult().getResponseBody();
-    Assertions.assertNotNull(responseBody);
-    Assertions.assertNotNull(responseBody.error());
-    Assertions.assertEquals(errorCode.code(), responseBody.code());
-    Assertions.assertEquals(errorCode.name(), responseBody.error().getCode());
-    Assertions.assertEquals(errorCode.message(), responseBody.error().getMessage());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code());
   }
 }

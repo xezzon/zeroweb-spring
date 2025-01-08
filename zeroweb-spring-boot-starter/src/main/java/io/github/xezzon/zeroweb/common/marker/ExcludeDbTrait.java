@@ -1,4 +1,4 @@
-package io.github.xezzon.zeroweb.common.trait;
+package io.github.xezzon.zeroweb.common.marker;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;

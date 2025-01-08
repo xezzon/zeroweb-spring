@@ -1,9 +1,11 @@
 package io.github.xezzon.zeroweb.common.exception;
 
+import static io.github.xezzon.zeroweb.core.error.ErrorSourceType.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.core.error.ErrorSourceType.CLIENT;
 
 import io.github.xezzon.zeroweb.core.error.ErrorSourceType;
 import io.github.xezzon.zeroweb.core.error.IErrorCode;
+import java.util.Arrays;
 
 /**
  * 错误码分配中心
@@ -11,10 +13,11 @@ import io.github.xezzon.zeroweb.core.error.IErrorCode;
  */
 public enum OpenErrorCode implements IErrorCode {
 
-  PUBLISHED_OPENAPI_CANNOT_BE_MODIFY(CLIENT, "已发布的开放接口不能修改"),
-  UNPUBLISHED_OPENAPI_CANNOT_BE_SUBSCRIBE(CLIENT, "不能订阅未发布的接口"),
-  INVALID_ACCESS_KEY(CLIENT, "无效的访问密钥"),
-  UNSUBSCRIBED_OPENAPI(CLIENT, "不能调用未订阅的接口"),
+  PUBLISHED_OPENAPI_CANNOT_BE_MODIFY(CLIENT, PublishedOpenapiCannotBeModifyException.class),
+  UNPUBLISHED_OPENAPI_CANNOT_BE_SUBSCRIBE(CLIENT,
+      UnpublishedOpenapiCannotBeSubscribeException.class),
+  INVALID_ACCESS_KEY(AUTHORIZATION, InvalidAccessKeyException.class),
+  UNSUBSCRIBED_OPENAPI(AUTHORIZATION, UnsubscribeOpenapiException.class),
   ;
 
   /**
@@ -22,13 +25,20 @@ public enum OpenErrorCode implements IErrorCode {
    */
   private final ErrorSourceType sourceType;
   /**
-   * 错误默认消息
+   * 错误码对应的异常类
    */
-  private final String message;
+  private final Class<? extends Throwable> mappedException;
 
-  OpenErrorCode(ErrorSourceType sourceType, String message) {
+  public static IErrorCode mapping(Class<? extends Throwable> exceptionClass) {
+    return Arrays.stream(OpenErrorCode.values())
+        .filter(o -> o.mappedException == exceptionClass)
+        .findAny()
+        .orElse(null);
+  }
+
+  OpenErrorCode(ErrorSourceType sourceType, Class<? extends Throwable> mappedException) {
     this.sourceType = sourceType;
-    this.message = message;
+    this.mappedException = mappedException;
   }
 
   @Override
@@ -38,11 +48,6 @@ public enum OpenErrorCode implements IErrorCode {
 
   @Override
   public byte moduleCode() {
-    return 2;
-  }
-
-  @Override
-  public String message() {
-    return this.message;
+    return -2;
   }
 }

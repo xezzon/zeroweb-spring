@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.dict;
 
 import com.google.protobuf.Empty;
-import io.github.xezzon.zeroweb.common.trait.RpcTrait;
+import io.github.xezzon.zeroweb.common.marker.RpcTrait;
 import io.github.xezzon.zeroweb.dict.DictGrpc.DictStub;
 import io.grpc.stub.StreamObserver;
 import java.util.concurrent.CountDownLatch;

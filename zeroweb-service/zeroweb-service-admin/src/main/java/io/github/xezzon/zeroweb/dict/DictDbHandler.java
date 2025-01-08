@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.dict;
 
-import io.github.xezzon.zeroweb.common.trait.DbTrait;
-import io.github.xezzon.zeroweb.common.trait.RpcTrait;
+import io.github.xezzon.zeroweb.common.marker.DbTrait;
+import io.github.xezzon.zeroweb.common.marker.RpcTrait;
 import io.github.xezzon.zeroweb.dict.converter.DictImportReqConverter;
 import io.github.xezzon.zeroweb.dict.domain.Dict;
 import java.util.List;

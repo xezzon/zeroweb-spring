@@ -7,6 +7,11 @@ package io.github.xezzon.zeroweb.core.error;
 public interface IErrorCode {
 
   /**
+   * 错误码国际化的命名空间
+   */
+  String I18N_BASENAME = "ErrorCode";
+
+  /**
    * 错误码编码 格式为 `${错误来源类型}{模块编码}{异常码序列号}`
    * @return 错误码编码
    */
@@ -14,8 +19,8 @@ public interface IErrorCode {
     return String.format(
         "%s%02X%02X",
         sourceType().getCode(),
-        Short.toUnsignedInt(moduleCode()),
-        Short.toUnsignedInt(serialNumber())
+        Byte.toUnsignedInt(moduleCode()),
+        Byte.toUnsignedInt(serialNumber())
     );
   }
 
@@ -25,13 +30,17 @@ public interface IErrorCode {
   ErrorSourceType sourceType();
 
   /**
-   * 模块编码 数据范围 1~127、-128~-1 0保留为公共异常 可转为2位16进制数的表示形式
+   * 模块编码
+   * 0 为公共模块
+   * ZeroWeb 的模块编码从 -1~-128 分配
+   * 1~127 由使用者分配
    * @return 模块编码
    */
   byte moduleCode();
 
   /**
-   * 异常码序列号 同一模块下的异常按从1~127、-128~-1编号
+   * 异常码序列号
+   * 同一模块下的异常按从 1~255 分配
    * @return 异常码序列号
    */
   default byte serialNumber() {
@@ -41,12 +50,6 @@ public interface IErrorCode {
     }
     throw new UnsupportedOperationException("serialNumber() should be implemented by non-enum");
   }
-
-  /**
-   * 错误消息模板
-   * @return 错误消息模板
-   */
-  String message();
 
   /**
    * 错误名称

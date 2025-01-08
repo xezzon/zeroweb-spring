@@ -6,7 +6,7 @@ import static com.google.auth.http.AuthHttpConstants.BEARER;
 import cn.dev33.satoken.stp.StpUtil;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
-import io.github.xezzon.zeroweb.common.exception.ErrorCode;
+import io.github.xezzon.zeroweb.common.exception.InvalidTokenException;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import io.github.xezzon.zeroweb.core.crypto.ASN1PublicKeyReader;
 import io.github.xezzon.zeroweb.core.crypto.DerStringReader;
@@ -83,7 +83,7 @@ public class JwtFilter implements Filter {
       return new JwtAuth(publicKey).decode(token);
     } catch (Exception e) {
       log.error("Failed to parse the JWT. token: {}; key: {}", token, publicKeyASN1, e);
-      throw new ZerowebRuntimeException(ErrorCode.INVALID_TOKEN, e);
+      throw new InvalidTokenException(e);
     }
   }
 

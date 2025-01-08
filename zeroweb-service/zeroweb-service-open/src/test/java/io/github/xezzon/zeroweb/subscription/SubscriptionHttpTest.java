@@ -8,7 +8,7 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
-import io.github.xezzon.zeroweb.common.exception.ErrorCode;
+import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import io.github.xezzon.zeroweb.common.exception.OpenErrorCode;
 import io.github.xezzon.zeroweb.openapi.domain.HttpMethod;
 import io.github.xezzon.zeroweb.openapi.domain.Openapi;
@@ -167,7 +167,8 @@ class SubscriptionHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.generateBearer(RandomUtil.randomString(6)))
         .exchange()
         .expectStatus().isForbidden()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCode.DATA_PERMISSION_FORBIDDEN.code());
+        .expectHeader()
+        .valueEquals(ERROR_CODE_HEADER, CommonErrorCode.DATA_PERMISSION_FORBIDDEN.code());
   }
 
   @Test
@@ -237,7 +238,8 @@ class SubscriptionHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.generateBearer(RandomUtil.randomString(8)))
         .exchange()
         .expectStatus().isForbidden()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCode.DATA_PERMISSION_FORBIDDEN.code());
+        .expectHeader()
+        .valueEquals(ERROR_CODE_HEADER, CommonErrorCode.DATA_PERMISSION_FORBIDDEN.code());
   }
 
   @Test

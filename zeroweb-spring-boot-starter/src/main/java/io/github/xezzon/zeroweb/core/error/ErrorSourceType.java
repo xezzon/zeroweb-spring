@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.core.error;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
+import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
@@ -23,6 +24,10 @@ public enum ErrorSourceType {
    * 需要通知给调用方处理
    */
   CLIENT("C", BAD_REQUEST),
+  /**
+   * 授权异常
+   */
+  AUTHORIZATION("A", FORBIDDEN),
   /**
    * 服务端异常
    * 通常由代码、配置等错误引起，需要通知开发人员处理

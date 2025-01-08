@@ -10,7 +10,7 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
-import io.github.xezzon.zeroweb.common.exception.ErrorCode;
+import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import io.github.xezzon.zeroweb.dict.domain.Dict;
 import io.github.xezzon.zeroweb.dict.entity.AddDictReq;
 import io.github.xezzon.zeroweb.dict.entity.ModifyDictReq;
@@ -131,7 +131,7 @@ class DictHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
-        .jsonPath("$.code").isEqualTo(ErrorCode.REPEAT_DATA.code());
+        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
   }
 
   @Test
@@ -172,7 +172,7 @@ class DictHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
-        .jsonPath("$.code").isEqualTo(ErrorCode.REPEAT_DATA.code());
+        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
   }
 
   @Test
@@ -222,7 +222,7 @@ class DictHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
-        .jsonPath("$.code").isEqualTo(ErrorCode.REPEAT_DATA.code());
+        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
     Dict dict = repository.findById(target.getId()).orElseThrow();
     assertEquals(target.getCode(), dict.getCode());
     assertEquals(target.getTag(), dict.getTag());
