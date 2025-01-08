@@ -28,3 +28,6 @@ PRE_COMMANDS:
 
 LINTER_RULES_PATH: .github/linters
 JAVA_CHECKSTYLE_FILE_NAME: google_checks.xml
+SPELL_CSPELL_FILE_EXTENSIONS:
+  - .java
+  - .proto
