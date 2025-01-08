@@ -6,7 +6,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERR
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import java.util.Set;
 import lombok.Getter;
 
 /**
@@ -47,19 +46,5 @@ public enum ErrorSourceType {
   ErrorSourceType(String code, HttpResponseStatus responseStatus) {
     this.responseCode = responseStatus.code();
     this.code = code;
-  }
-
-  /**
-   * @return 是否系统异常
-   */
-  public boolean isServer() {
-    return Set.of(SERVER, THIRD_PARTY).contains(this);
-  }
-
-  /**
-   * @return 是否业务异常
-   */
-  public boolean isClient() {
-    return Set.of(CLIENT, AUTHORIZATION).contains(this);
   }
 }

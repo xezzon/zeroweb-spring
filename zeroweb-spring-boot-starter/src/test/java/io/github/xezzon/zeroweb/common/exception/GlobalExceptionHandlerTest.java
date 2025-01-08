@@ -173,6 +173,6 @@ class GlobalExceptionHandlerTest {
         DataPermissionForbiddenException.class.getSimpleName(),
         responseBody.error().getCode()
     );
-    Assertions.assertEquals("禁止访问: 无权访问该应用", responseBody.error().getMessage());
+    Assertions.assertEquals("禁止访问。", responseBody.error().getMessage());
   }
 }
