@@ -10,9 +10,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 /**
  * 数据校验：仅允许字母、数字、下划线
@@ -64,44 +65,47 @@ public @interface Alphanumeric {
    * Hibernate Validator 要求的字段之一
    * @return 发生异常时的提示信息
    */
+  @SuppressWarnings("unused")
   String message() default "{io.github.xezzon.zeroweb.common.validator.Alphanumeric.message}";
 
   /**
    * Hibernate Validator 要求的字段之一
    */
+  @SuppressWarnings("unused")
   Class<?>[] groups() default {};
 
   /**
    * Hibernate Validator 要求的字段之一
    */
+  @SuppressWarnings("unused")
   Class<? extends Payload>[] payload() default {};
 }
 
 class AlphanumericValidator implements ConstraintValidator<Alphanumeric, String> {
 
-  private String expression = ".*";
+  private Pattern pattern = Pattern.compile(".*");
 
   @Override
-  public void initialize(Alphanumeric annotation) {
-    Set<String> includes = Arrays.stream(annotation.includes())
-        .parallel()
+  public void initialize(final Alphanumeric annotation) {
+    final Set<String> excludes = Arrays.stream(annotation.excludes())
         .collect(Collectors.toSet());
-    Set<String> excludes = Arrays.stream(annotation.excludes())
-        .parallel()
-        .collect(Collectors.toSet());
-    this.expression = includes.parallelStream()
+    final String expression = Arrays.stream(annotation.includes())
         .filter(o -> !excludes.contains(o))
-        .collect(Collectors.joining(""));
+        .collect(Collectors.joining("", "[", "]*"));
+    this.pattern = Pattern.compile(expression);
   }
 
   @Override
   public boolean isValid(String value, ConstraintValidatorContext context) {
-    return value.matches(regex());
-  }
-
-  private String regex() {
-    return Optional.ofNullable(expression)
-        .map(s -> "[" + s + "]*")
-        .orElse(".*");
+    if (value == null) {
+      return true;
+    }
+    String invalidCharacter = pattern.matcher(value).replaceAll("");
+    context.unwrap(HibernateConstraintValidatorContext.class)
+        .addMessageParameter("0", invalidCharacter)
+        .buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
+        .addConstraintViolation()
+    ;
+    return invalidCharacter.isEmpty();
   }
 }

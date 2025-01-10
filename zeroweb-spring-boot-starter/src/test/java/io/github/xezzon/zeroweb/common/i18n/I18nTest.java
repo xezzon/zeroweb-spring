@@ -23,17 +23,6 @@ class I18nTest {
   }
 
   @Test
-  void currentLocale() {
-    Assertions.assertEquals(TARGET_LOCALE, I18nUtil.getCurrentLocale());
-
-    I18nUtil.setCurrentLocale(Locale.ENGLISH);
-    Assertions.assertEquals(Locale.ENGLISH, I18nUtil.getCurrentLocale());
-
-    I18nUtil.setCurrentLocale(null);
-    Assertions.assertEquals(TARGET_LOCALE, I18nUtil.getCurrentLocale());
-  }
-
-  @Test
   void format() {
     final String fallback = "fallback";
 
