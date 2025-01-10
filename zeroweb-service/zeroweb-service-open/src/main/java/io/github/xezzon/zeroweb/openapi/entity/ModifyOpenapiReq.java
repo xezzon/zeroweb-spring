@@ -18,7 +18,7 @@ import org.mapstruct.factory.Mappers;
  */
 public record ModifyOpenapiReq(
     String id,
-    @Alphanumeric String code,
+    @Alphanumeric(excludes = {Alphanumeric.DOT}) String code,
     String destination,
     HttpMethod httpMethod
 ) implements Into<Openapi> {

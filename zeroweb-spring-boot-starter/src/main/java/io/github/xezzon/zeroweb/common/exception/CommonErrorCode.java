@@ -21,6 +21,7 @@ public enum CommonErrorCode implements IErrorCode {
   UNKNOWN(SERVER, Throwable.class),
   /**
    * 唯一键冲突
+   * 消息参数0: 重复的键名
    */
   REPEAT_DATA(CLIENT, RepeatDataException.class),
   /**

@@ -110,7 +110,7 @@ public class GlobalExceptionHandler {
     // 异常明细
     ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
     errorDetail.setDetails(e.getFieldErrors().parallelStream()
-        .map(error -> new ErrorDetail(error.getCode(), error.getDefaultMessage()))
+        .map(error -> new ErrorDetail(error.getField(), error.getDefaultMessage()))
         .toList()
     );
     // 响应体

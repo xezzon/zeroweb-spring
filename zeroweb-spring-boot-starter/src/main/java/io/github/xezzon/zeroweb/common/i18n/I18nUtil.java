@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * 国际化相关方法
  * @author xezzon
+ * @see org.springframework.context.i18n.LocaleContextHolder#getLocale()
+ * @see org.springframework.context.MessageSource#getMessage(String, Object[], Locale)
  */
 @Slf4j
 public class I18nUtil {
@@ -19,33 +21,9 @@ public class I18nUtil {
    * 国际化资源前缀
    */
   private static final String BASE_DIR = "i18n/";
-  /**
-   * 当前语言
-   */
-  private static final ThreadLocal<Locale> CURRENT_LOCALE = new InheritableThreadLocal<>();
 
   private I18nUtil() {
     super();
-  }
-
-  /**
-   * 设置当前线程的语言
-   * @param locale 语言
-   */
-  public static void setCurrentLocale(Locale locale) {
-    if (locale != null) {
-      CURRENT_LOCALE.set(locale);
-    } else {
-      CURRENT_LOCALE.remove();
-    }
-  }
-
-  /**
-   * @return 当前线程的语言配置
-   */
-  public static Locale getCurrentLocale() {
-    return Optional.ofNullable(CURRENT_LOCALE.get())
-        .orElseGet(Locale::getDefault);
   }
 
   /**

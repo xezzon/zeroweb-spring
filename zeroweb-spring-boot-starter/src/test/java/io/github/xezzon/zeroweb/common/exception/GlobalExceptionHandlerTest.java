@@ -5,8 +5,6 @@ import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.E
 import cn.hutool.core.util.RandomUtil;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Size;
 import java.util.Locale;
 import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
@@ -25,12 +23,12 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @DirtiesContext
 class GlobalExceptionHandlerTest {
 
-  @Resource
-  private WebTestClient webTestClient;
-
   static {
     Locale.setDefault(Locale.CHINA);
   }
+
+  @Resource
+  private WebTestClient webTestClient;
 
   @Test
   void repeatDataException() {
@@ -130,10 +128,10 @@ class GlobalExceptionHandlerTest {
     );
     Assertions.assertEquals("参数错误。请检查输入后重新提交。", responseBody.error().getMessage());
     Assertions.assertTrue(responseBody.error().getDetails().parallelStream()
-        .anyMatch(detail -> Objects.equals(Email.class.getSimpleName(), detail.getCode()))
+        .anyMatch(detail -> Objects.equals("email", detail.getCode()))
     );
     Assertions.assertTrue(responseBody.error().getDetails().parallelStream()
-        .anyMatch(detail -> Objects.equals(Size.class.getSimpleName(), detail.getCode()))
+        .anyMatch(detail -> Objects.equals("name", detail.getCode()))
     );
   }
 
