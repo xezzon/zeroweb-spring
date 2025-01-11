@@ -132,7 +132,9 @@ public class DictService {
     Optional<Dict> exist = dictDAO.get().findByTagAndCode(dict.getTag(), dict.getCode());
     if (exist.isPresent() && !Objects.equals(dict.getId(), exist.get().getId())) {
       // 存在冲突的字典项
-      throw new RepeatDataException(MessageFormat.format("字典`{0}`已存在", dict.getCode()));
+      throw new RepeatDataException(
+          MessageFormat.format("`{0}`.`{1}`", dict.getTag(), dict.getCode())
+      );
     }
   }
 }

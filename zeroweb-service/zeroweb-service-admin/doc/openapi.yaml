@@ -111,7 +111,7 @@ paths:
       operationId: dict-GET
       tags: []
       parameters:
-        - name: $top
+        - name: top
           in: query
           description: ''
           required: false
@@ -121,7 +121,7 @@ paths:
             format: uint32
             minimum: 1
             maximum: 2000
-        - name: $skip
+        - name: skip
           in: query
           description: ''
           required: false
@@ -292,9 +292,7 @@ paths:
           in: path
           description: 字典目编码
           required: true
-          example: ''
           schema:
-            format: string
             type: string
         - name: X-PUBLIC-KEY
           in: header
@@ -309,7 +307,7 @@ paths:
             '*/*':
               schema:
                 type: array
-                items: &ref_1
+                items: &ref_2
                   $ref: '#/components/schemas/Dict'
                 minItems: 0
                 uniqueItems: true
@@ -509,6 +507,504 @@ paths:
                 properties: {}
           headers: {}
       security: []
+  /locale/{id}:
+    delete:
+      summary: 删除国际化内容及关联的国际化文本
+      deprecated: false
+      description: ''
+      tags: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { }
+          headers: { }
+      security: [ ]
+  /i18n/{language}/{namespace}:
+    get:
+      summary: 加载国际化资源
+      deprecated: false
+      description: ''
+      tags: [ ]
+      parameters:
+        - name: language
+          in: path
+          description: 语言标签
+          required: true
+          schema:
+            type: string
+        - name: namespace
+          in: path
+          description: 命名空间
+          required: true
+          schema:
+            type: string
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { }
+                additionalProperties:
+                  type: string
+          headers: { }
+      security: [ ]
+  /locale/{namespace}:
+    get:
+      summary: 查询国际化内容列表
+      deprecated: false
+      description: ''
+      tags: [ ]
+      parameters:
+        - name: namespace
+          in: path
+          description: 命名空间
+          required: true
+          schema:
+            type: string
+        - name: top
+          in: query
+          description: 每页数量
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 2000
+            exclusiveMinimum: true
+        - name: skip
+          in: query
+          description: 翻页数量
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            multipleOf: 5
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/I18nMessage'
+                    title: 内容
+                  number:
+                    type: integer
+                    title: 页码
+                    minimum: 1
+                  size:
+                    type: integer
+                    title: 页大小
+                    minimum: 5
+                    maximum: 2000
+                    multipleOf: 5
+                  totalElements:
+                    type: integer
+                    title: 总数量
+                    minimum: 0
+                    maximum: 2000000
+                required:
+                  - content
+          headers: { }
+      security: [ ]
+  /language:
+    post:
+      summary: 新增语言
+      deprecated: false
+      description: ''
+      tags: [ ]
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                languageTag:
+                  type: string
+                  title: 语言标签
+                  minLength: 1
+                  maxLength: 255
+                  pattern: ^[\w]+(\-\w+)?
+                description:
+                  type: string
+                  title: 描述
+                  minLength: 0
+                  maxLength: 255
+                ordinal:
+                  type: integer
+                  title: 排序号
+                  description: 数值越小，顺序越靠前
+                enabled:
+                  type: boolean
+                  title: 启用状态
+              required:
+                - languageTag
+                - description
+                - ordinal
+                - enabled
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: *ref_0
+          headers: { }
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { }
+          headers: { }
+      security: [ ]
+    get:
+      summary: 查询语言列表
+      deprecated: false
+      description: ''
+      tags: [ ]
+      parameters:
+        - name: top
+          in: query
+          description: 每页数量
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 2000
+            exclusiveMinimum: true
+        - name: skip
+          in: query
+          description: 翻页数量
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            multipleOf: 5
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items: &ref_1
+                      $ref: '#/components/schemas/Language'
+                    title: 内容
+                  number:
+                    type: integer
+                    title: 页码
+                    minimum: 1
+                  size:
+                    type: integer
+                    title: 页大小
+                    minimum: 5
+                    maximum: 2000
+                    multipleOf: 5
+                  totalElements:
+                    type: integer
+                    title: 总数量
+                    minimum: 0
+                    maximum: 2000000
+                required:
+                  - content
+          headers: { }
+      security: [ ]
+    put:
+      summary: 更新语言接口
+      deprecated: false
+      description: ''
+      tags: [ ]
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_1
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { }
+          headers: { }
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { }
+          headers: { }
+        x-400:数据不存在或已删除:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { }
+          headers: { }
+      security: [ ]
+  /language/{id}:
+    delete:
+      summary: 移除语言及关联的国际化文本
+      deprecated: false
+      description: ''
+      tags: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: ''
+          required: true
+          example: '{{$database.mongodbObjectId}}'
+          schema:
+            type: string
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { }
+          headers: { }
+      security: [ ]
+  /locale:
+    post:
+      summary: 新增国际化内容
+      deprecated: false
+      description: ''
+      tags: [ ]
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                namespace:
+                  type: string
+                  title: 命名空间
+                  minLength: 1
+                  maxLength: 255
+                  pattern: ^[\w]+
+                messageKey:
+                  type: string
+                  title: 国际化内容
+                  minLength: 1
+                  maxLength: 255
+                  pattern: ^[\w\.]+
+              required:
+                - namespace
+                - messageKey
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: *ref_0
+          headers: { }
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { }
+          headers: { }
+      security: [ ]
+    get:
+      summary: 列举国际化内容命名空间
+      deprecated: false
+      description: ''
+      tags: [ ]
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+          headers: { }
+      security: [ ]
+    put:
+      summary: 新增/更新国际化文本
+      deprecated: false
+      description: ''
+      tags: [ ]
+      parameters:
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                namespace:
+                  type: string
+                  pattern: ^[\w]+
+                  minLength: 1
+                  maxLength: 255
+                  title: 命名空间
+                messageKey:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                  pattern: ^[\w\.]+
+                  title: 国际化内容
+                languageTag:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                  pattern: '[\w]+(\-\w+)?'
+                  title: 语言标签
+                content:
+                  type: string
+                  minLength: 0
+                  maxLength: 4095
+                  title: 国际化文本
+              required:
+                - namespace
+                - messageKey
+                - languageTag
+                - content
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: *ref_0
+          headers: { }
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { }
+          headers: { }
+      security: [ ]
+  /locale/{namespace}/{messageKey}:
+    get:
+      summary: 查询国际化文本列表
+      deprecated: false
+      description: ''
+      tags: [ ]
+      parameters:
+        - name: namespace
+          in: path
+          description: 命名空间
+          required: true
+          schema:
+            type: string
+        - name: messageKey
+          in: path
+          description: 国际化内容键
+          required: true
+          schema:
+            type: string
+        - name: X-PUBLIC-KEY
+          in: header
+          description: ''
+          example: '{{JWT_PUBLIC_KEY}}'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { }
+                additionalProperties: true
+          headers: { }
+      security: [ ]
 components:
   schemas:
     Dict:
@@ -540,7 +1036,7 @@ components:
           title: 是否可编辑
         children:
           type: array
-          items: *ref_1
+          items: *ref_2
           title: 子级字典
       title: 字典
       required:
@@ -553,6 +1049,100 @@ components:
         - ordinal
         - children
         - parentId
+    Language:
+      type: object
+      properties:
+        id:
+          type: string
+          title: ''
+          description: ''
+          readOnly: true
+        languageTag:
+          type: string
+          title: 语言标签
+          minLength: 1
+          maxLength: 255
+          pattern: ^[\w]+(\-\w+)?
+        description:
+          type: string
+          title: 描述
+          minLength: 0
+          maxLength: 255
+        ordinal:
+          type: integer
+          title: 排序号
+          description: 数值越小，顺序越靠前
+        enabled:
+          type: boolean
+          title: 启用状态
+      required:
+        - languageTag
+        - description
+        - ordinal
+        - enabled
+        - id
+      title: 语言
+    I18nMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          title: ''
+          description: ''
+        namespace:
+          type: string
+          title: 命名空间
+          minLength: 1
+          maxLength: 255
+          pattern: ^[\w]+
+        messageKey:
+          type: string
+          title: 国际化内容
+          minLength: 1
+          maxLength: 255
+          pattern: ^[\w\.]+
+      title: 国际化内容
+      required:
+        - namespace
+        - id
+        - messageKey
+    I18nText:
+      type: object
+      properties:
+        id:
+          type: string
+          title: ''
+          description: ''
+        namespace:
+          type: string
+          pattern: ^[\w]+
+          minLength: 1
+          maxLength: 255
+          title: 命名空间
+        messageKey:
+          type: string
+          minLength: 1
+          maxLength: 255
+          pattern: ^[\w\.]+
+          title: 国际化内容
+        languageTag:
+          type: string
+          minLength: 1
+          maxLength: 255
+          pattern: '[\w]+(\-\w+)?'
+          title: 语言标签
+        content:
+          type: string
+          minLength: 0
+          maxLength: 4095
+          title: 国际化文本
+      title: 国际化文本
+      required:
+        - id
+        - namespace
+        - messageKey
+        - content
+        - languageTag
     Page:
       type: object
       properties:
