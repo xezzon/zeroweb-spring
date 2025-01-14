@@ -5,7 +5,9 @@ import io.github.xezzon.zeroweb.locale.domain.Language;
 import io.github.xezzon.zeroweb.locale.entity.AddLanguageReq;
 import io.github.xezzon.zeroweb.locale.entity.ModifyLanguageReq;
 import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,5 +59,10 @@ public class LanguageController {
   public void updateLanguage(@RequestBody ModifyLanguageReq req) {
     Language language = req.into();
     localizedService.updateLanguage(language);
+  }
+
+  @DeleteMapping("/{id}")
+  public void deleteLanguage(@PathVariable String id) {
+    localizedService.deleteLanguage(id);
   }
 }

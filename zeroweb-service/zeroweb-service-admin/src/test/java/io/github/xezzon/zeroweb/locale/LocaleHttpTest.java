@@ -2,6 +2,7 @@ package io.github.xezzon.zeroweb.locale;
 
 import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.hutool.core.util.RandomUtil;
@@ -14,6 +15,7 @@ import io.github.xezzon.zeroweb.locale.repository.LanguageRepository;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +33,7 @@ class LocaleHttpTest {
   private static final String ADD_LANGUAGE_URL = "/language";
   private static final String LIST_LANGUAGE_URL = "/language";
   private static final String UPDATE_LANGUAGE_URL = "/language";
+  private static final String DELETE_LANGUAGE_URL = "/language/{id}";
 
   @Resource
   private WebTestClient webTestClient;
@@ -143,5 +146,25 @@ class LocaleHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
+  }
+
+  @Test
+  void deleteLanguage() {
+    Language except = new Language();
+    except.setLanguageTag(Locale.FRENCH.toLanguageTag());
+    except.setDescription(Locale.FRENCH.getDisplayName());
+    except.setOrdinal(16);
+    except.setEnabled(true);
+    languageRepository.save(except);
+
+    webTestClient.delete()
+        .uri(builder -> builder.path(DELETE_LANGUAGE_URL)
+            .build(except.getId())
+        )
+        .exchange()
+        .expectStatus().isOk();
+
+    Optional<Language> actual = languageRepository.findById(except.getId());
+    assertFalse(actual.isPresent());
   }
 }

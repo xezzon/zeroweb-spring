@@ -53,6 +53,10 @@ public class LocalizedService {
     languageDAO.get().save(language);
   }
 
+  void deleteLanguage(String id) {
+    languageDAO.get().deleteById(id);
+  }
+
   /**
    * 语言之间不能有相同的 Language Tag
    */
