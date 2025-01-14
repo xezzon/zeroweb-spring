@@ -41,6 +41,19 @@ public class LocalizedService {
   }
 
   /**
+   * 更新语言
+   * @param language 语言
+   */
+  void updateLanguage(Language language) {
+    Language entity = languageDAO.get().getReferenceById(language.getId());
+    languageDAO.getCopier().copy(language, entity);
+    /* 前置校验 */
+    this.checkRepeat(language);
+    /* 持久化 */
+    languageDAO.get().save(language);
+  }
+
+  /**
    * 语言之间不能有相同的 Language Tag
    */
   private void checkRepeat(Language language) {
