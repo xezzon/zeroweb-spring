@@ -42,4 +42,37 @@
       </column>
     </addColumn>
   </changeSet>
+
+  <changeSet id="64" author="xezzon">
+    <insert tableName="zeroweb_dict">
+      <column name="id" value="1"/>
+      <column name="tag" value="DICT"/>
+      <column name="code" value="Language"/>
+      <column name="label" value="语言"/>
+      <column name="ordinal" value="0"/>
+      <column name="parent_id" value="0"/>
+      <column name="enabled" value="true"/>
+      <column name="editable" value="true"/>
+    </insert>
+    <insert tableName="zeroweb_dict">
+      <column name="id" value="2"/>
+      <column name="tag" value="Language"/>
+      <column name="code" value="zh-CN"/>
+      <column name="label" value="中文"/>
+      <column name="ordinal" value="1"/>
+      <column name="parent_id" value="1"/>
+      <column name="enabled" value="true"/>
+      <column name="editable" value="true"/>
+    </insert>
+    <insert tableName="zeroweb_dict">
+      <column name="id" value="3"/>
+      <column name="tag" value="Language"/>
+      <column name="code" value="en"/>
+      <column name="label" value="English"/>
+      <column name="ordinal" value="2"/>
+      <column name="parent_id" value="1"/>
+      <column name="enabled" value="true"/>
+      <column name="editable" value="true"/>
+    </insert>
+  </changeSet>
 </databaseChangeLog>
