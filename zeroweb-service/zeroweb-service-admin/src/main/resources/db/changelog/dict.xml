@@ -43,7 +43,7 @@
     </addColumn>
   </changeSet>
 
-  <changeSet id="64" author="xezzon">
+  <changeSet id="64" author="xezzon" labels="0.5">
     <insert tableName="zeroweb_dict">
       <column name="id" value="1"/>
       <column name="tag" value="DICT"/>

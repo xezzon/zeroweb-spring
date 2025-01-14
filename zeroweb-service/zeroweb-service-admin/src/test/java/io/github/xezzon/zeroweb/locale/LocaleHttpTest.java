@@ -8,15 +8,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
+import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
 import io.github.xezzon.zeroweb.locale.domain.Language;
+import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
 import io.github.xezzon.zeroweb.locale.entity.AddLanguageReq;
 import io.github.xezzon.zeroweb.locale.entity.ModifyLanguageReq;
+import io.github.xezzon.zeroweb.locale.repository.I18nMessageRepository;
 import io.github.xezzon.zeroweb.locale.repository.LanguageRepository;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -34,11 +38,28 @@ class LocaleHttpTest {
   private static final String LIST_LANGUAGE_URL = "/language";
   private static final String UPDATE_LANGUAGE_URL = "/language";
   private static final String DELETE_LANGUAGE_URL = "/language/{id}";
+  private static final String ADD_I18N_MESSAGE_URL = "/locale";
 
   @Resource
   private WebTestClient webTestClient;
   @Resource
   private LanguageRepository languageRepository;
+  @Resource
+  private I18nMessageRepository i18nMessageRepository;
+
+  public void initData() {
+    for (int i = 0; i < 16; i++) {
+      I18nMessage i18nMessage = new I18nMessage();
+      i18nMessage.setNamespace(RandomUtil.randomString(8));
+      i18nMessage.setMessageKey(RandomUtil.randomString(8));
+      i18nMessageRepository.save(i18nMessage);
+    }
+  }
+
+  @AfterEach
+  void tearDown() {
+    i18nMessageRepository.deleteAll();
+  }
 
   @Test
   void addLanguage() {
@@ -58,8 +79,7 @@ class LocaleHttpTest {
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
     assertNotNull(responseBody.id());
-    io.github.xezzon.zeroweb.locale.domain.Language language = languageRepository.findById(
-        responseBody.id()).orElseThrow();
+    Language language = languageRepository.findById(responseBody.id()).orElseThrow();
     assertEquals(true, language.getEnabled());
   }
 
@@ -166,5 +186,38 @@ class LocaleHttpTest {
 
     Optional<Language> actual = languageRepository.findById(except.getId());
     assertFalse(actual.isPresent());
+  }
+
+  @Test
+  void addI18nMessage() {
+    AddI18nMessageReq req = new AddI18nMessageReq(
+        RandomUtil.randomString(8),
+        RandomUtil.randomString(8)
+    );
+    Id responseBody = webTestClient.post()
+        .uri(ADD_I18N_MESSAGE_URL)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(Id.class)
+        .returnResult().getResponseBody();
+    assertNotNull(responseBody);
+    i18nMessageRepository.findById(responseBody.id()).orElseThrow();
+  }
+
+  @Test
+  void addI18nMessage_repeat() {
+    this.initData();
+    I18nMessage except = i18nMessageRepository.findAll().get(0);
+    AddI18nMessageReq req = new AddI18nMessageReq(
+        except.getNamespace(),
+        except.getMessageKey()
+    );
+    webTestClient.post()
+        .uri(ADD_I18N_MESSAGE_URL)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
   }
 }

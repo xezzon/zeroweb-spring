@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.locale;
 
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
+import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
 import io.github.xezzon.zeroweb.locale.domain.Language;
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +14,11 @@ import org.springframework.stereotype.Service;
 public class LocalizedService {
 
   private final LanguageDAO languageDAO;
+  private final I18nMessageDAO i18nMessageDAO;
 
-  LocalizedService(LanguageDAO languageDAO) {
+  LocalizedService(LanguageDAO languageDAO, I18nMessageDAO i18nMessageDAO) {
     this.languageDAO = languageDAO;
+    this.i18nMessageDAO = i18nMessageDAO;
   }
 
   /**
@@ -57,6 +60,13 @@ public class LocalizedService {
     languageDAO.get().deleteById(id);
   }
 
+  void addI18nMessage(I18nMessage i18nMessage) {
+    /* 前置校验 */
+    this.checkRepeat(i18nMessage);
+    /* 持久化 */
+    i18nMessageDAO.get().save(i18nMessage);
+  }
+
   /**
    * 语言之间不能有相同的 Language Tag
    */
@@ -64,6 +74,21 @@ public class LocalizedService {
     Optional<Language> exist = languageDAO.findByLanguageTag(language.getLanguageTag());
     if (exist.isPresent() && !exist.get().getId().equals(language.getId())) {
       throw new RepeatDataException("`" + language.getLanguageTag() + "`");
+    }
+  }
+
+  /**
+   * 同一命名空间下，国际化内容不能重复
+   *
+   * @param i18nMessage 国际化内容
+   */
+  private void checkRepeat(I18nMessage i18nMessage) {
+    String namespace = i18nMessage.getNamespace();
+    String messageKey = i18nMessage.getMessageKey();
+    Optional<I18nMessage> exist = i18nMessageDAO.get()
+        .findByNamespaceAndMessageKey(namespace, messageKey);
+    if (exist.isPresent() && !exist.get().getId().equals(i18nMessage.getId())) {
+      throw new RepeatDataException(String.format("`%s`.`%s`", namespace, messageKey));
     }
   }
 }
