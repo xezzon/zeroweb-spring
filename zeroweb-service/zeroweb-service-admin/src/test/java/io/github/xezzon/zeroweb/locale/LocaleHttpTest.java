@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
+import io.github.xezzon.zeroweb.locale.domain.Language;
 import io.github.xezzon.zeroweb.locale.entity.AddLanguageReq;
 import io.github.xezzon.zeroweb.locale.repository.LanguageRepository;
 import jakarta.annotation.Resource;
+import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +26,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class LocaleHttpTest {
 
   private static final String ADD_LANGUAGE_URL = "/language";
+  private static final String LIST_LANGUAGE_URL = "/language";
 
   @Resource
   private WebTestClient webTestClient;
@@ -68,5 +71,17 @@ class LocaleHttpTest {
         .expectStatus().isBadRequest()
         .expectBody()
         .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+  }
+
+  @Test
+  void queryLanguageList() {
+    List<Language> responseBody = webTestClient.get()
+        .uri(LIST_LANGUAGE_URL)
+        .exchange()
+        .expectBodyList(Language.class)
+        .returnResult().getResponseBody();
+    assertNotNull(responseBody);
+    assertEquals(2, responseBody.size());
+    assertEquals(Locale.CHINA.toLanguageTag(), responseBody.get(0).getLanguageTag());
   }
 }

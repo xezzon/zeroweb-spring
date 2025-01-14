@@ -3,6 +3,8 @@ package io.github.xezzon.zeroweb.locale;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.locale.domain.Language;
 import io.github.xezzon.zeroweb.locale.entity.AddLanguageReq;
+import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,5 +34,15 @@ public class LanguageController {
     Language language = req.into();
     localizedService.addLanguage(language);
     return Id.of(language.getId());
+  }
+
+  /**
+   * 查询语言列表
+   *
+   * @return 语言列表
+   */
+  @GetMapping()
+  public List<Language> queryLanguageList() {
+    return localizedService.queryLanguageList();
   }
 }

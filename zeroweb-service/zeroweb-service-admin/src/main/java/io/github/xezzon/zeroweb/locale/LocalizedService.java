@@ -2,6 +2,7 @@ package io.github.xezzon.zeroweb.locale;
 
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.locale.domain.Language;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,15 @@ public class LocalizedService {
     checkRepeat(language);
     /* 持久化 */
     languageDAO.get().save(language);
+  }
+
+  /**
+   * 查询语言列表
+   *
+   * @return 语言列表
+   */
+  List<Language> queryLanguageList() {
+    return languageDAO.findAllOrderByOrdinalAsc();
   }
 
   /**
