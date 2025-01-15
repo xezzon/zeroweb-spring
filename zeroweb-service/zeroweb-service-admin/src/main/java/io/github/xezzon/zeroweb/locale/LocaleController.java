@@ -3,7 +3,9 @@ package io.github.xezzon.zeroweb.locale;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
 import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
+import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,6 +37,11 @@ public class LocaleController {
     I18nMessage i18nMessage = req.into();
     localizedService.addI18nMessage(i18nMessage);
     return Id.of(i18nMessage.getId());
+  }
+
+  @GetMapping()
+  public List<String> listI18nNamespace() {
+    return localizedService.listI18nNamespace();
   }
 
   /**

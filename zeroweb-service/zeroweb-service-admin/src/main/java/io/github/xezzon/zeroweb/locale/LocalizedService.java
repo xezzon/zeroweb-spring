@@ -77,6 +77,17 @@ public class LocalizedService {
   }
 
   /**
+   * 列举国际化内容命名空间
+   * @return 国际化内容命名空间列表
+   */
+  List<String> listI18nNamespace() {
+    return i18nMessageDAO.get().findDistinctNamespace()
+        .stream()
+        .sorted()
+        .toList();
+  }
+
+  /**
    * 更新国际化内容
    * @param i18nMessage 国际化内容
    * @throws RepeatDataException 重复数据异常

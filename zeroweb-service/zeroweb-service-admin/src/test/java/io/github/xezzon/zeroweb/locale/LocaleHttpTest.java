@@ -24,6 +24,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -39,6 +40,7 @@ class LocaleHttpTest {
   private static final String UPDATE_LANGUAGE_URL = "/language";
   private static final String DELETE_LANGUAGE_URL = "/language/{id}";
   private static final String ADD_I18N_MESSAGE_URL = "/locale";
+  private static final String LIST_I18N_NAMESPACE_URL = "/locale";
   private static final String UPDATE_I18N_MESSAGE_URL = "/locale";
   private static final String DELETE_I18N_MESSAGE_URL = "/locale/{id}";
 
@@ -205,6 +207,29 @@ class LocaleHttpTest {
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
     i18nMessageRepository.findById(responseBody.id()).orElseThrow();
+  }
+
+  @Test
+  void listI18nMessageNamespace() {
+    this.initData();
+    List<String> except = i18nMessageRepository.findAll()
+        .stream()
+        .map(I18nMessage::getNamespace)
+        .sorted()
+        .toList();
+
+    List<String> responseBody = webTestClient.get()
+        .uri(LIST_I18N_NAMESPACE_URL)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(new ParameterizedTypeReference<List<String>>() {
+        })
+        .returnResult().getResponseBody();
+    assertNotNull(responseBody);
+    assertEquals(except.size(), responseBody.size());
+    for (int i = 0, cnt = except.size(); i < cnt; i++) {
+      assertEquals(except.get(i), responseBody.get(i));
+    }
   }
 
   @Test
