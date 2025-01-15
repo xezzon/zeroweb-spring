@@ -1,7 +1,6 @@
 package io.github.xezzon.zeroweb.crypto;
 
 import com.auth0.jwt.JWTCreator;
-import io.github.xezzon.tao.observer.ObserverContext;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig.ZerowebJwtConfig;
@@ -11,6 +10,7 @@ import io.github.xezzon.zeroweb.core.crypto.SecretKeyUtil;
 import io.github.xezzon.zeroweb.crypto.event.PublicKeyGeneratedEvent;
 import io.github.xezzon.zeroweb.crypto.service.JwtCryptoService;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +20,9 @@ import java.time.Instant;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,11 +37,11 @@ public class JwtKeyManager implements JwtCryptoService {
   private final ZerowebJwtConfig zerowebJwtConfig;
   private PrivateKey privateKey;
   private PublicKey publicKey;
+  @Resource
+  private ApplicationEventPublisher eventPublisher;
 
   public JwtKeyManager(ZerowebConfig zerowebConfig) {
     this.zerowebJwtConfig = zerowebConfig.getJwt();
-    ObserverContext.register(PublicKeyGeneratedEvent.class, this::printPublicKey);
-    ObserverContext.register(PublicKeyGeneratedEvent.class, this::savePublicKeyToClasspath);
   }
 
   /**
@@ -75,7 +78,7 @@ public class JwtKeyManager implements JwtCryptoService {
       }
     }
     /* 广播公钥 */
-    ObserverContext.post(new PublicKeyGeneratedEvent(publicKey));
+    eventPublisher.publishEvent(new PublicKeyGeneratedEvent(publicKey));
   }
 
   @Override
@@ -110,6 +113,8 @@ public class JwtKeyManager implements JwtCryptoService {
    * 打印公钥到控制台
    * @param event 公钥
    */
+  @EventListener
+  @Async
   public void printPublicKey(PublicKeyGeneratedEvent event) {
     log.info("Current JWT Public Key is: {}", event.getPublicKey());
   }
@@ -118,6 +123,8 @@ public class JwtKeyManager implements JwtCryptoService {
    * 将公钥保存到文件中（PKCS8）
    * @param event 公钥
    */
+  @EventListener
+  @Async
   public void savePublicKeyToClasspath(PublicKeyGeneratedEvent event) {
     ASN1PublicKeyWriter asn1Writer = new PemClasspathReaderAndWriter(zerowebJwtConfig.getIssuer());
     try {
