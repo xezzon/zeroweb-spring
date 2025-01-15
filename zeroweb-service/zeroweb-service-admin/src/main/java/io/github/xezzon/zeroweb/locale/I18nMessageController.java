@@ -18,16 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 国际化内容及文本管理
- *
  * @author xezzon
  */
 @RestController
-@RequestMapping("/locale")
-public class LocaleController {
+@RequestMapping("/i18n")
+public class I18nMessageController {
 
   private final LocalizedService localizedService;
 
-  public LocaleController(LocalizedService localizedService) {
+  public I18nMessageController(final LocalizedService localizedService) {
     this.localizedService = localizedService;
   }
 
@@ -36,12 +35,16 @@ public class LocaleController {
    * @param req 国际化内容
    */
   @PostMapping()
-  public Id addI18nMessage(@RequestBody AddI18nMessageReq req) {
-    I18nMessage i18nMessage = req.into();
+  public Id addI18nMessage(@RequestBody final AddI18nMessageReq req) {
+    final I18nMessage i18nMessage = req.into();
     localizedService.addI18nMessage(i18nMessage);
     return Id.of(i18nMessage.getId());
   }
 
+  /**
+   * 列举国际化内容命名空间
+   * @return 国际化内容命名空间
+   */
   @GetMapping()
   public List<String> listI18nNamespace() {
     return localizedService.listI18nNamespace();
@@ -55,8 +58,8 @@ public class LocaleController {
    */
   @GetMapping("/{namespace}")
   public Page<I18nMessage> queryI18nMessageList(
-      @PathVariable String namespace,
-      ODataRequestParam odata
+      @PathVariable final String namespace,
+      final ODataRequestParam odata
   ) {
     return localizedService.queryI18nMessageList(namespace, odata.into());
   }
@@ -66,7 +69,7 @@ public class LocaleController {
    * @param i18nMessage 国际化内容
    */
   @PutMapping()
-  public void updateI18nMessage(@RequestBody I18nMessage i18nMessage) {
+  public void updateI18nMessage(@RequestBody final I18nMessage i18nMessage) {
     localizedService.updateI18nMessage(i18nMessage);
   }
 
@@ -75,7 +78,7 @@ public class LocaleController {
    * @param id 国际化内容ID
    */
   @DeleteMapping("/{id}")
-  public void deleteI18nMessage(@PathVariable String id) {
+  public void deleteI18nMessage(@PathVariable final String id) {
     localizedService.deleteI18nMessage(id);
   }
 
@@ -86,10 +89,10 @@ public class LocaleController {
    * @return 语言-国际化文本
    */
   @GetMapping("/{namespace}/{messageKey}")
-  public Map<String, String> queryI18nText(
-      @PathVariable String namespace,
-      @PathVariable String messageKey
+  public Map<String, String> queryTranslation(
+      @PathVariable final String namespace,
+      @PathVariable final String messageKey
   ) {
-    return localizedService.queryI18nText(namespace, messageKey);
+    return localizedService.queryTranslation(namespace, messageKey);
   }
 }

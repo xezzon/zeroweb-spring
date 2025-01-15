@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class LanguageDAO extends BaseDAO<Language, String, LanguageRepository> {
 
-  protected LanguageDAO(LanguageRepository repository) {
+  protected LanguageDAO(final LanguageRepository repository) {
     super(repository, Language.class);
   }
 
@@ -24,7 +24,7 @@ public class LanguageDAO extends BaseDAO<Language, String, LanguageRepository> {
     return Copier.INSTANCE;
   }
 
-  Optional<Language> findByLanguageTag(String languageTag) {
+  Optional<Language> findByLanguageTag(final String languageTag) {
     return this.get().findByDictTagAndLanguageTag(Language.LANGUAGE_DICT_TAG, languageTag);
   }
 

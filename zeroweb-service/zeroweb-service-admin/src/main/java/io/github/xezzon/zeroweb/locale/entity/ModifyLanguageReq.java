@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 /**
+ * 修改语言的请求参数
  * @param languageTag 语言标签
  * @param description 语言描述
  * @param ordinal 排序序号

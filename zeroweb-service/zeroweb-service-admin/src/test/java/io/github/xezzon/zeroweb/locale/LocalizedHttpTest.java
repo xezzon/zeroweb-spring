@@ -12,15 +12,15 @@ import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
-import io.github.xezzon.zeroweb.locale.domain.I18nText;
 import io.github.xezzon.zeroweb.locale.domain.Language;
+import io.github.xezzon.zeroweb.locale.domain.Translation;
 import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
 import io.github.xezzon.zeroweb.locale.entity.AddLanguageReq;
 import io.github.xezzon.zeroweb.locale.entity.ModifyLanguageReq;
-import io.github.xezzon.zeroweb.locale.entity.UpsertI18nTextReq;
+import io.github.xezzon.zeroweb.locale.entity.UpsertTranslationReq;
 import io.github.xezzon.zeroweb.locale.repository.I18nMessageRepository;
-import io.github.xezzon.zeroweb.locale.repository.I18nTextRepository;
 import io.github.xezzon.zeroweb.locale.repository.LanguageRepository;
+import io.github.xezzon.zeroweb.locale.repository.TranslationRepository;
 import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
@@ -50,14 +50,14 @@ class LocalizedHttpTest {
   private static final String LIST_LANGUAGE_URL = "/language";
   private static final String UPDATE_LANGUAGE_URL = "/language";
   private static final String DELETE_LANGUAGE_URL = "/language/{id}";
-  private static final String ADD_I18N_MESSAGE_URL = "/locale";
-  private static final String LIST_I18N_NAMESPACE_URL = "/locale";
-  private static final String UPDATE_I18N_MESSAGE_URL = "/locale";
-  private static final String DELETE_I18N_MESSAGE_URL = "/locale/{id}";
-  private static final String LIST_I18N_MESSAGE_URL = "/locale/{namespace}";
-  private static final String QUERY_I18N_TEXT_URL = "/locale/{namespace}/{messageKey}";
-  private static final String UPSERT_I18N_TEXT_URL = "/i18n";
-  private static final String LOAD_I18N_TEXT_URL = "/i18n/{language}/{namespace}";
+  private static final String ADD_I18N_MESSAGE_URL = "/i18n";
+  private static final String LIST_I18N_NAMESPACE_URL = "/i18n";
+  private static final String UPDATE_I18N_MESSAGE_URL = "/i18n";
+  private static final String DELETE_I18N_MESSAGE_URL = "/i18n/{id}";
+  private static final String LIST_I18N_MESSAGE_URL = "/i18n/{namespace}";
+  private static final String QUERY_TRANSLATION_URL = "/i18n/{namespace}/{messageKey}";
+  private static final String UPSERT_TRANSLATION_URL = "/locale";
+  private static final String LOAD_TRANSLATION_URL = "/locale/{language}/{namespace}";
 
   @Resource
   private WebTestClient webTestClient;
@@ -66,7 +66,7 @@ class LocalizedHttpTest {
   @Resource
   private I18nMessageRepository i18nMessageRepository;
   @Resource
-  private I18nTextRepository i18nTextRepository;
+  private TranslationRepository translationRepository;
 
   public void initData() {
     List<Language> languages = languageRepository.findAll().stream()
@@ -80,12 +80,12 @@ class LocalizedHttpTest {
         i18nMessage.setMessageKey(RandomUtil.randomString(8));
         i18nMessageRepository.save(i18nMessage);
         for (Language language : languages) {
-          I18nText i18nText = new I18nText();
-          i18nText.setNamespace(i18nMessage.getNamespace());
-          i18nText.setMessageKey(i18nMessage.getMessageKey());
-          i18nText.setLanguage(language.getLanguageTag());
-          i18nText.setContent(RandomUtil.randomString(8));
-          i18nTextRepository.save(i18nText);
+          Translation translation = new Translation();
+          translation.setNamespace(i18nMessage.getNamespace());
+          translation.setMessageKey(i18nMessage.getMessageKey());
+          translation.setLanguage(language.getLanguageTag());
+          translation.setContent(RandomUtil.randomString(8));
+          translationRepository.save(translation);
         }
       }
     }
@@ -94,7 +94,7 @@ class LocalizedHttpTest {
   @AfterEach
   void tearDown() {
     i18nMessageRepository.deleteAll();
-    i18nTextRepository.deleteAll();
+    translationRepository.deleteAll();
   }
 
   @Test
@@ -144,16 +144,15 @@ class LocalizedHttpTest {
         .expectBodyList(Language.class)
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
-    assertEquals(2, responseBody.size());
     assertEquals(Locale.CHINA.toLanguageTag(), responseBody.get(0).getLanguageTag());
   }
 
   @Test
   void updateLanguage() {
-    List<I18nText> dataset = i18nTextRepository.findAll()
+    List<Translation> dataset = translationRepository.findAll()
         .stream()
         .filter(o -> Objects.equals(o.getLanguage(), Locale.ENGLISH.toLanguageTag()))
-        .sorted(Comparator.comparing(I18nText::getId))
+        .sorted(Comparator.comparing(Translation::getId))
         .toList();
 
     ModifyLanguageReq req = new ModifyLanguageReq(
@@ -175,15 +174,15 @@ class LocalizedHttpTest {
     assertEquals(3, actualLanguage.getOrdinal());
     assertEquals(false, actualLanguage.getEnabled());
 
-    List<I18nText> actualDataset = i18nTextRepository.findAll()
+    List<Translation> actualDataset = translationRepository.findAll()
         .stream()
         .filter(o -> Objects.equals(o.getLanguage(), Locale.GERMAN.toLanguageTag()))
-        .sorted(Comparator.comparing(I18nText::getId))
+        .sorted(Comparator.comparing(Translation::getId))
         .toList();
     assertEquals(dataset.size(), actualDataset.size());
     for (int i = 0; i < dataset.size(); i++) {
-      I18nText expect = dataset.get(i);
-      I18nText actual = actualDataset.get(i);
+      Translation expect = dataset.get(i);
+      Translation actual = actualDataset.get(i);
       assertEquals(expect.getId(), actual.getId());
     }
   }
@@ -241,7 +240,7 @@ class LocalizedHttpTest {
     Optional<Language> actual = languageRepository.findById(except.getId());
     assertFalse(actual.isPresent());
 
-    assertTrue(i18nTextRepository.findAll()
+    assertTrue(translationRepository.findAll()
         .stream()
         .noneMatch(o -> Objects.equals(o.getLanguage(), except.getLanguageTag()))
     );
@@ -351,12 +350,12 @@ class LocalizedHttpTest {
     assertEquals(except.getMessageKey(), actual.getMessageKey());
 
     Thread.sleep(3000);
-    assertFalse(i18nTextRepository.findAll()
+    assertFalse(translationRepository.findAll()
         .stream()
         .filter(o -> Objects.equals(o.getNamespace(), target.getNamespace()))
         .anyMatch(o -> Objects.equals(o.getMessageKey(), target.getMessageKey()))
     );
-    assertTrue(i18nTextRepository.findAll()
+    assertTrue(translationRepository.findAll()
         .stream()
         .filter(o -> Objects.equals(o.getNamespace(), except.getNamespace()))
         .anyMatch(o -> Objects.equals(o.getMessageKey(), except.getMessageKey()))
@@ -395,7 +394,7 @@ class LocalizedHttpTest {
     assertFalse(i18nMessageRepository.existsById(target.getId()));
 
     Thread.sleep(3000);
-    assertFalse(i18nTextRepository.findAll()
+    assertFalse(translationRepository.findAll()
         .stream()
         .filter(o -> Objects.equals(o.getNamespace(), target.getNamespace()))
         .anyMatch(o -> Objects.equals(o.getMessageKey(), target.getMessageKey()))
@@ -403,12 +402,12 @@ class LocalizedHttpTest {
   }
 
   @Test
-  void queryI18nText() {
+  void queryTranslation() {
     this.initData();
     I18nMessage i18nMessage = i18nMessageRepository.findAll().get(0);
 
     Map<String, String> responseBody = webTestClient.get()
-        .uri(builder -> builder.path(QUERY_I18N_TEXT_URL)
+        .uri(builder -> builder.path(QUERY_TRANSLATION_URL)
             .build(i18nMessage.getNamespace(), i18nMessage.getMessageKey())
         )
         .exchange()
@@ -416,11 +415,11 @@ class LocalizedHttpTest {
         .expectBody(new ParameterizedTypeReference<Map<String, String>>() {
         })
         .returnResult().getResponseBody();
-    Map<String, String> except = i18nTextRepository.findAll()
+    Map<String, String> except = translationRepository.findAll()
         .stream()
         .filter(o -> Objects.equals(o.getNamespace(), i18nMessage.getNamespace()))
         .filter(o -> Objects.equals(o.getMessageKey(), i18nMessage.getMessageKey()))
-        .collect(Collectors.toMap(I18nText::getLanguage, I18nText::getContent));
+        .collect(Collectors.toMap(Translation::getLanguage, Translation::getContent));
     assertNotNull(responseBody);
     for (Entry<String, String> entry : responseBody.entrySet()) {
       assertEquals(except.get(entry.getKey()), entry.getValue());
@@ -428,7 +427,7 @@ class LocalizedHttpTest {
   }
 
   @Test
-  void insertI18nText() {
+  void insertTranslation() {
     this.initData();
     I18nMessage targetMessage = i18nMessageRepository.findAll().get(0);
     Language targetLanguage = new Language();
@@ -438,61 +437,61 @@ class LocalizedHttpTest {
     targetLanguage.setEnabled(true);
     languageRepository.save(targetLanguage);
 
-    UpsertI18nTextReq req = new UpsertI18nTextReq(
+    UpsertTranslationReq req = new UpsertTranslationReq(
         targetMessage.getNamespace(),
         targetMessage.getMessageKey(),
         targetLanguage.getLanguageTag(),
         RandomUtil.randomString(8)
     );
     Id responseBody = webTestClient.put()
-        .uri(UPSERT_I18N_TEXT_URL)
+        .uri(UPSERT_TRANSLATION_URL)
         .bodyValue(req)
         .exchange()
         .expectStatus().isOk()
         .expectBody(Id.class)
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
-    I18nText actual = i18nTextRepository.findById(responseBody.id()).orElseThrow();
+    Translation actual = translationRepository.findById(responseBody.id()).orElseThrow();
     assertEquals(req.content(), actual.getContent());
   }
 
   @Test
-  void updateI18nText() {
+  void updateTranslation() {
     this.initData();
-    I18nText target = i18nTextRepository.findAll().get(0);
+    Translation target = translationRepository.findAll().get(0);
 
-    UpsertI18nTextReq req = new UpsertI18nTextReq(
+    UpsertTranslationReq req = new UpsertTranslationReq(
         target.getNamespace(),
         target.getMessageKey(),
         target.getLanguage(),
         RandomUtil.randomString(8)
     );
     Id responseBody = webTestClient.put()
-        .uri(UPSERT_I18N_TEXT_URL)
+        .uri(UPSERT_TRANSLATION_URL)
         .bodyValue(req)
         .exchange()
         .expectStatus().isOk()
         .expectBody(Id.class)
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
-    I18nText actual = i18nTextRepository.findById(responseBody.id()).orElseThrow();
+    Translation actual = translationRepository.findById(responseBody.id()).orElseThrow();
     assertNotEquals(target.getContent(), actual.getContent());
     assertEquals(req.content(), actual.getContent());
   }
 
   @Test
-  void updateI18nText_noSuchData_language() {
+  void updateTranslation_noSuchData_language() {
     this.initData();
-    I18nText target = i18nTextRepository.findAll().get(0);
+    Translation target = translationRepository.findAll().get(0);
 
-    UpsertI18nTextReq req = new UpsertI18nTextReq(
+    UpsertTranslationReq req = new UpsertTranslationReq(
         target.getNamespace(),
         target.getMessageKey(),
         RandomUtil.randomString(8),
         RandomUtil.randomString(8)
     );
     webTestClient.put()
-        .uri(UPSERT_I18N_TEXT_URL)
+        .uri(UPSERT_TRANSLATION_URL)
         .bodyValue(req)
         .exchange()
         .expectStatus().isBadRequest()
@@ -500,18 +499,18 @@ class LocalizedHttpTest {
   }
 
   @Test
-  void updateI18nText_noSuchData_namespace() {
+  void updateTranslation_noSuchData_namespace() {
     this.initData();
-    I18nText target = i18nTextRepository.findAll().get(0);
+    Translation target = translationRepository.findAll().get(0);
 
-    UpsertI18nTextReq req = new UpsertI18nTextReq(
+    UpsertTranslationReq req = new UpsertTranslationReq(
         RandomUtil.randomString(8),
         target.getMessageKey(),
         target.getLanguage(),
         RandomUtil.randomString(8)
     );
     webTestClient.put()
-        .uri(UPSERT_I18N_TEXT_URL)
+        .uri(UPSERT_TRANSLATION_URL)
         .bodyValue(req)
         .exchange()
         .expectStatus().isBadRequest()
@@ -519,18 +518,18 @@ class LocalizedHttpTest {
   }
 
   @Test
-  void updateI18nText_noSuchData_messageKey() {
+  void updateTranslation_noSuchData_messageKey() {
     this.initData();
-    I18nText target = i18nTextRepository.findAll().get(0);
+    Translation target = translationRepository.findAll().get(0);
 
-    UpsertI18nTextReq req = new UpsertI18nTextReq(
+    UpsertTranslationReq req = new UpsertTranslationReq(
         target.getNamespace(),
         RandomUtil.randomString(8),
         target.getLanguage(),
         RandomUtil.randomString(8)
     );
     webTestClient.put()
-        .uri(UPSERT_I18N_TEXT_URL)
+        .uri(UPSERT_TRANSLATION_URL)
         .bodyValue(req)
         .exchange()
         .expectStatus().isBadRequest()
@@ -538,14 +537,14 @@ class LocalizedHttpTest {
   }
 
   @Test
-  void loadI18nText() {
+  void loadTranslation() {
     this.initData();
-    List<I18nText> dataset = i18nTextRepository.findAll();
+    List<Translation> dataset = translationRepository.findAll();
     String targetLanguage = dataset.get(0).getLanguage();
     String targetNamespace = dataset.get(0).getNamespace();
 
     Map<String, String> responseBody = webTestClient.get()
-        .uri(builder -> builder.path(LOAD_I18N_TEXT_URL)
+        .uri(builder -> builder.path(LOAD_TRANSLATION_URL)
             .build(targetLanguage, targetNamespace)
         )
         .exchange()

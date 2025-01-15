@@ -3,12 +3,11 @@ package io.github.xezzon.zeroweb.locale;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
-import io.github.xezzon.zeroweb.locale.domain.I18nText;
 import io.github.xezzon.zeroweb.locale.domain.Language;
+import io.github.xezzon.zeroweb.locale.domain.Translation;
 import io.github.xezzon.zeroweb.locale.event.I18nMessageChangedEvent;
 import io.github.xezzon.zeroweb.locale.event.I18nMessageDeletedEvent;
 import io.github.xezzon.zeroweb.locale.event.II18nMessage;
-import io.github.xezzon.zeroweb.locale.repository.I18nTextRepository;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -30,20 +29,18 @@ public class LocalizedService {
 
   private final LanguageDAO languageDAO;
   private final I18nMessageDAO i18nMessageDAO;
-  private final I18nTextDAO i18nTextDAO;
-  private final I18nTextRepository i18nTextRepository;
+  private final TranslationDAO translationDAO;
   @Resource
   private ApplicationEventPublisher eventPublisher;
 
   LocalizedService(
-      LanguageDAO languageDAO,
-      I18nMessageDAO i18nMessageDAO,
-      I18nTextDAO i18nTextDAO,
-      I18nTextRepository i18nTextRepository) {
+      final LanguageDAO languageDAO,
+      final I18nMessageDAO i18nMessageDAO,
+      final TranslationDAO translationDAO
+  ) {
     this.languageDAO = languageDAO;
     this.i18nMessageDAO = i18nMessageDAO;
-    this.i18nTextDAO = i18nTextDAO;
-    this.i18nTextRepository = i18nTextRepository;
+    this.translationDAO = translationDAO;
   }
 
   /**
@@ -52,7 +49,7 @@ public class LocalizedService {
    * @param language 语言
    * @throws RepeatDataException 重复数据异常
    */
-  void addLanguage(Language language) {
+  void addLanguage(final Language language) {
     /* 前置校验 */
     checkRepeat(language);
     /* 持久化 */
@@ -73,8 +70,8 @@ public class LocalizedService {
    *
    * @param language 语言
    */
-  void updateLanguage(Language language) {
-    Language entity = languageDAO.get().getReferenceById(language.getId());
+  void updateLanguage(final Language language) {
+    final Language entity = languageDAO.get().getReferenceById(language.getId());
     languageDAO.getCopier().copy(language, entity);
     /* 前置校验 */
     this.checkRepeat(language);
@@ -82,7 +79,7 @@ public class LocalizedService {
     languageDAO.get().save(entity);
     /* 后置处理 */
     if (!Objects.equals(entity.getLanguageTag(), language.getLanguageTag())) {
-      i18nTextDAO.get().updateByLanguage(language.getLanguageTag(), entity.getLanguageTag());
+      translationDAO.get().updateByLanguage(language.getLanguageTag(), entity.getLanguageTag());
     }
   }
 
@@ -91,14 +88,14 @@ public class LocalizedService {
    *
    * @param id 语言ID
    */
-  void deleteLanguage(String id) {
-    Optional<Language> entity = languageDAO.get().findById(id);
+  void deleteLanguage(final String id) {
+    final Optional<Language> entity = languageDAO.get().findById(id);
     if (entity.isEmpty()) {
       return;
     }
     languageDAO.get().deleteById(id);
     /* 后置处理 */
-    i18nTextDAO.get().deleteByLanguage(entity.get().getLanguageTag());
+    translationDAO.get().deleteByLanguage(entity.get().getLanguageTag());
   }
 
   /**
@@ -107,7 +104,7 @@ public class LocalizedService {
    * @param i18nMessage 国际化内容
    * @throws RepeatDataException 重复数据异常
    */
-  void addI18nMessage(I18nMessage i18nMessage) {
+  void addI18nMessage(final I18nMessage i18nMessage) {
     /* 前置校验 */
     this.checkRepeat(i18nMessage);
     /* 持久化 */
@@ -133,7 +130,7 @@ public class LocalizedService {
    * @param odata 分页查询参数
    * @return 国际化内容列表
    */
-  Page<I18nMessage> queryI18nMessageList(String namespace, ODataQueryOption odata) {
+  Page<I18nMessage> queryI18nMessageList(final String namespace, final ODataQueryOption odata) {
     return i18nMessageDAO.findAllWithNamespace(namespace, odata);
   }
 
@@ -144,9 +141,9 @@ public class LocalizedService {
    * @throws RepeatDataException 重复数据异常
    * @throws jakarta.persistence.EntityNotFoundException 数据不存在或已删除
    */
-  void updateI18nMessage(I18nMessage i18nMessage) {
-    I18nMessage entity = i18nMessageDAO.get().getReferenceById(i18nMessage.getId());
-    I18nMessage oldValue = new I18nMessage();
+  void updateI18nMessage(final I18nMessage i18nMessage) {
+    final I18nMessage entity = i18nMessageDAO.get().getReferenceById(i18nMessage.getId());
+    final I18nMessage oldValue = new I18nMessage();
     i18nMessageDAO.getCopier().copy(entity, oldValue);
     i18nMessageDAO.getCopier().copy(i18nMessage, entity);
     /* 前置校验 */
@@ -162,8 +159,8 @@ public class LocalizedService {
    *
    * @param id 国际化内容ID
    */
-  void deleteI18nMessage(String id) {
-    Optional<I18nMessage> entity = i18nMessageDAO.get().findById(id);
+  void deleteI18nMessage(final String id) {
+    final Optional<I18nMessage> entity = i18nMessageDAO.get().findById(id);
     if (entity.isEmpty()) {
       return;
     }
@@ -179,56 +176,63 @@ public class LocalizedService {
    * @param messageKey 国际化内容
    * @return 语言-国际化文本
    */
-  Map<String, String> queryI18nText(String namespace, String messageKey) {
-    return i18nTextDAO.get().findByNamespaceAndMessageKey(namespace, messageKey)
+  Map<String, String> queryTranslation(final String namespace, final String messageKey) {
+    return translationDAO.get().findByNamespaceAndMessageKey(namespace, messageKey)
         .stream()
-        .collect(Collectors.toMap(I18nText::getLanguage, I18nText::getContent, (a, b) -> a));
+        .collect(Collectors.toMap(Translation::getLanguage, Translation::getContent, (a, b) -> a));
   }
 
   /**
    * 新增国际化文本，如果已存在则更新
-   * @param i18nText 国际化文本
+   *
+   * @param translation 国际化文本
    * @throws EntityNotFoundException 数据不存在或已删除
    */
-  void upsertI18nText(I18nText i18nText) {
+  void upsertTranslation(final Translation translation) {
     /* 前置校验 */
-    final String languageTag = i18nText.getLanguage();
-    Language language = languageDAO.findByLanguageTag(languageTag)
+    final String languageTag = translation.getLanguage();
+    final Language language = languageDAO.findByLanguageTag(languageTag)
         .orElseThrow(() -> new EntityNotFoundException(
             String.format("Language %s not found", languageTag)
         ));
-    final String namespace = i18nText.getNamespace();
-    final String messageKey = i18nText.getMessageKey();
-    I18nMessage i18nMessage = i18nMessageDAO.get()
+    final String namespace = translation.getNamespace();
+    final String messageKey = translation.getMessageKey();
+    final I18nMessage i18nMessage = i18nMessageDAO.get()
         .findByNamespaceAndMessageKey(namespace, messageKey)
         .orElseThrow(() -> new EntityNotFoundException(
             String.format("I18nMessage `%s`.`%s` not found", namespace, messageKey)
         ));
     /* 持久化 */
-    Optional<I18nText> entity = i18nTextRepository.findByNamespaceAndMessageKeyAndLanguage(
-        i18nMessage.getNamespace(), i18nMessage.getMessageKey(), language.getLanguageTag()
-    );
-    entity.ifPresent(nText -> i18nText.setId(nText.getId()));
-    i18nTextDAO.get().save(i18nText);
+    final Optional<Translation> entity = translationDAO.get()
+        .findByNamespaceAndMessageKeyAndLanguage(
+            i18nMessage.getNamespace(), i18nMessage.getMessageKey(), language.getLanguageTag()
+        );
+    entity.ifPresent(o -> translation.setId(o.getId()));
+    translationDAO.get().save(translation);
   }
 
   /**
    * 加载国际化资源
+   *
    * @param language 语言标签
    * @param namespace 命名空间
    * @return 国际化内容-国际化文本
    */
-  Map<String, String> loadI18nText(String language, String namespace) {
-    return i18nTextDAO.get().findByNamespaceAndLanguage(namespace, language)
+  Map<String, String> loadTranslation(final String language, final String namespace) {
+    return translationDAO.get().findByNamespaceAndLanguage(namespace, language)
         .stream()
-        .collect(Collectors.toMap(I18nText::getMessageKey, I18nText::getContent, (a, b) -> a));
+        .collect(Collectors.toMap(
+            Translation::getMessageKey,
+            Translation::getContent,
+            (a, b) -> a)
+        );
   }
 
   /**
    * 语言之间不能有相同的 Language Tag
    */
-  private void checkRepeat(Language language) {
-    Optional<Language> exist = languageDAO.findByLanguageTag(language.getLanguageTag());
+  private void checkRepeat(final Language language) {
+    final Optional<Language> exist = languageDAO.findByLanguageTag(language.getLanguageTag());
     if (exist.isPresent() && !exist.get().getId().equals(language.getId())) {
       throw new RepeatDataException("`" + language.getLanguageTag() + "`");
     }
@@ -239,10 +243,10 @@ public class LocalizedService {
    *
    * @param i18nMessage 国际化内容
    */
-  private void checkRepeat(I18nMessage i18nMessage) {
-    String namespace = i18nMessage.getNamespace();
-    String messageKey = i18nMessage.getMessageKey();
-    Optional<I18nMessage> exist = i18nMessageDAO.get()
+  private void checkRepeat(final I18nMessage i18nMessage) {
+    final String namespace = i18nMessage.getNamespace();
+    final String messageKey = i18nMessage.getMessageKey();
+    final Optional<I18nMessage> exist = i18nMessageDAO.get()
         .findByNamespaceAndMessageKey(namespace, messageKey);
     if (exist.isPresent() && !exist.get().getId().equals(i18nMessage.getId())) {
       throw new RepeatDataException(String.format("`%s`.`%s`", namespace, messageKey));
@@ -251,23 +255,20 @@ public class LocalizedService {
 
   @EventListener
   @Async
-  public void listen(I18nMessageChangedEvent event) {
-    II18nMessage oldValue = event.oldValue();
-    II18nMessage newValue = event.newValue();
-    if (newValue.equalsTo(oldValue)) {
+  public void listen(final I18nMessageChangedEvent event) {
+    final II18nMessage oldValue = event.oldValue();
+    final II18nMessage newValue = event.newValue();
+    if (newValue.eq(oldValue)) {
       return;
     }
-    i18nTextDAO.get().updateByNamespaceAndMessageKey(
-        newValue.getNamespace(), newValue.getMessageKey(),
-        oldValue.getNamespace(), oldValue.getMessageKey()
-    );
+    translationDAO.get().updateByNamespaceAndMessageKey(oldValue, newValue);
   }
 
   @EventListener
   @Async
-  public void listen(I18nMessageDeletedEvent event) {
-    II18nMessage i18nMessage = event.i18nMessage();
-    i18nTextDAO.get().deleteByNamespaceAndMessageKey(
+  public void listen(final I18nMessageDeletedEvent event) {
+    final II18nMessage i18nMessage = event.i18nMessage();
+    translationDAO.get().deleteByNamespaceAndMessageKey(
         i18nMessage.getNamespace(), i18nMessage.getMessageKey()
     );
   }

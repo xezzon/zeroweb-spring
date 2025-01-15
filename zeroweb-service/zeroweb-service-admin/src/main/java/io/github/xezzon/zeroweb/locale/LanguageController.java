@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 语言管理
- *
  * @author xezzon
  */
 @RestController
@@ -25,7 +24,7 @@ public class LanguageController {
 
   private final LocalizedService localizedService;
 
-  LanguageController(LocalizedService localizedService) {
+  LanguageController(final LocalizedService localizedService) {
     this.localizedService = localizedService;
   }
 
@@ -34,15 +33,14 @@ public class LanguageController {
    * @param req 语言
    */
   @PostMapping()
-  public Id addLanguage(@RequestBody AddLanguageReq req) {
-    Language language = req.into();
+  public Id addLanguage(@RequestBody final AddLanguageReq req) {
+    final Language language = req.into();
     localizedService.addLanguage(language);
     return Id.of(language.getId());
   }
 
   /**
    * 查询语言列表
-   *
    * @return 语言列表
    */
   @GetMapping()
@@ -52,17 +50,20 @@ public class LanguageController {
 
   /**
    * 更新语言
-   *
    * @param req 语言
    */
   @PutMapping()
-  public void updateLanguage(@RequestBody ModifyLanguageReq req) {
-    Language language = req.into();
+  public void updateLanguage(@RequestBody final ModifyLanguageReq req) {
+    final Language language = req.into();
     localizedService.updateLanguage(language);
   }
 
+  /**
+   * 删除语言
+   * @param id 语言ID
+   */
   @DeleteMapping("/{id}")
-  public void deleteLanguage(@PathVariable String id) {
+  public void deleteLanguage(@PathVariable final String id) {
     localizedService.deleteLanguage(id);
   }
 }

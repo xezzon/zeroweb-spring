@@ -18,8 +18,13 @@ public interface II18nMessage {
    */
   String getMessageKey();
 
-  default boolean equalsTo(II18nMessage o) {
-    return getNamespace().equals(o.getNamespace())
-        && getMessageKey().equals(o.getMessageKey());
+  /**
+   * 当命名空间与键都相同时，认为是同一国际化内容
+   * @param that 另一个实现了国际化内容接口的对象
+   * @return 是否认定同一
+   */
+  default boolean eq(final II18nMessage that) {
+    return getNamespace().equals(that.getNamespace())
+        && getMessageKey().equals(that.getMessageKey());
   }
 }

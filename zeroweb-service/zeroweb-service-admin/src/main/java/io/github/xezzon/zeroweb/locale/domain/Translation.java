@@ -18,8 +18,8 @@ import lombok.ToString;
 @Setter
 @ToString
 @Entity
-@Table(name = "zeroweb_i18n_text")
-public class I18nText implements IEntity<String> {
+@Table(name = "zeroweb_translation")
+public class Translation implements IEntity<String> {
 
   @Id
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)

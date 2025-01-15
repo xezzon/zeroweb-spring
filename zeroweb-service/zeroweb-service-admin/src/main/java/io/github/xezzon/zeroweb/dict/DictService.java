@@ -60,7 +60,7 @@ public class DictService {
    */
   protected void modifyDict(Dict dict) {
     Dict entity = dictDAO.get().getReferenceById(dict.getId());
-    Dict oldValue = new Dict();
+    final Dict oldValue = new Dict();
     dictDAO.getCopier().copy(entity, oldValue);
     dictDAO.getCopier().copy(dict, entity);
     /* 前置校验 */

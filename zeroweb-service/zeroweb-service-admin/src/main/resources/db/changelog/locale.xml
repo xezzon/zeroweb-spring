@@ -22,7 +22,7 @@
       <column name="message_key"/>
     </createIndex>
 
-    <createTable tableName="zeroweb_i18n_text" remarks="国际化文本">
+    <createTable tableName="zeroweb_translation" remarks="国际化文本">
       <column name="id" type="VARCHAR(64)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
@@ -39,12 +39,12 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <createIndex tableName="zeroweb_i18n_text" indexName="UK_it_ns_mk_lng">
+    <createIndex tableName="zeroweb_translation" indexName="UK_t_ns_mk_lng">
       <column name="namespace"/>
       <column name="message_key"/>
       <column name="language"/>
     </createIndex>
-    <createIndex tableName="zeroweb_i18n_text" indexName="IDX_it_ns_lng">
+    <createIndex tableName="zeroweb_translation" indexName="IDX_t_ns_lng">
       <column name="namespace"/>
       <column name="language"/>
     </createIndex>

@@ -19,7 +19,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class I18nMessageDAO extends BaseDAO<I18nMessage, String, I18nMessageRepository> {
 
-  protected I18nMessageDAO(I18nMessageRepository repository) {
+  protected I18nMessageDAO(final I18nMessageRepository repository) {
     super(repository, I18nMessage.class);
   }
 
@@ -28,10 +28,10 @@ public class I18nMessageDAO extends BaseDAO<I18nMessage, String, I18nMessageRepo
     return Copier.INSTANCE;
   }
 
-  Page<I18nMessage> findAllWithNamespace(String namespace, ODataQueryOption odata) {
-    Specification<I18nMessage> spec = (root, query, cb) ->
+  Page<I18nMessage> findAllWithNamespace(final String namespace, final ODataQueryOption odata) {
+    final Specification<I18nMessage> spec = (root, query, cb) ->
         cb.equal(root.get(I18nMessage_.namespace), namespace);
-    Sort sort = Sort.by(Order.asc(I18nMessage_.MESSAGE_KEY));
+    final Sort sort = Sort.by(Order.asc(I18nMessage_.MESSAGE_KEY));
     return super.findAll(odata, spec, sort);
   }
 

@@ -10,7 +10,6 @@ import io.github.xezzon.zeroweb.core.crypto.SecretKeyUtil;
 import io.github.xezzon.zeroweb.crypto.event.PublicKeyGeneratedEvent;
 import io.github.xezzon.zeroweb.crypto.service.JwtCryptoService;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -20,9 +19,7 @@ import java.time.Instant;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,8 +34,6 @@ public class JwtKeyManager implements JwtCryptoService {
   private final ZerowebJwtConfig zerowebJwtConfig;
   private PrivateKey privateKey;
   private PublicKey publicKey;
-  @Resource
-  private ApplicationEventPublisher eventPublisher;
 
   public JwtKeyManager(ZerowebConfig zerowebConfig) {
     this.zerowebJwtConfig = zerowebConfig.getJwt();
@@ -78,7 +73,9 @@ public class JwtKeyManager implements JwtCryptoService {
       }
     }
     /* 广播公钥 */
-    eventPublisher.publishEvent(new PublicKeyGeneratedEvent(publicKey));
+    final PublicKeyGeneratedEvent event = new PublicKeyGeneratedEvent(publicKey);
+    this.printPublicKey(event);
+    this.savePublicKeyToClasspath(event);
   }
 
   @Override
@@ -114,7 +111,6 @@ public class JwtKeyManager implements JwtCryptoService {
    * @param event 公钥
    */
   @EventListener
-  @Async
   public void printPublicKey(PublicKeyGeneratedEvent event) {
     log.info("Current JWT Public Key is: {}", event.getPublicKey());
   }
@@ -124,7 +120,6 @@ public class JwtKeyManager implements JwtCryptoService {
    * @param event 公钥
    */
   @EventListener
-  @Async
   public void savePublicKeyToClasspath(PublicKeyGeneratedEvent event) {
     ASN1PublicKeyWriter asn1Writer = new PemClasspathReaderAndWriter(zerowebJwtConfig.getIssuer());
     try {
