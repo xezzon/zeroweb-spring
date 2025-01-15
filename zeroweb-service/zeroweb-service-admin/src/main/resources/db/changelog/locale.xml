@@ -21,5 +21,28 @@
       <column name="namespace"/>
       <column name="message_key"/>
     </createIndex>
+
+    <createTable tableName="zeroweb_i18n_text" remarks="国际化文本">
+      <column name="id" type="VARCHAR(64)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="namespace" type="VARCHAR(255)" remarks="命名空间">
+        <constraints nullable="false"/>
+      </column>
+      <column name="message_key" type="VARCHAR(255)" remarks="国际化内容">
+        <constraints nullable="false"/>
+      </column>
+      <column name="language" type="VARCHAR(255)" remarks="语言">
+        <constraints nullable="false"/>
+      </column>
+      <column name="content" type="VARCHAR(4095)" remarks="国际化文本">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <createIndex tableName="zeroweb_i18n_text" indexName="UK_it_ns_mk_lng">
+      <column name="namespace"/>
+      <column name="message_key"/>
+      <column name="language"/>
+    </createIndex>
   </changeSet>
 </databaseChangeLog>

@@ -10,19 +10,24 @@ import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
+import io.github.xezzon.zeroweb.locale.domain.I18nText;
 import io.github.xezzon.zeroweb.locale.domain.Language;
 import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
 import io.github.xezzon.zeroweb.locale.entity.AddLanguageReq;
 import io.github.xezzon.zeroweb.locale.entity.ModifyLanguageReq;
 import io.github.xezzon.zeroweb.locale.repository.I18nMessageRepository;
+import io.github.xezzon.zeroweb.locale.repository.I18nTextRepository;
 import io.github.xezzon.zeroweb.locale.repository.LanguageRepository;
 import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,6 +52,7 @@ class LocaleHttpTest {
   private static final String UPDATE_I18N_MESSAGE_URL = "/locale";
   private static final String DELETE_I18N_MESSAGE_URL = "/locale/{id}";
   private static final String LIST_I18N_MESSAGE_URL = "/locale/{namespace}";
+  private static final String QUERY_I18N_TEXT_URL = "/locale/{namespace}/{messageKey}";
 
   @Resource
   private WebTestClient webTestClient;
@@ -54,8 +60,11 @@ class LocaleHttpTest {
   private LanguageRepository languageRepository;
   @Resource
   private I18nMessageRepository i18nMessageRepository;
+  @Resource
+  private I18nTextRepository i18nTextRepository;
 
   public void initData() {
+    List<Language> languages = languageRepository.findAll();
     for (int i = 0; i < 8; i++) {
       String namespace = RandomUtil.randomString(8);
       for (int j = 0, cnt = 8; j < cnt; j++) {
@@ -63,6 +72,14 @@ class LocaleHttpTest {
         i18nMessage.setNamespace(namespace);
         i18nMessage.setMessageKey(RandomUtil.randomString(8));
         i18nMessageRepository.save(i18nMessage);
+        for (Language language : languages) {
+          I18nText i18nText = new I18nText();
+          i18nText.setNamespace(i18nMessage.getNamespace());
+          i18nText.setMessageKey(i18nMessage.getMessageKey());
+          i18nText.setLanguage(language.getLanguageTag());
+          i18nText.setContent(RandomUtil.randomString(8));
+          i18nTextRepository.save(i18nText);
+        }
       }
     }
   }
@@ -333,5 +350,30 @@ class LocaleHttpTest {
         .exchange()
         .expectStatus().isOk();
     assertFalse(i18nMessageRepository.existsById(target.getId()));
+  }
+
+  @Test
+  void queryI18nText() {
+    this.initData();
+    I18nMessage i18nMessage = i18nMessageRepository.findAll().get(0);
+
+    Map<String, String> responseBody = webTestClient.get()
+        .uri(builder -> builder.path(QUERY_I18N_TEXT_URL)
+            .build(i18nMessage.getNamespace(), i18nMessage.getMessageKey())
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(new ParameterizedTypeReference<Map<String, String>>() {
+        })
+        .returnResult().getResponseBody();
+    Map<String, String> except = i18nTextRepository.findAll()
+        .stream()
+        .filter(o -> Objects.equals(o.getNamespace(), i18nMessage.getNamespace()))
+        .filter(o -> Objects.equals(o.getMessageKey(), i18nMessage.getMessageKey()))
+        .collect(Collectors.toMap(I18nText::getLanguage, I18nText::getContent));
+    assertNotNull(responseBody);
+    for (Entry<String, String> entry : responseBody.entrySet()) {
+      assertEquals(except.get(entry.getKey()), entry.getValue());
+    }
   }
 }

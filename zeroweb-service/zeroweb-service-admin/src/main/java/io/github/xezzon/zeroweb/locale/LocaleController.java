@@ -5,6 +5,7 @@ import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
 import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -76,5 +77,13 @@ public class LocaleController {
   @DeleteMapping("/{id}")
   public void deleteI18nMessage(@PathVariable String id) {
     localizedService.deleteI18nMessage(id);
+  }
+
+  @GetMapping("/{namespace}/{messageKey}")
+  public Map<String, String> queryI18nText(
+      @PathVariable String namespace,
+      @PathVariable String messageKey
+  ) {
+    return localizedService.queryI18nText(namespace, messageKey);
   }
 }
