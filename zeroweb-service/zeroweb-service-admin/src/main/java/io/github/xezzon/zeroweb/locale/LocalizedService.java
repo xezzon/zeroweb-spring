@@ -183,6 +183,18 @@ public class LocalizedService {
   }
 
   /**
+   * 加载国际化资源
+   * @param language 语言标签
+   * @param namespace 命名空间
+   * @return 国际化内容-国际化文本
+   */
+  Map<String, String> loadI18nText(String language, String namespace) {
+    return i18nTextDAO.get().findByNamespaceAndLanguage(namespace, language)
+        .stream()
+        .collect(Collectors.toMap(I18nText::getMessageKey, I18nText::getContent, (a, b) -> a));
+  }
+
+  /**
    * 语言之间不能有相同的 Language Tag
    */
   private void checkRepeat(Language language) {

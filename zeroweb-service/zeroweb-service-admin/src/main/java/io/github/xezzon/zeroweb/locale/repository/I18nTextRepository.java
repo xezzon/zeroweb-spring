@@ -17,4 +17,6 @@ public interface I18nTextRepository extends
   Optional<I18nText> findByNamespaceAndMessageKeyAndLanguage(
       String namespace, String messageKey, String language
   );
+
+  List<I18nText> findByNamespaceAndLanguage(String namespace, String language);
 }

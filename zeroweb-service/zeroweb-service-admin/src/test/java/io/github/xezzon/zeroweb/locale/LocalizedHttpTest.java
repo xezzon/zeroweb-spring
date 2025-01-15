@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.domain.Id;
@@ -43,7 +44,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
  */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext
-class LocaleHttpTest {
+class LocalizedHttpTest {
 
   private static final String ADD_LANGUAGE_URL = "/language";
   private static final String LIST_LANGUAGE_URL = "/language";
@@ -56,6 +57,7 @@ class LocaleHttpTest {
   private static final String LIST_I18N_MESSAGE_URL = "/locale/{namespace}";
   private static final String QUERY_I18N_TEXT_URL = "/locale/{namespace}/{messageKey}";
   private static final String UPSERT_I18N_TEXT_URL = "/i18n";
+  private static final String LOAD_I18N_TEXT_URL = "/i18n/{language}/{namespace}";
 
   @Resource
   private WebTestClient webTestClient;
@@ -491,5 +493,32 @@ class LocaleHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
+  }
+
+  @Test
+  void loadI18nText() {
+    this.initData();
+    List<I18nText> dataset = i18nTextRepository.findAll();
+    String targetLanguage = dataset.get(0).getLanguage();
+    String targetNamespace = dataset.get(0).getNamespace();
+
+    Map<String, String> responseBody = webTestClient.get()
+        .uri(builder -> builder.path(LOAD_I18N_TEXT_URL)
+            .build(targetLanguage, targetNamespace)
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(new ParameterizedTypeReference<Map<String, String>>() {
+        })
+        .returnResult().getResponseBody();
+    assertNotNull(responseBody);
+    for (Entry<String, String> entry : responseBody.entrySet()) {
+      assertTrue(dataset.stream()
+          .filter(o -> Objects.equals(o.getLanguage(), targetLanguage))
+          .filter(o -> Objects.equals(o.getNamespace(), targetNamespace))
+          .filter(o -> Objects.equals(o.getMessageKey(), entry.getKey()))
+          .anyMatch(o -> Objects.equals(o.getContent(), entry.getValue()))
+      );
+    }
   }
 }

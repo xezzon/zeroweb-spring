@@ -79,6 +79,12 @@ public class LocaleController {
     localizedService.deleteI18nMessage(id);
   }
 
+  /**
+   * 查询国际化文本
+   * @param namespace 命名空间
+   * @param messageKey 国际化内容
+   * @return 语言-国际化文本
+   */
   @GetMapping("/{namespace}/{messageKey}")
   public Map<String, String> queryI18nText(
       @PathVariable String namespace,

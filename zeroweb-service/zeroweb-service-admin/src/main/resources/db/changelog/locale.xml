@@ -44,5 +44,9 @@
       <column name="message_key"/>
       <column name="language"/>
     </createIndex>
+    <createIndex tableName="zeroweb_i18n_text" indexName="IDX_it_ns_lng">
+      <column name="namespace"/>
+      <column name="language"/>
+    </createIndex>
   </changeSet>
 </databaseChangeLog>
