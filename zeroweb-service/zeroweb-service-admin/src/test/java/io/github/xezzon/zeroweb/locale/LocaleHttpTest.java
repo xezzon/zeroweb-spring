@@ -39,6 +39,7 @@ class LocaleHttpTest {
   private static final String UPDATE_LANGUAGE_URL = "/language";
   private static final String DELETE_LANGUAGE_URL = "/language/{id}";
   private static final String ADD_I18N_MESSAGE_URL = "/locale";
+  private static final String UPDATE_I18N_MESSAGE_URL = "/locale";
 
   @Resource
   private WebTestClient webTestClient;
@@ -216,6 +217,43 @@ class LocaleHttpTest {
     webTestClient.post()
         .uri(ADD_I18N_MESSAGE_URL)
         .bodyValue(req)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
+  }
+
+  @Test
+  void updateI18nMessage() {
+    this.initData();
+    I18nMessage target = i18nMessageRepository.findAll().get(0);
+
+    I18nMessage except = new I18nMessage();
+    except.setId(target.getId());
+    except.setNamespace(RandomUtil.randomString(6));
+    except.setMessageKey(RandomUtil.randomString(6));
+    webTestClient.put()
+        .uri(UPDATE_I18N_MESSAGE_URL)
+        .bodyValue(except)
+        .exchange()
+        .expectStatus().isOk();
+    I18nMessage actual = i18nMessageRepository.findById(target.getId()).orElseThrow();
+    assertEquals(except.getNamespace(), actual.getNamespace());
+    assertEquals(except.getMessageKey(), actual.getMessageKey());
+  }
+
+  @Test
+  void updateI18nMessage_repeat() {
+    this.initData();
+    I18nMessage target = i18nMessageRepository.findAll().get(0);
+    I18nMessage repeat = i18nMessageRepository.findAll().get(1);
+
+    I18nMessage except = new I18nMessage();
+    except.setId(target.getId());
+    except.setNamespace(repeat.getNamespace());
+    except.setMessageKey(repeat.getMessageKey());
+    webTestClient.put()
+        .uri(UPDATE_I18N_MESSAGE_URL)
+        .bodyValue(except)
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());

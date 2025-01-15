@@ -56,11 +56,35 @@ public class LocalizedService {
     languageDAO.get().save(language);
   }
 
+  /**
+   * 删除语言
+   * @param id 语言ID
+   */
   void deleteLanguage(String id) {
     languageDAO.get().deleteById(id);
   }
 
+  /**
+   * 新增国际化内容
+   * @param i18nMessage 国际化内容
+   * @throws RepeatDataException 重复数据异常
+   */
   void addI18nMessage(I18nMessage i18nMessage) {
+    /* 前置校验 */
+    this.checkRepeat(i18nMessage);
+    /* 持久化 */
+    i18nMessageDAO.get().save(i18nMessage);
+  }
+
+  /**
+   * 更新国际化内容
+   * @param i18nMessage 国际化内容
+   * @throws RepeatDataException 重复数据异常
+   * @throws jakarta.persistence.EntityNotFoundException 数据不存在或已删除
+   */
+  void updateI18nMessage(I18nMessage i18nMessage) {
+    I18nMessage entity = i18nMessageDAO.get().getReferenceById(i18nMessage.getId());
+    i18nMessageDAO.getCopier().copy(i18nMessage, entity);
     /* 前置校验 */
     this.checkRepeat(i18nMessage);
     /* 持久化 */
