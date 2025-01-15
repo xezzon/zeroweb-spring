@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.locale.domain;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.jpa.IEntity;
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
+import io.github.xezzon.zeroweb.locale.event.II18nMessage;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -21,7 +22,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "zeroweb_i18n_message")
-public class I18nMessage implements IEntity<String> {
+public class I18nMessage implements IEntity<String>, II18nMessage {
 
   @Id
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)

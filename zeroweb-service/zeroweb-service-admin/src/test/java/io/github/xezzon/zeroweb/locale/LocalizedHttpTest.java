@@ -150,6 +150,12 @@ class LocalizedHttpTest {
 
   @Test
   void updateLanguage() {
+    List<I18nText> dataset = i18nTextRepository.findAll()
+        .stream()
+        .filter(o -> Objects.equals(o.getLanguage(), Locale.ENGLISH.toLanguageTag()))
+        .sorted(Comparator.comparing(I18nText::getId))
+        .toList();
+
     ModifyLanguageReq req = new ModifyLanguageReq(
         "3",
         Locale.GERMAN.toLanguageTag(),
@@ -163,11 +169,23 @@ class LocalizedHttpTest {
         .exchange()
         .expectStatus().isOk();
 
-    Language actual = languageRepository.findById("3").orElseThrow();
-    assertEquals(Locale.GERMAN.toLanguageTag(), actual.getLanguageTag());
-    assertEquals(Locale.GERMAN.getDisplayLanguage(), actual.getDescription());
-    assertEquals(3, actual.getOrdinal());
-    assertEquals(false, actual.getEnabled());
+    Language actualLanguage = languageRepository.findById("3").orElseThrow();
+    assertEquals(Locale.GERMAN.toLanguageTag(), actualLanguage.getLanguageTag());
+    assertEquals(Locale.GERMAN.getDisplayLanguage(), actualLanguage.getDescription());
+    assertEquals(3, actualLanguage.getOrdinal());
+    assertEquals(false, actualLanguage.getEnabled());
+
+    List<I18nText> actualDataset = i18nTextRepository.findAll()
+        .stream()
+        .filter(o -> Objects.equals(o.getLanguage(), Locale.GERMAN.toLanguageTag()))
+        .sorted(Comparator.comparing(I18nText::getId))
+        .toList();
+    assertEquals(dataset.size(), actualDataset.size());
+    for (int i = 0; i < dataset.size(); i++) {
+      I18nText expect = dataset.get(i);
+      I18nText actual = actualDataset.get(i);
+      assertEquals(expect.getId(), actual.getId());
+    }
   }
 
   @Test
@@ -222,6 +240,11 @@ class LocalizedHttpTest {
 
     Optional<Language> actual = languageRepository.findById(except.getId());
     assertFalse(actual.isPresent());
+
+    assertTrue(i18nTextRepository.findAll()
+        .stream()
+        .noneMatch(o -> Objects.equals(o.getLanguage(), except.getLanguageTag()))
+    );
   }
 
   @Test
@@ -310,7 +333,7 @@ class LocalizedHttpTest {
   }
 
   @Test
-  void updateI18nMessage() {
+  void updateI18nMessage() throws InterruptedException {
     this.initData();
     I18nMessage target = i18nMessageRepository.findAll().get(0);
 
@@ -326,6 +349,18 @@ class LocalizedHttpTest {
     I18nMessage actual = i18nMessageRepository.findById(target.getId()).orElseThrow();
     assertEquals(except.getNamespace(), actual.getNamespace());
     assertEquals(except.getMessageKey(), actual.getMessageKey());
+
+    Thread.sleep(3000);
+    assertFalse(i18nTextRepository.findAll()
+        .stream()
+        .filter(o -> Objects.equals(o.getNamespace(), target.getNamespace()))
+        .anyMatch(o -> Objects.equals(o.getMessageKey(), target.getMessageKey()))
+    );
+    assertTrue(i18nTextRepository.findAll()
+        .stream()
+        .filter(o -> Objects.equals(o.getNamespace(), except.getNamespace()))
+        .anyMatch(o -> Objects.equals(o.getMessageKey(), except.getMessageKey()))
+    );
   }
 
   @Test
@@ -347,7 +382,7 @@ class LocalizedHttpTest {
   }
 
   @Test
-  void deleteI18nMessage() {
+  void deleteI18nMessage() throws InterruptedException {
     this.initData();
     I18nMessage target = i18nMessageRepository.findAll().get(0);
 
@@ -358,6 +393,13 @@ class LocalizedHttpTest {
         .exchange()
         .expectStatus().isOk();
     assertFalse(i18nMessageRepository.existsById(target.getId()));
+
+    Thread.sleep(3000);
+    assertFalse(i18nTextRepository.findAll()
+        .stream()
+        .filter(o -> Objects.equals(o.getNamespace(), target.getNamespace()))
+        .anyMatch(o -> Objects.equals(o.getMessageKey(), target.getMessageKey()))
+    );
   }
 
   @Test

@@ -5,13 +5,21 @@ import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
 import io.github.xezzon.zeroweb.locale.domain.I18nText;
 import io.github.xezzon.zeroweb.locale.domain.Language;
+import io.github.xezzon.zeroweb.locale.event.I18nMessageChangedEvent;
+import io.github.xezzon.zeroweb.locale.event.I18nMessageDeletedEvent;
+import io.github.xezzon.zeroweb.locale.event.II18nMessage;
 import io.github.xezzon.zeroweb.locale.repository.I18nTextRepository;
+import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 /**
@@ -24,6 +32,8 @@ public class LocalizedService {
   private final I18nMessageDAO i18nMessageDAO;
   private final I18nTextDAO i18nTextDAO;
   private final I18nTextRepository i18nTextRepository;
+  @Resource
+  private ApplicationEventPublisher eventPublisher;
 
   LocalizedService(
       LanguageDAO languageDAO,
@@ -69,7 +79,11 @@ public class LocalizedService {
     /* 前置校验 */
     this.checkRepeat(language);
     /* 持久化 */
-    languageDAO.get().save(language);
+    languageDAO.get().save(entity);
+    /* 后置处理 */
+    if (!Objects.equals(entity.getLanguageTag(), language.getLanguageTag())) {
+      i18nTextDAO.get().updateByLanguage(language.getLanguageTag(), entity.getLanguageTag());
+    }
   }
 
   /**
@@ -78,7 +92,13 @@ public class LocalizedService {
    * @param id 语言ID
    */
   void deleteLanguage(String id) {
+    Optional<Language> entity = languageDAO.get().findById(id);
+    if (entity.isEmpty()) {
+      return;
+    }
     languageDAO.get().deleteById(id);
+    /* 后置处理 */
+    i18nTextDAO.get().deleteByLanguage(entity.get().getLanguageTag());
   }
 
   /**
@@ -126,11 +146,15 @@ public class LocalizedService {
    */
   void updateI18nMessage(I18nMessage i18nMessage) {
     I18nMessage entity = i18nMessageDAO.get().getReferenceById(i18nMessage.getId());
+    I18nMessage oldValue = new I18nMessage();
+    i18nMessageDAO.getCopier().copy(entity, oldValue);
     i18nMessageDAO.getCopier().copy(i18nMessage, entity);
     /* 前置校验 */
     this.checkRepeat(i18nMessage);
     /* 持久化 */
-    i18nMessageDAO.get().save(i18nMessage);
+    i18nMessageDAO.get().save(entity);
+    /* 后置处理 */
+    eventPublisher.publishEvent(new I18nMessageChangedEvent(oldValue, i18nMessage));
   }
 
   /**
@@ -139,7 +163,13 @@ public class LocalizedService {
    * @param id 国际化内容ID
    */
   void deleteI18nMessage(String id) {
+    Optional<I18nMessage> entity = i18nMessageDAO.get().findById(id);
+    if (entity.isEmpty()) {
+      return;
+    }
     i18nMessageDAO.get().deleteById(id);
+    /* 后置处理 */
+    eventPublisher.publishEvent(new I18nMessageDeletedEvent(entity.get()));
   }
 
   /**
@@ -217,5 +247,28 @@ public class LocalizedService {
     if (exist.isPresent() && !exist.get().getId().equals(i18nMessage.getId())) {
       throw new RepeatDataException(String.format("`%s`.`%s`", namespace, messageKey));
     }
+  }
+
+  @EventListener
+  @Async
+  public void listen(I18nMessageChangedEvent event) {
+    II18nMessage oldValue = event.oldValue();
+    II18nMessage newValue = event.newValue();
+    if (newValue.equalsTo(oldValue)) {
+      return;
+    }
+    i18nTextDAO.get().updateByNamespaceAndMessageKey(
+        newValue.getNamespace(), newValue.getMessageKey(),
+        oldValue.getNamespace(), oldValue.getMessageKey()
+    );
+  }
+
+  @EventListener
+  @Async
+  public void listen(I18nMessageDeletedEvent event) {
+    II18nMessage i18nMessage = event.i18nMessage();
+    i18nTextDAO.get().deleteByNamespaceAndMessageKey(
+        i18nMessage.getNamespace(), i18nMessage.getMessageKey()
+    );
   }
 }
