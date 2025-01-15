@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.locale;
 import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.hutool.core.util.RandomUtil;
@@ -15,6 +16,7 @@ import io.github.xezzon.zeroweb.locale.domain.Language;
 import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
 import io.github.xezzon.zeroweb.locale.entity.AddLanguageReq;
 import io.github.xezzon.zeroweb.locale.entity.ModifyLanguageReq;
+import io.github.xezzon.zeroweb.locale.entity.UpsertI18nTextReq;
 import io.github.xezzon.zeroweb.locale.repository.I18nMessageRepository;
 import io.github.xezzon.zeroweb.locale.repository.I18nTextRepository;
 import io.github.xezzon.zeroweb.locale.repository.LanguageRepository;
@@ -53,6 +55,7 @@ class LocaleHttpTest {
   private static final String DELETE_I18N_MESSAGE_URL = "/locale/{id}";
   private static final String LIST_I18N_MESSAGE_URL = "/locale/{namespace}";
   private static final String QUERY_I18N_TEXT_URL = "/locale/{namespace}/{messageKey}";
+  private static final String UPSERT_I18N_TEXT_URL = "/i18n";
 
   @Resource
   private WebTestClient webTestClient;
@@ -64,7 +67,9 @@ class LocaleHttpTest {
   private I18nTextRepository i18nTextRepository;
 
   public void initData() {
-    List<Language> languages = languageRepository.findAll();
+    List<Language> languages = languageRepository.findAll().stream()
+        .filter(o -> Objects.equals(o.getDictTag(), Language.LANGUAGE_DICT_TAG))
+        .toList();
     for (int i = 0; i < 8; i++) {
       String namespace = RandomUtil.randomString(8);
       for (int j = 0, cnt = 8; j < cnt; j++) {
@@ -87,6 +92,7 @@ class LocaleHttpTest {
   @AfterEach
   void tearDown() {
     i18nMessageRepository.deleteAll();
+    i18nTextRepository.deleteAll();
   }
 
   @Test
@@ -375,5 +381,115 @@ class LocaleHttpTest {
     for (Entry<String, String> entry : responseBody.entrySet()) {
       assertEquals(except.get(entry.getKey()), entry.getValue());
     }
+  }
+
+  @Test
+  void insertI18nText() {
+    this.initData();
+    I18nMessage targetMessage = i18nMessageRepository.findAll().get(0);
+    Language targetLanguage = new Language();
+    targetLanguage.setLanguageTag(Locale.TAIWAN.toLanguageTag());
+    targetLanguage.setDescription(Locale.TAIWAN.getDisplayName());
+    targetLanguage.setOrdinal(1);
+    targetLanguage.setEnabled(true);
+    languageRepository.save(targetLanguage);
+
+    UpsertI18nTextReq req = new UpsertI18nTextReq(
+        targetMessage.getNamespace(),
+        targetMessage.getMessageKey(),
+        targetLanguage.getLanguageTag(),
+        RandomUtil.randomString(8)
+    );
+    Id responseBody = webTestClient.put()
+        .uri(UPSERT_I18N_TEXT_URL)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(Id.class)
+        .returnResult().getResponseBody();
+    assertNotNull(responseBody);
+    I18nText actual = i18nTextRepository.findById(responseBody.id()).orElseThrow();
+    assertEquals(req.content(), actual.getContent());
+  }
+
+  @Test
+  void updateI18nText() {
+    this.initData();
+    I18nText target = i18nTextRepository.findAll().get(0);
+
+    UpsertI18nTextReq req = new UpsertI18nTextReq(
+        target.getNamespace(),
+        target.getMessageKey(),
+        target.getLanguage(),
+        RandomUtil.randomString(8)
+    );
+    Id responseBody = webTestClient.put()
+        .uri(UPSERT_I18N_TEXT_URL)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(Id.class)
+        .returnResult().getResponseBody();
+    assertNotNull(responseBody);
+    I18nText actual = i18nTextRepository.findById(responseBody.id()).orElseThrow();
+    assertNotEquals(target.getContent(), actual.getContent());
+    assertEquals(req.content(), actual.getContent());
+  }
+
+  @Test
+  void updateI18nText_noSuchData_language() {
+    this.initData();
+    I18nText target = i18nTextRepository.findAll().get(0);
+
+    UpsertI18nTextReq req = new UpsertI18nTextReq(
+        target.getNamespace(),
+        target.getMessageKey(),
+        RandomUtil.randomString(8),
+        RandomUtil.randomString(8)
+    );
+    webTestClient.put()
+        .uri(UPSERT_I18N_TEXT_URL)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
+  }
+
+  @Test
+  void updateI18nText_noSuchData_namespace() {
+    this.initData();
+    I18nText target = i18nTextRepository.findAll().get(0);
+
+    UpsertI18nTextReq req = new UpsertI18nTextReq(
+        RandomUtil.randomString(8),
+        target.getMessageKey(),
+        target.getLanguage(),
+        RandomUtil.randomString(8)
+    );
+    webTestClient.put()
+        .uri(UPSERT_I18N_TEXT_URL)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
+  }
+
+  @Test
+  void updateI18nText_noSuchData_messageKey() {
+    this.initData();
+    I18nText target = i18nTextRepository.findAll().get(0);
+
+    UpsertI18nTextReq req = new UpsertI18nTextReq(
+        target.getNamespace(),
+        RandomUtil.randomString(8),
+        target.getLanguage(),
+        RandomUtil.randomString(8)
+    );
+    webTestClient.put()
+        .uri(UPSERT_I18N_TEXT_URL)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
   }
 }

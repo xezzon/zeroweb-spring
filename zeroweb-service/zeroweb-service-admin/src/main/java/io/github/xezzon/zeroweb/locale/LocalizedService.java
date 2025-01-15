@@ -5,6 +5,8 @@ import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
 import io.github.xezzon.zeroweb.locale.domain.I18nText;
 import io.github.xezzon.zeroweb.locale.domain.Language;
+import io.github.xezzon.zeroweb.locale.repository.I18nTextRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,15 +23,17 @@ public class LocalizedService {
   private final LanguageDAO languageDAO;
   private final I18nMessageDAO i18nMessageDAO;
   private final I18nTextDAO i18nTextDAO;
+  private final I18nTextRepository i18nTextRepository;
 
   LocalizedService(
       LanguageDAO languageDAO,
       I18nMessageDAO i18nMessageDAO,
-      I18nTextDAO i18nTextDAO
-  ) {
+      I18nTextDAO i18nTextDAO,
+      I18nTextRepository i18nTextRepository) {
     this.languageDAO = languageDAO;
     this.i18nMessageDAO = i18nMessageDAO;
     this.i18nTextDAO = i18nTextDAO;
+    this.i18nTextRepository = i18nTextRepository;
   }
 
   /**
@@ -149,6 +153,33 @@ public class LocalizedService {
     return i18nTextDAO.get().findByNamespaceAndMessageKey(namespace, messageKey)
         .stream()
         .collect(Collectors.toMap(I18nText::getLanguage, I18nText::getContent, (a, b) -> a));
+  }
+
+  /**
+   * 新增国际化文本，如果已存在则更新
+   * @param i18nText 国际化文本
+   * @throws EntityNotFoundException 数据不存在或已删除
+   */
+  void upsertI18nText(I18nText i18nText) {
+    /* 前置校验 */
+    final String languageTag = i18nText.getLanguage();
+    Language language = languageDAO.findByLanguageTag(languageTag)
+        .orElseThrow(() -> new EntityNotFoundException(
+            String.format("Language %s not found", languageTag)
+        ));
+    final String namespace = i18nText.getNamespace();
+    final String messageKey = i18nText.getMessageKey();
+    I18nMessage i18nMessage = i18nMessageDAO.get()
+        .findByNamespaceAndMessageKey(namespace, messageKey)
+        .orElseThrow(() -> new EntityNotFoundException(
+            String.format("I18nMessage `%s`.`%s` not found", namespace, messageKey)
+        ));
+    /* 持久化 */
+    Optional<I18nText> entity = i18nTextRepository.findByNamespaceAndMessageKeyAndLanguage(
+        i18nMessage.getNamespace(), i18nMessage.getMessageKey(), language.getLanguageTag()
+    );
+    entity.ifPresent(nText -> i18nText.setId(nText.getId()));
+    i18nTextDAO.get().save(i18nText);
   }
 
   /**
