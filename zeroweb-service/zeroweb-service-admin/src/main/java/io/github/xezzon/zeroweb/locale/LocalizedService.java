@@ -92,6 +92,14 @@ public class LocalizedService {
   }
 
   /**
+   * 删除国际化内容
+   * @param id 国际化内容ID
+   */
+  void deleteI18nMessage(String id) {
+    i18nMessageDAO.get().deleteById(id);
+  }
+
+  /**
    * 语言之间不能有相同的 Language Tag
    */
   private void checkRepeat(Language language) {

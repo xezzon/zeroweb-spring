@@ -40,6 +40,7 @@ class LocaleHttpTest {
   private static final String DELETE_LANGUAGE_URL = "/language/{id}";
   private static final String ADD_I18N_MESSAGE_URL = "/locale";
   private static final String UPDATE_I18N_MESSAGE_URL = "/locale";
+  private static final String DELETE_I18N_MESSAGE_URL = "/locale/{id}";
 
   @Resource
   private WebTestClient webTestClient;
@@ -257,5 +258,19 @@ class LocaleHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
+  }
+
+  @Test
+  void deleteI18nMessage() {
+    this.initData();
+    I18nMessage target = i18nMessageRepository.findAll().get(0);
+
+    webTestClient.delete()
+        .uri(builder -> builder.path(DELETE_I18N_MESSAGE_URL)
+            .build(target.getId())
+        )
+        .exchange()
+        .expectStatus().isOk();
+    assertFalse(i18nMessageRepository.existsById(target.getId()));
   }
 }

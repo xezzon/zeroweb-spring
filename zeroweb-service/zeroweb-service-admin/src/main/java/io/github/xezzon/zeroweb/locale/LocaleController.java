@@ -3,6 +3,8 @@ package io.github.xezzon.zeroweb.locale;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
 import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,5 +44,14 @@ public class LocaleController {
   @PutMapping()
   public void updateI18nMessage(@RequestBody I18nMessage i18nMessage) {
     localizedService.updateI18nMessage(i18nMessage);
+  }
+
+  /**
+   * 删除国际化内容
+   * @param id 国际化内容ID
+   */
+  @DeleteMapping("/{id}")
+  public void deleteI18nMessage(@PathVariable String id) {
+    localizedService.deleteI18nMessage(id);
   }
 }
