@@ -1,9 +1,11 @@
 package io.github.xezzon.zeroweb.locale;
 
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
 import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +44,20 @@ public class LocaleController {
   @GetMapping()
   public List<String> listI18nNamespace() {
     return localizedService.listI18nNamespace();
+  }
+
+  /**
+   * 分页查询国际化内容
+   * @param namespace 命名空间
+   * @param odata 分页查询参数
+   * @return 国际化内容列表
+   */
+  @GetMapping("/{namespace}")
+  public Page<I18nMessage> queryI18nMessageList(
+      @PathVariable String namespace,
+      ODataRequestParam odata
+  ) {
+    return localizedService.queryI18nMessageList(namespace, odata.into());
   }
 
   /**

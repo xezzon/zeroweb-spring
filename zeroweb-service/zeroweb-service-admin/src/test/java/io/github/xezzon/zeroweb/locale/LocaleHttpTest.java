@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
 import io.github.xezzon.zeroweb.locale.domain.Language;
@@ -16,8 +17,10 @@ import io.github.xezzon.zeroweb.locale.entity.ModifyLanguageReq;
 import io.github.xezzon.zeroweb.locale.repository.I18nMessageRepository;
 import io.github.xezzon.zeroweb.locale.repository.LanguageRepository;
 import jakarta.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -43,6 +46,7 @@ class LocaleHttpTest {
   private static final String LIST_I18N_NAMESPACE_URL = "/locale";
   private static final String UPDATE_I18N_MESSAGE_URL = "/locale";
   private static final String DELETE_I18N_MESSAGE_URL = "/locale/{id}";
+  private static final String LIST_I18N_MESSAGE_URL = "/locale/{namespace}";
 
   @Resource
   private WebTestClient webTestClient;
@@ -52,11 +56,14 @@ class LocaleHttpTest {
   private I18nMessageRepository i18nMessageRepository;
 
   public void initData() {
-    for (int i = 0; i < 16; i++) {
-      I18nMessage i18nMessage = new I18nMessage();
-      i18nMessage.setNamespace(RandomUtil.randomString(8));
-      i18nMessage.setMessageKey(RandomUtil.randomString(8));
-      i18nMessageRepository.save(i18nMessage);
+    for (int i = 0; i < 8; i++) {
+      String namespace = RandomUtil.randomString(8);
+      for (int j = 0, cnt = 8; j < cnt; j++) {
+        I18nMessage i18nMessage = new I18nMessage();
+        i18nMessage.setNamespace(namespace);
+        i18nMessage.setMessageKey(RandomUtil.randomString(8));
+        i18nMessageRepository.save(i18nMessage);
+      }
     }
   }
 
@@ -215,6 +222,7 @@ class LocaleHttpTest {
     List<String> except = i18nMessageRepository.findAll()
         .stream()
         .map(I18nMessage::getNamespace)
+        .distinct()
         .sorted()
         .toList();
 
@@ -229,6 +237,34 @@ class LocaleHttpTest {
     assertEquals(except.size(), responseBody.size());
     for (int i = 0, cnt = except.size(); i < cnt; i++) {
       assertEquals(except.get(i), responseBody.get(i));
+    }
+  }
+
+  @Test
+  void queryI18nMessageList() {
+    this.initData();
+    List<I18nMessage> dataset = i18nMessageRepository.findAll();
+    List<I18nMessage> except = dataset.stream()
+        .filter(it -> Objects.equals(it.getNamespace(), dataset.get(0).getNamespace()))
+        .sorted(Comparator.comparing(I18nMessage::getMessageKey))
+        .toList();
+
+    PagedModel<I18nMessage> responseBody = webTestClient.get()
+        .uri(builder -> builder.path(LIST_I18N_MESSAGE_URL)
+            .queryParam("top", except.size())
+            .queryParam("skip", 0)
+            .build(dataset.get(0).getNamespace())
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(new ParameterizedTypeReference<PagedModel<I18nMessage>>() {
+        })
+        .returnResult().getResponseBody();
+    assertNotNull(responseBody);
+    assertEquals(except.size(), responseBody.getPage().getTotalElements());
+    assertEquals(except.size(), responseBody.getContent().size());
+    for (int i = 0, cnt = except.size(); i < cnt; i++) {
+      assertEquals(except.get(i).getId(), responseBody.getContent().get(i).getId());
     }
   }
 

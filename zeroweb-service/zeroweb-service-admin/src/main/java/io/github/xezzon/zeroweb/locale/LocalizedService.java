@@ -1,10 +1,12 @@
 package io.github.xezzon.zeroweb.locale;
 
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
+import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
 import io.github.xezzon.zeroweb.locale.domain.Language;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 /**
@@ -85,6 +87,17 @@ public class LocalizedService {
         .stream()
         .sorted()
         .toList();
+  }
+
+  /**
+   * 分页查询国际化内容
+   *
+   * @param namespace 命名空间
+   * @param odata 分页查询参数
+   * @return 国际化内容列表
+   */
+  Page<I18nMessage> queryI18nMessageList(String namespace, ODataQueryOption odata) {
+    return i18nMessageDAO.findAllWithNamespace(namespace, odata);
   }
 
   /**
