@@ -17,15 +17,22 @@ DISABLE_LINTERS:
 DISABLE_ERRORS_LINTERS:
   - SPELL_CSPELL
   - COPYPASTE_JSCPD
-  - EDITORCONFIG_EDITORCONFIG_CHECKER
   - REPOSITORY_TRIVY
   - JAVA_PMD
   - JAVA_CHECKSTYLE
+  - REPOSITORY_CHECKOV
 
 SARIF_REPORTER: true
 
 PRE_COMMANDS:
   - command: curl https://raw.githubusercontent.com/checkstyle/checkstyle/refs/heads/master/src/main/resources/google_checks.xml > google_checks.xml
+JAVA_PMD_POST_COMMANDS:
+  - command: sed 's|file:///github/workspace/||' -i megalinter-reports/sarif/JAVA_PMD.sarif
+    cwd: workspace
 
 LINTER_RULES_PATH: .github/linters
-JAVA_CHECKSTYLE_FILE_NAME: google_checks.xml
+JAVA_CHECKSTYLE_FILE_NAME: .github/linters/google_checks.xml
+JAVA_PMD_CONFIG_FILE: .github/linters/java-pmd-rulesets.xml
+SPELL_CSPELL_FILE_EXTENSIONS:
+  - .java
+  - .proto

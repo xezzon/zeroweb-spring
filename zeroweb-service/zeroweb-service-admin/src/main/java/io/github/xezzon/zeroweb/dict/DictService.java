@@ -4,6 +4,9 @@ import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.dict.domain.Dict;
+import io.github.xezzon.zeroweb.locale.event.I18nMessageChangedEvent;
+import io.github.xezzon.zeroweb.locale.event.I18nMessageDeletedEvent;
+import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -11,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +25,8 @@ import org.springframework.stereotype.Service;
 public class DictService {
 
   private final DictDAO dictDAO;
+  @Resource
+  private ApplicationEventPublisher eventPublisher;
 
   public DictService(DictDAO dictDAO) {
     this.dictDAO = dictDAO;
@@ -44,7 +50,7 @@ public class DictService {
    * @return 字典分页列表
    */
   protected Page<Dict> pagedList(ODataQueryOption odata) {
-      return dictDAO.findAll(odata);
+    return dictDAO.findAll(odata);
   }
 
   /**
@@ -54,11 +60,15 @@ public class DictService {
    */
   protected void modifyDict(Dict dict) {
     Dict entity = dictDAO.get().getReferenceById(dict.getId());
+    final Dict oldValue = new Dict();
+    dictDAO.getCopier().copy(entity, oldValue);
     dictDAO.getCopier().copy(dict, entity);
     /* 前置校验 */
     this.checkRepeat(entity);
     /* 持久化 */
     dictDAO.get().save(entity);
+    /* 后置处理 */
+    eventPublisher.publishEvent(new I18nMessageChangedEvent(oldValue, dict));
   }
 
   /**
@@ -85,6 +95,9 @@ public class DictService {
       ids = children.parallelStream()
           .map(Dict::getId)
           .collect(Collectors.toSet());
+      children.stream()
+          .map(I18nMessageDeletedEvent::new)
+          .forEach(eventPublisher::publishEvent);
     }
   }
 
@@ -97,6 +110,11 @@ public class DictService {
     return dictDAO.get().findByTagOrderByOrdinalAsc(tag);
   }
 
+  /**
+   * 批量导入字典。
+   * 先给导入字典目，得到字典目的ID，再给字典项的parentId赋值。
+   * @param dictList 字典列表
+   */
   protected void importDict(List<Dict> dictList) {
     List<Dict> tagList = dictList.stream()
         .filter(o -> Objects.equals(o.getTag(), Dict.DICT_TAG))
@@ -127,7 +145,9 @@ public class DictService {
     Optional<Dict> exist = dictDAO.get().findByTagAndCode(dict.getTag(), dict.getCode());
     if (exist.isPresent() && !Objects.equals(dict.getId(), exist.get().getId())) {
       // 存在冲突的字典项
-      throw new RepeatDataException(MessageFormat.format("字典`{0}`已存在", dict.getCode()));
+      throw new RepeatDataException(
+          MessageFormat.format("`{0}`.`{1}`", dict.getTag(), dict.getCode())
+      );
     }
   }
 }

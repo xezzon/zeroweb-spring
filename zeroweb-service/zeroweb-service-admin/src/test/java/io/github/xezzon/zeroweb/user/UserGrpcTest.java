@@ -23,15 +23,15 @@ class UserGrpcTest {
   private UserBlockingStub userBlockingStub;
   @Resource
   private UserRepository repository;
-  
+
   @Test
   @Transactional
   void addUser() {
     AddUserResp resp = userBlockingStub.addUser(AddUserReq.newBuilder()
-      .setUsername(RandomUtil.randomString(8))
-      .setNickname(RandomUtil.randomString(8))
-      .setPassword(RandomUtil.randomString(8))
-      .build()
+        .setUsername(RandomUtil.randomString(8))
+        .setNickname(RandomUtil.randomString(8))
+        .setPassword(RandomUtil.randomString(8))
+        .build()
     );
     assertNotNull(resp.getId());
     Optional<User> after = repository.findById(resp.getId());

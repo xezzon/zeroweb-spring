@@ -4,6 +4,7 @@ import static io.github.xezzon.zeroweb.core.error.ErrorSourceType.CLIENT;
 
 import io.github.xezzon.zeroweb.core.error.ErrorSourceType;
 import io.github.xezzon.zeroweb.core.error.IErrorCode;
+import java.util.Arrays;
 
 /**
  * 错误码分配中心
@@ -14,7 +15,7 @@ public enum AdminErrorCode implements IErrorCode {
   /**
    * 用户名或密码错误
    */
-  INVALID_TOKEN(CLIENT, "用户名或密码错误"),
+  INVALID_PASSWORD(CLIENT, InvalidPasswordException.class),
   ;
 
   /**
@@ -22,13 +23,20 @@ public enum AdminErrorCode implements IErrorCode {
    */
   private final ErrorSourceType sourceType;
   /**
-   * 错误默认消息
+   * 错误码对应的异常类
    */
-  private final String message;
+  private final Class<? extends Throwable> mappedException;
 
-  AdminErrorCode(ErrorSourceType sourceType, String message) {
+  public static IErrorCode mapping(Class<? extends Throwable> exceptionClass) {
+    return Arrays.stream(AdminErrorCode.values())
+        .filter(o -> o.mappedException == exceptionClass)
+        .findAny()
+        .orElse(null);
+  }
+
+  AdminErrorCode(ErrorSourceType sourceType, Class<? extends Throwable> mappedException) {
     this.sourceType = sourceType;
-    this.message = message;
+    this.mappedException = mappedException;
   }
 
   @Override
@@ -38,11 +46,6 @@ public enum AdminErrorCode implements IErrorCode {
 
   @Override
   public byte moduleCode() {
-    return 1;
-  }
-
-  @Override
-  public String message() {
-    return this.message;
+    return -1;
   }
 }

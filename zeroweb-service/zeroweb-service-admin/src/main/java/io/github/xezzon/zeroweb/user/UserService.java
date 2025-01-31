@@ -28,7 +28,7 @@ public class UserService implements IUserService4Auth {
     /* 前置校验 */
     Optional<User> exist = userDAO.get().findByUsername(user.getUsername());
     if (exist.isPresent()) {
-      throw new RepeatDataException("");
+      throw new RepeatDataException("`" + user.getUsername() + "`");
     }
     /* 持久化 */
     userDAO.get().save(user);

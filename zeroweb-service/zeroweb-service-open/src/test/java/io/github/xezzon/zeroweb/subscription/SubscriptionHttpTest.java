@@ -8,15 +8,15 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
-import io.github.xezzon.zeroweb.common.exception.ErrorCode;
+import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import io.github.xezzon.zeroweb.common.exception.OpenErrorCode;
 import io.github.xezzon.zeroweb.openapi.domain.HttpMethod;
 import io.github.xezzon.zeroweb.openapi.domain.Openapi;
 import io.github.xezzon.zeroweb.openapi.domain.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
-import io.github.xezzon.zeroweb.subscription.domain.AddSubscriptionReq;
 import io.github.xezzon.zeroweb.subscription.domain.Subscription;
 import io.github.xezzon.zeroweb.subscription.domain.SubscriptionStatus;
+import io.github.xezzon.zeroweb.subscription.entity.AddSubscriptionReq;
 import io.github.xezzon.zeroweb.subscription.repository.SubscriptionRepository;
 import io.github.xezzon.zeroweb.third_party_app.domain.ThirdPartyApp;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
@@ -158,16 +158,17 @@ class SubscriptionHttpTest {
     List<Subscription> dataset = this.initData();
 
     webTestClient.get()
-      .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
-        .queryParam("top", top)
-        .queryParam("skip", skip)
-        .build(dataset.get(0).getAppId())
-      )
-      .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-      .header(AUTHORIZATION, TestJwtGenerator.generateBearer(RandomUtil.randomString(6)))
-      .exchange()
-      .expectStatus().isForbidden()
-      .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCode.DATA_PERMISSION_FORBIDDEN.code());
+        .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
+            .queryParam("top", top)
+            .queryParam("skip", skip)
+            .build(dataset.get(0).getAppId())
+        )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.generateBearer(RandomUtil.randomString(6)))
+        .exchange()
+        .expectStatus().isForbidden()
+        .expectHeader()
+        .valueEquals(ERROR_CODE_HEADER, CommonErrorCode.DATA_PERMISSION_FORBIDDEN.code());
   }
 
   @Test
@@ -237,7 +238,8 @@ class SubscriptionHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.generateBearer(RandomUtil.randomString(8)))
         .exchange()
         .expectStatus().isForbidden()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCode.DATA_PERMISSION_FORBIDDEN.code());
+        .expectHeader()
+        .valueEquals(ERROR_CODE_HEADER, CommonErrorCode.DATA_PERMISSION_FORBIDDEN.code());
   }
 
   @Test

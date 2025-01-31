@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.auth;
 
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
-import io.github.xezzon.zeroweb.auth.domain.BasicAuth;
+import io.github.xezzon.zeroweb.auth.entity.BasicAuth;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthController {
 
-  private final AuthService authService;
+  private final AuthNService authNService;
 
-  public AuthController(AuthService authService) {
-    this.authService = authService;
+  public AuthController(AuthNService authNService) {
+    this.authNService = authNService;
   }
 
   /**
@@ -31,7 +31,7 @@ public class AuthController {
    */
   @PostMapping("/login/basic")
   public SaTokenInfo basicLogin(@RequestBody BasicAuth basicAuth) {
-    authService.basicLogin(basicAuth.username(), basicAuth.password());
+    authNService.basicLogin(basicAuth.username(), basicAuth.password());
     return StpUtil.getTokenInfo();
   }
 
@@ -41,7 +41,7 @@ public class AuthController {
    */
   @GetMapping("/sso")
   public SaTokenInfo sso() {
-    String tokenValue = authService.signJwt();
+    String tokenValue = authNService.signJwt();
     SaTokenInfo saTokenInfo = new SaTokenInfo();
     saTokenInfo.setTokenName(HttpHeaders.AUTHORIZATION);
     saTokenInfo.setTokenValue(tokenValue);

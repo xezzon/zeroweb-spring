@@ -8,8 +8,8 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.third_party_app.domain.AccessSecret;
-import io.github.xezzon.zeroweb.third_party_app.domain.AddThirdPartyAppReq;
 import io.github.xezzon.zeroweb.third_party_app.domain.ThirdPartyApp;
+import io.github.xezzon.zeroweb.third_party_app.entity.AddThirdPartyAppReq;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
 import jakarta.annotation.Resource;
@@ -36,7 +36,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @DirtiesContext
 class ThirdPartyAppHttpTest {
 
-  private static final String THIRD_PARTY_APP_ADD_URI = "/third-party-app/add";
+  private static final String THIRD_PARTY_APP_ADD_URI = "/third-party-app";
   private static final String THIRD_PARTY_LIST_MINE_API = "/third-party-app/mine";
   private static final String THIRD_PARTY_LIST_API = "/third-party-app";
   private static final String ROLL_ACCESS_SECRET_URI = "/third-party-app/{appId}/roll";

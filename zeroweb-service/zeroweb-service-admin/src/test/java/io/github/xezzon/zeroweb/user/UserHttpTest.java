@@ -7,9 +7,9 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.InitializeDataRunner;
 import io.github.xezzon.zeroweb.common.constant.CharacterConstant;
 import io.github.xezzon.zeroweb.common.domain.Id;
-import io.github.xezzon.zeroweb.common.exception.ErrorCode;
-import io.github.xezzon.zeroweb.user.domain.RegisterUserReq;
+import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import io.github.xezzon.zeroweb.user.domain.User;
+import io.github.xezzon.zeroweb.user.entity.RegisterUserReq;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -80,6 +80,6 @@ class UserHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
-        .jsonPath("$.code").isEqualTo(ErrorCode.REPEAT_DATA.code());
+        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
   }
 }

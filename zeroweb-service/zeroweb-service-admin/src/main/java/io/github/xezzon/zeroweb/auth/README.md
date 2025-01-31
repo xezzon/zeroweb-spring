@@ -1,32 +1,8 @@
 # 认证
 
-## 引用文档
-
-[用户模块](../user/README.md)
-
-## 术语定义
-
-- `认证`: 用户向系统证明自己身份的过程。该过程需要出示只有该用户自己才能够出示的凭证，最常用的凭证是`口令`。
-- `令牌`: 认证通过后，系统应当向用户颁发令牌。令牌具有与 用户名+口令 同等的效力，但不包含密码之类的隐私信息。
-
 ## 功能描述
 
-```mermaid
-C4Dynamic
-  title ''
-```
-
-## 数据字典
-
-## 接口清单
-
 ### 用户登录（用户名、口令模式）
-
-#### HTTP接口
-
-POST /auth/login/basic
-
-#### 业务逻辑
 
 ```mermaid
 sequenceDiagram
@@ -52,10 +28,6 @@ sequenceDiagram
 ```
 
 ### 单点登录
-
-#### HTTP接口
-
-POST /auth/sso
 
 #### 网关模式（推荐）
 
@@ -98,11 +70,11 @@ sequenceDiagram
     service -->> client: 返回请求结果
 ```
 
-#### 签发 [JWT](https://jwt.io/)
+### 签发 [JWT](https://jwt.io/)
 
 本系统签发的 JWT 采用 ES256 算法。
 
-claim 命名参照 [IANA 机构](https://www.iana.org/assignments/jwt/jwt.xhtml) 内已注册的 claim，包含以下内容：
+payload 中包含以下内容：
 
 | 字段                 | 含义      | 注释                       |
 |--------------------|---------|--------------------------|
@@ -118,4 +90,6 @@ claim 命名参照 [IANA 机构](https://www.iana.org/assignments/jwt/jwt.xhtml)
 | groups             | 所在用户组   | 类型为 String[]。            |
 | entitlements       | 持有者权限   | 类型为 String[]。            |
 
-#### 操作权限
+## 引用文档
+
+- [IANA 机构](https://www.iana.org/assignments/jwt/jwt.xhtml)

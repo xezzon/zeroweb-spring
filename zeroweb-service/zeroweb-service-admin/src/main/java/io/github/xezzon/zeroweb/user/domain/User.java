@@ -31,16 +31,19 @@ public class User {
   String id;
   /**
    * 用户名
+   * 由用户定义的、区别于其他用户的一个标识。
    */
   @Column(name = "username", nullable = false, unique = true)
   String username;
   /**
    * 用户昵称
+   * 显示在页面上的用户的名称。
    */
   @Column(name = "nickname")
   String nickname;
   /**
    * 密码
+   * 口令被加密后的内容。
    */
   @JsonIgnore
   @Column(name = "cipher", nullable = false)

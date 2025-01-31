@@ -1,9 +1,9 @@
 package io.github.xezzon.zeroweb.subscription;
 
 import io.github.xezzon.zeroweb.common.domain.Id;
-import io.github.xezzon.zeroweb.subscription.domain.AddSubscriptionReq;
 import io.github.xezzon.zeroweb.subscription.domain.Subscription;
 import io.github.xezzon.zeroweb.subscription.domain.SubscriptionStatus;
+import io.github.xezzon.zeroweb.subscription.entity.AddSubscriptionReq;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;

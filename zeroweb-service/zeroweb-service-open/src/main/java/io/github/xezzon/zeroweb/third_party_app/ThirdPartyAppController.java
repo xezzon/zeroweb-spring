@@ -5,8 +5,8 @@ import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.subscription.domain.Subscription;
 import io.github.xezzon.zeroweb.subscription.service.ISubscriptionService4ThirdPartyApp;
 import io.github.xezzon.zeroweb.third_party_app.domain.AccessSecret;
-import io.github.xezzon.zeroweb.third_party_app.domain.AddThirdPartyAppReq;
 import io.github.xezzon.zeroweb.third_party_app.domain.ThirdPartyApp;
+import io.github.xezzon.zeroweb.third_party_app.entity.AddThirdPartyAppReq;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -40,7 +40,7 @@ public class ThirdPartyAppController {
    * @param req 请求体，包含要添加的第三方应用信息
    * @return 添加成功后返回的第三方应用ID
    */
-  @PostMapping("/add")
+  @PostMapping()
   public AccessSecret add(@RequestBody AddThirdPartyAppReq req) {
     ThirdPartyApp thirdPartyApp = req.into();
     thirdPartyApp.setOwnerId(StpUtil.getLoginIdAsString());

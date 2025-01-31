@@ -2,8 +2,8 @@ package io.github.xezzon.zeroweb.user;
 
 import cn.dev33.satoken.secure.BCrypt;
 import io.github.xezzon.zeroweb.common.domain.Id;
-import io.github.xezzon.zeroweb.user.domain.RegisterUserReq;
 import io.github.xezzon.zeroweb.user.domain.User;
+import io.github.xezzon.zeroweb.user.entity.RegisterUserReq;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 用户功能HTTP接口
+ * 用户管理
  * @author xezzon
  */
 @RequestMapping("/user")

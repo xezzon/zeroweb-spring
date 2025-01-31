@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.dict;
 
 import com.google.protobuf.Empty;
-import io.github.xezzon.zeroweb.common.trait.RpcTrait;
+import io.github.xezzon.zeroweb.common.marker.RpcTrait;
 import io.github.xezzon.zeroweb.dict.DictGrpc.DictStub;
 import io.grpc.stub.StreamObserver;
 import java.util.concurrent.CountDownLatch;
@@ -11,6 +11,7 @@ import org.jetbrains.annotations.TestOnly;
 import org.springframework.stereotype.Component;
 
 /**
+ * 以 RPC 调用的方式实现字典导入功能，针对 zeroweb-service-admin 以外的服务。
  * @author xezzon
  */
 @Slf4j

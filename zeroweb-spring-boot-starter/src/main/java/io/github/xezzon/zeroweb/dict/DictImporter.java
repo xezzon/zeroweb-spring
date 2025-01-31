@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.dict;
 
 /**
+ * 字典导入功能
  * @author xezzon
  */
 public interface DictImporter {

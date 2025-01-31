@@ -16,8 +16,13 @@ body:
     attributes:
       label: Product
       description: 受影响的构件
+      multiple: true
       options:
-        - java-sdk
+        - zeroweb-open-sdk
+        - zeroweb-proto
+        - zeroweb-spring-boot-starter
+        - zeroweb-service-admin
+        - zeroweb-service-open
     validations:
       required: true
   - type: input

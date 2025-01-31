@@ -13,8 +13,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.zeroweb.InitializeDataRunner;
-import io.github.xezzon.zeroweb.auth.domain.BasicAuth;
-import io.github.xezzon.zeroweb.auth.domain.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.entity.BasicAuth;
+import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.exception.AdminErrorCode;
 import io.github.xezzon.zeroweb.crypto.JwtKeyManager;
@@ -128,7 +128,7 @@ class AuthHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
-        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_TOKEN.code());
+        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_PASSWORD.code());
     // 密码不正确
     BasicAuth basicAuth2 = new BasicAuth(user.getUsername(), RandomUtil.randomString(9));
     webTestClient.post()
@@ -137,7 +137,7 @@ class AuthHttpTest {
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
-        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_TOKEN.code());
+        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_PASSWORD.code());
   }
 
   @RepeatedTest(2)

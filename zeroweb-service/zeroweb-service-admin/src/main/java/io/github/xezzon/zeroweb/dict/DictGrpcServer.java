@@ -36,6 +36,9 @@ public class DictGrpcServer extends DictGrpc.DictImplBase {
     responseObserver.onCompleted();
   }
 
+  /**
+   * 导入字典数据（服务间接口）
+   */
   @Override
   public void importDict(DictImportReqList request, StreamObserver<Empty> responseObserver) {
     List<Dict> dictList = request.getDataList().parallelStream()

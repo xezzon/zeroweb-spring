@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="23" author="xezzon" labels="0.2">
+    <createTable tableName="zeroweb_dict" remarks="字典">
+      <column name="id" type="VARCHAR(64)" remarks="字典标识">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="tag" type="VARCHAR(255)" remarks="字典目">
+        <constraints nullable="false"/>
+      </column>
+      <column name="code" type="VARCHAR(255)" remarks="字典键">
+        <constraints nullable="false"/>
+      </column>
+      <column name="label" type="VARCHAR(255)" remarks="字典值">
+        <constraints nullable="true"/>
+      </column>
+      <column name="ordinal" type="INTEGER" remarks="排序号">
+        <constraints nullable="false"/>
+      </column>
+      <column name="parent_id" type="VARCHAR(64)" remarks="上级字典ID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="enabled" type="BOOLEAN" remarks="启用状态">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <createIndex tableName="zeroweb_dict" indexName="UK_d_tag_code">
+      <column name="tag"/>
+      <column name="code"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet id="32" author="xezzon" labels="0.2">
+    <addColumn tableName="zeroweb_dict">
+      <column name="editable" type="BOOLEAN" remarks="是否可编辑">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="64" author="xezzon" labels="0.5">
+    <insert tableName="zeroweb_dict">
+      <column name="id" value="1"/>
+      <column name="tag" value="DICT"/>
+      <column name="code" value="Language"/>
+      <column name="label" value="语言"/>
+      <column name="ordinal" value="0"/>
+      <column name="parent_id" value="0"/>
+      <column name="enabled" value="1"/>
+      <column name="editable" value="1"/>
+    </insert>
+    <insert tableName="zeroweb_dict">
+      <column name="id" value="2"/>
+      <column name="tag" value="Language"/>
+      <column name="code" value="zh-CN"/>
+      <column name="label" value="中文"/>
+      <column name="ordinal" value="1"/>
+      <column name="parent_id" value="1"/>
+      <column name="enabled" value="1"/>
+      <column name="editable" value="1"/>
+    </insert>
+    <insert tableName="zeroweb_dict">
+      <column name="id" value="3"/>
+      <column name="tag" value="Language"/>
+      <column name="code" value="en"/>
+      <column name="label" value="English"/>
+      <column name="ordinal" value="2"/>
+      <column name="parent_id" value="1"/>
+      <column name="enabled" value="1"/>
+      <column name="editable" value="1"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>

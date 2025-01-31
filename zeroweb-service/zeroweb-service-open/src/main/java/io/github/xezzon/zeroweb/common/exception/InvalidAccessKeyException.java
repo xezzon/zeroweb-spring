@@ -1,7 +1,5 @@
 package io.github.xezzon.zeroweb.common.exception;
 
-import io.github.xezzon.zeroweb.core.error.IErrorCode;
-
 /**
  * 无效的访问密钥
  * 原因：
@@ -10,11 +8,9 @@ import io.github.xezzon.zeroweb.core.error.IErrorCode;
  * 3. AccessKey或签名使用的SecretKey不匹配
  * @author xezzon
  */
-public class InvalidAccessKeyException extends ZerowebRuntimeException {
-
-  private static final IErrorCode ERROR_CODE = OpenErrorCode.INVALID_ACCESS_KEY;
+public class InvalidAccessKeyException extends ZerowebBusinessException {
 
   public InvalidAccessKeyException() {
-    super(ERROR_CODE);
+    super();
   }
 }

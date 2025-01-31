@@ -5,7 +5,7 @@ import com.auth0.jwt.JWTCreator.Builder;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
-import io.github.xezzon.zeroweb.auth.domain.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig.ZerowebJwtConfig;
 import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
@@ -56,16 +56,32 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
     this.zerowebJwtConfig = zerowebConfig.getJwt();
   }
 
+  /**
+   * 添加第三方应用并生成访问密钥
+   * @param thirdPartyApp 要添加的第三方应用对象
+   * @return 生成的访问密钥对象
+   */
   @Transactional()
   protected AccessSecret addThirdPartyApp(ThirdPartyApp thirdPartyApp) {
     thirdPartyAppDAO.get().save(thirdPartyApp);
     return this.rollAccessSecret(thirdPartyApp.getId());
   }
 
+  /**
+   * 根据用户ID分页查询第三方应用列表
+   * @param odata OData查询选项，用于指定分页和排序等条件
+   * @param userId 用户ID
+   * @return 分页查询结果，包含符合条件的第三方应用列表
+   */
   protected Page<ThirdPartyApp> listThirdPartyAppByUser(ODataQueryOption odata, String userId) {
     return thirdPartyAppDAO.findAllWithUserId(odata, userId);
   }
 
+  /**
+   * 分页查询第三方应用列表
+   * @param odata OData查询选项，用于指定分页和排序等条件
+   * @return 分页查询结果，包含符合条件的第三方应用列表
+   */
   protected Page<ThirdPartyApp> listThirdPartyApp(ODataQueryOption odata) {
     return thirdPartyAppDAO.findAll(odata);
   }

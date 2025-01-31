@@ -4,7 +4,9 @@ import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
 import static com.google.auth.http.AuthHttpConstants.BEARER;
 
 import cn.dev33.satoken.stp.StpUtil;
-import io.github.xezzon.zeroweb.common.exception.ErrorCode;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.common.exception.InvalidTokenException;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import io.github.xezzon.zeroweb.core.crypto.ASN1PublicKeyReader;
 import io.github.xezzon.zeroweb.core.crypto.DerStringReader;
@@ -19,8 +21,11 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.interfaces.ECPublicKey;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +34,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @WebFilter(urlPatterns = "/*")
+@Order(8)
 public class JwtFilter implements Filter {
 
   public static final String PUBLIC_KEY_HEADER = "X-Public-Key";
@@ -46,17 +52,19 @@ public class JwtFilter implements Filter {
         String token = authorization.substring(BEARER.length()).trim();
         String publicKeyASN1 = httpRequest.getHeader(PUBLIC_KEY_HEADER);
         String accessKey = httpRequest.getHeader(ACCESS_KEY_HEADER);
-        JwtClaim claim;
+        DecodedJWT jwt;
         if (publicKeyASN1 != null && !publicKeyASN1.isEmpty()) {
           // 前端调用经过网关验证，使用公钥验证
-          claim = validateWithPublicKey(token, publicKeyASN1);
+          jwt = validateWithPublicKey(token, publicKeyASN1);
         } else if (accessKey != null && !accessKey.isEmpty()) {
           // 第三方系统调用经过网关验证，使用AccessKey验证
-          claim = validateWithAccessKey(token, accessKey);
+          jwt = validateWithAccessKey(token, accessKey);
         } else {
           throw new BreakException();
         }
-        StpUtil.login(claim.getSubject());
+        JwtClaim claim = JwtClaimWrapper.from(jwt).get();
+        Duration timeout = Duration.between(Instant.now(), jwt.getExpiresAtAsInstant());
+        StpUtil.login(claim.getSubject(), timeout.getSeconds());
         JwtAuth.saveJwtClaim(claim);
       }
     } catch (BreakException | ZerowebRuntimeException ignored) {
@@ -68,18 +76,18 @@ public class JwtFilter implements Filter {
     chain.doFilter(request, response);
   }
 
-  public JwtClaim validateWithPublicKey(String token, String publicKeyASN1) {
+  public DecodedJWT validateWithPublicKey(String token, String publicKeyASN1) {
     try {
       ASN1PublicKeyReader asn1Reader = new DerStringReader(publicKeyASN1);
       ECPublicKey publicKey = (ECPublicKey) SecretKeyUtil.readPublicKey(asn1Reader);
       return new JwtAuth(publicKey).decode(token);
     } catch (Exception e) {
       log.error("Failed to parse the JWT. token: {}; key: {}", token, publicKeyASN1, e);
-      throw new ZerowebRuntimeException(ErrorCode.INVALID_TOKEN, e);
+      throw new InvalidTokenException(e);
     }
   }
 
-  public JwtClaim validateWithAccessKey(String token, String accessKey) {
+  public DecodedJWT validateWithAccessKey(String token, String accessKey) {
     return new JwtAuth(
         Base64.getDecoder().decode(accessKey)
     ).decode(token);

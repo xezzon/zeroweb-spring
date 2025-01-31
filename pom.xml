@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.xezzon</groupId>
@@ -57,6 +57,7 @@
     <grpc-spring-boot-starter.version>3.1.0.RELEASE</grpc-spring-boot-starter.version>
     <sa-token.version>1.39.0</sa-token.version>
     <!-- 插件版本 -->
+    <therapi-runtime-javadoc.version>0.15.0</therapi-runtime-javadoc.version>
   </properties>
 
   <dependencyManagement>
@@ -166,6 +167,18 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <configuration>
+          <excludeArtifacts>
+            <excludeArtifact>report-aggregate</excludeArtifact>
+            <excludeArtifact>zeroweb-service</excludeArtifact>
+            <excludeArtifact>zeroweb-service-admin</excludeArtifact>
+            <excludeArtifact>zeroweb-service-open</excludeArtifact>
+          </excludeArtifacts>
+        </configuration>
       </plugin>
     </plugins>
   </build>

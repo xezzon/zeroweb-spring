@@ -1,6 +1,5 @@
 package io.github.xezzon.zeroweb.crypto.event;
 
-import io.github.xezzon.tao.observer.Observation;
 import java.security.PublicKey;
 import java.util.Base64;
 
@@ -10,7 +9,7 @@ import java.util.Base64;
  */
 public record PublicKeyGeneratedEvent(
     PublicKey publicKey
-) implements Observation {
+) {
 
   public String getPublicKey() {
     return Base64.getEncoder().encodeToString(publicKey.getEncoded());
