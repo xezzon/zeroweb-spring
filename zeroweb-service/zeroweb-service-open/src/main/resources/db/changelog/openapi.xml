@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="42" author="xezzon" labels="0.4">
+    <createTable tableName="zeroweb_openapi" remarks="对外接口">
+      <column name="id" type="VARCHAR(64)" remarks="对外接口标识">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="code" type="VARCHAR(255)" remarks="对外接口编码">
+        <constraints nullable="false" unique="true" uniqueConstraintName="UK_o_code"/>
+      </column>
+      <column name="status" type="VARCHAR(255)" remarks="对外接口状态">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="54" author="xezzon" labels="0.4">
+    <addColumn tableName="zeroweb_openapi">
+      <column name="destination" type="VARCHAR(2083)" remarks="后端地址">
+        <constraints nullable="false"/>
+      </column>
+      <column name="http_method" type="VARCHAR(16)" remarks="接口请求的HTTP方法">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>

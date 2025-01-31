@@ -75,7 +75,7 @@ public class OpenapiService implements IOpenapiService4Subscription {
   private void checkRepeat(Openapi openapi) {
     Openapi exist = openapiDAO.get().findByCode(openapi.getCode());
     if (exist != null && !Objects.equals(exist.getId(), openapi.getId())) {
-      throw new RepeatDataException("接口已存在");
+      throw new RepeatDataException("`" + openapi.getCode() + "`");
     }
   }
 
