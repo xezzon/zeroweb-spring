@@ -140,13 +140,16 @@ class MergedResourceBundleControl extends ResourceBundle.Control {
 
   @Override
   public ResourceBundle newBundle(final String baseName, final Locale locale, final String format,
-      final ClassLoader loader,
-      final boolean reload) throws IOException {
+      final ClassLoader loader, final boolean reload) throws IOException {
     final String bundleName = toBundleName(baseName, locale);
     final String resourceName = toResourceName(bundleName, "properties");
     final List<URL> resources = Collections.list(loader.getResources(resourceName));
     if (resources.isEmpty()) {
-      return null;
+      throw new MissingResourceException(
+          "Can't find bundle for base name " + baseName + ", locale " + locale, // message
+          baseName + "_" + locale, // className
+          "" // key
+      );
     }
     final int initialMapCapacity = Math.max(16, (int) (resources.size() * 20 / 0.75));
     final Map<String, String> lookup = new HashMap<>(initialMapCapacity);
