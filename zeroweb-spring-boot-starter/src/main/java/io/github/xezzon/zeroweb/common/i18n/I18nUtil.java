@@ -1,9 +1,21 @@
 package io.github.xezzon.zeroweb.common.i18n;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +47,7 @@ public class I18nUtil {
    */
   public static ResourceBundle readResourceBundle(@NotNull String basename, @NotNull Locale locale)
       throws MissingResourceException {
-    return ResourceBundle.getBundle(BASE_DIR + basename, locale);
+    return ResourceBundle.getBundle(BASE_DIR + basename, locale, new MergedResourceBundleControl());
   }
 
   /**
@@ -118,5 +130,51 @@ public class I18nUtil {
     private String resourceBundleName() {
       return BASE_DIR + basename + "_" + locale + ".properties";
     }
+  }
+}
+
+/**
+ * 从多个classpath读取同名的资源文件，对相同的key进行合并。 classpath顺序越靠前，优先级越高。
+ */
+class MergedResourceBundleControl extends ResourceBundle.Control {
+
+  @Override
+  public ResourceBundle newBundle(final String baseName, final Locale locale, final String format,
+      final ClassLoader loader, final boolean reload) throws IOException {
+    final String bundleName = toBundleName(baseName, locale);
+    final String resourceName = toResourceName(bundleName, "properties");
+    final List<URL> resources = Collections.list(loader.getResources(resourceName));
+    if (resources.isEmpty()) {
+      throw new MissingResourceException(
+          "Can't find bundle for base name " + baseName + ", locale " + locale, // message
+          baseName + "_" + locale, // className
+          "" // key
+      );
+    }
+    final int initialMapCapacity = Math.max(16, (int) (resources.size() * 20 / 0.75));
+    final Map<String, String> lookup = new HashMap<>(initialMapCapacity);
+    final Properties properties = new Properties();
+    for (final URL url : resources) {
+      final URLConnection urlConnection = url.openConnection();
+      urlConnection.setUseCaches(!reload);
+      try (InputStream inputStream = urlConnection.getInputStream();
+          InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)
+      ) {
+        properties.load(reader);
+        properties.forEach((key, value) -> lookup.putIfAbsent(key.toString(), value.toString()));
+      }
+    }
+    return new ResourceBundle() {
+
+      @Override
+      protected Object handleGetObject(@NotNull final String key) {
+        return lookup.get(key);
+      }
+
+      @Override
+      public @NotNull Enumeration<String> getKeys() {
+        return Collections.enumeration(lookup.keySet());
+      }
+    };
   }
 }
