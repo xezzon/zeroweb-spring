@@ -26,5 +26,6 @@
     <exclude name="ShortVariable"/>
     <exclude name="CommentDefaultAccessModifier"/>
     <exclude name="ShortMethodName"/>
+    <exclude name="OnlyOneReturn"/>
   </rule>
 </ruleset>

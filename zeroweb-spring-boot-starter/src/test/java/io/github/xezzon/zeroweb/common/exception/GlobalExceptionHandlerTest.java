@@ -128,7 +128,9 @@ class GlobalExceptionHandlerTest {
     );
     Assertions.assertEquals("参数错误。请检查输入后重新提交。", responseBody.error().getMessage());
     Assertions.assertTrue(responseBody.error().getDetails().parallelStream()
-        .anyMatch(detail -> Objects.equals("email", detail.getCode()))
+        .anyMatch(detail -> Objects.equals("email", detail.getCode())
+            && Objects.equals(detail.getMessage(), "不是一个合法的电子邮件地址")
+        )
     );
     Assertions.assertTrue(responseBody.error().getDetails().parallelStream()
         .anyMatch(detail -> Objects.equals("name", detail.getCode()))

@@ -224,8 +224,8 @@ public class LocalizedService {
         .collect(Collectors.toMap(
             Translation::getMessageKey,
             Translation::getContent,
-            (a, b) -> a)
-        );
+            (a, b) -> a
+        ));
   }
 
   /**
