@@ -1,1 +1,7 @@
 REDIS_URL: localhost:6379
+
+spring:
+  application:
+    group: zeroweb
+    name: zeroweb-spring-boot-starter
+    version: 1.0.0
