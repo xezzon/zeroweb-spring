@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-ZerowebAdminApplication<zeroweb-service-admin>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "io.github.xezzon.zeroweb.ZerowebAdminApplication",
+      "projectName": "zeroweb-service-admin",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-ZerowebOpenApplication<zeroweb-service-open>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "io.github.xezzon.zeroweb.ZerowebOpenApplication",
+      "projectName": "zeroweb-service-open",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JsonSchemaMappingsProjectConfiguration">
+    <state>
+      <map>
+        <entry key="GitHub Action">
+          <value>
+            <SchemaInfo>
+              <option name="generatedName" value="New Schema" />
+              <option name="name" value="GitHub Action" />
+              <option name="relativePathToSchema" value="https://json.schemastore.org/github-workflow.json" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="path" value=".github/workflows/linter.yml" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+        <entry key="Liquibase">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="Liquibase" />
+              <option name="relativePathToSchema" value="https://json.schemastore.org/liquibase-3.2.json" />
+              <option name="applicationDefined" value="true" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="path" value="geom-spring-boot-starter/src/main/resources/db/changelog/db.changelog-master.yaml" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+        <entry key="megalinter-configuration.jsonschema">
+          <value>
+            <SchemaInfo>
+              <option name="generatedName" value="New Schema" />
+              <option name="name" value="megalinter-configuration.jsonschema" />
+              <option name="relativePathToSchema" value="https://raw.githubusercontent.com/megalinter/megalinter/main/megalinter/descriptors/schemas/megalinter-configuration.jsonschema.json" />
+              <option name="schemaVersion" value="JSON Schema 7" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="path" value=".github/.mega-linter.yml" />
+                  </Item>
+                  <Item>
+                    <option name="path" value=".mega-linter.yml" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+      </map>
+    </state>
+  </component>
+</project>
