@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.app;
 
 import io.github.xezzon.zeroweb.app.domain.App;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,5 +22,13 @@ public class AppService {
    */
   void addApp(App app) {
     appDAO.get().save(app);
+  }
+
+  /**
+   * 查询服务列表
+   * @return 服务列表
+   */
+  List<App> listApp() {
+    return appDAO.get().findAllByOrderByOrdinalAsc();
   }
 }
