@@ -1,0 +1,43 @@
+# Security
+
+## Sensitive Files
+
+DO NOT read or modify:
+
+-   .env files
+-   \*_/config/secrets._
+-   \*_/_.pem
+-   Any file containing API keys, tokens, or credentials
+
+## Security Practices
+
+-   Never commit sensitive files
+-   Use environment variables for secrets
+-   Keep credentials out of logs and output
+
+# Project Guidelines
+
+## Documentation Requirements
+
+-   Keep README.md in sync with new capabilities
+
+## Architecture Decision Records
+
+Create ADRs in /doc/adr for:
+
+-   Major dependency changes
+-   Architectural pattern changes
+-   New integration patterns
+-   Database schema changes
+    Follow template in /doc/adr/template.md
+
+## Code Style & Patterns
+
+-   Prefer composition over inheritance
+-   Use repository pattern for data access
+
+## Testing Standards
+
+-   Unit tests required for business logic
+-   Integration tests for API endpoints
+-   E2E tests for critical user flows
