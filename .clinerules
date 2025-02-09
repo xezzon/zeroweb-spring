@@ -38,6 +38,5 @@ Create ADRs in /doc/adr for:
 
 ## Testing Standards
 
--   Unit tests required for business logic
--   Integration tests for API endpoints
--   E2E tests for critical user flows
+-   Unit tests for HTTP endpoints and gRPC endpoints.
+-   Prefer to use Testcontainers to avoid Mock.

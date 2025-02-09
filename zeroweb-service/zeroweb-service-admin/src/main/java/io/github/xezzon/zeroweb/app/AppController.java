@@ -1,5 +1,11 @@
 package io.github.xezzon.zeroweb.app;
 
+import io.github.xezzon.zeroweb.app.domain.AddAppReq;
+import io.github.xezzon.zeroweb.app.domain.App;
+import io.github.xezzon.zeroweb.common.domain.Id;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,5 +21,16 @@ public class AppController {
 
   public AppController(final AppService appService) {
     this.appService = appService;
+  }
+
+  /**
+   * 新增服务
+   * @param req 服务基础信息
+   */
+  @PostMapping()
+  public Id addApp(@RequestBody @Validated AddAppReq req) {
+    App app = req.into();
+    appService.addApp(app);
+    return Id.of(app.getId());
   }
 }
