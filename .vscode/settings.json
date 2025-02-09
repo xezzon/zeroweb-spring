@@ -1,0 +1,13 @@
+{
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "maven.view": "hierarchical",
+  "json.schemas": [
+    {
+      "fileMatch": [
+        ".github/.mega-linter.yml"
+      ],
+      "url": "https://raw.githubusercontent.com/megalinter/megalinter/main/megalinter/descriptors/schemas/megalinter-configuration.jsonschema.json"
+    }
+  ]
+}
