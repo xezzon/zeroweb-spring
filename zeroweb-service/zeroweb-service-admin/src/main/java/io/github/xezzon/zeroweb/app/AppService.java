@@ -1,7 +1,12 @@
 package io.github.xezzon.zeroweb.app;
 
 import io.github.xezzon.zeroweb.app.domain.App;
+import io.github.xezzon.zeroweb.locale.event.I18nMessageChangedEvent;
+import io.github.xezzon.zeroweb.locale.event.I18nMessageDeletedEvent;
+import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,6 +16,8 @@ import org.springframework.stereotype.Service;
 public class AppService {
 
   private final AppDAO appDAO;
+  @Resource
+  private ApplicationEventPublisher eventPublisher;
 
   public AppService(final AppDAO appDAO) {
     this.appDAO = appDAO;
@@ -37,7 +44,12 @@ public class AppService {
    * @param app 服务信息
    */
   void updateApp(App app) {
-    appDAO.partialUpdate(app);
+    final App entity = appDAO.get().findById(app.getId()).orElseThrow();
+    final App oldValue = new App();
+    appDAO.getCopier().copy(entity, oldValue);
+    appDAO.get().save(app);
+    /* 后置处理 */
+    eventPublisher.publishEvent(new I18nMessageChangedEvent(oldValue, app));
   }
 
   /**
@@ -45,6 +57,12 @@ public class AppService {
    * @param id 服务ID
    */
   void deleteApp(String id) {
+    final Optional<App> app = appDAO.get().findById(id);
+    if (app.isEmpty()) {
+      return;
+    }
     appDAO.get().deleteById(id);
+    /* 后置处理 */
+    eventPublisher.publishEvent(new I18nMessageDeletedEvent(app.get()));
   }
 }
