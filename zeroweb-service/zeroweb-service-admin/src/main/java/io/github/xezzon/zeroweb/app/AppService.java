@@ -31,4 +31,12 @@ public class AppService {
   List<App> listApp() {
     return appDAO.get().findAllByOrderByOrdinalAsc();
   }
+
+  /**
+   * 更新服务信息
+   * @param app 服务信息
+   */
+  void updateApp(App app) {
+    appDAO.partialUpdate(app);
+  }
 }

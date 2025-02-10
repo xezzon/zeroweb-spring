@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.app.domain.AddAppReq;
 import io.github.xezzon.zeroweb.app.domain.App;
+import io.github.xezzon.zeroweb.app.domain.UpdateAppReq;
 import io.github.xezzon.zeroweb.app.repository.AppRepository;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import jakarta.annotation.Resource;
@@ -25,6 +26,7 @@ class AppHttpTest {
 
   private static final String ADD_APP_URI = "/app";
   private static final String LIST_APP_URI = "/app";
+  private static final String UPDATE_APP_URI = "/app";
 
   @Resource
   private WebTestClient webTestClient;
@@ -97,5 +99,30 @@ class AppHttpTest {
     for (int i = 0, cnt = apps.size(); i < cnt; i++) {
       assertEquals(apps.get(i).getId(), responseBody.get(i).getId());
     }
+  }
+
+  @Test
+  void updateApp() {
+    // Arrange
+    List<App> dataset = this.initData();
+    App app = dataset.get(0);
+    UpdateAppReq req = new UpdateAppReq(
+        app.getId(),
+        RandomUtil.randomString(8),
+        "http://example.com",
+        1
+    );
+
+    // Act & Assert
+    webTestClient.put()
+        .uri(UPDATE_APP_URI)
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isOk();
+
+    App after = repository.findById(app.getId()).orElseThrow();
+    assertEquals(req.name(), after.getName());
+    assertEquals(req.baseUrl(), after.getBaseUrl());
+    assertEquals(req.ordinal(), after.getOrdinal());
   }
 }
