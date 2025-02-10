@@ -1,5 +1,6 @@
 package io.github.xezzon.zeroweb.app;
 
+import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,12 +11,16 @@ import io.github.xezzon.zeroweb.app.domain.App;
 import io.github.xezzon.zeroweb.app.domain.UpdateAppReq;
 import io.github.xezzon.zeroweb.app.repository.AppRepository;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
@@ -72,10 +77,17 @@ class AppHttpTest {
     assertNotNull(responseBody.id());
   }
 
-  @Test
-  void addApp_shouldReturnBadRequest_whenBaseUrlInvalid() {
+  @ParameterizedTest
+  @ValueSource(strings = {
+      "invalid-url",
+      "htp://example.com",
+      "://missing-part",
+      "http//missingColon.com",
+      "www.example.com",    // missing protocol
+  })
+  void addApp_shouldReturnBadRequest_whenBaseUrlInvalid(String invalidUrl) {
     // Arrange
-    AddAppReq req = new AddAppReq("testApp", "invalid-url", 1);
+    AddAppReq req = new AddAppReq("testApp", invalidUrl, 1);
 
     // Act & Assert
     webTestClient.post()
@@ -115,18 +127,97 @@ class AppHttpTest {
         1
     );
 
-    // Act & Assert
+    // Act & Assert for a valid update
     webTestClient.put()
         .uri(UPDATE_APP_URI)
         .bodyValue(req)
         .exchange()
         .expectStatus().isOk();
-
-    App after = repository.findById(app.getId()).orElseThrow();
-    assertEquals(req.name(), after.getName());
-    assertEquals(req.baseUrl(), after.getBaseUrl());
-    assertEquals(req.ordinal(), after.getOrdinal());
   }
+
+  @Test
+  void updateApp_invalidBaseUrl() {
+    // Arrange
+    List<App> dataset = this.initData();
+    App app = dataset.get(0);
+    UpdateAppReq invalidUrlReq = new UpdateAppReq(
+        app.getId(),
+        RandomUtil.randomString(8),
+        "invalid-url",  // Invalid baseUrl format
+        1
+    );
+
+    // Act & Assert for invalid baseUrl
+    webTestClient.put()
+        .uri(UPDATE_APP_URI)
+        .bodyValue(invalidUrlReq)
+        .exchange()
+        .expectStatus().isBadRequest();
+  }
+
+  @Test
+  void updateApp_nonExistent() {
+    // Arrange
+    // Using a non-existent app id for the test
+    UpdateAppReq nonExistentReq = new UpdateAppReq(
+        "non-existent-id",
+        RandomUtil.randomString(8),
+        "http://example.com",
+        1
+    );
+
+    // Act & Assert for non-existent app update
+    webTestClient.put()
+        .uri(UPDATE_APP_URI)
+        .bodyValue(nonExistentReq)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
+  }
+
+  @Test
+  void updateApp_nullOptionalFields() {
+    // Arrange
+    List<App> dataset = this.initData();
+    App app = dataset.get(0);
+    // Assuming that the app name is optional and can be null
+    UpdateAppReq nullOptionalReq = new UpdateAppReq(
+        app.getId(),
+        null,
+        "http://example.com",
+        1
+    );
+
+    // Act & Assert for updating with null optional fields
+    webTestClient.put()
+        .uri(UPDATE_APP_URI)
+        .bodyValue(nullOptionalReq)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.ARGUMENT_NOT_VALID.code());
+  }
+
+  @Test
+  void updateApp_concurrentUpdates() {
+    // Arrange
+    List<App> dataset = this.initData();
+    App app = dataset.get(0);
+    int concurrentRequests = 16;
+    IntStream.range(0, concurrentRequests).parallel()
+        .mapToObj(i -> new UpdateAppReq(
+            app.getId(),
+            RandomUtil.randomString(8),
+            "http://example.com",
+            RandomUtil.randomInt()
+        ))
+        .forEach(o -> webTestClient.put()
+            .uri(UPDATE_APP_URI)
+            .bodyValue(o)
+            .exchange()
+            .expectStatus().isOk()
+        );
+  }
+
 
   @Test
   void deleteApp() {

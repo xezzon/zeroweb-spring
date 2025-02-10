@@ -4,6 +4,7 @@ import io.github.xezzon.zeroweb.app.domain.App;
 import io.github.xezzon.zeroweb.locale.event.I18nMessageChangedEvent;
 import io.github.xezzon.zeroweb.locale.event.I18nMessageDeletedEvent;
 import jakarta.annotation.Resource;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,7 +28,7 @@ public class AppService {
    * 新增服务
    * @param app 服务信息
    */
-  void addApp(App app) {
+  void addApp(final App app) {
     appDAO.get().save(app);
   }
 
@@ -43,8 +44,9 @@ public class AppService {
    * 更新服务信息
    * @param app 服务信息
    */
-  void updateApp(App app) {
-    final App entity = appDAO.get().findById(app.getId()).orElseThrow();
+  void updateApp(final App app) {
+    final App entity = appDAO.get().findById(app.getId())
+        .orElseThrow(EntityNotFoundException::new);
     final App oldValue = new App();
     appDAO.getCopier().copy(entity, oldValue);
     appDAO.get().save(app);
@@ -56,7 +58,7 @@ public class AppService {
    * 删除服务
    * @param id 服务ID
    */
-  void deleteApp(String id) {
+  void deleteApp(final String id) {
     final Optional<App> app = appDAO.get().findById(id);
     if (app.isEmpty()) {
       return;

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * 服务自省
  * @author xezzon
  */
 @RestController
@@ -18,12 +19,12 @@ public class MetadataController {
   private String appVersion;
 
   /**
-   * 服务自省
+   * 服务自省服务信息
    * @return 服务信息
    */
   @GetMapping("/info.json")
   public ServiceInfo loadServiceInfo() {
-    ServiceInfo serviceInfo = new ServiceInfo();
+    final ServiceInfo serviceInfo = new ServiceInfo();
     serviceInfo.setName(appName);
     serviceInfo.setVersion(appVersion);
     serviceInfo.setType(ServiceType.SERVER);

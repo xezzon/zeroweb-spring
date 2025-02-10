@@ -13,7 +13,7 @@ public enum ServiceType implements IDict {
 
   private final String label;
 
-  ServiceType(String label) {
+  ServiceType(final String label) {
     this.label = label;
   }
 

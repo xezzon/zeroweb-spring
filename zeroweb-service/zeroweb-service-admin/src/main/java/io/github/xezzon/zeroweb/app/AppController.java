@@ -34,8 +34,8 @@ public class AppController {
    * @param req 服务基础信息
    */
   @PostMapping()
-  public Id addApp(@RequestBody @Validated AddAppReq req) {
-    App app = req.into();
+  public Id addApp(@RequestBody @Validated final AddAppReq req) {
+    final App app = req.into();
     appService.addApp(app);
     return Id.of(app.getId());
   }
@@ -54,8 +54,8 @@ public class AppController {
    * @param req 服务基础信息
    */
   @PutMapping
-  public void updateApp(@RequestBody @Validated UpdateAppReq req) {
-    App app = req.into();
+  public void updateApp(@RequestBody @Validated final UpdateAppReq req) {
+    final App app = req.into();
     appService.updateApp(app);
   }
 
@@ -64,7 +64,7 @@ public class AppController {
    * @param id 服务ID
    */
   @DeleteMapping("/{id}")
-  public void deleteApp(@PathVariable String id) {
+  public void deleteApp(@PathVariable final String id) {
     appService.deleteApp(id);
   }
 }

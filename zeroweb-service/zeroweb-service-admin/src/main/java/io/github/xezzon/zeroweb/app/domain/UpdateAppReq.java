@@ -2,6 +2,7 @@ package io.github.xezzon.zeroweb.app.domain;
 
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.tao.trait.Into;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.URL;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -16,6 +17,7 @@ import org.mapstruct.factory.Mappers;
  */
 public record UpdateAppReq(
     String id,
+    @NotNull
     String name,
     @URL
     String baseUrl,
