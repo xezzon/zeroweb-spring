@@ -39,4 +39,12 @@ public class AppService {
   void updateApp(App app) {
     appDAO.partialUpdate(app);
   }
+
+  /**
+   * 删除服务
+   * @param id 服务ID
+   */
+  void deleteApp(String id) {
+    appDAO.get().deleteById(id);
+  }
 }

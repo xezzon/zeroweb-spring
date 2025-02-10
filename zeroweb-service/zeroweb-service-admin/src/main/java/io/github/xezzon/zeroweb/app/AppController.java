@@ -6,7 +6,9 @@ import io.github.xezzon.zeroweb.app.domain.UpdateAppReq;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,5 +57,14 @@ public class AppController {
   public void updateApp(@RequestBody @Validated UpdateAppReq req) {
     App app = req.into();
     appService.updateApp(app);
+  }
+
+  /**
+   * 删除服务
+   * @param id 服务ID
+   */
+  @DeleteMapping("/{id}")
+  public void deleteApp(@PathVariable String id) {
+    appService.deleteApp(id);
   }
 }

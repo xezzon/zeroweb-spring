@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.app;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.hutool.core.util.RandomUtil;
@@ -27,6 +28,7 @@ class AppHttpTest {
   private static final String ADD_APP_URI = "/app";
   private static final String LIST_APP_URI = "/app";
   private static final String UPDATE_APP_URI = "/app";
+  private static final String DELETE_APP_URI = "/app/{id}";
 
   @Resource
   private WebTestClient webTestClient;
@@ -124,5 +126,21 @@ class AppHttpTest {
     assertEquals(req.name(), after.getName());
     assertEquals(req.baseUrl(), after.getBaseUrl());
     assertEquals(req.ordinal(), after.getOrdinal());
+  }
+
+  @Test
+  void deleteApp() {
+    // Arrange
+    List<App> dataset = this.initData();
+    String id = dataset.get(0).getId();
+
+    // Act & Assert
+    webTestClient.delete()
+        .uri(uri -> uri.path(DELETE_APP_URI).build(id))
+        .exchange()
+        .expectStatus().isOk();
+
+    assertFalse(repository.existsById(id));
+    assertEquals(dataset.size() - 1, repository.count());
   }
 }
