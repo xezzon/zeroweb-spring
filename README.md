@@ -32,9 +32,9 @@ ZeroWeb 是一组 BaaS(Backend as a Service)，可以低成本地实现认证授
 
 ## 应用架构
 
-![应用架构](./doc/excalidraw/component.svg)
+![应用架构](docs/excalidraw/component.svg)
 
-![部署架构](./doc/excalidraw/deploy.svg)
+![部署架构](docs/excalidraw/deploy.svg)
 
 ## [开发者手册](./CONTRIBUTING.md)
 
