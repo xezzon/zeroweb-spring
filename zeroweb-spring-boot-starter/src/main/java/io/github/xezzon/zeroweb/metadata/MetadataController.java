@@ -1,5 +1,7 @@
 package io.github.xezzon.zeroweb.metadata;
 
+import jakarta.annotation.Resource;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,8 @@ public class MetadataController {
   private String appName;
   @Value("${spring.application.version}")
   private String appVersion;
+  @Resource
+  private IMenuService resourceService;
 
   /**
    * 服务自省服务信息
@@ -30,5 +34,14 @@ public class MetadataController {
     serviceInfo.setType(ServiceType.SERVER);
     serviceInfo.setHidden(true);
     return serviceInfo;
+  }
+
+  /**
+   * 服务自省资源信息
+   * @return 资源信息
+   */
+  @GetMapping("/menu.json")
+  public List<MenuInfo> loadResourceInfo() {
+    return resourceService.list();
   }
 }
