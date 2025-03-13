@@ -10,5 +10,8 @@ public interface TestApi {
 
   @RequestLine("POST /test")
   @Headers("Content-Type: application/json")
-  String test(Entity entity);
+  String post(Entity entity);
+
+  @RequestLine("GET /test")
+  String get();
 }

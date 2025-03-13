@@ -2,6 +2,8 @@ package io.github.xezzon.zeroweb.third_party_app;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.auth0.jwt.JWTCreator.Builder;
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
@@ -128,7 +130,8 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
         Base64.getDecoder().decode(accessKey),
         StandardCharsets.UTF_8
     );
-    this.validateSignature(appId, body, signature);
+    final byte[] salt = Longs.toByteArray(iat.toEpochMilli());
+    this.validateSignature(appId, body, signature, salt);
     /* 构造JWT */
     ThirdPartyApp thirdPartyApp = thirdPartyAppDAO.get().getReferenceById(appId);
     JwtClaim claim = JwtClaim.newBuilder()
@@ -154,16 +157,22 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
    * @param appId 应用标识
    * @param body 消息体
    * @param signature 摘要
+   * @param salt 盐值
    * @throws InvalidAccessKeyException 签名校验失败
    */
-  private void validateSignature(String appId, byte[] body, String signature) {
+  private void validateSignature(
+      final String appId,
+      final byte[] body,
+      final String signature,
+      final byte[] salt
+  ) {
     AccessSecret accessSecret = accessSecretRepository.findById(appId)
         .orElseThrow(InvalidAccessKeyException::new);
     try {
       Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
       byte[] secretKey = Base64.getDecoder().decode(accessSecret.getSecretKey());
       mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
-      mac.update(body);
+      mac.update(Bytes.concat(body, salt));
       if (!Objects.equals(
           signature,
           Base64.getEncoder().encodeToString(mac.doFinal())

@@ -18,11 +18,19 @@ class ZerowebOpenRequestBuilderTest {
   private int port;
 
   @Test
-  void test() {
-    TestApi testApi = new RequestBuilder("hello", SECRET_KEY).builder()
+  void post() {
+    TestApi testApi = new RequestBuilder("hello", SECRET_KEY)
         .target(TestApi.class, "http://localhost:" + this.port);
     Entity entity = new Entity("Alice");
-    String response = testApi.test(entity);
+    String response = testApi.post(entity);
+    Assertions.assertEquals("Hello, Alice", response);
+  }
+
+  @Test
+  void get() {
+    TestApi testApi = new RequestBuilder("hello", SECRET_KEY)
+        .target(TestApi.class, "http://localhost:" + this.port);
+    String response = testApi.get();
     Assertions.assertEquals("Hello, Alice", response);
   }
 }

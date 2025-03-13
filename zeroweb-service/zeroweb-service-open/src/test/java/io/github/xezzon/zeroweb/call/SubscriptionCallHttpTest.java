@@ -3,6 +3,8 @@ package io.github.xezzon.zeroweb.call;
 import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 
 import cn.hutool.core.util.RandomUtil;
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import io.github.xezzon.zeroweb.common.exception.OpenErrorCode;
@@ -89,7 +91,7 @@ class SubscriptionCallHttpTest {
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
-    mac.update(rawBody.getBytes());
+    mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
     String responseBody = webTestClient.post()
@@ -120,7 +122,7 @@ class SubscriptionCallHttpTest {
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
-    mac.update(rawBody.getBytes());
+    mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
     webTestClient.post()
@@ -149,7 +151,7 @@ class SubscriptionCallHttpTest {
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
-    mac.update(rawBody.getBytes());
+    mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
     webTestClient.post()
@@ -178,7 +180,7 @@ class SubscriptionCallHttpTest {
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(RandomUtil.randomString(8));
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
-    mac.update(rawBody.getBytes());
+    mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
     webTestClient.post()
@@ -207,7 +209,7 @@ class SubscriptionCallHttpTest {
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
-    mac.update("tampered message".getBytes());
+    mac.update(Bytes.concat("tampered message".getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
     webTestClient.post()
@@ -236,7 +238,7 @@ class SubscriptionCallHttpTest {
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
-    mac.update(rawBody.getBytes());
+    mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
     final CommonErrorCode errorCode = CommonErrorCode.NOT_LOGIN;
@@ -253,5 +255,34 @@ class SubscriptionCallHttpTest {
         .bodyValue(rawBody)
         .exchange()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code());
+  }
+
+  @Test
+  void validate_emptyBody() throws NoSuchAlgorithmException, InvalidKeyException {
+    final String anything = RandomUtil.randomString(8);
+    final String hello = RandomUtil.randomString(8);
+    long timestamp = Instant.now().toEpochMilli();
+    Tuple4<Openapi, ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
+    Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
+    byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
+    mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
+    mac.update(Bytes.concat(Longs.toByteArray(timestamp)));
+    String signature = Base64.getEncoder().encodeToString(mac.doFinal());
+
+    String responseBody = webTestClient.get()
+        .uri(builder -> builder
+            .path(SUBSCRIPTION_CALL)
+            .queryParam("anything", anything)
+            .queryParam("hello", hello)
+            .build(dataset.getT3().getOpenapiCode())
+        )
+        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, dataset.getT4().getAccessKey())
+        .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
+        .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(String.class)
+        .returnResult().getResponseBody();
+    Assertions.assertEquals(anything + "," + hello, responseBody);
   }
 }

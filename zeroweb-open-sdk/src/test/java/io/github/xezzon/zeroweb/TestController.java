@@ -4,6 +4,8 @@ import static io.github.xezzon.zeroweb.TestApplication.SECRET_KEY;
 import static io.github.xezzon.zeroweb.ZerowebOpenConstant.DIGEST_ALGORITHM;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -14,6 +16,7 @@ import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.Assertions;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -29,7 +32,7 @@ public class TestController {
   private ObjectMapper objectMapper;
 
   @PostMapping("/test")
-  public String test(
+  public String post(
       @RequestBody byte[] body,
       @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) String accessKey,
       @RequestHeader(ZerowebOpenConstant.TIMESTAMP_HEADER) Instant timestamp,
@@ -40,9 +43,25 @@ public class TestController {
     Assertions.assertTrue(Duration.between(timestamp, Instant.now()).toMinutes() < 2);
     Mac mac = Mac.getInstance(DIGEST_ALGORITHM);
     mac.init(new SecretKeySpec(Base64.getDecoder().decode(SECRET_KEY), DIGEST_ALGORITHM));
-    mac.update(body);
+    mac.update(Bytes.concat(body, Longs.toByteArray(timestamp.toEpochMilli())));
     Assertions.assertArrayEquals(Base64.getDecoder().decode(signature), mac.doFinal());
     Entity entity = objectMapper.readValue(body, Entity.class);
     return "Hello, " + entity.name();
+  }
+
+  @GetMapping("/test")
+  public String get(
+      @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) String accessKey,
+      @RequestHeader(ZerowebOpenConstant.TIMESTAMP_HEADER) Instant timestamp,
+      @RequestHeader(ZerowebOpenConstant.SIGNATURE_HEADER) String signature
+  ) throws NoSuchAlgorithmException, InvalidKeyException {
+    Assertions.assertEquals("hello", accessKey);
+    Assertions.assertTrue(timestamp.isBefore(Instant.now()));
+    Assertions.assertTrue(Duration.between(timestamp, Instant.now()).toMinutes() < 2);
+    Mac mac = Mac.getInstance(DIGEST_ALGORITHM);
+    mac.init(new SecretKeySpec(Base64.getDecoder().decode(SECRET_KEY), DIGEST_ALGORITHM));
+    mac.update(Bytes.concat(new byte[0], Longs.toByteArray(timestamp.toEpochMilli())));
+    Assertions.assertArrayEquals(Base64.getDecoder().decode(signature), mac.doFinal());
+    return "Hello, Alice";
   }
 }
