@@ -1,11 +1,14 @@
 package io.github.xezzon.zeroweb;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import feign.Feign;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import java.security.Security;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Optional;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -13,7 +16,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 /**
  * @author xezzon
  */
-public class ZerowebOpenRequestBuilder {
+public class ZerowebOpenRequestBuilder extends Feign.Builder {
 
   static {
     Security.addProvider(new BouncyCastleProvider());
@@ -35,11 +38,7 @@ public class ZerowebOpenRequestBuilder {
   public ZerowebOpenRequestBuilder(String accessKey, String secretKey) {
     this.accessKey = accessKey;
     this.secretKey = Base64.getDecoder().decode(secretKey);
-  }
-
-  public Feign.Builder builder() {
-    return Feign.builder()
-        .requestInterceptor(new ZerowebOpenRequestInterceptor());
+    this.requestInterceptor(new ZerowebOpenRequestInterceptor());
   }
 
   /**
@@ -52,15 +51,19 @@ public class ZerowebOpenRequestBuilder {
       // 应用访问凭据
       requestTemplate.header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessKey);
       // 时间戳
-      long timestamp = Instant.now().toEpochMilli();
+      final long timestamp = Instant.now().toEpochMilli();
       requestTemplate.header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp));
       // 摘要
-      byte[] body = requestTemplate.body();
       try {
-        Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
+        final Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
         mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
-        mac.update(body);
-        String signature = Base64.getEncoder().encodeToString(mac.doFinal());
+        final byte[] input = Optional.ofNullable(requestTemplate.body())
+            .orElseGet(() -> new byte[0]);
+        final byte[] salt = Longs.toByteArray(timestamp);
+        mac.update(
+            Bytes.concat(input, salt)
+        );
+        final String signature = Base64.getEncoder().encodeToString(mac.doFinal());
         requestTemplate.header(ZerowebOpenConstant.SIGNATURE_HEADER, signature);
       } catch (Exception e) {
         throw new ZerowebOpenException(e);

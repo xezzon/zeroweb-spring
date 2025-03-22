@@ -61,6 +61,9 @@ public class SubscriptionCallController {
       @RequestHeader HttpHeaders headers,
       HttpServletRequest request
   ) {
+    if (body == null) {
+      body = new byte[0];
+    }
     Map<String, String[]> parameterMap = request.getParameterMap();
     return forward(openapiCode, body, accessKey, timestamp, signature, headers, parameterMap);
   }
@@ -78,6 +81,9 @@ public class SubscriptionCallController {
       @RequestHeader HttpHeaders headers,
       HttpServletRequest request
   ) {
+    if (body == null) {
+      body = new byte[0];
+    }
     Map<String, String[]> parameterMap = request.getParameterMap();
     return forward(openapiCode, body, accessKey, timestamp, signature, headers, parameterMap);
   }
