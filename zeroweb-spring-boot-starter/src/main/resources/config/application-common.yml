@@ -18,6 +18,10 @@ spring:
     properties:
       "[hibernate.default_batch_fetch_size]": 1000  # 处理 N+1 问题
 
+management:
+  server:
+    port: 1${server.port}
+
 logging:
   level:
     root: info
