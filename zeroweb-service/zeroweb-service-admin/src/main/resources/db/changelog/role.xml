@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="82" author="xezzon">
+    <createTable tableName="zeroweb_role">
+      <column name="id" type="VARCHAR(64)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="code" type="VARCHAR(16)" remarks="角色简码">
+        <constraints nullable="false"/>
+      </column>
+      <column name="value" type="VARCHAR(255)" remarks="角色编码">
+        <constraints nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(255)" remarks="角色名称">
+        <constraints nullable="false"/>
+      </column>
+      <column name="inheritable" type="BOOLEAN" remarks="是否允许继承">
+        <constraints nullable="false"/>
+      </column>
+      <column name="parent_id" type="VARCHAR(64)" remarks="上级角色ID">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="zeroweb_role">
+      <column name="id" value="3"/>
+      <column name="code" value="ROOT"/>
+      <column name="value" value="ROOT"/>
+      <column name="name" value="超级管理员"/>
+      <column name="inheritable" value="false"/>
+      <column name="parent_id" value="0"/>
+    </insert>
+    <insert tableName="zeroweb_role">
+      <column name="id" value="2"/>
+      <column name="code" value="SUPER"/>
+      <column name="value" value="SUPER"/>
+      <column name="name" value="应用管理员"/>
+      <column name="inheritable" value="false"/>
+      <column name="parent_id" value="0"/>
+    </insert>
+    <insert tableName="zeroweb_role">
+      <column name="id" value="1"/>
+      <column name="code" value="ADMIN"/>
+      <column name="value" value="ADMIN"/>
+      <column name="name" value="系统管理员"/>
+      <column name="inheritable" value="true"/>
+      <column name="parent_id" value="0"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>
