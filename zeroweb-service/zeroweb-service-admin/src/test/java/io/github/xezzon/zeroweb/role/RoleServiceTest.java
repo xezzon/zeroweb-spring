@@ -7,6 +7,7 @@ import io.github.xezzon.zeroweb.role.domain.Role;
 import io.github.xezzon.zeroweb.role.entity.AddRoleReq;
 import io.github.xezzon.zeroweb.role.repository.RoleRepository;
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -118,5 +119,21 @@ class RoleServiceTest {
         RepeatDataException.class,
         () -> roleService.addRole(req)
     );
+  }
+
+  @Test
+  @Transactional
+  void deleteRole_success() {
+    Role role = dataset.get(0);
+
+    roleService.deleteRole(role.getId());
+    Assertions.assertFalse(repository.existsById(role.getId()));
+
+    roleService.deleteRole("1");
+    Role child = dataset.stream()
+        .filter(Role::getInheritable)
+        .findAny().orElseThrow();
+    Assertions.assertFalse(repository.existsById(child.getId()));
+    Assertions.assertFalse(repository.existsById(child.getChildren().get(0).getId()));
   }
 }

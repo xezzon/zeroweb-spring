@@ -38,4 +38,15 @@ class RoleHttpTest {
     Assertions.assertNotNull(responseBody1);
     Assertions.assertNotNull(responseBody1.id());
   }
+
+  @Test
+  void deleteRole() {
+    webTestClient.delete()
+        .uri(builder -> builder
+            .path("/role/{id}")
+            .build(RandomUtil.randomString(8))
+        )
+        .exchange()
+        .expectStatus().isOk();
+  }
 }

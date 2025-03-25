@@ -2,17 +2,24 @@ package io.github.xezzon.zeroweb.role;
 
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.common.exception.RoleNotInheritableException;
+import io.github.xezzon.zeroweb.core.tree.ITreeService;
 import io.github.xezzon.zeroweb.role.constant.RoleConstant;
 import io.github.xezzon.zeroweb.role.domain.Role;
 import io.github.xezzon.zeroweb.role.repository.RoleRepository;
+import jakarta.transaction.Transactional;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
  * @author xezzon
  */
 @Service
-public class RoleService {
+public class RoleService implements ITreeService<Role, String> {
 
   private final RoleRepository roleRepository;
 
@@ -43,5 +50,36 @@ public class RoleService {
     }
     /* 持久化到数据库 */
     roleRepository.save(role);
+  }
+
+  void deleteRole(String id) {
+    final Optional<Role> role = roleRepository.findById(id);
+    if (role.isEmpty()) {
+      return;
+    }
+    this.deleteRole(Collections.singleton(role.get()));
+  }
+
+  /**
+   * 递归删除下级角色
+   * @param roles 下级角色
+   */
+  @Transactional
+  void deleteRole(Collection<Role> roles) {
+    if (roles.isEmpty()) {
+      return;
+    }
+    final Set<String> roleIds = roles.stream()
+        .map(Role::getId)
+        .collect(Collectors.toSet());
+    roleRepository.deleteAllByIdInBatch(roleIds);
+    // 递归删除下级
+    final List<Role> children = this.listByParentId(roleIds);
+    this.deleteRole(children);
+  }
+
+  @Override
+  public List<Role> listByParentId(Collection<String> parentIds) {
+    return roleRepository.findByParentIdIn(parentIds);
   }
 }
