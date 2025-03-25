@@ -1,5 +1,10 @@
 package io.github.xezzon.zeroweb.role;
 
+import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.role.domain.Role;
+import io.github.xezzon.zeroweb.role.entity.AddRoleReq;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,5 +20,17 @@ public class RoleController {
 
   public RoleController(RoleService roleService) {
     this.roleService = roleService;
+  }
+
+  /**
+   * 新增角色
+   * @param req 角色信息
+   * @return 角色ID
+   */
+  @PostMapping()
+  public Id addRole(@RequestBody AddRoleReq req) {
+    Role role = req.into();
+    roleService.addRole(role);
+    return Id.of(role.getId());
   }
 }

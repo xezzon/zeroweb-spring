@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.role.repository;
 
 import io.github.xezzon.zeroweb.role.domain.Role;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -12,4 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface RoleRepository extends
     JpaRepository<Role, String>,
     JpaSpecificationExecutor<Role> {
+
+  Optional<Role> findByValue(String value);
 }
