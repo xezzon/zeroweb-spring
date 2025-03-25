@@ -16,6 +16,10 @@ public enum AdminErrorCode implements IErrorCode {
    * 用户名或密码错误
    */
   INVALID_PASSWORD(CLIENT, InvalidPasswordException.class),
+  /**
+   * 角色不能继承
+   */
+  ROLE_NOT_INHERITABLE(CLIENT, RoleNotInheritableException.class),
   ;
 
   /**
