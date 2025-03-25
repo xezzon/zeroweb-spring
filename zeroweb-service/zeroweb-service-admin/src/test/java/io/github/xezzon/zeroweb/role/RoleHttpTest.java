@@ -2,6 +2,7 @@ package io.github.xezzon.zeroweb.role;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.role.domain.Role;
 import io.github.xezzon.zeroweb.role.entity.AddRoleReq;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
@@ -48,5 +49,14 @@ class RoleHttpTest {
         )
         .exchange()
         .expectStatus().isOk();
+  }
+
+  @Test
+  void listAllRole() {
+    webTestClient.get()
+        .uri("/role")
+        .exchange()
+        .expectStatus().isOk()
+        .expectBodyList(Role.class);
   }
 }
