@@ -2,6 +2,7 @@ package io.github.xezzon.zeroweb.crypto;
 
 import com.auth0.jwt.JWTCreator;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
+import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig.ZerowebJwtConfig;
 import io.github.xezzon.zeroweb.core.crypto.ASN1PublicKeyWriter;
@@ -84,6 +85,7 @@ public class JwtKeyManager implements JwtCryptoService {
     Instant exp = iat.plusSeconds(zerowebJwtConfig.getTimeout());
     jwtBuilder
         .withIssuer(zerowebJwtConfig.getIssuer())
+        .withClaim(JwtClaimWrapper.AUTHORIZED_PARTY_CLAIM, JwtClaimWrapper.AZP_VALUE)
         .withIssuedAt(iat)
         .withExpiresAt(exp)
         .withJWTId(UUID.randomUUID().toString());

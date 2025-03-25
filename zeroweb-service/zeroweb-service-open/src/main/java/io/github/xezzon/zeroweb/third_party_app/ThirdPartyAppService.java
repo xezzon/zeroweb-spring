@@ -144,6 +144,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
     Instant exp = iat.plusSeconds(zerowebJwtConfig.getTimeout());
     jwtBuilder
         .withIssuer(zerowebJwtConfig.getIssuer())
+        .withClaim(JwtClaimWrapper.AUTHORIZED_PARTY_CLAIM, JwtClaimWrapper.AZP_VALUE)
         .withIssuedAt(iat)
         .withExpiresAt(exp)
         .withJWTId(UUID.randomUUID().toString());

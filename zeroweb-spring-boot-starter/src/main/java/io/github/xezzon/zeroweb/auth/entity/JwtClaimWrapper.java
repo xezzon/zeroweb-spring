@@ -36,6 +36,14 @@ public record JwtClaimWrapper(JwtClaim value) implements
    * 权限
    */
   public static final String PERMISSION_CLAIM = "entitlements";
+  /**
+   * 授权方 - ID 令牌的发行方
+   */
+  public static final String AUTHORIZED_PARTY_CLAIM = "azp";
+  /**
+   * 授权方： ZeroWeb
+   */
+  public static final String AZP_VALUE = "zeroweb";
 
   @Override
   public JwtClaim get() {
