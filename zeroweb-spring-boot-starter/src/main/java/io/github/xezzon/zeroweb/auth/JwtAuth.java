@@ -1,18 +1,15 @@
 package io.github.xezzon.zeroweb.auth;
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.util.JsonFormat;
-import io.github.xezzon.zeroweb.auth.JwtClaim.Builder;
-import io.github.xezzon.zeroweb.common.exception.InvalidSessionException;
+import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * JWT认证相关
@@ -20,9 +17,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JwtAuth {
 
-  public static final String CLAIM_NAME = "claim";
-
   private final Algorithm algorithm;
+  private static final ThreadLocal<JwtClaim> CACHE = new InheritableThreadLocal<>();
 
   /**
    * 签发JWT时的构造器
@@ -45,34 +41,6 @@ public class JwtAuth {
   }
 
   /**
-   * @return 用户认证信息
-   */
-  public static JwtClaim loadJwtClaim() {
-    Builder builder = JwtClaim.newBuilder();
-    String json = StpUtil.getSession()
-        .getString(CLAIM_NAME);
-    try {
-      JsonFormat.parser().merge(json, builder);
-      return builder.build();
-    } catch (InvalidProtocolBufferException e) {
-      throw new InvalidSessionException(e);
-    }
-  }
-
-  /**
-   * @param claim 用户认证信息
-   */
-  public static void saveJwtClaim(JwtClaim claim) {
-    try {
-      StpUtil.getSession()
-          .set(CLAIM_NAME, JsonFormat.printer().print(claim));
-    } catch (InvalidProtocolBufferException e) {
-      StpUtil.logout();
-      throw new InvalidSessionException(e);
-    }
-  }
-
-  /**
    * 对JWT进行签名
    * @param jwtBuilder JWT构建器
    * @return JWT
@@ -89,5 +57,19 @@ public class JwtAuth {
   public DecodedJWT decode(String token) {
     JWTVerifier verifier = JWT.require(algorithm).build();
     return verifier.verify(token);
+  }
+
+  public static void save(DecodedJWT decodedJWT) {
+    JwtClaim claim = JwtClaimWrapper.from(decodedJWT).get();
+    CACHE.set(claim);
+  }
+
+  public static void clear() {
+    CACHE.remove();
+  }
+
+  @Nullable
+  public static JwtClaim get() {
+    return CACHE.get();
   }
 }

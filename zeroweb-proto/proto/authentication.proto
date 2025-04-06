@@ -9,7 +9,7 @@ option java_package = "io.github.xezzon.zeroweb.auth";
 // JWT claim
 message JwtClaim {
   // 用户ID
-  string subject = 1;
+  string sub = 1;
   // 用户名
   string preferred_username = 2;
   // 昵称

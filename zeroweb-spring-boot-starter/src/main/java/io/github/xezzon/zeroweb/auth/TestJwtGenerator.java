@@ -57,7 +57,7 @@ public class TestJwtGenerator {
 
   public static String generateJwt(String userId) {
     JwtClaim claim = JwtClaim.newBuilder()
-        .setSubject(userId)
+        .setSub(userId)
         .setPreferredUsername(RandomUtil.randomString(8))
         .setNickname(RandomUtil.randomString(8))
         .build();
@@ -71,7 +71,7 @@ public class TestJwtGenerator {
 
   public static String generateJwt4App(String appId) {
     JwtClaim claim = JwtClaim.newBuilder()
-        .setSubject(appId)
+        .setSub(appId)
         .setPreferredUsername(RandomUtil.randomString(8))
         .setNickname(RandomUtil.randomString(8))
         .build();

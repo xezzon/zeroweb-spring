@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.dev33.satoken.config.SaTokenConfig;
-import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.hutool.core.util.RandomUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -15,6 +14,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.zeroweb.InitializeDataRunner;
 import io.github.xezzon.zeroweb.auth.entity.BasicAuth;
 import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.entity.OidcToken;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.exception.AdminErrorCode;
 import io.github.xezzon.zeroweb.crypto.JwtKeyManager;
@@ -26,7 +26,6 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -77,41 +76,40 @@ class AuthnHttpTest {
     User user = dataset.getUsers().get(0);
 
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
-    SaTokenInfo responseBody = webTestClient.post()
+    OidcToken responseBody = webTestClient.post()
         .uri(uri)
         .bodyValue(basicAuth)
         .exchange()
-        .expectBody(SaTokenInfo.class)
+        .expectBody(OidcToken.class)
         .returnResult()
         .getResponseBody();
     assertNotNull(responseBody);
-    assertEquals(user.getId(), responseBody.getLoginId());
-    String tokenValue0 = responseBody.getTokenValue();
+    String tokenValue0 = responseBody.getAccessToken();
     // 再次以相同用户登录，返回相同的令牌
-    SaTokenInfo responseBody1 = webTestClient.post()
+    OidcToken responseBody1 = webTestClient.post()
         .uri(uri)
         .bodyValue(basicAuth)
-        .header(saTokenConfig.getTokenName(), tokenValue0)
+        .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
         .exchange()
-        .expectBody(SaTokenInfo.class)
+        .expectBody(OidcToken.class)
         .returnResult()
         .getResponseBody();
     assertNotNull(responseBody1);
-    assertEquals(tokenValue0, responseBody1.getTokenValue());
+    assertEquals(tokenValue0, responseBody1.getAccessToken());
     // 以不同的用户登录，返回不同的令牌
     String password2 = dataset.getPassword();
     User user2 = dataset.getUsers().get(1);
     BasicAuth basicAuth2 = new BasicAuth(user2.getUsername(), password2);
-    SaTokenInfo responseBody2 = webTestClient.post()
+    OidcToken responseBody2 = webTestClient.post()
         .uri(uri)
         .bodyValue(basicAuth2)
         .header(saTokenConfig.getTokenName(), tokenValue0)
         .exchange()
-        .expectBody(SaTokenInfo.class)
+        .expectBody(OidcToken.class)
         .returnResult()
         .getResponseBody();
     assertNotNull(responseBody2);
-    assertNotEquals(tokenValue0, responseBody2.getTokenValue());
+    assertNotEquals(tokenValue0, responseBody2.getAccessToken());
   }
 
   @Test
@@ -142,35 +140,34 @@ class AuthnHttpTest {
 
   @RepeatedTest(2)
   void signJwt() {
-    final String uri = "/auth/sso";
+    final String uri = "/auth/token";
     String password = dataset.getPassword();
     User user = dataset.getUsers().get(0);
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
-    SaTokenInfo responseBody = webTestClient.post()
+    OidcToken responseBody = webTestClient.post()
         .uri(BASIC_LOGIN_URI)
         .bodyValue(basicAuth)
         .exchange()
-        .expectBody(SaTokenInfo.class)
+        .expectBody(OidcToken.class)
         .returnResult()
         .getResponseBody();
     assertNotNull(responseBody);
 
-    SaTokenInfo responseBody1 = webTestClient.get()
+    OidcToken responseBody1 = webTestClient.get()
         .uri(uri)
-        .header(responseBody.getTokenName(), responseBody.getTokenValue())
+        .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
         .exchange()
-        .expectBody(SaTokenInfo.class)
+        .expectBody(OidcToken.class)
         .returnResult()
         .getResponseBody();
     assertNotNull(responseBody1);
-    assertEquals(HttpHeaders.AUTHORIZATION, responseBody1.getTokenName());
 
     ECPublicKey publicKey = keyManager.getPublicKey();
     JWTVerifier verifier = JWT.require(Algorithm.ECDSA256(publicKey))
         .withIssuer(zerowebConfig.getJwt().getIssuer())
         .build();
-    DecodedJWT jwt = assertDoesNotThrow(() -> verifier.verify(responseBody1.getTokenValue()));
+    DecodedJWT jwt = assertDoesNotThrow(() -> verifier.verify(responseBody1.getIdToken()));
     JwtClaim claim = JwtClaimWrapper.from(jwt).get();
-    assertEquals(user.getId(), claim.getSubject());
+    assertEquals(user.getId(), claim.getSub());
   }
 }

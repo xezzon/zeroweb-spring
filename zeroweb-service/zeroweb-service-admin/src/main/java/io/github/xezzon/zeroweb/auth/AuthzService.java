@@ -2,8 +2,10 @@ package io.github.xezzon.zeroweb.auth;
 
 import io.github.xezzon.zeroweb.auth.domain.RolePermission;
 import io.github.xezzon.zeroweb.auth.domain.RoleUser;
+import io.github.xezzon.zeroweb.auth.event.UserLoginEvent;
 import io.github.xezzon.zeroweb.auth.repository.RolePermissionRepository;
 import io.github.xezzon.zeroweb.auth.repository.RoleUserRepository;
+import io.github.xezzon.zeroweb.auth.util.SessionUtil;
 import io.github.xezzon.zeroweb.role.domain.Role;
 import io.github.xezzon.zeroweb.role.service.IRoleService4Auth;
 import io.github.xezzon.zeroweb.user.domain.User;
@@ -12,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -129,5 +132,23 @@ public class AuthzService {
         .map(RolePermission::getRoleId)
         .collect(Collectors.toSet());
     return roleService.findByIdIn(roleIds);
+  }
+
+  /**
+   * 用户登录后，将授权信息加载到会话中
+   * @param event 用户登录事件
+   */
+  @EventListener
+  protected void listen(UserLoginEvent event) {
+    List<Role> roles = this.queryRoleByUser(event.getUser().getId());
+    Set<String> roleValues = roles.stream()
+        .map(Role::getValue)
+        .collect(Collectors.toSet());
+    SessionUtil.saveRoles(roleValues);
+    Set<String> roleIds = roles.stream()
+        .map(Role::getId)
+        .collect(Collectors.toSet());
+    Set<String> permissions = this.queryPermissionByRole(roleIds);
+    SessionUtil.savePermissions(permissions);
   }
 }
