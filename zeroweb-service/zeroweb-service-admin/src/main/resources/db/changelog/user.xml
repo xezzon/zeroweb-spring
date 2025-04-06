@@ -11,7 +11,7 @@
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="username" type="VARCHAR(255)" remarks="用户名">
-        <constraints nullable="false" unique="true" uniqueConstraintName="UK_o_code"/>
+        <constraints nullable="false" unique="true" uniqueConstraintName="UK_u_code"/>
       </column>
       <column name="nickname" type="VARCHAR(255)" remarks="昵称">
         <constraints nullable="true"/>

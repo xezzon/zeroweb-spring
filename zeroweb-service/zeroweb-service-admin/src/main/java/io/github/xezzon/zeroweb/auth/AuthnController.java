@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 认证授权管理
+ * 认证管理
  * @author xezzon
  */
 @RequestMapping("/auth")
 @RestController
-public class AuthController {
+public class AuthnController {
 
-  private final AuthNService authNService;
+  private final AuthnService authnService;
 
-  public AuthController(AuthNService authNService) {
-    this.authNService = authNService;
+  public AuthnController(AuthnService authnService) {
+    this.authnService = authnService;
   }
 
   /**
@@ -31,7 +31,7 @@ public class AuthController {
    */
   @PostMapping("/login/basic")
   public SaTokenInfo basicLogin(@RequestBody BasicAuth basicAuth) {
-    authNService.basicLogin(basicAuth.username(), basicAuth.password());
+    authnService.basicLogin(basicAuth.username(), basicAuth.password());
     return StpUtil.getTokenInfo();
   }
 
@@ -41,7 +41,7 @@ public class AuthController {
    */
   @GetMapping("/sso")
   public SaTokenInfo sso() {
-    String tokenValue = authNService.signJwt();
+    String tokenValue = authnService.signJwt();
     SaTokenInfo saTokenInfo = new SaTokenInfo();
     saTokenInfo.setTokenName(HttpHeaders.AUTHORIZATION);
     saTokenInfo.setTokenValue(tokenValue);
