@@ -5,8 +5,8 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-  <changeSet id="82" author="xezzon">
-    <createTable tableName="zeroweb_role">
+  <changeSet id="82" author="xezzon" labels="0.6">
+    <createTable tableName="zeroweb_role" remarks="角色">
       <column name="id" type="VARCHAR(64)">
         <constraints primaryKey="true" nullable="false"/>
       </column>

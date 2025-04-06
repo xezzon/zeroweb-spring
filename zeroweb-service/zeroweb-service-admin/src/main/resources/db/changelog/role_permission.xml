@@ -5,20 +5,22 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-  <changeSet id="79" author="xezzon" labels="0.6">
-    <createTable tableName="zeroweb_zpp">
-      <column name="id" type="VARCHAR(64)" remarks="服务标识">
+  <changeSet id="82" author="xezzon">
+    <createTable tableName="zeroweb_role_permission" remarks="角色-权限绑定关系">
+      <column name="id" type="VARCHAR(64)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="name" type="VARCHAR(255)" remarks="服务名称">
+      <column name="role_id" type="VARCHAR(64)" remarks="角色ID">
         <constraints nullable="false"/>
       </column>
-      <column name="base_url" type="VARCHAR(2083)" remarks="服务基础访问路径">
-        <constraints nullable="false"/>
-      </column>
-      <column name="ordinal" type="INTEGER" remarks="排序号">
+      <column name="permission" type="VARCHAR(255)" remarks="接口权限编码">
         <constraints nullable="false"/>
       </column>
     </createTable>
+    <insert tableName="zeroweb_role_permission">
+      <column name="id" value="1"/>
+      <column name="role_id" value="3"/>
+      <column name="permission" value="*"/>
+    </insert>
   </changeSet>
 </databaseChangeLog>
