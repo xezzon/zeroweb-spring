@@ -5,7 +5,6 @@ import static com.google.auth.http.AuthHttpConstants.BEARER;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.exception.InvalidTokenException;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import io.github.xezzon.zeroweb.core.crypto.ASN1PublicKeyReader;
@@ -62,10 +61,9 @@ public class JwtFilter implements Filter {
         } else {
           throw new BreakException();
         }
-        JwtClaim claim = JwtClaimWrapper.from(jwt).get();
         Duration timeout = Duration.between(Instant.now(), jwt.getExpiresAtAsInstant());
-        StpUtil.login(claim.getSubject(), timeout.getSeconds());
-        JwtAuth.saveJwtClaim(claim);
+        StpUtil.login(jwt.getSubject(), timeout.getSeconds());
+        JwtAuth.save(jwt);
       }
     } catch (BreakException | ZerowebRuntimeException ignored) {
       // 流程控制中断，无需任何处理
@@ -74,6 +72,7 @@ public class JwtFilter implements Filter {
       log.error("Failed to parse the JWT", e);
     }
     chain.doFilter(request, response);
+    JwtAuth.clear();
   }
 
   public DecodedJWT validateWithPublicKey(String token, String publicKeyASN1) {
