@@ -6,6 +6,7 @@ import io.github.xezzon.zeroweb.core.tree.ITreeService;
 import io.github.xezzon.zeroweb.role.constant.RoleConstant;
 import io.github.xezzon.zeroweb.role.domain.Role;
 import io.github.xezzon.zeroweb.role.repository.RoleRepository;
+import io.github.xezzon.zeroweb.role.service.IRoleService4Auth;
 import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
  * @author xezzon
  */
 @Service
-public class RoleService implements ITreeService<Role, String> {
+public class RoleService implements ITreeService<Role, String>, IRoleService4Auth {
 
   private final RoleRepository roleRepository;
 
@@ -81,5 +82,10 @@ public class RoleService implements ITreeService<Role, String> {
   @Override
   public List<Role> listByParentId(final Collection<String> parentIds) {
     return roleRepository.findByParentIdIn(parentIds);
+  }
+
+  @Override
+  public List<Role> findByIdIn(Collection<String> roleIds) {
+    return roleRepository.findAllById(roleIds);
   }
 }
