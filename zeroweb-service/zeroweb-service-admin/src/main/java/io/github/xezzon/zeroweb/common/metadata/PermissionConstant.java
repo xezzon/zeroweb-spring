@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 接口权限
  */
-public class PermissionConstant {
+public final class PermissionConstant {
 
   static final List<MenuInfo> PERMISSIONS;
 
@@ -20,13 +20,13 @@ public class PermissionConstant {
         .filter(field -> Modifier.isStatic(field.getModifiers()))
         .filter(field -> Modifier.isPublic(field.getModifiers()))
         .map(field -> {
-          String value;
+          final String value;
           try {
             value = field.get(null).toString();
           } catch (IllegalAccessException e) {
             throw new ZerowebRuntimeException(e);
           }
-          MenuInfo resourceInfo = new MenuInfo();
+          final MenuInfo resourceInfo = new MenuInfo();
           resourceInfo.setType(MenuType.PERMISSION);
           resourceInfo.setPath(value);
           resourceInfo.setPermissions(Collections.singleton(value));
