@@ -5,6 +5,7 @@ import io.github.xezzon.zeroweb.auth.domain.RoleUser;
 import io.github.xezzon.zeroweb.role.domain.Role;
 import io.github.xezzon.zeroweb.user.domain.User;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -68,7 +69,7 @@ public class AuthzController {
    */
   @GetMapping("/role/{roleId}/permission")
   public Set<String> queryPermissionByRole(@PathVariable String roleId) {
-    throw new UnsupportedOperationException();
+    return authzService.queryPermissionByRole(Collections.singleton(roleId));
   }
 
   /**
@@ -77,7 +78,9 @@ public class AuthzController {
    */
   @PutMapping("/role/-/permission")
   public void bindPermissionToRole(@RequestBody Collection<RolePermission> rolePermissions) {
-    throw new UnsupportedOperationException();
+    for (RolePermission rolePermission : rolePermissions) {
+      authzService.bindPermissionToRole(rolePermission);
+    }
   }
 
   /**
@@ -86,7 +89,9 @@ public class AuthzController {
    */
   @DeleteMapping("/role/-/permission")
   public void releaseRolePermission(@RequestBody Collection<RolePermission> rolePermissions) {
-    throw new UnsupportedOperationException();
+    for (RolePermission rolePermission : rolePermissions) {
+      authzService.releaseRolePermission(rolePermission);
+    }
   }
 
   /**
@@ -106,6 +111,6 @@ public class AuthzController {
    */
   @GetMapping("/permission/-/role")
   public List<Role> queryRoleByPermission(@RequestParam String permission) {
-    throw new UnsupportedOperationException();
+    return authzService.queryRoleByPermission(permission);
   }
 }

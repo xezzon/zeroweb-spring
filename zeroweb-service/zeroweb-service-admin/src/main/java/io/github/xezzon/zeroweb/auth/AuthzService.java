@@ -1,5 +1,6 @@
 package io.github.xezzon.zeroweb.auth;
 
+import io.github.xezzon.zeroweb.auth.domain.RolePermission;
 import io.github.xezzon.zeroweb.auth.domain.RoleUser;
 import io.github.xezzon.zeroweb.auth.repository.RolePermissionRepository;
 import io.github.xezzon.zeroweb.auth.repository.RoleUserRepository;
@@ -7,6 +8,7 @@ import io.github.xezzon.zeroweb.role.domain.Role;
 import io.github.xezzon.zeroweb.role.service.IRoleService4Auth;
 import io.github.xezzon.zeroweb.user.domain.User;
 import io.github.xezzon.zeroweb.user.service.IUserService4Auth;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -76,6 +78,55 @@ public class AuthzService {
     List<RoleUser> roleUsers = roleUserRepository.findByUserId(userId);
     Set<String> roleIds = roleUsers.stream()
         .map(RoleUser::getRoleId)
+        .collect(Collectors.toSet());
+    return roleService.findByIdIn(roleIds);
+  }
+
+  /**
+   * 批量查询角色关联的接口权限
+   * @param roleIds 角色ID集合
+   * @return 接口权限集合
+   */
+  Set<String> queryPermissionByRole(Collection<String> roleIds) {
+    List<RolePermission> rolePermissions = rolePermissionRepository.findByRoleIdIn(roleIds);
+    return rolePermissions.stream()
+        .map(RolePermission::getPermission)
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * 将接口权限绑定到角色
+   * @param rolePermission 角色-接口权限绑定关系
+   */
+  void bindPermissionToRole(RolePermission rolePermission) {
+    boolean exist = rolePermissionRepository.existsByRoleIdAndPermission(
+        rolePermission.getRoleId(), rolePermission.getPermission()
+    );
+    if (exist) {
+      return;
+    }
+    rolePermissionRepository.save(rolePermission);
+  }
+
+  /**
+   * 解除角色与接口权限的关联
+   * @param rolePermission 角色-接口权限关系
+   */
+  void releaseRolePermission(RolePermission rolePermission) {
+    rolePermissionRepository.deleteByRoleIdAndPermission(
+        rolePermission.getRoleId(), rolePermission.getPermission()
+    );
+  }
+
+  /**
+   * 查询接口权限关联的角色集合
+   * @param permission 接口权限编码
+   * @return 角色信息集合
+   */
+  List<Role> queryRoleByPermission(String permission) {
+    List<RolePermission> rolePermissions = rolePermissionRepository.findByPermission(permission);
+    Set<String> roleIds = rolePermissions.stream()
+        .map(RolePermission::getRoleId)
         .collect(Collectors.toSet());
     return roleService.findByIdIn(roleIds);
   }
