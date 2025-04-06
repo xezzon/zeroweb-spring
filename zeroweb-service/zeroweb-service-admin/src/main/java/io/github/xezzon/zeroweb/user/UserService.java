@@ -3,6 +3,8 @@ package io.github.xezzon.zeroweb.user;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.user.domain.User;
 import io.github.xezzon.zeroweb.user.service.IUserService4Auth;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -46,5 +48,10 @@ public class UserService implements IUserService4Auth {
   @Override
   public User getUserByUsername(String username) {
     return this.getByUsername(username);
+  }
+
+  @Override
+  public List<User> findByIdIn(Collection<String> userIds) {
+    return userDAO.get().findAllById(userIds);
   }
 }

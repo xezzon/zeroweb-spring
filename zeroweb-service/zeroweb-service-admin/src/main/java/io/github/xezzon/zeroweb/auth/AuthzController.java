@@ -36,7 +36,7 @@ public class AuthzController {
    */
   @GetMapping("/role/{roleId}/user")
   public List<User> queryUserByRole(@PathVariable String roleId) {
-    throw new UnsupportedOperationException();
+    return authzService.queryUserByRole(roleId);
   }
 
   /**
@@ -45,7 +45,9 @@ public class AuthzController {
    */
   @PutMapping("/role/-/user")
   public void bindUserToRole(@RequestBody Collection<RoleUser> roleUsers) {
-    throw new UnsupportedOperationException();
+    for (RoleUser roleUser : roleUsers) {
+      authzService.bindUserToRole(roleUser);
+    }
   }
 
   /**
@@ -54,7 +56,9 @@ public class AuthzController {
    */
   @DeleteMapping("/role/-/user")
   public void releaseRoleUser(@RequestBody Collection<RoleUser> roleUsers) {
-    throw new UnsupportedOperationException();
+    for (RoleUser roleUser : roleUsers) {
+      authzService.releaseRoleUser(roleUser);
+    }
   }
 
   /**
@@ -92,7 +96,7 @@ public class AuthzController {
    */
   @GetMapping("/user/{userId}/role")
   public List<Role> queryRoleByUser(@PathVariable String userId) {
-    throw new UnsupportedOperationException();
+    return authzService.queryRoleByUser(userId);
   }
 
   /**
