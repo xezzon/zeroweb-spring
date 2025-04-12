@@ -2,6 +2,8 @@ package io.github.xezzon.zeroweb;
 
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.util.RandomUtil;
+import io.github.xezzon.zeroweb.role.domain.Role;
+import io.github.xezzon.zeroweb.role.repository.RoleRepository;
 import io.github.xezzon.zeroweb.user.domain.User;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
@@ -21,22 +23,43 @@ public class InitializeDataRunner implements CommandLineRunner {
   private String password;
   @Getter
   private final List<User> users = new ArrayList<>();
+  @Getter
+  private final List<Role> roles = new ArrayList<>();
+  @Getter
+  private final List<String> permissions = new ArrayList<>();
 
   @Resource
   private UserRepository userRepository;
+  @Resource
+  private RoleRepository roleRepository;
 
   @Override
   public void run(String... args) {
     // 密码
     this.password = RandomUtil.randomString(8);
     // 用户
-    for (int i = 0, cnt = 2; i < cnt; i++) {
+    for (int i = 0, cnt = 8; i < cnt; i++) {
       User user = new User();
       user.setUsername(RandomUtil.randomString(8));
       user.setNickname(RandomUtil.randomString(8));
       user.setCipher(BCrypt.hashpw(this.password));
-      userRepository.saveAndFlush(user);
       users.add(user);
+    }
+    userRepository.saveAllAndFlush(users);
+    // 角色
+    for (int i = 0, cnt = 8; i < cnt; i++) {
+      Role role = new Role();
+      role.setCode(RandomUtil.randomString(8));
+      role.setValue(role.getCode());
+      role.setName(RandomUtil.randomString(8));
+      role.setInheritable(RandomUtil.randomBoolean());
+      role.setParentId("1");
+      roles.add(role);
+    }
+    roleRepository.saveAllAndFlush(roles);
+    // 权限
+    for (int i = 0, cnt = 8; i < cnt; i++) {
+      permissions.add(RandomUtil.randomString(8));
     }
   }
 }

@@ -40,18 +40,18 @@ public class SessionUtil {
   public static Set<String> loadPermissions() {
     return StpUtil.getSession().getModel(PERMISSION, PermissionSet.class);
   }
+}
 
-  static class RoleSet extends HashSet<String> {
+class RoleSet extends HashSet<String> {
 
-    public RoleSet(Set<String> roles) {
-      super(roles);
-    }
+  public RoleSet(Set<String> roles) {
+    super(roles);
   }
+}
 
-  static class PermissionSet extends HashSet<String> {
+class PermissionSet extends HashSet<String> {
 
-    public PermissionSet(Set<String> permissions) {
-      super(permissions);
-    }
+  public PermissionSet(Set<String> permissions) {
+    super(permissions);
   }
 }
