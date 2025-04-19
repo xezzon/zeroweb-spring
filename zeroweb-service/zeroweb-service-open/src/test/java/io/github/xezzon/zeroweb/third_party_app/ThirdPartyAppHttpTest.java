@@ -78,7 +78,7 @@ class ThirdPartyAppHttpTest {
     AccessSecret responseBody = webTestClient.post()
         .uri(THIRD_PARTY_APP_ADD_URI)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-        .header(AUTHORIZATION, TestJwtGenerator.generateBearer())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .bodyValue(req)
         .exchange()
         .expectStatus().is2xxSuccessful()
@@ -111,7 +111,11 @@ class ThirdPartyAppHttpTest {
             .build()
         )
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-        .header(AUTHORIZATION, TestJwtGenerator.generateBearer(me))
+        .header(AUTHORIZATION, TestJwtGenerator
+            .userBuilder()
+            .userId(me)
+            .bearer()
+        )
         .exchange()
         .expectStatus().isOk()
         .expectBody(new ParameterizedTypeReference<PagedModel<ThirdPartyApp>>() {
@@ -148,7 +152,7 @@ class ThirdPartyAppHttpTest {
             .build()
         )
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-        .header(AUTHORIZATION, TestJwtGenerator.generateBearer())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(new ParameterizedTypeReference<PagedModel<ThirdPartyApp>>() {
@@ -177,7 +181,11 @@ class ThirdPartyAppHttpTest {
             .build(target.getId())
         )
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-        .header(AUTHORIZATION, TestJwtGenerator.generateBearer(target.getOwnerId()))
+        .header(AUTHORIZATION, TestJwtGenerator
+            .userBuilder()
+            .userId(target.getOwnerId())
+            .bearer()
+        )
         .exchange()
         .expectStatus().is2xxSuccessful()
         .expectBody(AccessSecret.class)

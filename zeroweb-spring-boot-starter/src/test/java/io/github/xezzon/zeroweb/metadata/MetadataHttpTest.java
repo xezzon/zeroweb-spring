@@ -26,7 +26,7 @@ class MetadataHttpTest {
   void serviceInfo() {
     ServiceInfo responseBody = webTestClient.get()
         .uri("/metadata/info.json")
-        .header(AUTHORIZATION, TestJwtGenerator.generateBearer())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectBody(ServiceInfo.class)
         .returnResult().getResponseBody();

@@ -138,6 +138,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
         .setSub(appId)
         .setPreferredUsername(thirdPartyApp.getId())
         .setNickname(thirdPartyApp.getName())
+        .addAllRoles(Collections.singleton("*"))
         .addAllEntitlements(Collections.singleton("*"))
         .build();
     Builder jwtBuilder = new JwtClaimWrapper(claim).into();

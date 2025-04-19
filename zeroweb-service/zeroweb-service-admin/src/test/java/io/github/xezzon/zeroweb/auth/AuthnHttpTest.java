@@ -1,5 +1,9 @@
 package io.github.xezzon.zeroweb.auth;
 
+import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
+import static com.google.auth.http.AuthHttpConstants.BEARER;
+import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -21,11 +25,14 @@ import io.github.xezzon.zeroweb.crypto.JwtKeyManager;
 import io.github.xezzon.zeroweb.user.domain.User;
 import jakarta.annotation.Resource;
 import java.security.interfaces.ECPublicKey;
+import java.util.Base64;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -138,6 +145,34 @@ class AuthnHttpTest {
         .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_PASSWORD.code());
   }
 
+  @Test
+  void self() {
+    final String uri = "/auth/self";
+    String password = dataset.getPassword();
+    User user = dataset.getUsers().get(0);
+    BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
+    OidcToken responseBody = webTestClient.post()
+        .uri(BASIC_LOGIN_URI)
+        .bodyValue(basicAuth)
+        .exchange()
+        .expectBody(OidcToken.class)
+        .returnResult()
+        .getResponseBody();
+    assertNotNull(responseBody);
+
+    Map<String, Object> responseBody1 = webTestClient.get()
+        .uri(uri)
+        .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
+        .exchange()
+        .expectBody(new ParameterizedTypeReference<Map<String, Object>>() {
+        })
+        .returnResult()
+        .getResponseBody();
+    assertNotNull(responseBody1);
+
+    assertEquals(user.getId(), responseBody1.get("sub"));
+  }
+
   @RepeatedTest(2)
   void signJwt() {
     final String uri = "/auth/token";
@@ -169,5 +204,51 @@ class AuthnHttpTest {
     DecodedJWT jwt = assertDoesNotThrow(() -> verifier.verify(responseBody1.getIdToken()));
     JwtClaim claim = JwtClaimWrapper.from(jwt).get();
     assertEquals(user.getId(), claim.getSub());
+  }
+
+  @Test
+  void forwardAuth() {
+    final ECPublicKey publicKey = keyManager.getPublicKey();
+    String password = dataset.getPassword();
+    User user = dataset.getUsers().get(0);
+    BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
+    OidcToken responseBody = webTestClient.post()
+        .uri(BASIC_LOGIN_URI)
+        .bodyValue(basicAuth)
+        .exchange()
+        .expectBody(OidcToken.class)
+        .returnResult()
+        .getResponseBody();
+    assertNotNull(responseBody);
+
+    webTestClient.get()
+        .uri("/auth/self")
+        .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
+        .exchange()
+        .expectHeader().value(PUBLIC_KEY_HEADER, key ->
+            assertArrayEquals(publicKey.getEncoded(), Base64.getDecoder().decode(key))
+        )
+        .expectHeader().value(AUTHORIZATION, bearer -> {
+          String jwt = bearer.substring(BEARER.length()).trim();
+          JWTVerifier verifier = JWT.require(Algorithm.ECDSA256(publicKey)).build();
+          DecodedJWT excepted = verifier.verify(responseBody.getIdToken());
+          DecodedJWT actual = verifier.verify(jwt);
+          assertEquals(excepted.getSubject(), actual.getSubject());
+        });
+
+    webTestClient.get()
+        .uri("/auth/token")
+        .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
+        .exchange()
+        .expectHeader().value(PUBLIC_KEY_HEADER, key ->
+            assertArrayEquals(publicKey.getEncoded(), Base64.getDecoder().decode(key))
+        )
+        .expectHeader().value(AUTHORIZATION, bearer -> {
+          String jwt = bearer.substring(BEARER.length()).trim();
+          JWTVerifier verifier = JWT.require(Algorithm.ECDSA256(publicKey)).build();
+          DecodedJWT excepted = verifier.verify(responseBody.getIdToken());
+          DecodedJWT actual = verifier.verify(jwt);
+          assertEquals(excepted.getSubject(), actual.getSubject());
+        });
   }
 }

@@ -1,6 +1,8 @@
 package io.github.xezzon.zeroweb.auth;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.RandomUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +18,8 @@ public class JwtAuthController {
   @SaCheckLogin
   public String getClaim() {
     JwtClaim claim = JwtAuth.get();
+    StpUtil.checkRole("test");
+    StpUtil.checkPermission(RandomUtil.randomString(8));
     return claim.getPreferredUsername();
   }
 }

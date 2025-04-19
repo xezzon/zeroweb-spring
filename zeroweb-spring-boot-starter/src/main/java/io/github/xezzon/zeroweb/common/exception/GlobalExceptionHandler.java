@@ -1,6 +1,8 @@
 package io.github.xezzon.zeroweb.common.exception;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
+import cn.dev33.satoken.exception.NotRoleException;
 import io.github.xezzon.zeroweb.common.i18n.I18nUtil;
 import io.github.xezzon.zeroweb.core.error.IErrorCode;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -160,6 +162,33 @@ public class GlobalExceptionHandler {
     IErrorCode errorCode = this.getErrorCode(e);
     // 响应码
     int responseStatus = HttpResponseStatus.UNAUTHORIZED.code();
+    // 异常名称
+    String errorName = e.getClass().getSimpleName();
+    // 异常消息
+    String errorMessage = I18nUtil.formatter(IErrorCode.I18N_BASENAME)
+        .locale(request.getLocale())
+        .format(errorCode.name(), CommonErrorCode.UNKNOWN.name());
+    // 异常明细
+    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
+    return ResponseEntity
+        .status(responseStatus)
+        .header(ERROR_CODE_HEADER, errorCode.code())
+        .body(new ErrorResponse(errorCode.code(), errorDetail));
+  }
+
+  /**
+   * 未授权
+   */
+  @ExceptionHandler({NotRoleException.class, NotPermissionException.class})
+  public ResponseEntity<ErrorResponse> handleForbiddenException(
+      RuntimeException e,
+      HttpServletRequest request
+  ) {
+    log(e, request);
+    // 错误码
+    IErrorCode errorCode = this.getErrorCode(e);
+    // 响应码
+    int responseStatus = HttpResponseStatus.FORBIDDEN.code();
     // 异常名称
     String errorName = e.getClass().getSimpleName();
     // 异常消息

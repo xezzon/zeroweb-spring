@@ -44,14 +44,14 @@ public class SessionUtil {
 
 class RoleSet extends HashSet<String> {
 
-  public RoleSet(Set<String> roles) {
+  RoleSet(Set<String> roles) {
     super(roles);
   }
 }
 
 class PermissionSet extends HashSet<String> {
 
-  public PermissionSet(Set<String> permissions) {
+  PermissionSet(Set<String> permissions) {
     super(permissions);
   }
 }
