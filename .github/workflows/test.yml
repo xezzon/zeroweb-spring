@@ -15,6 +15,7 @@ on:
 jobs:
   unit-test:
     strategy:
+      fail-fast: false
       matrix:
         db_type: [ "postgresql", "mysql" ]
     runs-on: ubuntu-24.04
