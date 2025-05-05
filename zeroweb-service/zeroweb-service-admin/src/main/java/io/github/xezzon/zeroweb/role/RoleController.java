@@ -60,4 +60,13 @@ public class RoleController {
   public void deleteRole(@PathVariable final String id) {
     roleService.deleteRole(id);
   }
+
+  /**
+   * 查询当前登陆人的角色及它们的下一级角色
+   * @return 角色列表
+   */
+  @GetMapping("/mine")
+  public List<Role> listMyRole() {
+    return roleService.listMyRole();
+  }
 }

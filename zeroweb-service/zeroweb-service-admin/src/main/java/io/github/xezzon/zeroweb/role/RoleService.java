@@ -1,5 +1,6 @@
 package io.github.xezzon.zeroweb.role;
 
+import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.common.exception.RoleNotInheritableException;
 import io.github.xezzon.zeroweb.core.tree.ITreeService;
@@ -11,6 +12,7 @@ import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -77,6 +79,22 @@ public class RoleService implements ITreeService<Role, String>, IRoleService4Aut
     // 递归删除下级
     final List<Role> children = this.listByParentId(roleIds);
     this.deleteRole(children);
+  }
+
+  List<Role> listMyRole() {
+    List<String> roleValues = StpUtil.getRoleList();
+    List<Role> roles = roleRepository.findByValueIn(roleValues);
+    Set<String> roleIds = roles.stream()
+        .map(Role::getId)
+        .collect(Collectors.toSet());
+    List<Role> children = roleRepository.findByParentIdIn(roleIds);
+    for (Role role : roles) {
+      role.setChildren(children.stream()
+          .filter(child -> Objects.equals(child.getParentId(), role.getId()))
+          .toList()
+      );
+    }
+    return roles;
   }
 
   @Override

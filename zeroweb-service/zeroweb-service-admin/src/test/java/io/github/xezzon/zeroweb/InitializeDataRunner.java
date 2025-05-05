@@ -54,9 +54,25 @@ public class InitializeDataRunner implements CommandLineRunner {
       role.setName(RandomUtil.randomString(8));
       role.setInheritable(RandomUtil.randomBoolean());
       role.setParentId("1");
+      role.setChildren(new ArrayList<>());
       roles.add(role);
     }
     roleRepository.saveAllAndFlush(roles);
+    // 二级角色
+    List<Role> inheritableRoles = roles.stream()
+        .filter(Role::getInheritable)
+        .toList();
+    for (int i = 0, cnt = 16; i < cnt; i++) {
+      Role parent = RandomUtil.randomEle(inheritableRoles);
+      Role role = new Role();
+      role.setCode(RandomUtil.randomString(8));
+      role.setValue(parent.getCode() + "/" + role.getCode());
+      role.setName(RandomUtil.randomString(8));
+      role.setInheritable(RandomUtil.randomBoolean());
+      role.setParentId(parent.getId());
+      parent.getChildren().add(role);
+      roleRepository.saveAndFlush(role);
+    }
     // 权限
     for (int i = 0, cnt = 8; i < cnt; i++) {
       permissions.add(RandomUtil.randomString(8));

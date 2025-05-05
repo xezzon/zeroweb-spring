@@ -19,4 +19,6 @@ public interface RoleRepository extends
   Optional<Role> findByValue(String value);
 
   List<Role> findByParentIdIn(Collection<String> parentIds);
+
+  List<Role> findByValueIn(Collection<String> values);
 }
