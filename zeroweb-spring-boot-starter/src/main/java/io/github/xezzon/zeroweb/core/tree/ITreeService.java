@@ -27,14 +27,14 @@ public interface ITreeService<T extends ITreeNode<T, I>, I> {
    * @param depth 查询深度
    * @return 列表
    */
-  default List<T> topDownList(Collection<I> initial, int depth) {
+  default List<T> topDownList(final Collection<I> initial, int depth) {
     if (initial.isEmpty()) {
       return Collections.emptyList();
     }
     List<T> result = new ArrayList<>();
     Collection<I> parentIds = initial;
     while (depth != 0) {
-      List<T> children = this.listByParentId(parentIds)
+      final List<T> children = this.listByParentId(parentIds)
           .stream()
           .filter(o -> result.stream().noneMatch(r -> Objects.equals(r.getId(), o.getId())))
           .toList();
@@ -56,15 +56,15 @@ public interface ITreeService<T extends ITreeNode<T, I>, I> {
    * @param depth 查询深度
    * @return 树形列表
    */
-  default List<T> topDownTree(Collection<I> initial, int depth) {
-    List<T> list = topDownList(initial, depth);
+  default List<T> topDownTree(final Collection<I> initial, final int depth) {
+    final List<T> list = topDownList(initial, depth);
     List<T> root = list.stream()
         .filter(o -> initial.contains(o.getParentId()))
         .toList();
     List<T> nodes = root;
     while (!nodes.isEmpty()) {
       for (T node : nodes) {
-        List<T> children = list.stream()
+        final List<T> children = list.stream()
             .filter(o -> Objects.equals(o.getParentId(), node.getId()))
             .toList();
         node.setChildren(children.isEmpty() ? null : children);

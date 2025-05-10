@@ -64,6 +64,43 @@ class TreeTest {
             .get(1).getId()
     );
   }
+
+  @Test
+  void topDownTreeFiniteDepth() {
+    // Test with depth 0: nodes should not have any children.
+    List<Menu> menusDepth0 = menuService.topDownTree(Collections.singleton("0"), 0);
+    menusDepth0.forEach(menu -> Assertions.assertTrue(
+        menu.getChildren() == null || menu.getChildren().isEmpty(),
+        "Expected no children at depth 0"
+    ));
+
+    // Test with depth 1: immediate children are available, but grandchildren should be pruned.
+    List<Menu> menusDepth1 = menuService.topDownTree(Collections.singleton("0"), 1);
+    menusDepth1.forEach(menu -> {
+      if (menu.getChildren() != null) {
+        menu.getChildren().forEach(child -> Assertions.assertTrue(
+            child.getChildren() == null || child.getChildren().isEmpty(),
+            "Expected no grandchildren at depth 1"
+        ));
+      }
+    });
+
+    // Test with depth 2: children and grandchildren are available, but great-grandchildren are pruned.
+    List<Menu> menusDepth2 = menuService.topDownTree(Collections.singleton("0"), 2);
+    menusDepth2.forEach(menu -> {
+      if (menu.getChildren() != null) {
+        menu.getChildren().forEach(child -> {
+          if (child.getChildren() != null) {
+            child.getChildren().forEach(grandchild -> Assertions.assertTrue(
+                grandchild.getChildren() == null || grandchild.getChildren().isEmpty(),
+                "Expected no great-grandchildren at depth 2"
+            ));
+          }
+        });
+      }
+    });
+  }
+
 }
 
 class Menu implements ITreeNode<Menu, String> {

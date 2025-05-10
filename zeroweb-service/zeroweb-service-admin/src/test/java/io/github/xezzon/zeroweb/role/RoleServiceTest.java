@@ -47,7 +47,7 @@ class RoleServiceTest {
           child.setInheritable(RandomUtil.randomBoolean());
           child.setParentId(role.getId());
           repository.save(child);
-          role.getChildren().add(role);
+          role.getChildren().add(child);
         }
       }
       dataset.add(role);

@@ -24,7 +24,7 @@ public class RoleController {
 
   private final RoleService roleService;
 
-  public RoleController(RoleService roleService) {
+  public RoleController(final RoleService roleService) {
     this.roleService = roleService;
   }
 
@@ -34,8 +34,8 @@ public class RoleController {
    * @return 角色ID
    */
   @PostMapping()
-  public Id addRole(@RequestBody AddRoleReq req) {
-    Role role = req.into();
+  public Id addRole(@RequestBody final AddRoleReq req) {
+    final Role role = req.into();
     roleService.addRole(role);
     return Id.of(role.getId());
   }
@@ -57,7 +57,7 @@ public class RoleController {
    * @param id 角色ID
    */
   @DeleteMapping("/{id}")
-  public void deleteRole(@PathVariable String id) {
+  public void deleteRole(@PathVariable final String id) {
     roleService.deleteRole(id);
   }
 }

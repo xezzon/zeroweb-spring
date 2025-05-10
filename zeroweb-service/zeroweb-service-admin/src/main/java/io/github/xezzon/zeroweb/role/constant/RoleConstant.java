@@ -3,7 +3,7 @@ package io.github.xezzon.zeroweb.role.constant;
 /**
  * @author xezzon
  */
-public class RoleConstant {
+public final class RoleConstant {
 
   /**
    * 系统管理员

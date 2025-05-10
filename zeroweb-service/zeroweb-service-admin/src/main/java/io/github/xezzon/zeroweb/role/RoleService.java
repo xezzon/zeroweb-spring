@@ -23,14 +23,14 @@ public class RoleService implements ITreeService<Role, String> {
 
   private final RoleRepository roleRepository;
 
-  public RoleService(RoleRepository roleRepository) {
+  public RoleService(final RoleRepository roleRepository) {
     this.roleRepository = roleRepository;
   }
 
   void addRole(Role role) {
     /* 前置校验校验 */
     // 校验上级角色是否存在并允许继承
-    Optional<Role> parent = roleRepository.findById(role.getParentId());
+    final Optional<Role> parent = roleRepository.findById(role.getParentId());
     if (parent.isEmpty()) {
       throw new RoleNotInheritableException();
     }
@@ -44,7 +44,7 @@ public class RoleService implements ITreeService<Role, String> {
       role.setValue(parent.get().getValue() + "/" + role.getCode());
     }
     // 校验重复
-    Optional<Role> exist = roleRepository.findByValue(role.getValue());
+    final Optional<Role> exist = roleRepository.findByValue(role.getValue());
     if (exist.isPresent()) {
       throw new RepeatDataException(role.getValue());
     }
@@ -52,7 +52,7 @@ public class RoleService implements ITreeService<Role, String> {
     roleRepository.save(role);
   }
 
-  void deleteRole(String id) {
+  void deleteRole(final String id) {
     final Optional<Role> role = roleRepository.findById(id);
     if (role.isEmpty()) {
       return;
@@ -65,7 +65,7 @@ public class RoleService implements ITreeService<Role, String> {
    * @param roles 下级角色
    */
   @Transactional
-  void deleteRole(Collection<Role> roles) {
+  void deleteRole(final Collection<Role> roles) {
     if (roles.isEmpty()) {
       return;
     }
@@ -79,7 +79,7 @@ public class RoleService implements ITreeService<Role, String> {
   }
 
   @Override
-  public List<Role> listByParentId(Collection<String> parentIds) {
+  public List<Role> listByParentId(final Collection<String> parentIds) {
     return roleRepository.findByParentIdIn(parentIds);
   }
 }
