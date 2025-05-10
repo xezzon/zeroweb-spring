@@ -1,12 +1,15 @@
 package io.github.xezzon.zeroweb.dict;
 
 
+import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
+import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.hutool.core.util.RandomUtil;
+import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
@@ -107,6 +110,8 @@ class DictHttpTest {
     Id responseBody = webTestClient.post()
         .uri(ADD_DICT_URI)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectBody(Id.class)
         .returnResult().getResponseBody();
@@ -128,6 +133,8 @@ class DictHttpTest {
     webTestClient.post()
         .uri(ADD_DICT_URI)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
@@ -146,6 +153,8 @@ class DictHttpTest {
     Id responseBody = webTestClient.post()
         .uri(ADD_DICT_URI)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectBody(Id.class)
         .returnResult().getResponseBody();
@@ -169,6 +178,8 @@ class DictHttpTest {
     webTestClient.post()
         .uri(ADD_DICT_URI)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
@@ -189,6 +200,8 @@ class DictHttpTest {
     webTestClient.put()
         .uri(MODIFY_DICT_URI)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
     Dict dict = repository.findById(target.getId()).orElseThrow();
@@ -219,6 +232,8 @@ class DictHttpTest {
     webTestClient.put()
         .uri(MODIFY_DICT_URI)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
@@ -249,6 +264,8 @@ class DictHttpTest {
             .build()
         )
         .bodyValue(List.of(dataset.get(0).getId(), dataset.get(1).getId()))
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
     Dict dict1 = repository.findById(dataset.get(0).getId()).orElseThrow();
@@ -263,6 +280,8 @@ class DictHttpTest {
             .build()
         )
         .bodyValue(List.of(dataset.get(1).getId(), dataset.get(2).getId()))
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
     Dict dict3 = repository.findById(dataset.get(1).getId()).orElseThrow();
@@ -281,6 +300,8 @@ class DictHttpTest {
     webTestClient.method(HttpMethod.DELETE)
         .uri(DELETE_DICT_URI)
         .bodyValue(List.of(dict0.getId(), dict1.getId()))
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
     assertFalse(repository.existsById(dict0.getId()));
@@ -305,6 +326,8 @@ class DictHttpTest {
             dict22.getId(),
             dict31.getId()
         ))
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
     assertFalse(repository.existsById(dict20.getId()));
@@ -362,6 +385,8 @@ class DictHttpTest {
             .queryParam("skip", skip)
             .build()
         )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(new ParameterizedTypeReference<PagedModel<Dict>>() {

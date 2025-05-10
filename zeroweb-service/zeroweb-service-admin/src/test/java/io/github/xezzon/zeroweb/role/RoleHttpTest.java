@@ -65,6 +65,8 @@ class RoleHttpTest {
     Id responseBody1 = webTestClient.post()
         .uri("/role")
         .bodyValue(req1)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(Id.class)
@@ -81,6 +83,8 @@ class RoleHttpTest {
             .path("/role/{id}")
             .build(role.getId())
         )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
     Assertions.assertEquals(excepted - 1, roleRepository.count());
@@ -90,6 +94,8 @@ class RoleHttpTest {
   void listAllRole() {
     List<Role> responseBody = webTestClient.get()
         .uri("/role")
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBodyList(Role.class)

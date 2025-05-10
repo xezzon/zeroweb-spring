@@ -1,8 +1,12 @@
 package io.github.xezzon.zeroweb.auth;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.zeroweb.auth.domain.RolePermission;
 import io.github.xezzon.zeroweb.auth.domain.RoleUser;
+import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.role.domain.Role;
+import io.github.xezzon.zeroweb.role.service.IRoleService4Auth;
 import io.github.xezzon.zeroweb.user.domain.User;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,9 +29,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthzController {
 
   private final AuthzService authzService;
+  private final IRoleService4Auth roleService;
 
-  public AuthzController(AuthzService authzService) {
+  public AuthzController(AuthzService authzService, IRoleService4Auth roleService) {
     this.authzService = authzService;
+    this.roleService = roleService;
   }
 
   /**
@@ -37,6 +43,10 @@ public class AuthzController {
    */
   @GetMapping("/role/{roleId}/user")
   public List<User> queryUserByRole(@PathVariable String roleId) {
+    // 当前用户的角色是该角色的上级角色，或者有相应的读取权限
+    if (!StpUtil.hasPermission(PermissionConstant.AUTHZ_READ)) {
+      authzService.checkParentRole(roleId);
+    }
     return authzService.queryUserByRole(roleId);
   }
 
@@ -69,6 +79,16 @@ public class AuthzController {
    */
   @GetMapping("/role/{roleId}/permission")
   public Set<String> queryPermissionByRole(@PathVariable String roleId) {
+    // 当前用户的角色是该角色或其上级角色，或者有相应的读取权限
+    Role role = roleService.findByIdIn(Collections.singleton(roleId))
+        .stream()
+        .findAny()
+        .orElseThrow();
+    if (!StpUtil.hasPermission(PermissionConstant.AUTHZ_READ)
+        && !StpUtil.hasRole(role.getValue())
+    ) {
+      authzService.checkParentRole(roleId);
+    }
     return authzService.queryPermissionByRole(Collections.singleton(roleId));
   }
 
@@ -99,6 +119,7 @@ public class AuthzController {
    * @param userId 用户ID
    * @return 角色信息集合
    */
+  @SaCheckPermission({PermissionConstant.AUTHZ_READ})
   @GetMapping("/user/{userId}/role")
   public List<Role> queryRoleByUser(@PathVariable String userId) {
     return authzService.queryRoleByUser(userId);
@@ -109,6 +130,7 @@ public class AuthzController {
    * @param permission 接口权限编码
    * @return 角色信息集合
    */
+  @SaCheckPermission({PermissionConstant.AUTHZ_READ})
   @GetMapping("/permission/-/role")
   public List<Role> queryRoleByPermission(@RequestParam String permission) {
     return authzService.queryRoleByPermission(permission);

@@ -1,8 +1,10 @@
 package io.github.xezzon.zeroweb.dict;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.github.xezzon.tao.tree.Tree;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.dict.domain.Dict;
 import io.github.xezzon.zeroweb.dict.entity.AddDictReq;
@@ -39,6 +41,7 @@ public class DictController {
    * @param req 对于字典项，字典目、上级ID不能为空
    * @return 字典ID
    */
+  @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @PostMapping()
   public Id addDict(@RequestBody AddDictReq req) {
     Dict dict = req.into();
@@ -55,6 +58,7 @@ public class DictController {
    * 分页查询字典目列表
    * @return 字典目列表
    */
+  @SaCheckPermission({PermissionConstant.DICT_READ})
   @GetMapping()
   public Page<Dict> getDictTagList(ODataRequestParam odata) {
     return dictService.pagedList(odata.into());
@@ -75,6 +79,7 @@ public class DictController {
    * 更新字典目/字典项
    * @param req 字典
    */
+  @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @PutMapping()
   public void modifyDict(@RequestBody ModifyDictReq req) {
     Dict dict = req.into();
@@ -86,6 +91,7 @@ public class DictController {
    * @param ids 字典ID集合
    * @param enabled 更新后的字典启用状态
    */
+  @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @PutMapping("/update-status")
   public void updateDictStatus(
       @RequestBody Collection<String> ids,
@@ -98,6 +104,7 @@ public class DictController {
    * 批量删除字典目/字典项
    * @param ids 字典ID集合
    */
+  @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @DeleteMapping()
   public void removeDict(@RequestBody Collection<String> ids) {
     dictService.remove(ids);

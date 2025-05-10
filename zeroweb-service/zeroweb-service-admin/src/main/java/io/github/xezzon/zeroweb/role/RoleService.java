@@ -106,4 +106,17 @@ public class RoleService implements ITreeService<Role, String>, IRoleService4Aut
   public List<Role> findByIdIn(Collection<String> roleIds) {
     return roleRepository.findAllById(roleIds);
   }
+
+  @Override
+  public Optional<Role> findParent(String childId) {
+    return roleRepository.findById(childId)
+        .flatMap(child ->
+            roleRepository.findById(child.getParentId())
+        );
+  }
+
+  @Override
+  public List<Role> topDownList(Collection<String> initial) {
+    return ITreeService.super.topDownList(initial, -1);
+  }
 }

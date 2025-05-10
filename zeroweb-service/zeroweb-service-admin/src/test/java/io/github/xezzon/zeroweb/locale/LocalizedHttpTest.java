@@ -1,5 +1,7 @@
 package io.github.xezzon.zeroweb.locale;
 
+import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
+import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -8,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.hutool.core.util.RandomUtil;
+import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
@@ -109,6 +112,8 @@ class LocalizedHttpTest {
     Id responseBody = webTestClient.post()
         .uri(ADD_LANGUAGE_URL)
         .bodyValue(addLanguageReq)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(Id.class)
@@ -130,6 +135,8 @@ class LocalizedHttpTest {
     webTestClient.post()
         .uri(ADD_LANGUAGE_URL)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectBody()
@@ -165,6 +172,8 @@ class LocalizedHttpTest {
     webTestClient.put()
         .uri(UPDATE_LANGUAGE_URL)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
 
@@ -199,6 +208,8 @@ class LocalizedHttpTest {
     webTestClient.put()
         .uri(UPDATE_LANGUAGE_URL)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
@@ -216,6 +227,8 @@ class LocalizedHttpTest {
     webTestClient.put()
         .uri(UPDATE_LANGUAGE_URL)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
@@ -234,6 +247,8 @@ class LocalizedHttpTest {
         .uri(builder -> builder.path(DELETE_LANGUAGE_URL)
             .build(except.getId())
         )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
 
@@ -255,6 +270,8 @@ class LocalizedHttpTest {
     Id responseBody = webTestClient.post()
         .uri(ADD_I18N_MESSAGE_URL)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(Id.class)
@@ -275,6 +292,8 @@ class LocalizedHttpTest {
 
     List<String> responseBody = webTestClient.get()
         .uri(LIST_I18N_NAMESPACE_URL)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(new ParameterizedTypeReference<List<String>>() {
@@ -302,6 +321,8 @@ class LocalizedHttpTest {
             .queryParam("skip", 0)
             .build(dataset.get(0).getNamespace())
         )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(new ParameterizedTypeReference<PagedModel<I18nMessage>>() {
@@ -326,6 +347,8 @@ class LocalizedHttpTest {
     webTestClient.post()
         .uri(ADD_I18N_MESSAGE_URL)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
@@ -343,6 +366,8 @@ class LocalizedHttpTest {
     webTestClient.put()
         .uri(UPDATE_I18N_MESSAGE_URL)
         .bodyValue(except)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
     I18nMessage actual = i18nMessageRepository.findById(target.getId()).orElseThrow();
@@ -375,6 +400,8 @@ class LocalizedHttpTest {
     webTestClient.put()
         .uri(UPDATE_I18N_MESSAGE_URL)
         .bodyValue(except)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
@@ -389,6 +416,8 @@ class LocalizedHttpTest {
         .uri(builder -> builder.path(DELETE_I18N_MESSAGE_URL)
             .build(target.getId())
         )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
     assertFalse(i18nMessageRepository.existsById(target.getId()));
@@ -446,6 +475,8 @@ class LocalizedHttpTest {
     Id responseBody = webTestClient.put()
         .uri(UPSERT_TRANSLATION_URL)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(Id.class)
@@ -469,6 +500,8 @@ class LocalizedHttpTest {
     Id responseBody = webTestClient.put()
         .uri(UPSERT_TRANSLATION_URL)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(Id.class)
@@ -493,6 +526,8 @@ class LocalizedHttpTest {
     webTestClient.put()
         .uri(UPSERT_TRANSLATION_URL)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
@@ -512,6 +547,8 @@ class LocalizedHttpTest {
     webTestClient.put()
         .uri(UPSERT_TRANSLATION_URL)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
@@ -531,6 +568,8 @@ class LocalizedHttpTest {
     webTestClient.put()
         .uri(UPSERT_TRANSLATION_URL)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());

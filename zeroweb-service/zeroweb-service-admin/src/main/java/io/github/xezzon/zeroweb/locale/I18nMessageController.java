@@ -1,6 +1,8 @@
 package io.github.xezzon.zeroweb.locale;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.locale.domain.I18nMessage;
 import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
@@ -34,6 +36,7 @@ public class I18nMessageController {
    * 新增国际化内容
    * @param req 国际化内容
    */
+  @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PostMapping()
   public Id addI18nMessage(@RequestBody final AddI18nMessageReq req) {
     final I18nMessage i18nMessage = req.into();
@@ -45,6 +48,7 @@ public class I18nMessageController {
    * 列举国际化内容命名空间
    * @return 国际化内容命名空间
    */
+  @SaCheckPermission({PermissionConstant.LOCALE_READ})
   @GetMapping()
   public List<String> listI18nNamespace() {
     return localizedService.listI18nNamespace();
@@ -56,6 +60,7 @@ public class I18nMessageController {
    * @param odata 分页查询参数
    * @return 国际化内容列表
    */
+  @SaCheckPermission({PermissionConstant.LOCALE_READ})
   @GetMapping("/{namespace}")
   public Page<I18nMessage> queryI18nMessageList(
       @PathVariable final String namespace,
@@ -68,6 +73,7 @@ public class I18nMessageController {
    * 更新国际化内容
    * @param i18nMessage 国际化内容
    */
+  @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
   public void updateI18nMessage(@RequestBody final I18nMessage i18nMessage) {
     localizedService.updateI18nMessage(i18nMessage);
@@ -77,6 +83,7 @@ public class I18nMessageController {
    * 删除国际化内容
    * @param id 国际化内容ID
    */
+  @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @DeleteMapping("/{id}")
   public void deleteI18nMessage(@PathVariable final String id) {
     localizedService.deleteI18nMessage(id);
