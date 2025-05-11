@@ -1,13 +1,20 @@
 package io.github.xezzon.zeroweb.role;
 
+import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
+import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
+
 import cn.hutool.core.util.RandomUtil;
+import io.github.xezzon.zeroweb.InitializeDataRunner;
+import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.role.domain.Role;
 import io.github.xezzon.zeroweb.role.entity.AddRoleReq;
 import io.github.xezzon.zeroweb.role.repository.RoleRepository;
 import jakarta.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +36,8 @@ class RoleHttpTest {
   private WebTestClient webTestClient;
   @Resource
   private RoleRepository roleRepository;
+  @Resource
+  private InitializeDataRunner dataset;
 
   @BeforeEach
   void setUp() {
@@ -56,6 +65,8 @@ class RoleHttpTest {
     Id responseBody1 = webTestClient.post()
         .uri("/role")
         .bodyValue(req1)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(Id.class)
@@ -72,6 +83,8 @@ class RoleHttpTest {
             .path("/role/{id}")
             .build(role.getId())
         )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
     Assertions.assertEquals(excepted - 1, roleRepository.count());
@@ -81,6 +94,8 @@ class RoleHttpTest {
   void listAllRole() {
     List<Role> responseBody = webTestClient.get()
         .uri("/role")
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBodyList(Role.class)
@@ -96,5 +111,47 @@ class RoleHttpTest {
             role.getId()
         ))
     );
+  }
+
+  @Test
+  void listMyRole() {
+    List<Role> roles = RandomUtil.randomEleList(dataset.getRoles(), 2);
+    List<String> roleValues = roles.stream()
+        .map(Role::getValue)
+        .toList();
+    List<Role> responseBody = webTestClient.get()
+        .uri("/role/mine")
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator
+            .userBuilder()
+            .roles(roleValues)
+            .bearer()
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBodyList(Role.class)
+        .returnResult().getResponseBody();
+    Assertions.assertNotNull(responseBody);
+    List<String> excepted = roles.stream()
+        .map(Role::getId)
+        .collect(Collectors.toList());
+    excepted.addAll(roles.stream()
+        .map(Role::getChildren)
+        .flatMap(Collection::stream)
+        .map(Role::getId)
+        .toList()
+    );
+    excepted.sort(String::compareTo);
+    List<String> actual = responseBody.stream()
+        .map(Role::getId)
+        .collect(Collectors.toList());
+    actual.addAll(responseBody.stream()
+        .map(Role::getChildren)
+        .flatMap(Collection::stream)
+        .map(Role::getId)
+        .toList()
+    );
+    actual.sort(String::compareTo);
+    Assertions.assertIterableEquals(excepted, actual);
   }
 }

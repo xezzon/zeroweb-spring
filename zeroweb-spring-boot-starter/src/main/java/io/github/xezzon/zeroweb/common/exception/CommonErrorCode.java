@@ -5,6 +5,8 @@ import static io.github.xezzon.zeroweb.core.error.ErrorSourceType.CLIENT;
 import static io.github.xezzon.zeroweb.core.error.ErrorSourceType.SERVER;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
+import cn.dev33.satoken.exception.NotRoleException;
 import io.github.xezzon.zeroweb.core.error.ErrorSourceType;
 import io.github.xezzon.zeroweb.core.error.IErrorCode;
 import jakarta.persistence.EntityNotFoundException;
@@ -48,6 +50,14 @@ public enum CommonErrorCode implements IErrorCode {
    * 数据权限无效
    */
   DATA_PERMISSION_FORBIDDEN(AUTHORIZATION, DataPermissionForbiddenException.class),
+  /**
+   * 用户没有指定的角色
+   */
+  NOT_ROLE(CLIENT, NotRoleException.class),
+  /**
+   * 用户没有指定的权限
+   */
+  NOT_PERMISSION(CLIENT, NotPermissionException.class),
   ;
 
   /**

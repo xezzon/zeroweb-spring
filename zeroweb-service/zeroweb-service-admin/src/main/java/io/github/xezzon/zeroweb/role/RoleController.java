@@ -1,7 +1,10 @@
 package io.github.xezzon.zeroweb.role;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.role.domain.Role;
 import io.github.xezzon.zeroweb.role.entity.AddRoleReq;
 import java.util.Collections;
@@ -33,6 +36,7 @@ public class RoleController {
    * @param req 角色信息
    * @return 角色ID
    */
+  @SaCheckPermission({PermissionConstant.ROLE_WRITE})
   @PostMapping()
   public Id addRole(@RequestBody final AddRoleReq req) {
     final Role role = req.into();
@@ -44,6 +48,7 @@ public class RoleController {
    * 查询角色列表
    * @return 角色列表（树形）
    */
+  @SaCheckPermission({PermissionConstant.ROLE_READ})
   @GetMapping()
   public List<Role> listAllRole() {
     return roleService.topDownTree(
@@ -56,8 +61,19 @@ public class RoleController {
    * 删除角色
    * @param id 角色ID
    */
+  @SaCheckPermission({PermissionConstant.ROLE_WRITE})
   @DeleteMapping("/{id}")
   public void deleteRole(@PathVariable final String id) {
     roleService.deleteRole(id);
+  }
+
+  /**
+   * 查询当前登陆人的角色及它们的下一级角色
+   * @return 角色列表
+   */
+  @SaCheckLogin
+  @GetMapping("/mine")
+  public List<Role> listMyRole() {
+    return roleService.listMyRole();
   }
 }

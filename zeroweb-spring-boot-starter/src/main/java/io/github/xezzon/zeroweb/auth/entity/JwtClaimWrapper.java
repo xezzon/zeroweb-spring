@@ -53,7 +53,7 @@ public record JwtClaimWrapper(JwtClaim value) implements
   @Override
   public Builder into() {
     return JWT.create()
-        .withSubject(this.get().getSubject())
+        .withSubject(this.get().getSub())
         .withClaim(USERNAME_CLAIM, this.get().getPreferredUsername())
         .withClaim(NICKNAME_CLAIM, this.get().getNickname())
         .withClaim(ROLES_CLAIM, this.get().getRolesList())
@@ -63,7 +63,7 @@ public record JwtClaimWrapper(JwtClaim value) implements
 
   public static JwtClaimWrapper from(DecodedJWT jwt) {
     JwtClaim claim = JwtClaim.newBuilder()
-        .setSubject(jwt.getSubject())
+        .setSub(jwt.getSubject())
         .setPreferredUsername(jwt.getClaim(USERNAME_CLAIM).asString())
         .setNickname(jwt.getClaim(NICKNAME_CLAIM).asString())
         .addAllRoles(jwt.getClaim(ROLES_CLAIM).asList(String.class))

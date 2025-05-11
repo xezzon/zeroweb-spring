@@ -4,11 +4,17 @@ import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import com.auth0.jwt.JWTCreator.Builder;
 import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.event.UserLoginEvent;
+import io.github.xezzon.zeroweb.auth.util.SessionUtil;
 import io.github.xezzon.zeroweb.common.exception.InvalidPasswordException;
 import io.github.xezzon.zeroweb.crypto.service.JwtCryptoService;
 import io.github.xezzon.zeroweb.user.domain.User;
 import io.github.xezzon.zeroweb.user.service.IUserService4Auth;
+import jakarta.annotation.Resource;
 import java.util.Objects;
+import java.util.Set;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,12 +22,17 @@ import org.springframework.stereotype.Service;
  * @author xezzon
  */
 @Service
-public class AuthNService {
+public class AuthnService {
 
   private final IUserService4Auth userService;
   private final JwtCryptoService jwtCryptoService;
+  @Resource
+  private ApplicationEventPublisher eventPublisher;
 
-  public AuthNService(IUserService4Auth userService, JwtCryptoService jwtCryptoService) {
+  public AuthnService(
+      final IUserService4Auth userService,
+      final JwtCryptoService jwtCryptoService
+  ) {
     this.userService = userService;
     this.jwtCryptoService = jwtCryptoService;
   }
@@ -35,7 +46,7 @@ public class AuthNService {
    * @throws InvalidPasswordException 用户名、密码不匹配时抛出异常
    */
   protected void basicLogin(String username, String password) {
-    User user = userService.getUserByUsername(username);
+    final User user = userService.getUserByUsername(username);
     /* 校验用户名、口令 */
     if (user == null) {
       throw new InvalidPasswordException();
@@ -45,8 +56,7 @@ public class AuthNService {
     }
     /* 检查是否已存在会话 */
     if (StpUtil.isLogin()) {
-      JwtClaim claim = JwtAuth.loadJwtClaim();
-      if (Objects.equals(claim.getSubject(), user.getId())) {
+      if (Objects.equals(StpUtil.getLoginIdAsString(), user.getId())) {
         // 原会话是同一个用户，则不作处理
         return;
       } else {
@@ -55,13 +65,24 @@ public class AuthNService {
       }
     }
     /* 写入 Session */
-    JwtClaim claim = JwtClaim.newBuilder()
-        .setSubject(user.getId())
+    StpUtil.login(user.getId());
+    eventPublisher.publishEvent(UserLoginEvent.builder()
+        .user(user)
+        .build()
+    );
+  }
+
+  protected JwtClaim getCustomClaim() {
+    final User user = SessionUtil.loadUser();
+    final Set<String> roles = SessionUtil.loadRoles();
+    final Set<String> permissions = SessionUtil.loadPermissions();
+    return JwtClaim.newBuilder()
+        .setSub(user.getId())
         .setPreferredUsername(user.getUsername())
         .setNickname(user.getNickname())
+        .addAllRoles(roles)
+        .addAllEntitlements(permissions)
         .build();
-    StpUtil.login(claim.getSubject());
-    JwtAuth.saveJwtClaim(claim);
   }
 
   /**
@@ -69,8 +90,17 @@ public class AuthNService {
    * @return 返回生成的JWT签名字符串
    */
   protected String signJwt() {
-    JwtClaim claim = JwtAuth.loadJwtClaim();
+    final JwtClaim claim = this.getCustomClaim();
     Builder jwtBuilder = new JwtClaimWrapper(claim).into();
     return jwtCryptoService.signJwt(jwtBuilder);
+  }
+
+  /**
+   * 用户登录后，将用户信息加载到会话中
+   * @param event 用户登录事件
+   */
+  @EventListener
+  protected void listen(final UserLoginEvent event) {
+    SessionUtil.saveUser(event.getUser());
   }
 }

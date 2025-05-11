@@ -135,9 +135,10 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
     /* 构造JWT */
     ThirdPartyApp thirdPartyApp = thirdPartyAppDAO.get().getReferenceById(appId);
     JwtClaim claim = JwtClaim.newBuilder()
-        .setSubject(appId)
+        .setSub(appId)
         .setPreferredUsername(thirdPartyApp.getId())
         .setNickname(thirdPartyApp.getName())
+        .addAllRoles(Collections.singleton("*"))
         .addAllEntitlements(Collections.singleton("*"))
         .build();
     Builder jwtBuilder = new JwtClaimWrapper(claim).into();

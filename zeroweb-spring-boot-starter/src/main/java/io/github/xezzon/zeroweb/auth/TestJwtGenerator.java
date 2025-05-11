@@ -3,7 +3,9 @@ package io.github.xezzon.zeroweb.auth;
 import static com.google.auth.http.AuthHttpConstants.BEARER;
 
 import cn.hutool.core.util.RandomUtil;
-import com.auth0.jwt.JWTCreator.Builder;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
+import com.auth0.jwt.algorithms.Algorithm;
 import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import java.security.KeyPair;
@@ -14,6 +16,8 @@ import java.security.interfaces.ECPublicKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -47,47 +51,75 @@ public class TestJwtGenerator {
   private TestJwtGenerator() {
   }
 
-  public static String generateBearer() {
-    return generateBearer(UUID.randomUUID().toString());
-  }
-
-  public static String generateBearer(String userId) {
-    return BEARER + " " + generateJwt(userId);
-  }
-
-  public static String generateJwt(String userId) {
-    JwtClaim claim = JwtClaim.newBuilder()
-        .setSubject(userId)
-        .setPreferredUsername(RandomUtil.randomString(8))
-        .setNickname(RandomUtil.randomString(8))
-        .build();
-    Builder jwtBuilder = new JwtClaimWrapper(claim)
-        .into()
-        .withIssuedAt(Instant.now())
-        .withExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
-        .withJWTId(UUID.randomUUID().toString());
-    return new JwtAuth(PRIVATE_KEY).sign(jwtBuilder);
-  }
-
-  public static String generateJwt4App(String appId) {
-    JwtClaim claim = JwtClaim.newBuilder()
-        .setSubject(appId)
-        .setPreferredUsername(RandomUtil.randomString(8))
-        .setNickname(RandomUtil.randomString(8))
-        .build();
-    Builder builder = new JwtClaimWrapper(claim)
-        .into()
-        .withIssuedAt(Instant.now())
-        .withExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
-        .withJWTId(UUID.randomUUID().toString());
-    return new JwtAuth(SECRET_KEY.getEncoded()).sign(builder);
-  }
-
   public static String getPublicKey() {
     return ENCODER.encodeToString(PUBLIC_KEY.getEncoded());
   }
 
   public static String getSecretKey() {
     return ENCODER.encodeToString(SECRET_KEY.getEncoded());
+  }
+
+  public static Builder userBuilder() {
+    return new Builder(PRIVATE_KEY)
+        .id(UUID.randomUUID().toString())
+        .username(RandomUtil.randomString(8))
+        .roles(Collections.singletonList("test"))
+        .permissions(Collections.singletonList("*"));
+  }
+
+  public static Builder appBuilder() {
+    return new Builder(SECRET_KEY)
+        .id(UUID.randomUUID().toString())
+        .username(RandomUtil.randomString(8))
+        .roles(Collections.singletonList("*"))
+        .permissions(Collections.singletonList("*"));
+  }
+
+  public static class Builder {
+
+    private final Algorithm algorithm;
+    private final JWTCreator.Builder jwtBuilder = JWT.create();
+
+    private Builder(ECPrivateKey privateKey) {
+      this.algorithm = Algorithm.ECDSA256(privateKey);
+    }
+
+    private Builder(SecretKey secretKey) {
+      this.algorithm = Algorithm.HMAC256(secretKey.getEncoded());
+    }
+
+    public Builder id(String id) {
+      jwtBuilder.withSubject(id);
+      return this;
+    }
+
+    public Builder username(String username) {
+      jwtBuilder.withClaim(JwtClaimWrapper.USERNAME_CLAIM, username);
+      return this;
+    }
+
+    public Builder roles(List<String> roles) {
+      jwtBuilder.withClaim(JwtClaimWrapper.ROLES_CLAIM, roles);
+      return this;
+    }
+
+    public Builder permissions(List<String> permissions) {
+      jwtBuilder.withClaim(JwtClaimWrapper.PERMISSION_CLAIM, permissions);
+      return this;
+    }
+
+    public String jwt() {
+      return jwtBuilder
+          .withClaim(JwtClaimWrapper.NICKNAME_CLAIM, RandomUtil.randomString(8))
+          .withClaim(JwtClaimWrapper.GROUPS_CLAIM, Collections.emptyList())
+          .withIssuedAt(Instant.now())
+          .withExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
+          .withJWTId(UUID.randomUUID().toString())
+          .sign(algorithm);
+    }
+
+    public String bearer() {
+      return BEARER + " " + this.jwt();
+    }
   }
 }

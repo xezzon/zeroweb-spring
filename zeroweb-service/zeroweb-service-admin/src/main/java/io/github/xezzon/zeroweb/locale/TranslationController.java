@@ -1,6 +1,8 @@
 package io.github.xezzon.zeroweb.locale;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.locale.domain.Translation;
 import io.github.xezzon.zeroweb.locale.entity.UpsertTranslationReq;
 import java.util.Map;
@@ -28,6 +30,7 @@ public class TranslationController {
    * 新增/更新 国际化文本
    * @param req 国际化文本
    */
+  @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
   public Id upsertTranslation(@RequestBody final UpsertTranslationReq req) {
     final Translation translation = req.into();

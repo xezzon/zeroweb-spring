@@ -1,13 +1,11 @@
 package io.github.xezzon.zeroweb.auth;
 
 import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
-import static com.google.auth.http.AuthHttpConstants.BEARER;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.ACCESS_KEY_HEADER;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 
-import com.auth0.jwt.JWT;
-import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
+import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import jakarta.annotation.Resource;
 import java.util.UUID;
@@ -31,9 +29,11 @@ class JwtAuthTest {
   @Test
   void login() {
     String userId = UUID.randomUUID().toString();
-    String encodedJwt = TestJwtGenerator.generateJwt(userId);
-    String username = JWT.decode(encodedJwt).getClaim(JwtClaimWrapper.USERNAME_CLAIM).asString();
-    String bearer = BEARER + " " + encodedJwt;
+    String username = RandomUtil.randomString(8);
+    String bearer = TestJwtGenerator.userBuilder()
+        .id(userId)
+        .username(username)
+        .bearer();
     String responseBody = webTestClient.get()
         .uri("/jwt")
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
@@ -50,7 +50,7 @@ class JwtAuthTest {
     CommonErrorCode errorCode = CommonErrorCode.NOT_LOGIN;
     webTestClient.get()
         .uri("/jwt")
-        .header(AUTHORIZATION, TestJwtGenerator.generateBearer())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isUnauthorized()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code());
@@ -58,10 +58,10 @@ class JwtAuthTest {
 
   @Test
   void accessKey() {
-    String appId = UUID.randomUUID().toString();
-    String encodedJwt = TestJwtGenerator.generateJwt4App(appId);
-    String username = JWT.decode(encodedJwt).getClaim(JwtClaimWrapper.USERNAME_CLAIM).asString();
-    String bearer = BEARER + " " + encodedJwt;
+    String username = RandomUtil.randomString(8);
+    String bearer = TestJwtGenerator.appBuilder()
+        .username(username)
+        .bearer();
     String responseBody = webTestClient.get()
         .uri("/jwt")
         .header(ACCESS_KEY_HEADER, TestJwtGenerator.getSecretKey())

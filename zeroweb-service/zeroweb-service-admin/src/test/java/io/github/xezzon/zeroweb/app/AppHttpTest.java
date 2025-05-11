@@ -1,5 +1,7 @@
 package io.github.xezzon.zeroweb.app;
 
+import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
+import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -10,6 +12,7 @@ import io.github.xezzon.zeroweb.app.domain.AddAppReq;
 import io.github.xezzon.zeroweb.app.domain.App;
 import io.github.xezzon.zeroweb.app.domain.UpdateAppReq;
 import io.github.xezzon.zeroweb.app.repository.AppRepository;
+import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import jakarta.annotation.Resource;
@@ -67,6 +70,8 @@ class AppHttpTest {
     Id responseBody = webTestClient.post()
         .uri(ADD_APP_URI)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(Id.class)
@@ -93,6 +98,8 @@ class AppHttpTest {
     webTestClient.post()
         .uri(ADD_APP_URI)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest();
   }
@@ -131,6 +138,8 @@ class AppHttpTest {
     webTestClient.put()
         .uri(UPDATE_APP_URI)
         .bodyValue(req)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
   }
@@ -151,6 +160,8 @@ class AppHttpTest {
     webTestClient.put()
         .uri(UPDATE_APP_URI)
         .bodyValue(invalidUrlReq)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest();
   }
@@ -170,6 +181,8 @@ class AppHttpTest {
     webTestClient.put()
         .uri(UPDATE_APP_URI)
         .bodyValue(nonExistentReq)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
@@ -192,6 +205,8 @@ class AppHttpTest {
     webTestClient.put()
         .uri(UPDATE_APP_URI)
         .bodyValue(nullOptionalReq)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.ARGUMENT_NOT_VALID.code());
@@ -213,6 +228,8 @@ class AppHttpTest {
         .forEach(o -> webTestClient.put()
             .uri(UPDATE_APP_URI)
             .bodyValue(o)
+            .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+            .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
             .exchange()
             .expectStatus().isOk()
         );
@@ -228,6 +245,8 @@ class AppHttpTest {
     // Act & Assert
     webTestClient.delete()
         .uri(uri -> uri.path(DELETE_APP_URI).build(id))
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
 

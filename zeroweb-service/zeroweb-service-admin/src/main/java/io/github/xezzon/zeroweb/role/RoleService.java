@@ -1,15 +1,18 @@
 package io.github.xezzon.zeroweb.role;
 
+import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.common.exception.RoleNotInheritableException;
 import io.github.xezzon.zeroweb.core.tree.ITreeService;
 import io.github.xezzon.zeroweb.role.constant.RoleConstant;
 import io.github.xezzon.zeroweb.role.domain.Role;
 import io.github.xezzon.zeroweb.role.repository.RoleRepository;
+import io.github.xezzon.zeroweb.role.service.IRoleService4Auth;
 import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,7 +22,7 @@ import org.springframework.stereotype.Service;
  * @author xezzon
  */
 @Service
-public class RoleService implements ITreeService<Role, String> {
+public class RoleService implements ITreeService<Role, String>, IRoleService4Auth {
 
   private final RoleRepository roleRepository;
 
@@ -78,8 +81,42 @@ public class RoleService implements ITreeService<Role, String> {
     this.deleteRole(children);
   }
 
+  List<Role> listMyRole() {
+    final List<String> roleValues = StpUtil.getRoleList();
+    List<Role> roles = roleRepository.findByValueIn(roleValues);
+    final Set<String> roleIds = roles.stream()
+        .map(Role::getId)
+        .collect(Collectors.toSet());
+    final List<Role> children = roleRepository.findByParentIdIn(roleIds);
+    for (Role role : roles) {
+      role.setChildren(children.stream()
+          .filter(child -> Objects.equals(child.getParentId(), role.getId()))
+          .toList()
+      );
+    }
+    return roles;
+  }
+
   @Override
   public List<Role> listByParentId(final Collection<String> parentIds) {
     return roleRepository.findByParentIdIn(parentIds);
+  }
+
+  @Override
+  public List<Role> findByIdIn(final Collection<String> roleIds) {
+    return roleRepository.findAllById(roleIds);
+  }
+
+  @Override
+  public Optional<Role> findParent(final String childId) {
+    return roleRepository.findById(childId)
+        .flatMap(child ->
+            roleRepository.findById(child.getParentId())
+        );
+  }
+
+  @Override
+  public List<Role> topDownList(final Collection<String> initial) {
+    return ITreeService.super.topDownList(initial, -1);
   }
 }

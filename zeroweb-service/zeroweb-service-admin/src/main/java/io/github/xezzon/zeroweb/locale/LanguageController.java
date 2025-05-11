@@ -1,6 +1,8 @@
 package io.github.xezzon.zeroweb.locale;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.locale.domain.Language;
 import io.github.xezzon.zeroweb.locale.entity.AddLanguageReq;
 import io.github.xezzon.zeroweb.locale.entity.ModifyLanguageReq;
@@ -32,6 +34,7 @@ public class LanguageController {
    * 新增语言
    * @param req 语言
    */
+  @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PostMapping()
   public Id addLanguage(@RequestBody final AddLanguageReq req) {
     final Language language = req.into();
@@ -52,6 +55,7 @@ public class LanguageController {
    * 更新语言
    * @param req 语言
    */
+  @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
   public void updateLanguage(@RequestBody final ModifyLanguageReq req) {
     final Language language = req.into();
@@ -62,6 +66,7 @@ public class LanguageController {
    * 删除语言
    * @param id 语言ID
    */
+  @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @DeleteMapping("/{id}")
   public void deleteLanguage(@PathVariable final String id) {
     localizedService.deleteLanguage(id);
