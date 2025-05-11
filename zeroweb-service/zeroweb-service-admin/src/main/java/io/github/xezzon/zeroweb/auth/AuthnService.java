@@ -29,7 +29,10 @@ public class AuthnService {
   @Resource
   private ApplicationEventPublisher eventPublisher;
 
-  public AuthnService(IUserService4Auth userService, JwtCryptoService jwtCryptoService) {
+  public AuthnService(
+      final IUserService4Auth userService,
+      final JwtCryptoService jwtCryptoService
+  ) {
     this.userService = userService;
     this.jwtCryptoService = jwtCryptoService;
   }
@@ -43,7 +46,7 @@ public class AuthnService {
    * @throws InvalidPasswordException 用户名、密码不匹配时抛出异常
    */
   protected void basicLogin(String username, String password) {
-    User user = userService.getUserByUsername(username);
+    final User user = userService.getUserByUsername(username);
     /* 校验用户名、口令 */
     if (user == null) {
       throw new InvalidPasswordException();
@@ -70,9 +73,9 @@ public class AuthnService {
   }
 
   protected JwtClaim getCustomClaim() {
-    User user = SessionUtil.loadUser();
-    Set<String> roles = SessionUtil.loadRoles();
-    Set<String> permissions = SessionUtil.loadPermissions();
+    final User user = SessionUtil.loadUser();
+    final Set<String> roles = SessionUtil.loadRoles();
+    final Set<String> permissions = SessionUtil.loadPermissions();
     return JwtClaim.newBuilder()
         .setSub(user.getId())
         .setPreferredUsername(user.getUsername())
@@ -87,7 +90,7 @@ public class AuthnService {
    * @return 返回生成的JWT签名字符串
    */
   protected String signJwt() {
-    JwtClaim claim = this.getCustomClaim();
+    final JwtClaim claim = this.getCustomClaim();
     Builder jwtBuilder = new JwtClaimWrapper(claim).into();
     return jwtCryptoService.signJwt(jwtBuilder);
   }
@@ -97,7 +100,7 @@ public class AuthnService {
    * @param event 用户登录事件
    */
   @EventListener
-  protected void listen(UserLoginEvent event) {
+  protected void listen(final UserLoginEvent event) {
     SessionUtil.saveUser(event.getUser());
   }
 }

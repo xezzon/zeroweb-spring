@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthzService {
@@ -32,10 +33,10 @@ public class AuthzService {
   private final IRoleService4Auth roleService;
 
   public AuthzService(
-      RoleUserRepository roleUserRepository,
-      RolePermissionRepository rolePermissionRepository,
-      IUserService4Auth userService,
-      IRoleService4Auth roleService
+      final RoleUserRepository roleUserRepository,
+      final RolePermissionRepository rolePermissionRepository,
+      final IUserService4Auth userService,
+      final IRoleService4Auth roleService
   ) {
     this.roleUserRepository = roleUserRepository;
     this.rolePermissionRepository = rolePermissionRepository;
@@ -48,9 +49,9 @@ public class AuthzService {
    * @param roleId 角色ID
    * @return 用户信息列表
    */
-  List<User> queryUserByRole(String roleId) {
-    List<RoleUser> roleUsers = roleUserRepository.findByRoleId(roleId);
-    Set<String> userIds = roleUsers.stream()
+  List<User> queryUserByRole(final String roleId) {
+    final List<RoleUser> roleUsers = roleUserRepository.findByRoleId(roleId);
+    final Set<String> userIds = roleUsers.stream()
         .map(RoleUser::getUserId)
         .collect(Collectors.toSet());
     return userService.findByIdIn(userIds);
@@ -60,15 +61,15 @@ public class AuthzService {
    * 将用户绑定到角色
    * @param roleUser 用户-角色绑定关系
    */
-  void bindUserToRole(RoleUser roleUser) {
+  @Transactional
+  public void bindUserToRole(RoleUser roleUser) {
     final String roleId = roleUser.getRoleId();
     final String userId = roleUser.getUserId();
     // 当前用户的角色是该角色的上级角色，或者有对应写入权限
     if (!StpUtil.hasPermission(PermissionConstant.AUTHZ_ROLE_USER)) {
       this.checkParentRole(roleId);
     }
-    boolean exist = roleUserRepository.existsByRoleIdAndUserId(roleId, userId);
-    if (exist) {
+    if (roleUserRepository.existsByRoleIdAndUserId(roleId, userId)) {
       return;
     }
     roleUserRepository.save(roleUser);
@@ -78,7 +79,8 @@ public class AuthzService {
    * 解除用户与角色的关联
    * @param roleUser 角色ID、用户ID
    */
-  void releaseRoleUser(RoleUser roleUser) {
+  @Transactional
+  public void releaseRoleUser(RoleUser roleUser) {
     final String roleId = roleUser.getRoleId();
     final String userId = roleUser.getUserId();
     // 当前用户的角色是该角色的上级角色，或者有对应写入权限，或者用户是自己
@@ -95,9 +97,9 @@ public class AuthzService {
    * @param userId 用户ID
    * @return 角色信息集合
    */
-  List<Role> queryRoleByUser(String userId) {
-    List<RoleUser> roleUsers = roleUserRepository.findByUserId(userId);
-    Set<String> roleIds = roleUsers.stream()
+  List<Role> queryRoleByUser(final String userId) {
+    final List<RoleUser> roleUsers = roleUserRepository.findByUserId(userId);
+    final Set<String> roleIds = roleUsers.stream()
         .map(RoleUser::getRoleId)
         .collect(Collectors.toSet());
     return roleService.findByIdIn(roleIds);
@@ -108,8 +110,8 @@ public class AuthzService {
    * @param roleIds 角色ID集合
    * @return 接口权限集合
    */
-  Set<String> queryPermissionByRole(Collection<String> roleIds) {
-    List<RolePermission> rolePermissions = rolePermissionRepository.findByRoleIdIn(roleIds);
+  Set<String> queryPermissionByRole(final Collection<String> roleIds) {
+    final List<RolePermission> rolePermissions = rolePermissionRepository.findByRoleIdIn(roleIds);
     return rolePermissions.stream()
         .map(RolePermission::getPermission)
         .collect(Collectors.toSet());
@@ -119,7 +121,8 @@ public class AuthzService {
    * 将接口权限绑定到角色
    * @param rolePermission 角色-接口权限绑定关系
    */
-  void bindPermissionToRole(RolePermission rolePermission) {
+  @Transactional
+  public void bindPermissionToRole(RolePermission rolePermission) {
     final String roleId = rolePermission.getRoleId();
     final String permission = rolePermission.getPermission();
     // 当前用户是该角色的上级角色，或者有对应的写入权限
@@ -127,8 +130,8 @@ public class AuthzService {
       this.checkParentRole(roleId);
     }
     // 角色的权限不能超过其上级角色
-    Role parent = roleService.findParent(roleId).orElseThrow();
-    List<String> parentPermissions = rolePermissionRepository
+    final Role parent = roleService.findParent(roleId).orElseThrow();
+    final List<String> parentPermissions = rolePermissionRepository
         .findByRoleIdIn(Collections.singleton(parent.getId()))
         .stream()
         .map(RolePermission::getPermission)
@@ -137,8 +140,7 @@ public class AuthzService {
     if (Boolean.FALSE.equals(SaStrategy.instance.hasElement.apply(parentPermissions, permission))) {
       throw new NotPermissionException(permission);
     }
-    boolean exist = rolePermissionRepository.existsByRoleIdAndPermission(roleId, permission);
-    if (exist) {
+    if (rolePermissionRepository.existsByRoleIdAndPermission(roleId, permission)) {
       return;
     }
     rolePermissionRepository.save(rolePermission);
@@ -148,14 +150,15 @@ public class AuthzService {
    * 解除角色与接口权限的关联
    * @param rolePermission 角色-接口权限关系
    */
-  void releaseRolePermission(RolePermission rolePermission) {
+  @Transactional
+  public void releaseRolePermission(RolePermission rolePermission) {
     final String roleId = rolePermission.getRoleId();
     final String permission = rolePermission.getPermission();
     // 当前用户是该角色的上级角色，或者有对应的写入权限
     if (!StpUtil.hasPermission(PermissionConstant.AUTHZ_ROLE_PERMISSION)) {
       this.checkParentRole(roleId);
     }
-    List<Role> roles = roleService.topDownList(Collections.singleton(roleId));
+    final List<Role> roles = roleService.topDownList(Collections.singleton(roleId));
     List<String> roleIds = roles.stream()
         .map(Role::getId)
         .collect(Collectors.toList());
@@ -168,9 +171,10 @@ public class AuthzService {
    * @param permission 接口权限编码
    * @return 角色信息集合
    */
-  List<Role> queryRoleByPermission(String permission) {
-    List<RolePermission> rolePermissions = rolePermissionRepository.findByPermission(permission);
-    Set<String> roleIds = rolePermissions.stream()
+  List<Role> queryRoleByPermission(final String permission) {
+    final List<RolePermission> rolePermissions = rolePermissionRepository.findByPermission(
+        permission);
+    final Set<String> roleIds = rolePermissions.stream()
         .map(RolePermission::getRoleId)
         .collect(Collectors.toSet());
     return roleService.findByIdIn(roleIds);
@@ -181,16 +185,16 @@ public class AuthzService {
    * @param event 用户登录事件
    */
   @EventListener
-  protected void listen(UserLoginEvent event) {
-    List<Role> roles = this.queryRoleByUser(event.getUser().getId());
-    Set<String> roleValues = roles.stream()
+  protected void listen(final UserLoginEvent event) {
+    final List<Role> roles = this.queryRoleByUser(event.getUser().getId());
+    final Set<String> roleValues = roles.stream()
         .map(Role::getValue)
         .collect(Collectors.toSet());
     SessionUtil.saveRoles(roleValues);
-    Set<String> roleIds = roles.stream()
+    final Set<String> roleIds = roles.stream()
         .map(Role::getId)
         .collect(Collectors.toSet());
-    Set<String> permissions = this.queryPermissionByRole(roleIds);
+    final Set<String> permissions = this.queryPermissionByRole(roleIds);
     SessionUtil.savePermissions(permissions);
   }
 
@@ -198,8 +202,8 @@ public class AuthzService {
    * 校验当前用户是否有指定角色的上级角色
    * @param roleId 角色ID
    */
-  void checkParentRole(String roleId) {
-    Role parent = roleService.findParent(roleId).orElseThrow();
+  void checkParentRole(final String roleId) {
+    final Role parent = roleService.findParent(roleId).orElseThrow();
     StpUtil.checkRole(parent.getValue());
   }
 }

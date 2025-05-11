@@ -4,6 +4,7 @@ import static com.google.auth.http.AuthHttpConstants.BEARER;
 
 import cn.hutool.core.util.RandomUtil;
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
@@ -58,87 +59,63 @@ public class TestJwtGenerator {
     return ENCODER.encodeToString(SECRET_KEY.getEncoded());
   }
 
-  public static UserBuilder userBuilder() {
-    return new UserBuilder();
+  public static Builder userBuilder() {
+    return new Builder(PRIVATE_KEY)
+        .id(UUID.randomUUID().toString())
+        .username(RandomUtil.randomString(8))
+        .roles(Collections.singletonList("test"))
+        .permissions(Collections.singletonList("*"));
   }
 
-  public static AppBuilder appBuilder() {
-    return new AppBuilder();
+  public static Builder appBuilder() {
+    return new Builder(SECRET_KEY)
+        .id(UUID.randomUUID().toString())
+        .username(RandomUtil.randomString(8))
+        .roles(Collections.singletonList("*"))
+        .permissions(Collections.singletonList("*"));
   }
 
-  public static class UserBuilder {
+  public static class Builder {
 
-    private String userId = UUID.randomUUID().toString();
-    private String username = RandomUtil.randomString(8);
-    private List<String> roles = Collections.singletonList("test");
-    private List<String> permissions = Collections.singletonList("*");
+    private final Algorithm algorithm;
+    private final JWTCreator.Builder jwtBuilder = JWT.create();
 
-    private UserBuilder() {
+    private Builder(ECPrivateKey privateKey) {
+      this.algorithm = Algorithm.ECDSA256(privateKey);
     }
 
-    public UserBuilder userId(String userId) {
-      this.userId = userId;
+    private Builder(SecretKey secretKey) {
+      this.algorithm = Algorithm.HMAC256(secretKey.getEncoded());
+    }
+
+    public Builder id(String id) {
+      jwtBuilder.withSubject(id);
       return this;
     }
 
-    public UserBuilder username(String username) {
-      this.username = username;
+    public Builder username(String username) {
+      jwtBuilder.withClaim(JwtClaimWrapper.USERNAME_CLAIM, username);
       return this;
     }
 
-    public UserBuilder roles(List<String> roles) {
-      this.roles = roles;
+    public Builder roles(List<String> roles) {
+      jwtBuilder.withClaim(JwtClaimWrapper.ROLES_CLAIM, roles);
       return this;
     }
 
-    public UserBuilder permissions(List<String> permissions) {
-      this.permissions = permissions;
+    public Builder permissions(List<String> permissions) {
+      jwtBuilder.withClaim(JwtClaimWrapper.PERMISSION_CLAIM, permissions);
       return this;
     }
 
     public String jwt() {
-      return JWT.create()
-          .withSubject(userId)
-          .withClaim(JwtClaimWrapper.USERNAME_CLAIM, username)
+      return jwtBuilder
           .withClaim(JwtClaimWrapper.NICKNAME_CLAIM, RandomUtil.randomString(8))
-          .withClaim(JwtClaimWrapper.ROLES_CLAIM, roles)
-          .withClaim(JwtClaimWrapper.PERMISSION_CLAIM, permissions)
           .withClaim(JwtClaimWrapper.GROUPS_CLAIM, Collections.emptyList())
           .withIssuedAt(Instant.now())
           .withExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
           .withJWTId(UUID.randomUUID().toString())
-          .sign(Algorithm.ECDSA256(PRIVATE_KEY));
-    }
-
-    public String bearer() {
-      return BEARER + " " + this.jwt();
-    }
-  }
-
-  public static class AppBuilder {
-
-    private String username = RandomUtil.randomString(8);
-
-    private AppBuilder() {
-    }
-
-    public AppBuilder username(String username) {
-      this.username = username;
-      return this;
-    }
-
-    public String jwt() {
-      return JWT.create()
-          .withSubject(UUID.randomUUID().toString())
-          .withClaim(JwtClaimWrapper.USERNAME_CLAIM, username)
-          .withClaim(JwtClaimWrapper.NICKNAME_CLAIM, RandomUtil.randomString(8))
-          .withClaim(JwtClaimWrapper.ROLES_CLAIM, Collections.singletonList("*"))
-          .withClaim(JwtClaimWrapper.PERMISSION_CLAIM, Collections.singletonList("*"))
-          .withClaim(JwtClaimWrapper.GROUPS_CLAIM, Collections.emptyList())
-          .withIssuedAt(Instant.now())
-          .withExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
-          .withJWTId(UUID.randomUUID().toString())
-          .sign(Algorithm.HMAC256(SECRET_KEY.getEncoded()));
+          .sign(algorithm);
     }
 
     public String bearer() {

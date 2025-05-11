@@ -39,7 +39,7 @@ public class AuthnController {
   @Resource
   private JwtKeyManager keyManager;
 
-  public AuthnController(AuthnService authnService, ZerowebConfig zerowebConfig) {
+  public AuthnController(final AuthnService authnService, final ZerowebConfig zerowebConfig) {
     this.authnService = authnService;
     this.zerowebJwtConfig = zerowebConfig.getJwt();
   }
@@ -50,7 +50,7 @@ public class AuthnController {
    * @return 令牌（即 Session ID）
    */
   @PostMapping("/login/basic")
-  public OidcToken basicLogin(@RequestBody BasicAuth basicAuth) {
+  public OidcToken basicLogin(@RequestBody final BasicAuth basicAuth) {
     authnService.basicLogin(basicAuth.username(), basicAuth.password());
     final String accessToken = StpUtil.getTokenValue();
     final Long expiredIn = StpUtil.getSessionTimeout();

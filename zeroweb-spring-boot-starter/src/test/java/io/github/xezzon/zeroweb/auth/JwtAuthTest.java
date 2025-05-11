@@ -31,7 +31,7 @@ class JwtAuthTest {
     String userId = UUID.randomUUID().toString();
     String username = RandomUtil.randomString(8);
     String bearer = TestJwtGenerator.userBuilder()
-        .userId(userId)
+        .id(userId)
         .username(username)
         .bearer();
     String responseBody = webTestClient.get()

@@ -82,12 +82,12 @@ public class RoleService implements ITreeService<Role, String>, IRoleService4Aut
   }
 
   List<Role> listMyRole() {
-    List<String> roleValues = StpUtil.getRoleList();
+    final List<String> roleValues = StpUtil.getRoleList();
     List<Role> roles = roleRepository.findByValueIn(roleValues);
-    Set<String> roleIds = roles.stream()
+    final Set<String> roleIds = roles.stream()
         .map(Role::getId)
         .collect(Collectors.toSet());
-    List<Role> children = roleRepository.findByParentIdIn(roleIds);
+    final List<Role> children = roleRepository.findByParentIdIn(roleIds);
     for (Role role : roles) {
       role.setChildren(children.stream()
           .filter(child -> Objects.equals(child.getParentId(), role.getId()))
@@ -103,12 +103,12 @@ public class RoleService implements ITreeService<Role, String>, IRoleService4Aut
   }
 
   @Override
-  public List<Role> findByIdIn(Collection<String> roleIds) {
+  public List<Role> findByIdIn(final Collection<String> roleIds) {
     return roleRepository.findAllById(roleIds);
   }
 
   @Override
-  public Optional<Role> findParent(String childId) {
+  public Optional<Role> findParent(final String childId) {
     return roleRepository.findById(childId)
         .flatMap(child ->
             roleRepository.findById(child.getParentId())
@@ -116,7 +116,7 @@ public class RoleService implements ITreeService<Role, String>, IRoleService4Aut
   }
 
   @Override
-  public List<Role> topDownList(Collection<String> initial) {
+  public List<Role> topDownList(final Collection<String> initial) {
     return ITreeService.super.topDownList(initial, -1);
   }
 }

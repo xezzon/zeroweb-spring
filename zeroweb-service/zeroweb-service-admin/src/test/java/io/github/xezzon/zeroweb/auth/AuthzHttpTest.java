@@ -323,7 +323,7 @@ class AuthzHttpTest {
         .bodyValue(userBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.singletonList(RoleConstant.ADMIN))
             .permissions(Collections.emptyList())
             .bearer()
@@ -336,7 +336,7 @@ class AuthzHttpTest {
         .uri("/auth/role/{roleId}/user", targetRole.getId())
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.singletonList(RoleConstant.ADMIN))
             .permissions(Collections.emptyList())
             .bearer()
@@ -356,7 +356,7 @@ class AuthzHttpTest {
         .bodyValue(userBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.singletonList(RoleConstant.ADMIN))
             .permissions(Collections.emptyList())
             .bearer()
@@ -379,7 +379,7 @@ class AuthzHttpTest {
         .bodyValue(selfUnbind)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.singletonList(currentRole.getValue()))
             .permissions(Collections.emptyList())
             .bearer()
@@ -413,7 +413,7 @@ class AuthzHttpTest {
         .bodyValue(userBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.emptyList())
             .permissions(Collections.emptyList())
             .bearer()
@@ -426,7 +426,7 @@ class AuthzHttpTest {
         .uri("/auth/role/{roleId}/user", targetRole.getId())
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.emptyList())
             .permissions(Collections.emptyList())
             .bearer()
@@ -440,7 +440,7 @@ class AuthzHttpTest {
         .bodyValue(userBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.emptyList())
             .permissions(Collections.emptyList())
             .bearer()
@@ -469,10 +469,6 @@ class AuthzHttpTest {
     parentRoleUser.setRoleId(targetRole.getParentId());
     parentRoleUser.setUserId(currentUser.getId());
     roleUserRepository.save(parentRoleUser);
-    RolePermission parentRolePermission = new RolePermission();
-    parentRolePermission.setRoleId(targetRole.getParentId());
-    parentRolePermission.setPermission(permission);
-    rolePermissionRepository.save(parentRolePermission);
 
     // 测试角色-权限绑定（当前用户属于目标角色的上级角色）
     List<RolePermission> permissionBindToRole = new ArrayList<>();
@@ -481,12 +477,32 @@ class AuthzHttpTest {
     rolePermission.setPermission(permission);
     permissionBindToRole.add(rolePermission);
 
+    // 下级角色的权限不能超过上级角色
     webTestClient.put()
         .uri("/auth/role/-/permission")
         .bodyValue(permissionBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
+            .roles(Collections.singletonList(RoleConstant.ADMIN))
+            .permissions(Collections.emptyList())
+            .bearer()
+        )
+        .exchange()
+        .expectStatus().isForbidden();
+
+    // 上级角色赋予对应权限
+    RolePermission parentRolePermission = new RolePermission();
+    parentRolePermission.setRoleId(targetRole.getParentId());
+    parentRolePermission.setPermission(permission);
+    rolePermissionRepository.save(parentRolePermission);
+
+    webTestClient.put()
+        .uri("/auth/role/-/permission")
+        .bodyValue(permissionBindToRole)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
+            .id(currentUser.getId())
             .roles(Collections.singletonList(RoleConstant.ADMIN))
             .permissions(Collections.emptyList())
             .bearer()
@@ -501,11 +517,24 @@ class AuthzHttpTest {
     roleUserRepository.save(memberRoleUser);
 
     // 测试查询角色绑定的权限（当前用户属于目标角色）
+    webTestClient.get()
+        .uri("/auth/role/{roleId}/permission", targetRole.getId())
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
+            .id(currentUser.getId())
+            .roles(Collections.singletonList(targetRole.getValue()))
+            .permissions(Collections.emptyList())
+            .bearer()
+        )
+        .exchange()
+        .expectStatus().isOk();
+
+    // 测试查询角色绑定的权限（当前用户属于目标角色的上级角色）
     List<Object> responseBody1 = webTestClient.get()
         .uri("/auth/role/{roleId}/permission", targetRole.getId())
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.singletonList(RoleConstant.ADMIN))
             .permissions(Collections.emptyList())
             .bearer()
@@ -525,7 +554,7 @@ class AuthzHttpTest {
         .uri("/auth/role/{roleId}/permission", targetRole.getId())
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.singletonList(RoleConstant.ADMIN))
             .permissions(Collections.emptyList())
             .bearer()
@@ -544,7 +573,7 @@ class AuthzHttpTest {
         .bodyValue(permissionBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.singletonList(RoleConstant.ADMIN))
             .permissions(Collections.emptyList())
             .bearer()
@@ -580,7 +609,7 @@ class AuthzHttpTest {
         .bodyValue(permissionBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.emptyList())
             .permissions(Collections.emptyList())
             .bearer()
@@ -593,7 +622,7 @@ class AuthzHttpTest {
         .uri("/auth/role/{roleId}/permission", targetRole.getId())
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.emptyList())
             .permissions(Collections.emptyList())
             .bearer()
@@ -607,7 +636,7 @@ class AuthzHttpTest {
         .bodyValue(permissionBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
-            .userId(currentUser.getId())
+            .id(currentUser.getId())
             .roles(Collections.emptyList())
             .permissions(Collections.emptyList())
             .bearer()

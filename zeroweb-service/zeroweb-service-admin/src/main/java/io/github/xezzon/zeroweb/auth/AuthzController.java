@@ -31,7 +31,7 @@ public class AuthzController {
   private final AuthzService authzService;
   private final IRoleService4Auth roleService;
 
-  public AuthzController(AuthzService authzService, IRoleService4Auth roleService) {
+  public AuthzController(final AuthzService authzService, final IRoleService4Auth roleService) {
     this.authzService = authzService;
     this.roleService = roleService;
   }
@@ -42,7 +42,7 @@ public class AuthzController {
    * @return 用户信息列表
    */
   @GetMapping("/role/{roleId}/user")
-  public List<User> queryUserByRole(@PathVariable String roleId) {
+  public List<User> queryUserByRole(@PathVariable final String roleId) {
     // 当前用户的角色是该角色的上级角色，或者有相应的读取权限
     if (!StpUtil.hasPermission(PermissionConstant.AUTHZ_READ)) {
       authzService.checkParentRole(roleId);
@@ -66,8 +66,8 @@ public class AuthzController {
    * @param roleUsers 角色-用户关联
    */
   @DeleteMapping("/role/-/user")
-  public void releaseRoleUser(@RequestBody Collection<RoleUser> roleUsers) {
-    for (RoleUser roleUser : roleUsers) {
+  public void releaseRoleUser(@RequestBody final Collection<RoleUser> roleUsers) {
+    for (final RoleUser roleUser : roleUsers) {
       authzService.releaseRoleUser(roleUser);
     }
   }
@@ -78,9 +78,9 @@ public class AuthzController {
    * @return 接口权限编码
    */
   @GetMapping("/role/{roleId}/permission")
-  public Set<String> queryPermissionByRole(@PathVariable String roleId) {
+  public Set<String> queryPermissionByRole(@PathVariable final String roleId) {
     // 当前用户的角色是该角色或其上级角色，或者有相应的读取权限
-    Role role = roleService.findByIdIn(Collections.singleton(roleId))
+    final Role role = roleService.findByIdIn(Collections.singleton(roleId))
         .stream()
         .findAny()
         .orElseThrow();
@@ -121,7 +121,7 @@ public class AuthzController {
    */
   @SaCheckPermission({PermissionConstant.AUTHZ_READ})
   @GetMapping("/user/{userId}/role")
-  public List<Role> queryRoleByUser(@PathVariable String userId) {
+  public List<Role> queryRoleByUser(@PathVariable final String userId) {
     return authzService.queryRoleByUser(userId);
   }
 
@@ -132,7 +132,7 @@ public class AuthzController {
    */
   @SaCheckPermission({PermissionConstant.AUTHZ_READ})
   @GetMapping("/permission/-/role")
-  public List<Role> queryRoleByPermission(@RequestParam String permission) {
+  public List<Role> queryRoleByPermission(@RequestParam final String permission) {
     return authzService.queryRoleByPermission(permission);
   }
 }

@@ -41,17 +41,17 @@ public class UserService implements IUserService4Auth {
    * @param username 用户名
    * @return 返回与用户名对应的用户信息，若不存在则返回null
    */
-  protected User getByUsername(@NotNull String username) {
+  protected User getByUsername(@NotNull final String username) {
     return userDAO.get().findByUsername(username).orElse(null);
   }
 
   @Override
-  public User getUserByUsername(String username) {
+  public User getUserByUsername(final String username) {
     return this.getByUsername(username);
   }
 
   @Override
-  public List<User> findByIdIn(Collection<String> userIds) {
+  public List<User> findByIdIn(final Collection<String> userIds) {
     return userDAO.get().findAllById(userIds);
   }
 }

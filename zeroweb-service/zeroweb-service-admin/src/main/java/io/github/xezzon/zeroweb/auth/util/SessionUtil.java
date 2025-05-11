@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * @author xezzon
  */
-public class SessionUtil {
+public final class SessionUtil {
 
   public static final String USER = "user";
   public static final String ROLE = "roles";
@@ -17,7 +17,7 @@ public class SessionUtil {
   private SessionUtil() {
   }
 
-  public static void saveUser(User user) {
+  public static void saveUser(final User user) {
     StpUtil.getSession().set(USER, user);
   }
 
@@ -25,7 +25,7 @@ public class SessionUtil {
     return StpUtil.getSession().getModel(USER, User.class);
   }
 
-  public static void saveRoles(Set<String> roles) {
+  public static void saveRoles(final Set<String> roles) {
     StpUtil.getSession().set(ROLE, new RoleSet(roles));
   }
 
@@ -33,7 +33,7 @@ public class SessionUtil {
     return StpUtil.getSession().getModel(ROLE, RoleSet.class);
   }
 
-  public static void savePermissions(Set<String> permissions) {
+  public static void savePermissions(final Set<String> permissions) {
     StpUtil.getSession().set(PERMISSION, new PermissionSet(permissions));
   }
 
@@ -44,14 +44,14 @@ public class SessionUtil {
 
 class RoleSet extends HashSet<String> {
 
-  RoleSet(Set<String> roles) {
+  RoleSet(final Set<String> roles) {
     super(roles);
   }
 }
 
 class PermissionSet extends HashSet<String> {
 
-  PermissionSet(Set<String> permissions) {
+  PermissionSet(final Set<String> permissions) {
     super(permissions);
   }
 }
