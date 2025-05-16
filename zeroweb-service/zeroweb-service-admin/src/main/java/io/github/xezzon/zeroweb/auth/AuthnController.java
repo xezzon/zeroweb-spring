@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,9 +59,16 @@ public class AuthnController {
     return new OidcToken(accessToken, idToken, expiredIn);
   }
 
+  /**
+   * @return 当前用户的认证信息
+   */
   @SaCheckLogin
   @GetMapping("/self")
   public ResponseEntity<byte[]> self() throws InvalidProtocolBufferException {
+    if (!StpUtil.isLogin()) {
+      return ResponseEntity.status(HttpStatus.NO_CONTENT)
+          .body(new byte[0]);
+    }
     final String jwt = authnService.signJwt();
     final String publicKey = Base64.getEncoder()
         .encodeToString(keyManager.getPublicKey().getEncoded());
@@ -76,16 +84,23 @@ public class AuthnController {
         .body(payload);
   }
 
+  /**
+   * @return 用户令牌
+   */
   @SaCheckLogin
   @GetMapping("/token")
-  public OidcToken getSsoToken(HttpServletResponse response) {
+  public ResponseEntity<OidcToken> getSsoToken(HttpServletResponse response) {
+    if (!StpUtil.isLogin()) {
+      return ResponseEntity.ok(null);
+    }
     final String accessToken = StpUtil.getTokenValue();
     final String idToken = authnService.signJwt();
     final Long expiredIn = zerowebJwtConfig.getTimeout();
-    response.setHeader(PUBLIC_KEY_HEADER, Base64.getEncoder()
-        .encodeToString(keyManager.getPublicKey().getEncoded())
-    );
-    response.setHeader(AUTHORIZATION, BEARER + " " + idToken);
-    return new OidcToken(accessToken, idToken, expiredIn);
+    return ResponseEntity.ok()
+        .header(PUBLIC_KEY_HEADER, Base64.getEncoder()
+            .encodeToString(keyManager.getPublicKey().getEncoded())
+        )
+        .header(AUTHORIZATION, BEARER + " " + idToken)
+        .body(new OidcToken(accessToken, idToken, expiredIn));
   }
 }

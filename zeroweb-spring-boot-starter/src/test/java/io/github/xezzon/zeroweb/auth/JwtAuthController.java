@@ -17,9 +17,9 @@ public class JwtAuthController {
   @GetMapping()
   @SaCheckLogin
   public String getClaim() {
-    JwtClaim claim = JwtAuth.get();
+    JwtClaimWrapper claimWrapper = JwtAuth.get().orElseThrow();
     StpUtil.checkRole("test");
     StpUtil.checkPermission(RandomUtil.randomString(8));
-    return claim.getPreferredUsername();
+    return claimWrapper.getPreferredUsername();
   }
 }

@@ -6,7 +6,7 @@ option java_multiple_files = true;
 option java_outer_classname = "AuthenticationProto";
 option java_package = "io.github.xezzon.zeroweb.auth";
 
-// JWT claim
+// 自定义 JWT 载荷
 message JwtClaim {
   // 用户ID
   string sub = 1;
@@ -20,4 +20,6 @@ message JwtClaim {
   repeated string entitlements = 5;
   // 用户组
   repeated string groups = 6;
+  // 令牌有效时长
+  optional int64 exi = 7;
 }

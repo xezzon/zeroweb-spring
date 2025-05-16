@@ -6,7 +6,6 @@ import cn.hutool.core.util.RandomUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
-import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -113,6 +112,7 @@ public class TestJwtGenerator {
           .withClaim(JwtClaimWrapper.NICKNAME_CLAIM, RandomUtil.randomString(8))
           .withClaim(JwtClaimWrapper.GROUPS_CLAIM, Collections.emptyList())
           .withIssuedAt(Instant.now())
+          .withClaim(JwtClaimWrapper.TIMEOUT_CLAIM, 60 * 60)
           .withExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
           .withJWTId(UUID.randomUUID().toString())
           .sign(algorithm);

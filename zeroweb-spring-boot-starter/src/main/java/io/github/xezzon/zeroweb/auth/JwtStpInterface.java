@@ -9,23 +9,20 @@ import org.springframework.stereotype.Component;
  * @author xezzon
  */
 @Component
+@SuppressWarnings("unused")
 public class JwtStpInterface implements StpInterface {
 
   @Override
   public List<String> getPermissionList(Object loginId, String loginType) {
-    JwtClaim jwtClaim = JwtAuth.get();
-    if (jwtClaim == null) {
-      return Collections.emptyList();
-    }
-    return jwtClaim.getEntitlementsList();
+    return JwtAuth.get()
+        .map(JwtClaimWrapper::getEntitlements)
+        .orElse(Collections.emptyList());
   }
 
   @Override
   public List<String> getRoleList(Object loginId, String loginType) {
-    JwtClaim jwtClaim = JwtAuth.get();
-    if (jwtClaim == null) {
-      return Collections.emptyList();
-    }
-    return jwtClaim.getRolesList();
+    return JwtAuth.get()
+        .map(JwtClaimWrapper::getRoles)
+        .orElse(Collections.emptyList());
   }
 }

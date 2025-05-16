@@ -1,15 +1,6 @@
 package io.github.xezzon.zeroweb.auth;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import java.util.Optional;
 
 /**
  * JWT认证相关
@@ -17,59 +8,32 @@ import org.jetbrains.annotations.Nullable;
  */
 public class JwtAuth {
 
-  private final Algorithm algorithm;
-  private static final ThreadLocal<JwtClaim> CACHE = new InheritableThreadLocal<>();
+  private static final ThreadLocal<JwtClaimWrapper> CLAIM = new InheritableThreadLocal<>();
 
-  /**
-   * 签发JWT时的构造器
-   * @param privateKey 私钥
-   */
-  public JwtAuth(ECPrivateKey privateKey) {
-    this.algorithm = Algorithm.ECDSA256(privateKey);
+  private JwtAuth() {
   }
 
   /**
-   * 校验JWT时使用的构造器
-   * @param publicKey 公钥
+   * 保存 Authorization 请求头中携带的 JWT
+   * @param claimWrapper JWT对象
    */
-  public JwtAuth(ECPublicKey publicKey) {
-    this.algorithm = Algorithm.ECDSA256(publicKey);
-  }
-
-  public JwtAuth(byte[] secretKey) {
-    this.algorithm = Algorithm.HMAC256(secretKey);
+  public static void save(JwtClaimWrapper claimWrapper) {
+    CLAIM.set(claimWrapper);
   }
 
   /**
-   * 对JWT进行签名
-   * @param jwtBuilder JWT构建器
-   * @return JWT
+   * 获取当前认证信息。
+   * 如果没获取到则返回 {@link Optional#empty()}
+   * @return 当前认证信息
    */
-  public String sign(@NotNull JWTCreator.Builder jwtBuilder) {
-    return jwtBuilder.sign(algorithm);
+  public static Optional<JwtClaimWrapper> get() {
+    return Optional.ofNullable(CLAIM.get());
   }
 
   /**
-   * 校验、解码JWT令牌
-   * @param token 待解码的JWT令牌字符串
-   * @return 解码后的JwtClaim对象
+   * 清楚 ThreadLocal 防止内存泄漏
    */
-  public DecodedJWT decode(String token) {
-    JWTVerifier verifier = JWT.require(algorithm).build();
-    return verifier.verify(token);
-  }
-
-  public static void save(DecodedJWT decodedJWT) {
-    JwtClaim claim = JwtClaimWrapper.from(decodedJWT).get();
-    CACHE.set(claim);
-  }
-
   public static void clear() {
-    CACHE.remove();
-  }
-
-  @Nullable
-  public static JwtClaim get() {
-    return CACHE.get();
+    CLAIM.remove();
   }
 }
