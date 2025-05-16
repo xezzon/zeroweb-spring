@@ -4,9 +4,9 @@ import com.google.protobuf.Empty;
 import io.github.xezzon.zeroweb.common.marker.RpcTrait;
 import io.github.xezzon.zeroweb.dict.DictGrpc.DictStub;
 import io.grpc.stub.StreamObserver;
+import jakarta.annotation.Resource;
 import java.util.concurrent.CountDownLatch;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.jetbrains.annotations.TestOnly;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ public class DictRpcHandler implements DictImporter, RpcTrait {
   @TestOnly
   private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-  @GrpcClient("dict")
+  @Resource
   private DictStub dictStub;
 
   @TestOnly

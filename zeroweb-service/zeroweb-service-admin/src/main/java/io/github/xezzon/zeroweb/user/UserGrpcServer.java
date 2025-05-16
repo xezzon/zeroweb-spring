@@ -4,7 +4,7 @@ import cn.dev33.satoken.secure.BCrypt;
 import io.github.xezzon.zeroweb.user.converter.AddUserReqConverter;
 import io.github.xezzon.zeroweb.user.domain.User;
 import io.grpc.stub.StreamObserver;
-import net.devh.boot.grpc.server.service.GrpcService;
+import org.springframework.grpc.server.service.GrpcService;
 
 /**
  * 用户功能Grpc接口

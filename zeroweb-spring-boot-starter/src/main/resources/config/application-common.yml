@@ -17,6 +17,13 @@ spring:
       ddl-auto: validate
     properties:
       "[hibernate.default_batch_fetch_size]": 1000  # 处理 N+1 问题
+  grpc:
+    client:
+      channels:
+        user:
+          address: zeroweb-service-admin:9002
+        dict:
+          address: zeroweb-service-admin:9002
 
 management:
   server:

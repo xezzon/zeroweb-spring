@@ -6,7 +6,7 @@ import io.github.xezzon.zeroweb.dict.converter.DictRespConverter;
 import io.github.xezzon.zeroweb.dict.domain.Dict;
 import io.grpc.stub.StreamObserver;
 import java.util.List;
-import net.devh.boot.grpc.server.service.GrpcService;
+import org.springframework.grpc.server.service.GrpcService;
 
 /**
  * @author xezzon

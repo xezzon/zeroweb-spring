@@ -3,7 +3,22 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.github.xezzon</groupId>
+    <artifactId>zeroweb</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
   <artifactId>zeroweb-spring-boot-starter</artifactId>
+
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Spring Boot 通用配置</description>
+
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>io.github.xezzon</groupId>
@@ -26,9 +41,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>net.devh</groupId>
-      <artifactId>grpc-client-spring-boot-starter</artifactId>
-      <version>${grpc-spring-boot-starter.version}</version>
+      <groupId>org.springframework.grpc</groupId>
+      <artifactId>spring-grpc-client-spring-boot-starter</artifactId>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -72,7 +86,6 @@
     <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct-processor</artifactId>
-      <version>${mapstruct.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -96,7 +109,6 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk18on</artifactId>
-      <version>${bouncy-castle.version}</version>
     </dependency>
     <dependency>
       <groupId>com.auth0</groupId>
@@ -116,19 +128,4 @@
       <artifactId>groovy</artifactId>
     </dependency>
   </dependencies>
-
-  <name>${project.groupId}:${project.artifactId}</name>
-  <description>Spring Boot 通用配置</description>
-
-  <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
-  <parent>
-    <groupId>io.github.xezzon</groupId>
-    <artifactId>zeroweb</artifactId>
-    <version>1.0-SNAPSHOT</version>
-  </parent>
 </project>
