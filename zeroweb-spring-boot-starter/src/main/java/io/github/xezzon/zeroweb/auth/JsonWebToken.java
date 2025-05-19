@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * 签发/解码JWT
- * @author xezzo
+ * @author xezzon
  */
 public class JsonWebToken {
 

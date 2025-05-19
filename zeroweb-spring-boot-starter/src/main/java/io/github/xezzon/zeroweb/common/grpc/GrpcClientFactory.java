@@ -10,7 +10,7 @@ import org.springframework.grpc.client.GrpcChannelFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * @author xezzo
+ * @author xezzon
  */
 @Component
 public class GrpcClientFactory {

@@ -2,6 +2,7 @@ package io.github.xezzon.zeroweb.auth;
 
 import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
 import static com.google.auth.http.AuthHttpConstants.BEARER;
+import static io.github.xezzon.zeroweb.auth.JwtClaimWrapper.DEFAULT_TIMEOUT;
 
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.zeroweb.common.exception.InvalidTokenException;
@@ -36,7 +37,6 @@ public class JwtFilter implements Filter {
 
   public static final String PUBLIC_KEY_HEADER = "X-Public-Key";
   public static final String ACCESS_KEY_HEADER = "X-Access-Key";
-  private static final Long DEFAULT_TIMEOUT = 2 * 60L;
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

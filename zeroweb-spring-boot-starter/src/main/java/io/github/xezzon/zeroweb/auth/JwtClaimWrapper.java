@@ -9,7 +9,7 @@ import lombok.Getter;
 
 /**
  * JWT包装器
- * @author xezzo
+ * @author xezzon
  */
 @Getter
 public class JwtClaimWrapper {
@@ -46,6 +46,10 @@ public class JwtClaimWrapper {
    * 令牌有效时长（秒）
    */
   public static final String TIMEOUT_CLAIM = "exi";
+  /**
+   * JWT默认过期时间（秒）
+   */
+  public static final Long DEFAULT_TIMEOUT = 2 * 60L;
 
   /**
    * 认证主体ID
@@ -124,6 +128,7 @@ public class JwtClaimWrapper {
         .withClaim(GROUPS_CLAIM, Collections.emptyList())
         .withClaim(PERMISSION_CLAIM, this.entitlements)
         .withClaim(AUTHORIZED_PARTY_CLAIM, AZP_VALUE)
+        .withClaim(TIMEOUT_CLAIM, this.exi)
         ;
   }
 }
