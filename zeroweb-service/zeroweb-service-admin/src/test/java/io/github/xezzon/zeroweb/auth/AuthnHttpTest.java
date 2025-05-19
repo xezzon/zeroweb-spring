@@ -202,7 +202,7 @@ class AuthnHttpTest {
         .withIssuer(zerowebConfig.getJwt().getIssuer())
         .build();
     DecodedJWT jwt = assertDoesNotThrow(() -> verifier.verify(responseBody1.getIdToken()));
-    JwtClaimWrapper claimWrapper = new JwtClaimWrapper(jwt);
+    final JwtClaimWrapper claimWrapper = new JwtClaimWrapper(jwt);
     assertEquals(user.getId(), claimWrapper.getSub());
   }
 

@@ -37,7 +37,7 @@ public class UserSpanAttributeFilter implements Filter {
       if (StpUtil.isLogin()) {
         Span span = Span.current();
         JwtAuth.get().ifPresent(claimWrapper -> {
-          span.setAttribute(USER_ID, StpUtil.getLoginIdAsString());
+          span.setAttribute(USER_ID, claimWrapper.getSub());
           span.setAttribute(USER_NAME, claimWrapper.getPreferredUsername());
           span.setAttribute(AttributeKey.stringArrayKey(USER_ROLES), claimWrapper.getRoles());
           span.setAttribute(USER_FULL_NAME, claimWrapper.getNickname());

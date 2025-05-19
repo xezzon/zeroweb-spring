@@ -93,7 +93,7 @@ public class AuthnService {
    */
   protected String signJwt() {
     final JwtClaim claim = this.getCustomClaim();
-    JwtClaimWrapper jwtBuilder = new JwtClaimWrapper(claim);
+    final JwtClaimWrapper jwtBuilder = new JwtClaimWrapper(claim);
     return jwtCryptoService.signJwt(jwtBuilder);
   }
 

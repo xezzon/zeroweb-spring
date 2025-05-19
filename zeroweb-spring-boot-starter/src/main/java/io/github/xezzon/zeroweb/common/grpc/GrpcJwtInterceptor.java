@@ -45,18 +45,18 @@ public class GrpcJwtInterceptor implements ServerInterceptor, ClientInterceptor 
    */
   @Override
   public <ReqT, RespT> Listener<ReqT> interceptCall(
-      ServerCall<ReqT, RespT> call,
-      Metadata requestHeaders,
-      ServerCallHandler<ReqT, RespT> next
+      final ServerCall<ReqT, RespT> call,
+      final Metadata requestHeaders,
+      final ServerCallHandler<ReqT, RespT> next
   ) {
     try {
-      byte[] jwtClaimBytes = requestHeaders.get(BEARER);
+      final byte[] jwtClaimBytes = requestHeaders.get(BEARER);
       if (jwtClaimBytes != null) {
-        JwtClaim claim = JwtClaim.parseFrom(jwtClaimBytes);
+        final JwtClaim claim = JwtClaim.parseFrom(jwtClaimBytes);
         JwtAuth.save(new JwtClaimWrapper(claim));
       }
     } catch (RuntimeException | InvalidProtocolBufferException e) {
-      // ignore
+      log.error("Parse JWT failed.", e);
     }
     return next.startCall(new SimpleForwardingServerCall<>(call) {
       @Override
@@ -72,9 +72,9 @@ public class GrpcJwtInterceptor implements ServerInterceptor, ClientInterceptor 
    */
   @Override
   public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(
-      MethodDescriptor<ReqT, RespT> method,
-      CallOptions callOptions,
-      Channel next
+      final MethodDescriptor<ReqT, RespT> method,
+      final CallOptions callOptions,
+      final Channel next
   ) {
     return new SimpleForwardingClientCall<>(next.newCall(method, callOptions)) {
       @Override

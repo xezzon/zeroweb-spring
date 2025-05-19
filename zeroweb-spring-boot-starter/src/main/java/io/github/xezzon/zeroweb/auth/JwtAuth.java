@@ -1,5 +1,9 @@
 package io.github.xezzon.zeroweb.auth;
 
+import static cn.dev33.satoken.exception.NotLoginException.DEFAULT_MESSAGE;
+import static cn.dev33.satoken.exception.NotLoginException.NOT_TOKEN;
+
+import cn.dev33.satoken.exception.NotLoginException;
 import java.util.Optional;
 
 /**
@@ -17,7 +21,7 @@ public class JwtAuth {
    * 保存 Authorization 请求头中携带的 JWT
    * @param claimWrapper JWT对象
    */
-  public static void save(JwtClaimWrapper claimWrapper) {
+  public static void save(final JwtClaimWrapper claimWrapper) {
     CLAIM.set(claimWrapper);
   }
 
@@ -28,6 +32,18 @@ public class JwtAuth {
    */
   public static Optional<JwtClaimWrapper> get() {
     return Optional.ofNullable(CLAIM.get());
+  }
+
+  /**
+   * 获取当前认证信息。
+   * @return 认证信息
+   * @throws NotLoginException 没有认证
+   */
+  public static JwtClaimWrapper getOrThrow() {
+    return get()
+        .orElseThrow(() ->
+            new NotLoginException(DEFAULT_MESSAGE, null, NOT_TOKEN)
+        );
   }
 
   /**

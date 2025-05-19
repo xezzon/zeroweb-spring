@@ -80,7 +80,7 @@ public class JwtClaimWrapper {
    * 从JWT对象构造
    * @param decodedJWT JWT对象
    */
-  public JwtClaimWrapper(DecodedJWT decodedJWT) {
+  public JwtClaimWrapper(final DecodedJWT decodedJWT) {
     this.sub = decodedJWT.getSubject();
     this.preferredUsername = decodedJWT.getClaim(USERNAME_CLAIM).asString();
     this.nickname = decodedJWT.getClaim(NICKNAME_CLAIM).asString();
@@ -93,7 +93,7 @@ public class JwtClaimWrapper {
    * 从认证信息构造
    * @param claim 认证信息
    */
-  public JwtClaimWrapper(JwtClaim claim) {
+  public JwtClaimWrapper(final JwtClaim claim) {
     this.sub = claim.getSub();
     this.preferredUsername = claim.getPreferredUsername();
     this.nickname = claim.getNickname();

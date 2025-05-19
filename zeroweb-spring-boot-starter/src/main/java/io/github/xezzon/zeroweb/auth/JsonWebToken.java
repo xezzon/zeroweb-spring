@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  * 签发/解码JWT
  * @author xezzon
  */
-public class JsonWebToken {
+public final class JsonWebToken {
 
   private JsonWebToken() {
   }
@@ -23,7 +23,7 @@ public class JsonWebToken {
    * @param privateKey ECC私钥
    * @return JWT签发器
    */
-  public static Signer signer(ECPrivateKey privateKey) {
+  public static Signer signer(final ECPrivateKey privateKey) {
     return new Signer(Algorithm.ECDSA256(privateKey));
   }
 
@@ -32,7 +32,7 @@ public class JsonWebToken {
    * @param secretKey 密钥
    * @return JWT 签发器
    */
-  public static Signer signer(byte[] secretKey) {
+  public static Signer signer(final byte[] secretKey) {
     return new Signer(Algorithm.HMAC256(secretKey));
   }
 
@@ -41,7 +41,7 @@ public class JsonWebToken {
    * @param publicKey 公钥
    * @return JWT 解码器
    */
-  public static Decoder decoder(ECPublicKey publicKey) {
+  public static Decoder decoder(final ECPublicKey publicKey) {
     return new Decoder(Algorithm.ECDSA256(publicKey));
   }
 
@@ -50,14 +50,14 @@ public class JsonWebToken {
    * @param secretKey 密钥
    * @return JWT 解码器
    */
-  public static Decoder decoder(byte[] secretKey) {
+  public static Decoder decoder(final byte[] secretKey) {
     return new Decoder(Algorithm.HMAC256(secretKey));
   }
 
   /**
    * JWT 签发器
    */
-  public static class Signer {
+  public static final class Signer {
 
     /**
      * 签名算法及密钥
@@ -76,14 +76,14 @@ public class JsonWebToken {
      */
     private Long timeout;
 
-    private Signer(Algorithm algorithm) {
+    private Signer(final Algorithm algorithm) {
       this.algorithm = algorithm;
     }
 
     /**
      * @param issuer JWT签发者
      */
-    public Signer issuer(String issuer) {
+    public Signer issuer(final String issuer) {
       this.issuer = issuer;
       return this;
     }
@@ -91,7 +91,7 @@ public class JsonWebToken {
     /**
      * @param issuedAt JWT签发时间
      */
-    public Signer issuedAt(@NotNull Instant issuedAt) {
+    public Signer issuedAt(@NotNull final Instant issuedAt) {
       this.issuedAt = issuedAt;
       return this;
     }
@@ -99,7 +99,7 @@ public class JsonWebToken {
     /**
      * @param timeout JWT有效期，单位（秒）
      */
-    public Signer timeout(Long timeout) {
+    public Signer timeout(final Long timeout) {
       this.timeout = timeout;
       return this;
     }
@@ -119,7 +119,7 @@ public class JsonWebToken {
      * @param claimWrapper JWT自定义载荷内容
      * @return JWT字符串
      */
-    public String sign(JwtClaimWrapper claimWrapper) {
+    public String sign(final JwtClaimWrapper claimWrapper) {
       return claimWrapper.jwtBuilder()
           .withIssuer(issuer)
           .withIssuedAt(issuedAt)
@@ -140,7 +140,7 @@ public class JsonWebToken {
      */
     private final Algorithm algorithm;
 
-    public Decoder(Algorithm algorithm) {
+    public Decoder(final Algorithm algorithm) {
       this.algorithm = algorithm;
     }
 
@@ -149,8 +149,8 @@ public class JsonWebToken {
      * @param token JWT字符串
      * @return JWT对象
      */
-    JwtClaimWrapper decode(String token) {
-      JWTVerifier verifier = JWT.require(algorithm).build();
+    JwtClaimWrapper decode(final String token) {
+      final JWTVerifier verifier = JWT.require(algorithm).build();
       return new JwtClaimWrapper(verifier.verify(token));
     }
   }

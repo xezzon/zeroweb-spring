@@ -19,21 +19,21 @@ public class GrpcClientFactory {
   private static final String USER_CHANNEL = "user";
 
   @Bean
-  public DictBlockingStub dictBlockingStub(GrpcChannelFactory channels) {
+  public DictBlockingStub dictBlockingStub(final GrpcChannelFactory channels) {
     return DictGrpc.newBlockingStub(
         channels.createChannel(DICT_CHANNEL)
     );
   }
 
   @Bean
-  public DictStub dictStub(GrpcChannelFactory channels) {
+  public DictStub dictStub(final GrpcChannelFactory channels) {
     return DictGrpc.newStub(
         channels.createChannel(DICT_CHANNEL)
     );
   }
 
   @Bean
-  public UserBlockingStub userBlockingStub(GrpcChannelFactory channels) {
+  public UserBlockingStub userBlockingStub(final GrpcChannelFactory channels) {
     return UserGrpc.newBlockingStub(
         channels.createChannel(USER_CHANNEL)
     );

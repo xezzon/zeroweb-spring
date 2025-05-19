@@ -28,11 +28,11 @@ class GrpcConfigurationTest {
 
   @Test
   void jwtInterceptor() {
-    String jwtString = TestJwtGenerator.userBuilder()
+    final String jwtString = TestJwtGenerator.userBuilder()
         .username("test")
         .jwt();
-    DecodedJWT jwt = JWT.decode(jwtString);
-    JwtClaimWrapper claimWrapper = new JwtClaimWrapper(jwt);
+    final DecodedJWT jwt = JWT.decode(jwtString);
+    final JwtClaimWrapper claimWrapper = new JwtClaimWrapper(jwt);
     JwtAuth.save(claimWrapper);
     Assertions.assertDoesNotThrow(() ->
         dictBlockingStub.getDictListByTag(DictReq.newBuilder().build())

@@ -89,18 +89,17 @@ public class AuthnController {
    */
   @SaCheckLogin
   @GetMapping("/token")
-  public ResponseEntity<OidcToken> getSsoToken(HttpServletResponse response) {
+  public OidcToken getSsoToken(HttpServletResponse response) {
     if (!StpUtil.isLogin()) {
-      return ResponseEntity.ok(null);
+      return null;
     }
     final String accessToken = StpUtil.getTokenValue();
     final String idToken = authnService.signJwt();
     final Long expiredIn = zerowebJwtConfig.getTimeout();
-    return ResponseEntity.ok()
-        .header(PUBLIC_KEY_HEADER, Base64.getEncoder()
-            .encodeToString(keyManager.getPublicKey().getEncoded())
-        )
-        .header(AUTHORIZATION, BEARER + " " + idToken)
-        .body(new OidcToken(accessToken, idToken, expiredIn));
+    response.setHeader(PUBLIC_KEY_HEADER, Base64.getEncoder()
+        .encodeToString(keyManager.getPublicKey().getEncoded())
+    );
+    response.setHeader(AUTHORIZATION, BEARER + " " + idToken);
+    return new OidcToken(accessToken, idToken, expiredIn);
   }
 }

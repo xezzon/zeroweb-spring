@@ -78,7 +78,7 @@ public class JwtKeyManager implements JwtCryptoService {
   }
 
   @Override
-  public String signJwt(@NotNull JwtClaimWrapper claimWrapper) {
+  public String signJwt(@NotNull final JwtClaimWrapper claimWrapper) {
     Instant iat = Instant.now();
     return JsonWebToken.signer(this.getPrivateKey())
         .issuer(zerowebJwtConfig.getIssuer())

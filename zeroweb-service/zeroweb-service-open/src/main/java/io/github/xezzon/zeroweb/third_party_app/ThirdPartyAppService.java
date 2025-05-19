@@ -1,10 +1,10 @@
 package io.github.xezzon.zeroweb.third_party_app;
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
 import io.github.xezzon.zeroweb.auth.JsonWebToken;
+import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
 import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
@@ -114,7 +114,10 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
   public void checkPermission(String appId) {
     Optional<ThirdPartyApp> thirdPartyApp = thirdPartyAppDAO.get().findById(appId);
     if (thirdPartyApp.isEmpty()
-        || !Objects.equals(thirdPartyApp.get().getOwnerId(), StpUtil.getLoginId())
+        || !Objects.equals(
+            thirdPartyApp.get().getOwnerId(),
+            JwtAuth.getOrThrow().getSub()
+        )
     ) {
       throw new DataPermissionForbiddenException("应用不存在或无权访问");
     }

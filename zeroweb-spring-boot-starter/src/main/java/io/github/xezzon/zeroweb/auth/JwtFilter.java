@@ -50,7 +50,7 @@ public class JwtFilter implements Filter {
         String token = authorization.substring(BEARER.length()).trim();
         String publicKeyASN1 = httpRequest.getHeader(PUBLIC_KEY_HEADER);
         String accessKey = httpRequest.getHeader(ACCESS_KEY_HEADER);
-        JwtClaimWrapper claimWrapper;
+        final JwtClaimWrapper claimWrapper;
         if (publicKeyASN1 != null && !publicKeyASN1.isEmpty()) {
           // 前端调用经过网关验证，使用公钥验证
           claimWrapper = validateWithPublicKey(token, publicKeyASN1);
@@ -60,7 +60,7 @@ public class JwtFilter implements Filter {
         } else {
           throw new BreakException();
         }
-        Long timeout = Optional.ofNullable(claimWrapper.getExi()).orElse(DEFAULT_TIMEOUT);
+        final Long timeout = Optional.ofNullable(claimWrapper.getExi()).orElse(DEFAULT_TIMEOUT);
         StpUtil.login(claimWrapper.getSub(), timeout);
         JwtAuth.save(claimWrapper);
       }
@@ -74,7 +74,7 @@ public class JwtFilter implements Filter {
     JwtAuth.clear();
   }
 
-  public JwtClaimWrapper validateWithPublicKey(String token, String publicKeyASN1) {
+  public JwtClaimWrapper validateWithPublicKey(final String token, final String publicKeyASN1) {
     try {
       ASN1PublicKeyReader asn1Reader = new DerStringReader(publicKeyASN1);
       ECPublicKey publicKey = (ECPublicKey) SecretKeyUtil.readPublicKey(asn1Reader);
@@ -85,7 +85,7 @@ public class JwtFilter implements Filter {
     }
   }
 
-  public JwtClaimWrapper validateWithAccessKey(String token, String accessKey) {
+  public JwtClaimWrapper validateWithAccessKey(final String token, final String accessKey) {
     return JsonWebToken.decoder(Base64.getDecoder().decode(accessKey))
         .decode(token);
   }
