@@ -10,7 +10,6 @@ import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -19,7 +18,7 @@ import org.springframework.test.annotation.DirtiesContext;
 @DirtiesContext
 class UserGrpcTest {
 
-  @GrpcClient("user")
+  @Resource
   private UserBlockingStub userBlockingStub;
   @Resource
   private UserRepository repository;

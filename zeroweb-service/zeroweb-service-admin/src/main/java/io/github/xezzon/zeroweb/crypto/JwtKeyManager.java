@@ -1,8 +1,7 @@
 package io.github.xezzon.zeroweb.crypto;
 
-import com.auth0.jwt.JWTCreator;
-import io.github.xezzon.zeroweb.auth.JwtAuth;
-import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.JsonWebToken;
+import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig.ZerowebJwtConfig;
 import io.github.xezzon.zeroweb.core.crypto.ASN1PublicKeyWriter;
@@ -17,7 +16,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.event.EventListener;
@@ -80,16 +78,13 @@ public class JwtKeyManager implements JwtCryptoService {
   }
 
   @Override
-  public String signJwt(@NotNull JWTCreator.Builder jwtBuilder) {
+  public String signJwt(@NotNull final JwtClaimWrapper claimWrapper) {
     Instant iat = Instant.now();
-    Instant exp = iat.plusSeconds(zerowebJwtConfig.getTimeout());
-    jwtBuilder
-        .withIssuer(zerowebJwtConfig.getIssuer())
-        .withClaim(JwtClaimWrapper.AUTHORIZED_PARTY_CLAIM, JwtClaimWrapper.AZP_VALUE)
-        .withIssuedAt(iat)
-        .withExpiresAt(exp)
-        .withJWTId(UUID.randomUUID().toString());
-    return new JwtAuth(this.getPrivateKey()).sign(jwtBuilder);
+    return JsonWebToken.signer(this.getPrivateKey())
+        .issuer(zerowebJwtConfig.getIssuer())
+        .issuedAt(iat)
+        .timeout(zerowebJwtConfig.getTimeout())
+        .sign(claimWrapper);
   }
 
   /**

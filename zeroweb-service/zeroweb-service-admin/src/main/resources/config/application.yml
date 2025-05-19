@@ -11,13 +11,12 @@ spring:
       - ${SPRING_ENVIRONMENT:prod}
   liquibase:
     tag: @project.version@
+  grpc:
+    server:
+      port: @grpc.port@
 
 server:
   port: @app.port@
-
-grpc:
-  server:
-    port: @grpc.port@
 
 sa-token:
   token-name: X-SESSION-ID

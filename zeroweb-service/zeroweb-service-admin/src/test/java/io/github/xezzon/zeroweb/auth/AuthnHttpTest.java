@@ -17,7 +17,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.zeroweb.InitializeDataRunner;
 import io.github.xezzon.zeroweb.auth.entity.BasicAuth;
-import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.auth.entity.OidcToken;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.exception.AdminErrorCode;
@@ -69,6 +68,7 @@ class AuthnHttpTest {
   }
 
   @DynamicPropertySource
+  @SuppressWarnings("unused")
   static void redisProperties(DynamicPropertyRegistry registry) {
     registry.add("REDIS_URL", () -> String.format(
         "%s:%s", redisContainer.getHost(), redisContainer.getMappedPort(6379)
@@ -202,8 +202,8 @@ class AuthnHttpTest {
         .withIssuer(zerowebConfig.getJwt().getIssuer())
         .build();
     DecodedJWT jwt = assertDoesNotThrow(() -> verifier.verify(responseBody1.getIdToken()));
-    JwtClaim claim = JwtClaimWrapper.from(jwt).get();
-    assertEquals(user.getId(), claim.getSub());
+    final JwtClaimWrapper claimWrapper = new JwtClaimWrapper(jwt);
+    assertEquals(user.getId(), claimWrapper.getSub());
   }
 
   @Test

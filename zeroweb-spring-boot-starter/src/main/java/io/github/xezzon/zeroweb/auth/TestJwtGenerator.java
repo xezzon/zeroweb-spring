@@ -3,10 +3,6 @@ package io.github.xezzon.zeroweb.auth;
 import static com.google.auth.http.AuthHttpConstants.BEARER;
 
 import cn.hutool.core.util.RandomUtil;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator;
-import com.auth0.jwt.algorithms.Algorithm;
-import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -14,7 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -77,45 +72,51 @@ public class TestJwtGenerator {
 
   public static class Builder {
 
-    private final Algorithm algorithm;
-    private final JWTCreator.Builder jwtBuilder = JWT.create();
+    private final JsonWebToken.Signer signer;
+    private final JwtClaim.Builder jwtBuilder = JwtClaim.newBuilder();
 
     private Builder(ECPrivateKey privateKey) {
-      this.algorithm = Algorithm.ECDSA256(privateKey);
+      this.signer = JsonWebToken.signer(privateKey);
     }
 
     private Builder(SecretKey secretKey) {
-      this.algorithm = Algorithm.HMAC256(secretKey.getEncoded());
+      this.signer = JsonWebToken.signer(secretKey.getEncoded());
     }
 
     public Builder id(String id) {
-      jwtBuilder.withSubject(id);
+      jwtBuilder.setSub(id);
       return this;
     }
 
     public Builder username(String username) {
-      jwtBuilder.withClaim(JwtClaimWrapper.USERNAME_CLAIM, username);
+      jwtBuilder.setPreferredUsername(username);
       return this;
     }
 
     public Builder roles(List<String> roles) {
-      jwtBuilder.withClaim(JwtClaimWrapper.ROLES_CLAIM, roles);
+      jwtBuilder
+          .clearRoles()
+          .addAllRoles(roles);
       return this;
     }
 
     public Builder permissions(List<String> permissions) {
-      jwtBuilder.withClaim(JwtClaimWrapper.PERMISSION_CLAIM, permissions);
+      jwtBuilder
+          .clearEntitlements()
+          .addAllEntitlements(permissions);
       return this;
     }
 
     public String jwt() {
-      return jwtBuilder
-          .withClaim(JwtClaimWrapper.NICKNAME_CLAIM, RandomUtil.randomString(8))
-          .withClaim(JwtClaimWrapper.GROUPS_CLAIM, Collections.emptyList())
-          .withIssuedAt(Instant.now())
-          .withExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
-          .withJWTId(UUID.randomUUID().toString())
-          .sign(algorithm);
+      final JwtClaim claim = jwtBuilder
+          .setNickname(RandomUtil.randomString(8))
+          .addAllGroups(Collections.emptyList())
+          .build();
+      return this.signer
+          .issuer("xezzon.github.io")
+          .issuedAt(Instant.now())
+          .timeout(60 * 60L)
+          .sign(new JwtClaimWrapper(claim));
     }
 
     public String bearer() {

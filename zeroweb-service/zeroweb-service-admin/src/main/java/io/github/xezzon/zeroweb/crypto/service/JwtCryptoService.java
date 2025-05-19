@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.crypto.service;
 
-import com.auth0.jwt.JWTCreator;
+import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -10,8 +10,8 @@ public interface JwtCryptoService {
 
   /**
    * 签发JWT
-   * @param jwtBuilder jwt构造器
+   * @param claimWrapper jwt构造器
    * @return JWT字符串
    */
-  String signJwt(@NotNull JWTCreator.Builder jwtBuilder);
+  String signJwt(@NotNull JwtClaimWrapper claimWrapper);
 }

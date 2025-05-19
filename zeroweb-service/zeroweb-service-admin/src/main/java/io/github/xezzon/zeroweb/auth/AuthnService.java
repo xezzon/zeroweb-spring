@@ -2,8 +2,6 @@ package io.github.xezzon.zeroweb.auth;
 
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
-import com.auth0.jwt.JWTCreator.Builder;
-import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.auth.event.UserLoginEvent;
 import io.github.xezzon.zeroweb.auth.util.SessionUtil;
 import io.github.xezzon.zeroweb.common.exception.InvalidPasswordException;
@@ -72,6 +70,10 @@ public class AuthnService {
     );
   }
 
+  /**
+   * 获取当前用户的认证信息
+   * @return 认证信息
+   */
   protected JwtClaim getCustomClaim() {
     final User user = SessionUtil.loadUser();
     final Set<String> roles = SessionUtil.loadRoles();
@@ -91,7 +93,7 @@ public class AuthnService {
    */
   protected String signJwt() {
     final JwtClaim claim = this.getCustomClaim();
-    Builder jwtBuilder = new JwtClaimWrapper(claim).into();
+    final JwtClaimWrapper jwtBuilder = new JwtClaimWrapper(claim);
     return jwtCryptoService.signJwt(jwtBuilder);
   }
 

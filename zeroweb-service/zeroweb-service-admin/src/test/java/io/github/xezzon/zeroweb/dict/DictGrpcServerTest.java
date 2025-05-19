@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -25,7 +24,7 @@ import org.springframework.test.annotation.DirtiesContext;
 @DirtiesContext
 class DictGrpcServerTest {
 
-  @GrpcClient("dict")
+  @Resource
   private DictBlockingStub dictBlockingStub;
   @Resource
   private DictRepository repository;

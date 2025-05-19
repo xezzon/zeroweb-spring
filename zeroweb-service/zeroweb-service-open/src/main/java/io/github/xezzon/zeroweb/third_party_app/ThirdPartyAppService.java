@@ -1,13 +1,12 @@
 package io.github.xezzon.zeroweb.third_party_app;
 
-import cn.dev33.satoken.stp.StpUtil;
-import com.auth0.jwt.JWTCreator.Builder;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
+import io.github.xezzon.zeroweb.auth.JsonWebToken;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
-import io.github.xezzon.zeroweb.auth.entity.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig.ZerowebJwtConfig;
 import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
@@ -26,7 +25,6 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -116,7 +114,10 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
   public void checkPermission(String appId) {
     Optional<ThirdPartyApp> thirdPartyApp = thirdPartyAppDAO.get().findById(appId);
     if (thirdPartyApp.isEmpty()
-        || !Objects.equals(thirdPartyApp.get().getOwnerId(), StpUtil.getLoginId())
+        || !Objects.equals(
+            thirdPartyApp.get().getOwnerId(),
+            JwtAuth.getOrThrow().getSub()
+        )
     ) {
       throw new DataPermissionForbiddenException("应用不存在或无权访问");
     }
@@ -141,17 +142,11 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
         .addAllRoles(Collections.singleton("*"))
         .addAllEntitlements(Collections.singleton("*"))
         .build();
-    Builder jwtBuilder = new JwtClaimWrapper(claim).into();
-    Instant exp = iat.plusSeconds(zerowebJwtConfig.getTimeout());
-    jwtBuilder
-        .withIssuer(zerowebJwtConfig.getIssuer())
-        .withClaim(JwtClaimWrapper.AUTHORIZED_PARTY_CLAIM, JwtClaimWrapper.AZP_VALUE)
-        .withIssuedAt(iat)
-        .withExpiresAt(exp)
-        .withJWTId(UUID.randomUUID().toString());
-    return new JwtAuth(
-        Base64.getDecoder().decode(accessKey)
-    ).sign(jwtBuilder);
+    return JsonWebToken.signer(Base64.getDecoder().decode(accessKey))
+        .issuer(zerowebJwtConfig.getIssuer())
+        .issuedAt(iat)
+        .timeout(zerowebJwtConfig.getTimeout())
+        .sign(new JwtClaimWrapper(claim));
   }
 
   /**
