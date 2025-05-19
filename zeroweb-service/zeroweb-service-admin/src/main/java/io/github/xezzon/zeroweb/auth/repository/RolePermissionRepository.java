@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.auth.repository;
 
-import io.github.xezzon.zeroweb.auth.domain.RolePermission;
+import io.github.xezzon.zeroweb.auth.RolePermission;
 import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;

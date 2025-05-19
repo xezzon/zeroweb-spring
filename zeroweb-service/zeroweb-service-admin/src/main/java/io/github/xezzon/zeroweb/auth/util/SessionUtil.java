@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.auth.util;
 
 import cn.dev33.satoken.stp.StpUtil;
-import io.github.xezzon.zeroweb.user.domain.User;
+import io.github.xezzon.zeroweb.user.User;
 import java.util.HashSet;
 import java.util.Set;
 

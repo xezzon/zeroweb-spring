@@ -8,15 +8,15 @@ import com.google.common.primitives.Longs;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
 import io.github.xezzon.zeroweb.common.exception.OpenErrorCode;
-import io.github.xezzon.zeroweb.openapi.domain.HttpMethod;
-import io.github.xezzon.zeroweb.openapi.domain.Openapi;
-import io.github.xezzon.zeroweb.openapi.domain.OpenapiStatus;
+import io.github.xezzon.zeroweb.openapi.Openapi;
+import io.github.xezzon.zeroweb.openapi.enumeration.HttpMethod;
+import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
-import io.github.xezzon.zeroweb.subscription.domain.Subscription;
-import io.github.xezzon.zeroweb.subscription.domain.SubscriptionStatus;
+import io.github.xezzon.zeroweb.subscription.Subscription;
+import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
 import io.github.xezzon.zeroweb.subscription.repository.SubscriptionRepository;
-import io.github.xezzon.zeroweb.third_party_app.domain.AccessSecret;
-import io.github.xezzon.zeroweb.third_party_app.domain.ThirdPartyApp;
+import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
+import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
 import jakarta.annotation.Resource;
@@ -161,7 +161,9 @@ class SubscriptionCallHttpTest {
             .queryParam("hello", hello)
             .build(dataset.getT3().getOpenapiCode())
         )
-        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, RandomUtil.randomString(8))
+        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, Base64.getEncoder()
+            .encodeToString(RandomUtil.randomString(8).getBytes())
+        )
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)

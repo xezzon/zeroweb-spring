@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.dict.converter;
 
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.zeroweb.dict.DictImportReq;
-import io.github.xezzon.zeroweb.dict.domain.Dict;
+import io.github.xezzon.zeroweb.dict.Dict;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

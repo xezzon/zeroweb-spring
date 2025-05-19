@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.role.entity;
 
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.tao.trait.Into;
-import io.github.xezzon.zeroweb.role.domain.Role;
+import io.github.xezzon.zeroweb.role.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

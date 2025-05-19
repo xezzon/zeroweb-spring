@@ -1,9 +1,9 @@
 package io.github.xezzon.zeroweb.dict.db;
 
-import io.github.xezzon.zeroweb.dict.DictDbHandler;
+import io.github.xezzon.zeroweb.dict.internal.DictDbHandler;
 import io.github.xezzon.zeroweb.dict.DictImporter;
 import io.github.xezzon.zeroweb.dict.TestEnum;
-import io.github.xezzon.zeroweb.dict.domain.Dict;
+import io.github.xezzon.zeroweb.dict.Dict;
 import io.github.xezzon.zeroweb.dict.repository.DictRepository;
 import jakarta.annotation.Resource;
 import java.util.List;

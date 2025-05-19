@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.user.converter;
 
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.zeroweb.user.AddUserReq;
-import io.github.xezzon.zeroweb.user.domain.User;
+import io.github.xezzon.zeroweb.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

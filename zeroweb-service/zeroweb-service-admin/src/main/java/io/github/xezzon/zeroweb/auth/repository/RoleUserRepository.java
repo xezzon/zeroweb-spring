@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.auth.repository;
 
-import io.github.xezzon.zeroweb.auth.domain.RoleUser;
+import io.github.xezzon.zeroweb.auth.RoleUser;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

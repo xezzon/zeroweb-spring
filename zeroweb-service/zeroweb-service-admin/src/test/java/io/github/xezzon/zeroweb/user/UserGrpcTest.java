@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.user.UserGrpc.UserBlockingStub;
-import io.github.xezzon.zeroweb.user.domain.User;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;

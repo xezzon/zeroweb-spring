@@ -2,9 +2,9 @@ package io.github.xezzon.zeroweb;
 
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.util.RandomUtil;
-import io.github.xezzon.zeroweb.role.domain.Role;
+import io.github.xezzon.zeroweb.role.Role;
 import io.github.xezzon.zeroweb.role.repository.RoleRepository;
-import io.github.xezzon.zeroweb.user.domain.User;
+import io.github.xezzon.zeroweb.user.User;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;

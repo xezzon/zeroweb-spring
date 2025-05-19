@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.locale.repository;
 
-import io.github.xezzon.zeroweb.locale.domain.Language;
+import io.github.xezzon.zeroweb.locale.Language;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

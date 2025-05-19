@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.dict.DictGrpc.DictBlockingStub;
-import io.github.xezzon.zeroweb.dict.domain.Dict;
 import io.github.xezzon.zeroweb.dict.repository.DictRepository;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;

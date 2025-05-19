@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.role.repository;
 
-import io.github.xezzon.zeroweb.role.domain.Role;
+import io.github.xezzon.zeroweb.role.Role;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;

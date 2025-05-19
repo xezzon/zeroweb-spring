@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.auth.event;
 
-import io.github.xezzon.zeroweb.user.domain.User;
+import io.github.xezzon.zeroweb.user.User;
 import lombok.Builder;
 import lombok.Getter;
 

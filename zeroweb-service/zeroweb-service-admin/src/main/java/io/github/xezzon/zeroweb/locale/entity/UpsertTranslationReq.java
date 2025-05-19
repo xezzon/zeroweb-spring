@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.locale.entity;
 
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.tao.trait.Into;
-import io.github.xezzon.zeroweb.locale.domain.Translation;
+import io.github.xezzon.zeroweb.locale.Translation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

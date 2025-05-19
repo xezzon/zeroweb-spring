@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
-import io.github.xezzon.zeroweb.third_party_app.domain.AccessSecret;
-import io.github.xezzon.zeroweb.third_party_app.domain.ThirdPartyApp;
 import io.github.xezzon.zeroweb.third_party_app.entity.AddThirdPartyAppReq;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;

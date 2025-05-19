@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.subscription.repository;
 
-import io.github.xezzon.zeroweb.subscription.domain.Subscription;
+import io.github.xezzon.zeroweb.subscription.Subscription;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
