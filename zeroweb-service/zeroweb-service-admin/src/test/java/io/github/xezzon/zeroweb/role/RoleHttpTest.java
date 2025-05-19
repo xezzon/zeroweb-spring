@@ -7,7 +7,6 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.InitializeDataRunner;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
-import io.github.xezzon.zeroweb.role.domain.Role;
 import io.github.xezzon.zeroweb.role.entity.AddRoleReq;
 import io.github.xezzon.zeroweb.role.repository.RoleRepository;
 import jakarta.annotation.Resource;

@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.third_party_app.repository;
 
-import io.github.xezzon.zeroweb.third_party_app.domain.AccessSecret;
+import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.app.repository;
 
-import io.github.xezzon.zeroweb.app.domain.App;
+import io.github.xezzon.zeroweb.app.App;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

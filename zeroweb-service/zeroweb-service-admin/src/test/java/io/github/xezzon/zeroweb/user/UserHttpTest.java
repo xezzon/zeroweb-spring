@@ -8,7 +8,6 @@ import io.github.xezzon.zeroweb.InitializeDataRunner;
 import io.github.xezzon.zeroweb.common.constant.CharacterConstant;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
-import io.github.xezzon.zeroweb.user.domain.User;
 import io.github.xezzon.zeroweb.user.entity.RegisterUserReq;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;

@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.dict.repository;
 
-import io.github.xezzon.zeroweb.dict.domain.Dict;
+import io.github.xezzon.zeroweb.dict.Dict;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;

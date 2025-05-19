@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.user.repository;
 
-import io.github.xezzon.zeroweb.user.domain.User;
+import io.github.xezzon.zeroweb.user.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

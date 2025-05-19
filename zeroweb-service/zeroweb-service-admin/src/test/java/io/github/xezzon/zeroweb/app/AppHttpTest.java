@@ -8,9 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.hutool.core.util.RandomUtil;
-import io.github.xezzon.zeroweb.app.domain.AddAppReq;
-import io.github.xezzon.zeroweb.app.domain.App;
-import io.github.xezzon.zeroweb.app.domain.UpdateAppReq;
+import io.github.xezzon.zeroweb.app.entity.AddAppReq;
+import io.github.xezzon.zeroweb.app.entity.UpdateAppReq;
 import io.github.xezzon.zeroweb.app.repository.AppRepository;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;

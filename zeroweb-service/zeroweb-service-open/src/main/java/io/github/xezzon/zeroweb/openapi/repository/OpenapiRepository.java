@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.openapi.repository;
 
-import io.github.xezzon.zeroweb.openapi.domain.Openapi;
+import io.github.xezzon.zeroweb.openapi.Openapi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;

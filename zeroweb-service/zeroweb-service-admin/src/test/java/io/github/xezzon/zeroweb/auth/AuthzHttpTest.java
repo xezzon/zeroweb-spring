@@ -5,13 +5,11 @@ import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.InitializeDataRunner;
-import io.github.xezzon.zeroweb.auth.domain.RolePermission;
-import io.github.xezzon.zeroweb.auth.domain.RoleUser;
 import io.github.xezzon.zeroweb.auth.repository.RolePermissionRepository;
 import io.github.xezzon.zeroweb.auth.repository.RoleUserRepository;
-import io.github.xezzon.zeroweb.role.constant.RoleConstant;
-import io.github.xezzon.zeroweb.role.domain.Role;
-import io.github.xezzon.zeroweb.user.domain.User;
+import io.github.xezzon.zeroweb.role.RoleConstant;
+import io.github.xezzon.zeroweb.role.Role;
+import io.github.xezzon.zeroweb.user.User;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collection;

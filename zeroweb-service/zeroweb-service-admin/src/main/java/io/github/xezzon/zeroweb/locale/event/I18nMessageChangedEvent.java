@@ -1,5 +1,7 @@
 package io.github.xezzon.zeroweb.locale.event;
 
+import io.github.xezzon.zeroweb.locale.II18nMessage;
+
 /**
  * 国际化内容变更事件
  *

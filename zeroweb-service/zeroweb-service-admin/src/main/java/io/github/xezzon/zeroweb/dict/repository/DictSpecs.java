@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.dict.repository;
 
-import io.github.xezzon.zeroweb.dict.domain.Dict;
-import io.github.xezzon.zeroweb.dict.domain.Dict_;
+import io.github.xezzon.zeroweb.dict.Dict;
+import io.github.xezzon.zeroweb.dict.Dict_;
 import org.springframework.data.jpa.domain.Specification;
 
 /**

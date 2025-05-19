@@ -14,7 +14,6 @@ import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
-import io.github.xezzon.zeroweb.dict.domain.Dict;
 import io.github.xezzon.zeroweb.dict.entity.AddDictReq;
 import io.github.xezzon.zeroweb.dict.entity.ModifyDictReq;
 import io.github.xezzon.zeroweb.dict.repository.DictRepository;
