@@ -15,27 +15,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class GrpcClientFactory {
 
-  private static final String DICT_CHANNEL = "dict";
-  private static final String USER_CHANNEL = "user";
+  private static final String ADMIN_CHANNEL = "dict";
 
   @Bean
   public DictBlockingStub dictBlockingStub(final GrpcChannelFactory channels) {
     return DictGrpc.newBlockingStub(
-        channels.createChannel(DICT_CHANNEL)
+        channels.createChannel(ADMIN_CHANNEL)
     );
   }
 
   @Bean
   public DictStub dictStub(final GrpcChannelFactory channels) {
     return DictGrpc.newStub(
-        channels.createChannel(DICT_CHANNEL)
+        channels.createChannel(ADMIN_CHANNEL)
     );
   }
 
   @Bean
   public UserBlockingStub userBlockingStub(final GrpcChannelFactory channels) {
     return UserGrpc.newBlockingStub(
-        channels.createChannel(USER_CHANNEL)
+        channels.createChannel(ADMIN_CHANNEL)
     );
   }
 }

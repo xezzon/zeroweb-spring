@@ -55,8 +55,8 @@ zeroweb-service-admin
 │   │   │   └── io/github/xezzon/zeroweb
 │   │   │       ├── user  # 用户功能
 │   │   │       │   ├── UserService.java  # 该功能的逻辑运转中枢
-│   │   │       │   ├── UserController.java  # 提供前端调用的 HTTP 接口
-│   │   │       │   ├── UserGrpcServer.java  # 服务间调用的 GRPC 接口服务端
+│   │   │       │   ├── UserHttpEndpoint.java  # 提供前端调用的 HTTP 接口
+│   │   │       │   ├── UserGrpcEndpoint.java  # 服务间调用的 gRPC 接口服务端
 │   │   │       │   ├── UserDAO.java  # 对 JPA 接口的封装
 │   │   │       │   ├── domain  # JPA Entity、枚举类
 │   │   │       │   ├── entity  # 贫血模型
@@ -154,19 +154,19 @@ JDBC_TYPE=postgresql
 #### Service
 
 - Service 是一个普通类。使用 `org.springframework.stereotype.Service` 注解。
-- Service 类中提供给 Controller 和 GrpcServer 调用的方法的访问级别为 `protected`；Service
+- Service 类中提供给 HTTP 端点 和 gRPC 端点调用的方法的访问级别为 `protected`；Service
   内部使用的方法访问级别为 `private`；
 - 提供给其他 Service 调用的方法需要在 `service` 包下定义 interface，并在 Service 类中实现。提供给不同
   Service 调用的方法需要在不同的 interface 中定义。不允许直接注入其他 Service，而应该依赖其对应的
   interface。
 
-#### Controller 和 GrpcServer
+#### HTTP 端点 和 gRPC 端点
 
-- Controller 是 HTTP 端点的集合。使用 `org.springframework.stereotype.RestController` 注解。
-- GrpcServer 是 gRPC 端点的集合。使用 `net.devh.boot.grpc.server.service.GrpcService` 注解。
+- HTTP 端点使用 `org.springframework.stereotype.RestController` 注解。
+- gRPC 端点使用 `org.springframework.grpc.server.service.GrpcService` 注解。
 - 两者均只允许被注入 Service，不允许直接注入 DAO 或 Repository。
-- GrpcServer 的原型在 `zeroweb-proto` 模块定义。
-- 一般情况下，应该对每个复杂请求封装一个请求对象，并在 Controller 层将其转换为对应的充血模型。
+- gRPC 端点的原型在 `zeroweb-proto` 模块定义。
+- 一般情况下，应该对每个复杂请求封装一个请求对象，将其转换为对应的充血模型传给 Service 层。
 - 一般情况下，可以直接以充血模型作为响应对象。必要时也可以封装一个响应对象。
 - 分页查询支持 odata 语法。参数为 `io.github.xezzon.zeroweb.core.odata.ODataRequestParam`，通过
   `io.github.xezzon.tao.trait.Into#into()` 方法转换为
@@ -177,11 +177,11 @@ JDBC_TYPE=postgresql
 
 贫血模型的种类有很多。比如对请求的封装、对响应的封装、事件对象。
 
-- 请求对象，一个 record 类。作为 Controller 的参数。实现 `io.github.xezzon.tao.trait.Into`
+- 请求对象，一个 record 类。作为 HTTP 端点的参数。实现 `io.github.xezzon.tao.trait.Into`
   接口，可以以自身为参数返回充血模型。可以实现一个范围级别为 `package-private` 的类内 interface，继承
   `io.github.xezzon.tao.trait.From` 接口，使用 `org.mapstruct.Mapper`
   注解。请求对象中的各字段应该使用合适的 [Hibernate Validator](https://hibernate.org/validator/) 注解。
-- 响应对象，一个 record 类。作为 Controller 的返回。实现一个名为 `from` 的静态方法，将充血模型转换为自身。可以实现一个范围级别为
+- 响应对象，一个 record 类。作为 HTTP 端点的返回。实现一个名为 `from` 的静态方法，将充血模型转换为自身。可以实现一个范围级别为
   `package-private` 的类内 interface，继承 `io.github.xezzon.tao.trait.From` 接口，使用
   `org.mapstruct.Mapper` 注解。
 - 事件对象，使用 `lombok.Builder` 注解。
@@ -200,7 +200,6 @@ JDBC_TYPE=postgresql
   中可以使用 [JPA Specification](https://docs.spring.io/spring-data/jpa/reference/jpa/specifications.html)
   对数据库进行操作。
 - 所有对数据库的直接操作都必须在 DAO 或 Repository 中完成。
-- Service 注入 DAO，通过 DAO 调用 Repository，不允许直接注入 Repository。
 
 ### 配置
 
@@ -232,8 +231,8 @@ JDBC_TYPE=postgresql
 - 针对 HTTP 端点的测试命名方式为 `${功能名称}HttpTest.java`
   。通过注入 [WebTestClient](https://docs.spring.io/spring-framework/reference/testing/webtestclient.html)
   调用 HTTP 端口进行测试。
-- 针对 gRPC 断点的测试命名方式为 `${功能名称}GrpcTest.java`。通过注入对应的 gRPC Stub 调用 gRPC
-  端口进行测试。
+- 针对 gRPC 端点的测试命名方式为 `${功能名称}GrpcTest.java`。通过注入对应的 gRPC Stub 调用 gRPC
+  端点进行测试。
 - 其他类的测试命名方式为`${类名}Test.java`。
 - 测试类的方法命名为`${被测试的方法名}_${预期的情况}`。测试类与测试方法的访问级别
 - 所有对中间件与外部系统的依赖都通过 [Testcontainers for Java](https://java.testcontainers.org/) 解决。严禁使用任何 Mock 方法或框架进行单元测试。

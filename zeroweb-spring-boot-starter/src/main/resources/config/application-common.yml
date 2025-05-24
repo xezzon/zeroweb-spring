@@ -23,9 +23,7 @@ spring:
         enabled: false
     client:
       channels:
-        user:
-          address: zeroweb-service-admin:9002
-        dict:
+        admin:
           address: zeroweb-service-admin:9002
 
 management:
