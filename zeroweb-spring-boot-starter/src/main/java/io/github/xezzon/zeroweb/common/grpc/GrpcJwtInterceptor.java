@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.common.grpc;
 
-import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
+import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.github.xezzon.zeroweb.auth.JwtAuth;

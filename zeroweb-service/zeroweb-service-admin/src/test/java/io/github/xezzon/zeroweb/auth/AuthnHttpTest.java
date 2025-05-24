@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.auth;
 
-import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
-import static com.google.auth.http.AuthHttpConstants.BEARER;
+import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
+import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.BEARER;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

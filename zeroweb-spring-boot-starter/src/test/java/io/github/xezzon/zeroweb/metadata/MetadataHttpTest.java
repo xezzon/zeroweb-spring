@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.metadata;
 
-import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
+import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import jakarta.annotation.Resource;

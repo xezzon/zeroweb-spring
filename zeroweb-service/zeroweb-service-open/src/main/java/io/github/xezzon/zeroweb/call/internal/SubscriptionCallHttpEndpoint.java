@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.call.internal;
 
-import static com.google.auth.http.AuthHttpConstants.BEARER;
+import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.BEARER;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;

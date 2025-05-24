@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.auth.entity;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.google.auth.http.AuthHttpConstants;
+import io.github.xezzon.zeroweb.auth.AuthHttpConstant;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,6 +32,6 @@ public class OidcToken {
 
   @SuppressWarnings("unused")
   public String getTokenType() {
-    return AuthHttpConstants.BEARER;
+    return AuthHttpConstant.BEARER;
   }
 }

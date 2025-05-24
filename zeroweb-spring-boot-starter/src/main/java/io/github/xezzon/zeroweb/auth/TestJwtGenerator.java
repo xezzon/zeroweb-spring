@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.auth;
 
-import static com.google.auth.http.AuthHttpConstants.BEARER;
+import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.BEARER;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;

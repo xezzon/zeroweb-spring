@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.auth;
 
-import static com.google.auth.http.AuthHttpConstants.AUTHORIZATION;
+import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 
 import jakarta.annotation.Resource;
