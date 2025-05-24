@@ -63,7 +63,6 @@ public class AuthnHttpEndpoint {
   /**
    * @return 当前用户的认证信息
    */
-  @SaCheckLogin
   @GetMapping("/self")
   public ResponseEntity<byte[]> self() throws InvalidProtocolBufferException {
     if (!StpUtil.isLogin()) {
@@ -91,9 +90,6 @@ public class AuthnHttpEndpoint {
   @SaCheckLogin
   @GetMapping("/token")
   public OidcToken getSsoToken(HttpServletResponse response) {
-    if (!StpUtil.isLogin()) {
-      return null;
-    }
     final String accessToken = StpUtil.getTokenValue();
     final String idToken = authnService.signJwt();
     final Long expiredIn = zerowebJwtConfig.getTimeout();

@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -250,5 +251,13 @@ class AuthnHttpTest {
           DecodedJWT actual = verifier.verify(jwt);
           assertEquals(excepted.getSubject(), actual.getSubject());
         });
+  }
+
+  @Test
+  void forwardAuth_notLogin() {
+    webTestClient.get()
+        .uri("/auth/self")
+        .exchange()
+        .expectStatus().isEqualTo(HttpStatus.NO_CONTENT);
   }
 }
