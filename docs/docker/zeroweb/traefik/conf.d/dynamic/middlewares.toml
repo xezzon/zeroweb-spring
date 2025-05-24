@@ -1,0 +1,9 @@
+[http.middlewares]
+
+# 参考：https://doc.traefik.io/traefik/middlewares/http/forwardauth/
+[http.middlewares.jwt-auth.forwardAuth]
+address = "http://zeroweb-service-admin:9001/auth/self"
+
+# 参考：https://doc.traefik.io/traefik/middlewares/http/stripprefixregex/
+[http.middlewares.stripprefix-api.stripPrefixRegex]
+regex = ["/api/[^/]+/"]

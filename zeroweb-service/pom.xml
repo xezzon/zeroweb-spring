@@ -26,17 +26,9 @@
     <!-- 应用端口号 -->
     <app.port>8080</app.port>
     <grpc.port>9090</grpc.port>
-    <!-- JavaAgent 存放路径 -->
-    <agent-extraction-root>${maven.multiModuleProjectDirectory}/agent</agent-extraction-root>
-    <!-- JavaAgent 在Docker中的路径 -->
-    <agent-path>/opt/agent</agent-path>
-    <workdir>/app</workdir>
-    <docker.host>${env.DOCKER_REGISTRY}</docker.host>
-    <!-- JavaAgent 名称 -->
-    <opentelemetry-javaagent.name>opentelemetry-javaagent-${opentelemetry-instrumentation.version}.jar</opentelemetry-javaagent.name>
-    <otel-ali-extension.name>ot-java-agent-extension-1.28.0.jar</otel-ali-extension.name>
     <!-- Testcontainers -->
-    <testcontainers.postgresql.url>jdbc:tc:postgresql:16-alpine:///postgres</testcontainers.postgresql.url>
+    <testcontainers.postgresql.url>jdbc:tc:postgresql:17-alpine:///postgres
+    </testcontainers.postgresql.url>
   </properties>
 
   <dependencies>
@@ -174,6 +166,21 @@
     <profile>
       <!-- 发布微服务应用时使用的配置。 -->
       <id>docker</id>
+      <properties>
+        <!-- JavaAgent 存放路径 -->
+        <agent-extraction-root>${maven.multiModuleProjectDirectory}/agent</agent-extraction-root>
+        <!-- JavaAgent 在Docker中的路径 -->
+        <agent-path>/opt/agent</agent-path>
+        <workdir>/app</workdir>
+        <!--suppress UnresolvedMavenProperty -->
+        <docker.host>${env.DOCKER_REGISTRY}</docker.host>
+        <image.version>${project.version}</image.version>
+        <!-- JavaAgent 名称 -->
+        <opentelemetry-javaagent.name>
+          opentelemetry-javaagent-${opentelemetry-instrumentation.version}.jar
+        </opentelemetry-javaagent.name>
+        <otel-ali-extension.name>ot-java-agent-extension-1.28.0.jar</otel-ali-extension.name>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -230,7 +237,10 @@
                 </platforms>
               </from>
               <to>
-                <image>${docker.host}/${project.artifactId}:${project.version}</image>
+                <image>${docker.host}/${project.artifactId}:${image.version}</image>
+                <tags>
+                  <tag>latest</tag>
+                </tags>
               </to>
               <container>
                 <environment>

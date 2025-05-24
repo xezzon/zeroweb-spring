@@ -1,0 +1,23 @@
+[api]
+dashboard = true
+insecure = true
+
+[entryPoints]
+[entryPoints.web]
+address = ":80"
+
+[providers.docker]
+exposedByDefault = false
+constraints = "Label(`com.docker.compose.project`,`zeroweb`)"  # 只监听 zeroweb 工程的服务。参考 https://docs.docker.com/compose/how-tos/project-name/。
+network = "zeroweb_gateway"  # 需要指定网关与服务共同的 Docker 网络，否则会访问不到服务。
+
+[providers.file]
+directory = "/etc/traefik/dynamic"
+watch = true
+
+[log]
+level = "INFO"
+
+[accessLog]
+filePath = "/var/log/access.log"
+bufferingSize = 1000
