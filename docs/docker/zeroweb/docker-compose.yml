@@ -1,0 +1,64 @@
+services:
+  ingress:
+    image: traefik:3
+    networks:
+      - gateway
+    ports:
+      - "80"
+      - "8080"
+    volumes:
+      - $PWD/traefik/conf.d:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock
+  zeroweb-service-admin:
+    image: ghcr.io/xezzon/zeroweb-service-admin:latest  # latest 为快照版本，正式版本请替换为版本号
+    networks:
+      - gateway
+      - db
+    environment:
+      - DB_URL=postgresql:5432/zeroweb
+      - DB_USERNAME=postgres_user
+      - DB_PASSWORD=postgres_password
+    volumes:
+      - $PWD/pem:/app/resources/pem
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.zeroweb-service-admin.rule=PathPrefix(`/api/admin`)
+      - traefik.http.routers.zeroweb-service-admin.middlewares=jwt-auth@file,stripprefix-api@file
+    depends_on:
+      - postgresql
+  zeroweb-service-open:
+    image: ghcr.io/xezzon/zeroweb-service-open:latest
+    networks:
+      - gateway
+      - db
+    environment:
+      - DB_URL=postgresql:5432/zeroweb
+      - DB_USERNAME=postgres_user
+      - DB_PASSWORD=postgres_password
+      - spring.grpc.client.channels.user.address=zeroweb-service-admin:9002
+      - spring.grpc.client.channels.dict.address=zeroweb-service-admin:9002
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.zeroweb-service-open.rule=PathPrefix(`/api/open`)
+      - traefik.http.routers.zeroweb-service-open.middlewares=jwt-auth@file,stripprefix-api@file
+    depends_on:
+      - postgresql
+  postgresql:
+    image: postgres:17
+    networks:
+      - db
+    environment:
+      - POSTGRES_DB=zeroweb
+      - POSTGRES_USER=postgres_user
+      - POSTGRES_PASSWORD=postgres_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data:rw
+
+networks:
+  gateway:
+    driver: bridge
+  db:
+    driver: bridge
+
+volumes:
+  postgres-data:

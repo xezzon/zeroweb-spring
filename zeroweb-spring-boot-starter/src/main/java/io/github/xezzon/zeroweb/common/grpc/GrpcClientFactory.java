@@ -10,32 +10,44 @@ import org.springframework.grpc.client.GrpcChannelFactory;
 import org.springframework.stereotype.Component;
 
 /**
+ * 构造 gRPC 客户端 Bean。
  * @author xezzon
  */
 @Component
 public class GrpcClientFactory {
 
-  private static final String DICT_CHANNEL = "dict";
-  private static final String USER_CHANNEL = "user";
+  private static final String ADMIN_CHANNEL = "admin";
 
+  /**
+   * 构造字典模块的阻塞式调用的 gRPC 客户端
+   * @return 字典 gRPC 服务客户端
+   */
   @Bean
-  public DictBlockingStub dictBlockingStub(final GrpcChannelFactory channels) {
+  DictBlockingStub dictBlockingStub(final GrpcChannelFactory channels) {
     return DictGrpc.newBlockingStub(
-        channels.createChannel(DICT_CHANNEL)
+        channels.createChannel(ADMIN_CHANNEL)
     );
   }
 
+  /**
+   * 构造字典模块的非阻塞式调用的 gRPC 客户端
+   * @return 字典 gRPC 服务客户端
+   */
   @Bean
-  public DictStub dictStub(final GrpcChannelFactory channels) {
+  DictStub dictStub(final GrpcChannelFactory channels) {
     return DictGrpc.newStub(
-        channels.createChannel(DICT_CHANNEL)
+        channels.createChannel(ADMIN_CHANNEL)
     );
   }
 
+  /**
+   * 构造用户模块的阻塞式调用的 gRPC 客户端
+   * @return 用户 gRPC 服务客户端
+   */
   @Bean
-  public UserBlockingStub userBlockingStub(final GrpcChannelFactory channels) {
+  UserBlockingStub userBlockingStub(final GrpcChannelFactory channels) {
     return UserGrpc.newBlockingStub(
-        channels.createChannel(USER_CHANNEL)
+        channels.createChannel(ADMIN_CHANNEL)
     );
   }
 }

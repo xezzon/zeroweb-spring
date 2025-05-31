@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 public class JwtKeyManager implements JwtCryptoService {
 
   public static final String ALGORITHM = "EC";
+  private static final String KEY_FOLDER = "pem/";
   private final ZerowebJwtConfig zerowebJwtConfig;
   private PrivateKey privateKey;
   private PublicKey publicKey;
@@ -44,7 +45,7 @@ public class JwtKeyManager implements JwtCryptoService {
   @PostConstruct
   public void loadPrivateKey() {
     PemClasspathReaderAndWriter pemReaderAndWriter =
-        new PemClasspathReaderAndWriter(zerowebJwtConfig.getIssuer());
+        new PemClasspathReaderAndWriter(KEY_FOLDER + zerowebJwtConfig.getIssuer());
     try {
       /* 从PEM文件中读取公钥、私钥 */
       this.privateKey = SecretKeyUtil.readPrivateKey(pemReaderAndWriter);
@@ -118,7 +119,8 @@ public class JwtKeyManager implements JwtCryptoService {
    */
   @EventListener
   public void savePublicKeyToClasspath(PublicKeyGeneratedEvent event) {
-    ASN1PublicKeyWriter asn1Writer = new PemClasspathReaderAndWriter(zerowebJwtConfig.getIssuer());
+    ASN1PublicKeyWriter asn1Writer =
+        new PemClasspathReaderAndWriter(KEY_FOLDER + zerowebJwtConfig.getIssuer());
     try {
       SecretKeyUtil.writePublicKey(event.publicKey(), asn1Writer);
     } catch (Exception e) {

@@ -55,7 +55,7 @@ public class RedisTemplateFactory {
    * 常规 Redis 处理器
    */
   @Bean
-  public <T> RedisTemplate<String, T> genericRedisTemplate() {
+  <T> RedisTemplate<String, T> genericRedisTemplate() {
     RedisTemplate<String, T> redisTemplate = new RedisTemplate<>();
     redisTemplate.setConnectionFactory(connectionFactory);
     redisTemplate.setKeySerializer(keySerializer);

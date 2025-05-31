@@ -8,25 +8,40 @@ on:
       - published
 
 env:
-  DOCKER_HOST: ghcr.io
+  JAVA_DISTRIBUTION: 'temurin'
+  JAVA_VERSION: '17'
 
 jobs:
+  set-version:
+    runs-on: ubuntu-24.04
+    outputs:
+      project_version: ${{ steps.set_version.outputs.project_version }}
+      image_version: ${{ steps.set_version.outputs.image_version }}
+    steps:
+      - id: set_version
+        env:
+          PROJECT_VERSION: ${{ github.ref_name }}
+          IMAGE_VERSION: ${{ github.event.release.prerelease && 'latest' || github.ref_name }}
+        run: |
+          echo "project_version=${PROJECT_VERSION}" >> $GITHUB_OUTPUT
+          echo "image_version=${IMAGE_VERSION}" >> $GITHUB_OUTPUT
   publish-sdk:
+    needs: set-version
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Apache Maven Central
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
           cache: 'maven'
           server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_CENTRAL_TOKEN
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
-      - name: Set Version
-        run: mvn -B versions:set -D newVersion=$GITHUB_REF_NAME
+      - name: Set SDK Version
+        run: mvn -B versions:set -D newVersion=${{ needs.set-version.outputs.project_version }}
       - name: Publish Java package
         run: mvn -B deploy -P release -D skipTests=true
         env:
@@ -34,31 +49,33 @@ jobs:
           MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
   publish-service:
+    needs: set-version
     runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
       attestations: write
+    env:
+      DOCKER_HOST: ghcr.io
     steps:
       - uses: actions/checkout@v4
       - name: Set up Apache Maven Central
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
           cache: 'maven'
           server-id: ${{ env.DOCKER_HOST }}
           server-username: DOCKER_USERNAME
           server-password: DOCKER_TOKEN
-      - name: Set Version
-        run: mvn -B versions:set -D newVersion=$GITHUB_REF_NAME
       - name: Publish Docker image
-        run: mvn -B deploy -P docker -D skipTests=true
+        run: mvn -B deploy -P docker -D skipTests=true -D image.version=${{ needs.set-version.outputs.image_version }}
         env:
           DOCKER_REGISTRY: ${{ env.DOCKER_HOST }}/${{ github.repository_owner }}
           DOCKER_USERNAME: ${{ github.repository_owner }}
           DOCKER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   report:
+    needs: set-version
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -72,11 +89,11 @@ jobs:
       - name: Set up Apache Maven Central
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
           cache: 'maven'
       - name: Set Version
-        run: mvn -B versions:set -D newVersion=$GITHUB_REF_NAME
+        run: mvn -B versions:set -D newVersion=${{ needs.set-version.outputs.project_version }}
       - name: Generate the report
         run: mvn -B site site:stage -P report
       - name: Setup Pages

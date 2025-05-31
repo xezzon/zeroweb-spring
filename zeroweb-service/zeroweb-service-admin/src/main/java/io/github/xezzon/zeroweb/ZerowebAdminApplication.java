@@ -7,7 +7,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode;
 
 /**
- * 后台管理服务
+ * 系统管理服务
  * @author xezzon
  */
 @SpringBootApplication
@@ -16,7 +16,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerial
 public class ZerowebAdminApplication {
 
   /**
-   * 后台管理服务入口
+   * 系统管理服务入口
    * @param args 应用启动参数
    */
   public static void main(String[] args) {

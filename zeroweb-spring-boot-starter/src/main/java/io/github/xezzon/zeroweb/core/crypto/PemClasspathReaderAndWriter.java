@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.util.io.pem.PemObject;
@@ -78,6 +79,7 @@ public class PemClasspathReaderAndWriter implements
   public void writePublicKey(byte[] publicKey) throws IOException {
     String filename = name + PUBLIC_KEY_FILE_SUFFIX;
     File keyFile = ResourceUtil.getResourceFromClasspath(filename).toFile();
+    Files.createDirectories(keyFile.toPath().getParent());
     try (PemWriter pemWriter = new PemWriter(new FileWriter(keyFile))) {
       PemObject pemObject = new PemObject(PEM_PUBLIC_KEY_HEADER, publicKey);
       pemWriter.writeObject(pemObject);
@@ -93,6 +95,7 @@ public class PemClasspathReaderAndWriter implements
   public void writePrivateKey(byte[] privateKey) throws IOException {
     String filename = name + PRIVATE_KEY_FILE_SUFFIX;
     File keyFile = ResourceUtil.getResourceFromClasspath(filename).toFile();
+    Files.createDirectories(keyFile.toPath().getParent());
     try (PemWriter pemWriter = new PemWriter(new FileWriter(keyFile))) {
       PemObject pemObject = new PemObject(PEM_PRIVATE_KEY_HEADER, privateKey);
       pemWriter.writeObject(pemObject);

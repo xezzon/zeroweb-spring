@@ -1,4 +1,4 @@
-# 后台管理服务
+# 系统管理服务
 
 ## 安装
 
@@ -13,7 +13,7 @@ service:
     name: pgsql
     environment:
       POSTGRES_PASSWORD: postgres@123
-  zeroweb-admin: # 后台管理服务
+  zeroweb-admin: # 系统管理服务
     image: ghcr.io/xezzon/zeroweb-service-admin:<version>
     name: zeroweb-admin
     environment:
