@@ -90,6 +90,19 @@ payload 中包含以下内容：
 | groups             | 所在用户组   | 类型为 String[]。            |
 | entitlements       | 持有者权限   | 类型为 String[]。            |
 
+## 系统设计
+
+### 模块划分
+
+- **AuthnService**：负责用户认证（用户名、口令校验）。
+- **AuthzService**：负责权限管理（角色、权限绑定）。
+- **SessionUtil**：会话管理工具类，负责加载和存储用户会话信息。
+- **JwtCryptoService**：JWT 签名与验证服务。
+
+### 事件机制
+
+- **UserLoginEvent**：用户登录事件，用于触发会话加载和权限初始化。
+
 ## 引用文档
 
 - [IANA 机构](https://www.iana.org/assignments/jwt/jwt.xhtml)

@@ -4,14 +4,17 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xezzon_zeroweb-spring&metric=coverage)](https://sonarcloud.io/summary/new_code?id=xezzon_zeroweb-spring)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=xezzon_zeroweb-spring&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=xezzon_zeroweb-spring)
 
-ZeroWeb 是一组 BaaS(Backend as a Service)，可以低成本地实现认证授权、后台管理、开放平台等功能。提供 gRPC 接口 SDK（后端集成）与 HTTP 接口 SDK（前端集成）。
+
+ZeroWeb 是一组 BaaS(Backend as a Service)，可以低成本地实现认证授权、系统管理、开放平台等功能。提供 gRPC 接口 SDK（后端集成）与 HTTP 接口 SDK（前端集成）。
 
 ## 功能特性
 
-- [后台管理服务](zeroweb-service/zeroweb-service-admin/README.md)
+- [系统管理服务](zeroweb-service/zeroweb-service-admin/README.md)
   - 认证
   - 单点登录
+  - RBAC模型授权
   - 字典管理
+  - 国际化管理
 - [服务间接口SDK](zeroweb-proto/README.md)
   - 第三方应用管理
   - 对外接口的管理、订阅、调用

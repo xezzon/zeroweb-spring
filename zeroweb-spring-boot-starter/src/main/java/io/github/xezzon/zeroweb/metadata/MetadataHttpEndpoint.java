@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/metadata")
-public class MetadataController {
+public class MetadataHttpEndpoint {
 
   @Value("${spring.application.name}")
   private String appName;

@@ -4,6 +4,8 @@
 
 本文档希望能帮助您写出高质量的、运维友好的设计与代码，更好地参与本项目的开发。
 
+想要快速了解本项目，可以借助[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/xezzon/zeroweb-spring)（仅供参考）。
+
 > 约定：本项目的所用文档中，开发者称呼 ZeroWeb 项目的开发维护人员，使用者称呼集成 ZeroWeb 开发自己系统的开发人员，用户称呼系统最终的使用者。
 
 ## 项目结构
@@ -13,7 +15,7 @@
 - `zeroweb-proto`: 通过protobuf定义的服务间交互的结构体与接口。
 - `zeroweb-spring-boot-starter`: 所有服务间共享的配置与工具。
 - `zeroweb-service`: 包含若干子模块，每一个模块是一个微服务构件。
-  - `zeroweb-service-admin`: 后台管理服务。
+  - `zeroweb-service-admin`: 系统管理服务。
   - `zeroweb-service-open`: 开放平台服务。
 
 ### 包名

@@ -19,6 +19,7 @@ import javax.crypto.SecretKey;
 import org.jetbrains.annotations.TestOnly;
 
 /**
+ * 为单元测试生成 JWT。
  * @author xezzon
  */
 @TestOnly

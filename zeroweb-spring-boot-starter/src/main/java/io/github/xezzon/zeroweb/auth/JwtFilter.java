@@ -27,6 +27,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
+ * 处理请求头中 JWT 携带的认证信息。
  * @author xezzon
  */
 @Slf4j

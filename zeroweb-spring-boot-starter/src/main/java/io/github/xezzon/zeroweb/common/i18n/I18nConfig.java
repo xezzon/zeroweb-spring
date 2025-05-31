@@ -24,7 +24,7 @@ public class I18nConfig {
    * @return 国际化工具
    */
   @Bean
-  public MessageSource messageSource() {
+  MessageSource messageSource() {
     final ReloadableResourceBundleMessageSource messageSource =
         new ReloadableResourceBundleMessageSource();
     messageSource.setBasename(BASENAME);
