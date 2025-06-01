@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -27,4 +28,17 @@ public class TestEntity implements IEntity<String> {
   private String field1;
   @Column(name = "field2")
   private String field2;
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof TestEntity that)) {
+      return false;
+    }
+    return Objects.equals(id, that.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
 }
