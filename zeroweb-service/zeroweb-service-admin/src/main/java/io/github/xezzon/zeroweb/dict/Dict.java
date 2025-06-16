@@ -5,7 +5,6 @@ import io.github.xezzon.tao.tree.TreeNode;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.jpa.IEntity;
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
-import io.github.xezzon.zeroweb.locale.II18nMessage;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -26,10 +25,9 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "zeroweb_dict")
-public class Dict implements IEntity<String>, IDict, TreeNode<Dict, String>, II18nMessage {
+public class Dict implements IEntity<String>, IDict, TreeNode<Dict, String> {
 
   public static final String DICT_TAG = "DICT";
-  public static final String DICT_I18N_NAMESPACE = "Dict";
 
   @Id
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
@@ -87,15 +85,5 @@ public class Dict implements IEntity<String>, IDict, TreeNode<Dict, String>, II1
 
   public int getOrdinal() {
     return this.ordinal;
-  }
-
-  @Override
-  public String getNamespace() {
-    return DICT_I18N_NAMESPACE;
-  }
-
-  @Override
-  public String getMessageKey() {
-    return this.tag + "." + this.code;
   }
 }

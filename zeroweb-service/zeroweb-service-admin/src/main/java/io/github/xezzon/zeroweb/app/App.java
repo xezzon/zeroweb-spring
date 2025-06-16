@@ -3,7 +3,6 @@ package io.github.xezzon.zeroweb.app;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.jpa.IEntity;
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
-import io.github.xezzon.zeroweb.locale.II18nMessage;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -21,7 +20,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "zeroweb_zpp")
-public class App implements IEntity<String>, II18nMessage {
+public class App implements IEntity<String> {
 
   @Id
   @IdGenerator
@@ -42,14 +41,4 @@ public class App implements IEntity<String>, II18nMessage {
    */
   @Column(name = "ordinal", nullable = false)
   private Integer ordinal;
-
-  @Override
-  public String getNamespace() {
-    return "APP_NAME";
-  }
-
-  @Override
-  public String getMessageKey() {
-    return this.name;
-  }
 }

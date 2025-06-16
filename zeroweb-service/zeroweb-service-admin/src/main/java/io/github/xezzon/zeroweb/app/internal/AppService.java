@@ -1,13 +1,9 @@
 package io.github.xezzon.zeroweb.app.internal;
 
 import io.github.xezzon.zeroweb.app.App;
-import io.github.xezzon.zeroweb.locale.event.I18nMessageChangedEvent;
-import io.github.xezzon.zeroweb.locale.event.I18nMessageDeletedEvent;
-import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,8 +13,6 @@ import org.springframework.stereotype.Service;
 public class AppService {
 
   private final AppDAO appDAO;
-  @Resource
-  private ApplicationEventPublisher eventPublisher;
 
   public AppService(final AppDAO appDAO) {
     this.appDAO = appDAO;
@@ -47,11 +41,8 @@ public class AppService {
   void updateApp(final App app) {
     final App entity = appDAO.get().findById(app.getId())
         .orElseThrow(EntityNotFoundException::new);
-    final App oldValue = new App();
-    appDAO.getCopier().copy(entity, oldValue);
+    appDAO.getCopier().copy(app, entity);
     appDAO.get().save(app);
-    /* 后置处理 */
-    eventPublisher.publishEvent(new I18nMessageChangedEvent(oldValue, app));
   }
 
   /**
@@ -64,7 +55,5 @@ public class AppService {
       return;
     }
     appDAO.get().deleteById(id);
-    /* 后置处理 */
-    eventPublisher.publishEvent(new I18nMessageDeletedEvent(app.get()));
   }
 }

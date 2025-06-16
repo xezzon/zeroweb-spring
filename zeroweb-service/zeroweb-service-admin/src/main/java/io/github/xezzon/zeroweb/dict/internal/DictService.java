@@ -4,9 +4,6 @@ import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.dict.Dict;
-import io.github.xezzon.zeroweb.locale.event.I18nMessageChangedEvent;
-import io.github.xezzon.zeroweb.locale.event.I18nMessageDeletedEvent;
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -14,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +21,6 @@ import org.springframework.stereotype.Service;
 public class DictService {
 
   private final DictDAO dictDAO;
-  @Resource
-  private ApplicationEventPublisher eventPublisher;
 
   public DictService(final DictDAO dictDAO) {
     this.dictDAO = dictDAO;
@@ -60,15 +54,11 @@ public class DictService {
    */
   protected void modifyDict(Dict dict) {
     Dict entity = dictDAO.get().getReferenceById(dict.getId());
-    final Dict oldValue = new Dict();
-    dictDAO.getCopier().copy(entity, oldValue);
     dictDAO.getCopier().copy(dict, entity);
     /* 前置校验 */
     this.checkRepeat(entity);
     /* 持久化 */
     dictDAO.get().save(entity);
-    /* 后置处理 */
-    eventPublisher.publishEvent(new I18nMessageChangedEvent(oldValue, dict));
   }
 
   /**
@@ -95,9 +85,6 @@ public class DictService {
       ids = children.parallelStream()
           .map(Dict::getId)
           .collect(Collectors.toSet());
-      children.stream()
-          .map(I18nMessageDeletedEvent::new)
-          .forEach(eventPublisher::publishEvent);
     }
   }
 
