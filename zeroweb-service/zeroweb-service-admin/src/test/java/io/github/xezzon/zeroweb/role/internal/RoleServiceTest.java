@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.role.internal;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
-import io.github.xezzon.zeroweb.common.exception.RoleNotInheritableException;
+import io.github.xezzon.zeroweb.role.exception.RoleNotInheritableException;
 import io.github.xezzon.zeroweb.role.Role;
 import io.github.xezzon.zeroweb.role.entity.AddRoleReq;
 import io.github.xezzon.zeroweb.role.repository.RoleRepository;

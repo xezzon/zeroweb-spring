@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.dict;
 
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -136,8 +137,7 @@ class DictHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
   }
 
   @Test
@@ -181,8 +181,7 @@ class DictHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
   }
 
   @Test
@@ -235,8 +234,7 @@ class DictHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
     Dict dict = repository.findById(target.getId()).orElseThrow();
     assertEquals(target.getCode(), dict.getCode());
     assertEquals(target.getTag(), dict.getTag());

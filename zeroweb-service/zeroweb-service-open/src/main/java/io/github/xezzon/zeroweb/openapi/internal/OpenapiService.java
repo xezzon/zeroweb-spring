@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.openapi.internal;
 
-import io.github.xezzon.zeroweb.common.exception.PublishedOpenapiCannotBeModifyException;
+import io.github.xezzon.zeroweb.openapi.exception.PublishedOpenapiCannotBeModifyException;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.openapi.Openapi;

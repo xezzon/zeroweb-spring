@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.subscription;
 
-import io.github.xezzon.zeroweb.common.exception.UnsubscribeOpenapiException;
+import io.github.xezzon.zeroweb.subscription.exception.UnsubscribeOpenapiException;
 
 /**
  * @author xezzon

@@ -1,5 +1,6 @@
 package io.github.xezzon.zeroweb.openapi;
 
+import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -99,8 +100,7 @@ class OpenapiHttpTest {
         .bodyValue(req)
         .exchange()
         .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
   }
 
   @Test
@@ -180,8 +180,7 @@ class OpenapiHttpTest {
         .bodyValue(req)
         .exchange()
         .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
     Openapi openapi = repository.findById(target.getId()).orElseThrow();
     assertEquals(target.getCode(), openapi.getCode());
     assertEquals(target.getDestination(), openapi.getDestination());
@@ -204,8 +203,7 @@ class OpenapiHttpTest {
         .bodyValue(req)
         .exchange()
         .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.NO_SUCH_DATA.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
   }
 
   @Test
@@ -230,8 +228,8 @@ class OpenapiHttpTest {
         .bodyValue(req)
         .exchange()
         .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(OpenErrorCode.PUBLISHED_OPENAPI_CANNOT_BE_MODIFY.code());
+        .expectHeader()
+        .valueEquals(ERROR_CODE_HEADER, OpenErrorCode.PUBLISHED_OPENAPI_CANNOT_BE_MODIFY.code());
 
     req = new ModifyOpenapiReq(
         publishedOpenapi.getId(),
@@ -275,7 +273,6 @@ class OpenapiHttpTest {
         )
         .exchange()
         .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.NO_SUCH_DATA.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
   }
 }

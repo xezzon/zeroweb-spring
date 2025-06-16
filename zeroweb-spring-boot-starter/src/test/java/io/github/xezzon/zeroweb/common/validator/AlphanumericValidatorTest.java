@@ -3,8 +3,7 @@ package io.github.xezzon.zeroweb.common.validator;
 import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 
 import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
-import io.github.xezzon.zeroweb.common.exception.ErrorDetail;
-import io.github.xezzon.zeroweb.common.exception.ErrorResponse;
+import io.github.xezzon.zeroweb.common.exception.ErrorResult;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Locale;
@@ -39,34 +38,33 @@ class AlphanumericValidatorTest {
     ChildEntity childEntity = new ChildEntity();
     childEntity.setAlphabet("no_rst-uvw");
     entity.setChildEntity(childEntity);
-    ErrorResponse responseBody = webTestClient.post()
+    ErrorResult responseBody = webTestClient.post()
         .uri("/alphanumeric/validate")
         .bodyValue(entity)
         .exchange()
         .expectStatus().isEqualTo(errorCode.sourceType().getResponseCode())
         .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
-        .expectBody(ErrorResponse.class)
+        .expectBody(ErrorResult.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
         MethodArgumentNotValidException.class.getSimpleName(),
-        responseBody.error().getCode()
+        responseBody.getCode()
     );
-    List<ErrorDetail> details = responseBody.error().getDetails();
+    List<ErrorResult> details = responseBody.getDetails();
     Assertions.assertNotNull(details);
     Assertions.assertEquals(2, details.size());
     Assertions.assertTrue(details.stream()
-        .anyMatch(detail ->
-            Objects.equals(detail.getCode(), "alphabet")
-                && Objects.equals(detail.getMessage(), "不允许的字符@.")
-        )
+        .anyMatch(detail -> Objects.equals(
+            detail.getParameters().get("field"),
+            "alphabet"
+        ))
     );
     Assertions.assertTrue(details.stream()
-        .anyMatch(detail ->
-            Objects.equals(detail.getCode(), "childEntity.alphabet")
-                && Objects.equals(detail.getMessage(), "不允许的字符_-")
-        )
+        .anyMatch(detail -> Objects.equals(
+            detail.getParameters().get("field"),
+            "childEntity.alphabet"
+        ))
     );
   }
 }

@@ -6,7 +6,7 @@ import io.github.xezzon.zeroweb.auth.JwtClaim;
 import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.auth.event.UserLoginEvent;
 import io.github.xezzon.zeroweb.auth.util.SessionUtil;
-import io.github.xezzon.zeroweb.common.exception.InvalidPasswordException;
+import io.github.xezzon.zeroweb.auth.exception.InvalidPasswordException;
 import io.github.xezzon.zeroweb.crypto.JwtCryptoService;
 import io.github.xezzon.zeroweb.user.User;
 import io.github.xezzon.zeroweb.user.IUserService4Auth;

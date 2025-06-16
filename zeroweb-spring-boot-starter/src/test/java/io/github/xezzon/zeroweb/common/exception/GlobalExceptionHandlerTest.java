@@ -33,77 +33,66 @@ class GlobalExceptionHandlerTest {
   @Test
   void repeatDataException() {
     CommonErrorCode errorCode = CommonErrorCode.REPEAT_DATA;
-    ErrorResponse responseBody = webTestClient.get()
+    ErrorResult responseBody = webTestClient.get()
         .uri("/RepeatDataException")
         .exchange()
         .expectStatus().isEqualTo(errorCode.sourceType().getResponseCode())
         .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
-        .expectBody(ErrorResponse.class)
+        .expectBody(ErrorResult.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(errorCode.code(), responseBody.code());
-    Assertions.assertEquals(
-        RepeatDataException.class.getSimpleName(),
-        responseBody.error().getCode()
-    );
-    Assertions.assertEquals("数据已存在", responseBody.error().getMessage());
+    Assertions.assertEquals(RepeatDataException.class.getSimpleName(), responseBody.getCode());
   }
 
   @Test
   void noValidClasspathException() {
     CommonErrorCode errorCode = CommonErrorCode.UNKNOWN;
-    ErrorResponse responseBody = webTestClient.get()
+    ErrorResult responseBody = webTestClient.get()
         .uri("/NoValidClasspathException")
         .exchange()
         .expectStatus().isEqualTo(errorCode.sourceType().getResponseCode())
         .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
-        .expectBody(ErrorResponse.class)
+        .expectBody(ErrorResult.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
         NoValidClasspathException.class.getSimpleName(),
-        responseBody.error().getCode()
+        responseBody.getCode()
     );
-    Assertions.assertEquals("服务器开小差了。请联系系统管理员。", responseBody.error().getMessage());
   }
 
   @Test
   void entityNotFoundException() {
     CommonErrorCode errorCode = CommonErrorCode.NO_SUCH_DATA;
-    ErrorResponse responseBody = webTestClient.get()
+    ErrorResult responseBody = webTestClient.get()
         .uri("/EntityNotFoundException")
         .exchange()
         .expectStatus().isEqualTo(errorCode.sourceType().getResponseCode())
         .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
-        .expectBody(ErrorResponse.class)
+        .expectBody(ErrorResult.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
         EntityNotFoundException.class.getSimpleName(),
-        responseBody.error().getCode()
+        responseBody.getCode()
     );
-    Assertions.assertEquals("数据不存在或已删除。请刷新页面。", responseBody.error().getMessage());
   }
 
   @Test
   void unsupportedOperationException() {
     CommonErrorCode errorCode = CommonErrorCode.UNKNOWN;
-    ErrorResponse responseBody = webTestClient.get()
+    ErrorResult responseBody = webTestClient.get()
         .uri("/UnsupportedOperationException")
         .exchange()
         .expectStatus().isEqualTo(errorCode.sourceType().getResponseCode())
         .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
-        .expectBody(ErrorResponse.class)
+        .expectBody(ErrorResult.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
         UnsupportedOperationException.class.getSimpleName(),
-        responseBody.error().getCode()
+        responseBody.getCode()
     );
-    Assertions.assertEquals("服务器开小差了。请联系系统管理员。", responseBody.error().getMessage());
   }
 
   @Test
@@ -112,65 +101,59 @@ class GlobalExceptionHandlerTest {
     ValidEntity entity = new ValidEntity();
     entity.setName(RandomUtil.randomString(8));
     entity.setEmail(RandomUtil.randomString(8));
-    ErrorResponse responseBody = webTestClient.post()
+    ErrorResult responseBody = webTestClient.post()
         .uri("/MethodArgumentNotValidException")
         .bodyValue(entity)
         .exchange()
         .expectStatus().isEqualTo(errorCode.sourceType().getResponseCode())
         .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
-        .expectBody(ErrorResponse.class)
+        .expectBody(ErrorResult.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
         MethodArgumentNotValidException.class.getSimpleName(),
-        responseBody.error().getCode()
+        responseBody.getCode()
     );
-    Assertions.assertEquals("参数错误。请检查输入后重新提交。", responseBody.error().getMessage());
-    Assertions.assertTrue(responseBody.error().getDetails().parallelStream()
-        .anyMatch(detail -> Objects.equals("email", detail.getCode()))
-    );
-    Assertions.assertTrue(responseBody.error().getDetails().parallelStream()
-        .anyMatch(detail -> Objects.equals("name", detail.getCode()))
-    );
+    Assertions.assertTrue(responseBody.getDetails().stream().anyMatch(detail ->
+        Objects.equals("email", detail.getParameters().get("field"))
+    ));
+    Assertions.assertTrue(responseBody.getDetails().stream().anyMatch(detail ->
+        Objects.equals("name", detail.getParameters().get("field"))
+    ));
   }
 
   @Test
   void noResourceFoundException() {
     CommonErrorCode errorCode = CommonErrorCode.NOT_FOUND;
     final String uri = RandomUtil.randomString(8);
-    ErrorResponse responseBody = webTestClient.get()
+    ErrorResult responseBody = webTestClient.get()
         .uri(uri)
         .exchange()
         .expectStatus().isNotFound()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
-        .expectBody(ErrorResponse.class)
+        .expectBody(ErrorResult.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
         NoResourceFoundException.class.getSimpleName(),
-        responseBody.error().getCode()
+        responseBody.getCode()
     );
-    Assertions.assertEquals("404", responseBody.error().getMessage());
   }
 
   @Test
   void dataPermissionForbiddenException() {
     CommonErrorCode errorCode = CommonErrorCode.DATA_PERMISSION_FORBIDDEN;
-    ErrorResponse responseBody = webTestClient.get()
+    ErrorResult responseBody = webTestClient.get()
         .uri("/DataPermissionForbiddenException")
         .exchange()
         .expectStatus().isForbidden()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
-        .expectBody(ErrorResponse.class)
+        .expectBody(ErrorResult.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(errorCode.code(), responseBody.code());
     Assertions.assertEquals(
         DataPermissionForbiddenException.class.getSimpleName(),
-        responseBody.error().getCode()
+        responseBody.getCode()
     );
-    Assertions.assertEquals("禁止访问。", responseBody.error().getMessage());
   }
 }

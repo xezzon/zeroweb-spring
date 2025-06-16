@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.subscription.internal;
 
-import io.github.xezzon.zeroweb.common.exception.UnpublishedOpenapiCannotBeSubscribeException;
-import io.github.xezzon.zeroweb.common.exception.UnsubscribeOpenapiException;
+import io.github.xezzon.zeroweb.subscription.exception.UnpublishedOpenapiCannotBeSubscribeException;
+import io.github.xezzon.zeroweb.subscription.exception.UnsubscribeOpenapiException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;

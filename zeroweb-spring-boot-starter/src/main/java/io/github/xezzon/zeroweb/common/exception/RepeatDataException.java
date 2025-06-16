@@ -1,5 +1,7 @@
 package io.github.xezzon.zeroweb.common.exception;
 
+import java.util.Collections;
+
 /**
  * 唯一键冲突
  * @author xezzon
@@ -7,6 +9,10 @@ package io.github.xezzon.zeroweb.common.exception;
 public class RepeatDataException extends ZerowebBusinessException {
 
   public RepeatDataException(String key) {
-    super(key);
+    super(
+        CommonErrorCode.REPEAT_DATA,
+        Collections.singletonMap("keyword", key),
+        String.format("`%s` is existed.", key)
+    );
   }
 }

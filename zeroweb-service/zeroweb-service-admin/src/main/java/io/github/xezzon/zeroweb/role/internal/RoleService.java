@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.role.internal;
 
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
-import io.github.xezzon.zeroweb.common.exception.RoleNotInheritableException;
+import io.github.xezzon.zeroweb.role.exception.RoleNotInheritableException;
 import io.github.xezzon.zeroweb.core.tree.ITreeService;
 import io.github.xezzon.zeroweb.role.RoleConstant;
 import io.github.xezzon.zeroweb.role.Role;

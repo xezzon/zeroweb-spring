@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.auth;
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.BEARER;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -133,8 +134,7 @@ class AuthnHttpTest {
         .bodyValue(basicAuth1)
         .exchange()
         .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_PASSWORD.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, AdminErrorCode.INVALID_PASSWORD.code());
     // 密码不正确
     BasicAuth basicAuth2 = new BasicAuth(user.getUsername(), RandomUtil.randomString(9));
     webTestClient.post()
@@ -142,8 +142,7 @@ class AuthnHttpTest {
         .bodyValue(basicAuth2)
         .exchange()
         .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_PASSWORD.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, AdminErrorCode.INVALID_PASSWORD.code());
   }
 
   @Test

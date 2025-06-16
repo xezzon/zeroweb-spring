@@ -1,5 +1,6 @@
 package io.github.xezzon.zeroweb.user;
 
+import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -78,7 +79,6 @@ class UserHttpTest {
         .bodyValue(req)
         .exchange()
         .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
   }
 }

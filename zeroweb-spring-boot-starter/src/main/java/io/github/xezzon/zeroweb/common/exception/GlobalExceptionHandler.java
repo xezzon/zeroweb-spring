@@ -3,11 +3,13 @@ package io.github.xezzon.zeroweb.common.exception;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
-import io.github.xezzon.zeroweb.common.i18n.I18nUtil;
 import io.github.xezzon.zeroweb.core.error.IErrorCode;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.opentelemetry.api.trace.Span;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
@@ -34,38 +36,41 @@ public class GlobalExceptionHandler {
    * 错误码的请求头名称
    */
   public static final String ERROR_CODE_HEADER = "X-Error-Code";
+  private static final Map<Class<? extends Throwable>, IErrorCode> ERROR_CODE_MAP = Map.ofEntries(
+      Map.entry(EntityNotFoundException.class, CommonErrorCode.NO_SUCH_DATA)
+  );
 
   /**
    * 业务异常
    */
   @ExceptionHandler(ZerowebBusinessException.class)
-  public ResponseEntity<ErrorResponse> handleException(
+  public ResponseEntity<ErrorResult> handleException(
       ZerowebBusinessException e,
       HttpServletRequest request
   ) {
     log(e, request);
     // 错误码
-    IErrorCode errorCode = this.getErrorCode(e);
+    IErrorCode errorCode = e.getErrorCode();
     // 响应码
     int responseStatus = errorCode.sourceType().getResponseCode();
     // 异常名称
     String errorName = e.getClass().getSimpleName();
     // 异常消息
-    String errorMessage = e.getLocalizedMessage(request.getLocale(), errorCode.name());
-    // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
+    String errorMessage = e.getMessage();
     // 响应体
     return ResponseEntity
         .status(responseStatus)
         .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+        .body(new ErrorResult(errorName, errorMessage)
+            .setParameters(e.getParameters())
+        );
   }
 
   /**
    * 非业务异常（通用）
    */
   @ExceptionHandler(Throwable.class)
-  public ResponseEntity<ErrorResponse> handleException(
+  public ResponseEntity<ErrorResult> handleException(
       Throwable e,
       HttpServletRequest request
   ) {
@@ -77,135 +82,118 @@ public class GlobalExceptionHandler {
     // 异常名称
     String errorName = e.getClass().getSimpleName();
     // 异常消息
-    String errorMessage = I18nUtil.formatter(IErrorCode.I18N_BASENAME)
-        .locale(request.getLocale())
-        .format(errorCode.name(), CommonErrorCode.UNKNOWN.name());
-    // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
+    String errorMessage = e.getMessage();
     // 响应体
     return ResponseEntity
         .status(responseStatus)
         .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+        .body(new ErrorResult(errorName, errorMessage));
   }
 
   /**
    * 参数校验不通过
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ErrorResponse> handleException(
+  public ResponseEntity<ErrorResult> handleException(
       MethodArgumentNotValidException e,
       HttpServletRequest request
   ) {
     // 参数校验错误，降低日志级别
     log(e, request, Level.INFO);
     // 错误码
-    IErrorCode errorCode = this.getErrorCode(e);
+    IErrorCode errorCode = CommonErrorCode.ARGUMENT_NOT_VALID;
     // 响应码
     int responseStatus = HttpResponseStatus.BAD_REQUEST.code();
     // 异常名称
     String errorName = e.getClass().getSimpleName();
     // 异常消息
-    String errorMessage = I18nUtil.formatter(IErrorCode.I18N_BASENAME)
-        .locale(request.getLocale())
-        .format(errorCode.name(), CommonErrorCode.UNKNOWN.name());
+    String errorMessage = e.getMessage();
     // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
-    errorDetail.setDetails(e.getFieldErrors().parallelStream()
-        .map(error -> new ErrorDetail(error.getField(), error.getDefaultMessage()))
-        .toList()
-    );
+    List<ErrorResult> errorDetails = e.getFieldErrors().stream()
+        .map(error -> new ErrorResult(error.getCode(), error.getDefaultMessage())
+            .setParameters(Map.ofEntries(
+                Map.entry("field", error.getField())
+            ))
+        )
+        .toList();
     // 响应体
     return ResponseEntity
         .status(responseStatus)
         .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+        .body(new ErrorResult(errorName, errorMessage).setDetails(errorDetails));
   }
 
   /**
    * 请求资源不存在
    */
   @ExceptionHandler(NoResourceFoundException.class)
-  public ResponseEntity<ErrorResponse> handleException(
+  public ResponseEntity<ErrorResult> handleException(
       NoResourceFoundException e,
       HttpServletRequest request
   ) {
     log(e, request);
     // 错误码
-    IErrorCode errorCode = this.getErrorCode(e);
+    IErrorCode errorCode = CommonErrorCode.NOT_FOUND;
     // 响应码
     int responseStatus = HttpResponseStatus.NOT_FOUND.code();
     // 异常名称
     String errorName = e.getClass().getSimpleName();
     // 异常消息
-    String errorMessage = I18nUtil.formatter(IErrorCode.I18N_BASENAME)
-        .locale(request.getLocale())
-        .format(errorCode.name(), CommonErrorCode.UNKNOWN.name());
-    // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
+    String errorMessage = e.getMessage();
     return ResponseEntity
         .status(responseStatus)
         .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+        .body(new ErrorResult(errorName, errorMessage));
   }
 
   /**
    * 未登录
    */
   @ExceptionHandler(NotLoginException.class)
-  public ResponseEntity<ErrorResponse> handleException(
+  public ResponseEntity<ErrorResult> handleException(
       NotLoginException e,
       HttpServletRequest request
   ) {
     log(e, request);
     // 错误码
-    IErrorCode errorCode = this.getErrorCode(e);
+    IErrorCode errorCode = CommonErrorCode.NOT_LOGIN;
     // 响应码
     int responseStatus = HttpResponseStatus.UNAUTHORIZED.code();
     // 异常名称
     String errorName = e.getClass().getSimpleName();
     // 异常消息
-    String errorMessage = I18nUtil.formatter(IErrorCode.I18N_BASENAME)
-        .locale(request.getLocale())
-        .format(errorCode.name(), CommonErrorCode.UNKNOWN.name());
-    // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
+    String errorMessage = e.getMessage();
     return ResponseEntity
         .status(responseStatus)
         .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+        .body(new ErrorResult(errorName, errorMessage));
   }
 
   /**
    * 未授权
    */
   @ExceptionHandler({NotRoleException.class, NotPermissionException.class})
-  public ResponseEntity<ErrorResponse> handleForbiddenException(
+  public ResponseEntity<ErrorResult> handleForbiddenException(
       RuntimeException e,
       HttpServletRequest request
   ) {
     log(e, request);
     // 错误码
-    IErrorCode errorCode = this.getErrorCode(e);
+    IErrorCode errorCode = CommonErrorCode.NOT_PERMISSION;
     // 响应码
     int responseStatus = HttpResponseStatus.FORBIDDEN.code();
     // 异常名称
     String errorName = e.getClass().getSimpleName();
     // 异常消息
-    String errorMessage = I18nUtil.formatter(IErrorCode.I18N_BASENAME)
-        .locale(request.getLocale())
-        .format(errorCode.name(), CommonErrorCode.UNKNOWN.name());
-    // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
+    String errorMessage = e.getMessage();
     return ResponseEntity
         .status(responseStatus)
         .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+        .body(new ErrorResult(errorName, errorMessage));
   }
 
   protected IErrorCode getErrorCode(Throwable e) {
-    return Optional.of(e.getClass())
-        .map(CommonErrorCode::mapping)
+    return Optional.ofNullable(ERROR_CODE_MAP.get(e.getClass()))
         .orElse(CommonErrorCode.UNKNOWN);
   }
 

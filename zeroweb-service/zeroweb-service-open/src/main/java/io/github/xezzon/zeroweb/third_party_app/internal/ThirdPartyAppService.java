@@ -10,7 +10,7 @@ import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig.ZerowebJwtConfig;
 import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
-import io.github.xezzon.zeroweb.common.exception.InvalidAccessKeyException;
+import io.github.xezzon.zeroweb.third_party_app.exception.InvalidAccessKeyException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
