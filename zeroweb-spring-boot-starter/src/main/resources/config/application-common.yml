@@ -25,6 +25,9 @@ spring:
       channels:
         admin:
           address: zeroweb-service-admin:9002
+  threads:
+    virtual:
+      enabled: true
 
 management:
   server:
