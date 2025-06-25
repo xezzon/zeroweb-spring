@@ -6,7 +6,7 @@
   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
   <changeSet id="79" author="xezzon" labels="0.6">
-    <createTable tableName="zeroweb_zpp">
+    <createTable tableName="zeroweb_app">
       <column name="id" type="VARCHAR(64)" remarks="服务标识">
         <constraints primaryKey="true" nullable="false"/>
       </column>

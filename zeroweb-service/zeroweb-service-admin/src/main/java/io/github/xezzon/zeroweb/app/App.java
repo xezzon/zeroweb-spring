@@ -20,7 +20,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @Entity
-@Table(name = "zeroweb_zpp")
+@Table(name = "zeroweb_app")
 public class App implements IEntity<String>, II18nMessage {
 
   @Id
