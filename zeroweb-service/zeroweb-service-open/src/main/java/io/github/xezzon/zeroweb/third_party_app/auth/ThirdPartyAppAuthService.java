@@ -39,15 +39,15 @@ public class ThirdPartyAppAuthService {
    * 列出用户组角色
    */
   public List<ThirdPartyAppRole> listGroupRole(String groupId) {
-    // TODO
-    return Collections.emptyList();
+    return thirdPartyAppRoleRepository.findByGroupId(groupId);
   }
 
   /**
    * 删除指定角色，并解绑所有用户
    */
   public void deleteGroupRole(String roleId) {
-    // TODO
+    thirdPartyAppRoleRepository.deleteById(roleId);
+    thirdPartyAppMemberRepository.deleteByRoleId(roleId);
   }
 
   /**
@@ -86,81 +86,108 @@ public class ThirdPartyAppAuthService {
    * 确认待分配人员的角色，或为现有成员添加新的角色。
    */
   public void addGroupMember(ThirdPartyAppMember member) {
-    // TODO
+    thirdPartyAppMemberRepository.save(member);
   }
 
   /**
    * 列出用户组成员（按角色分组）
    */
   public List<ThirdPartyAppMember> listGroupMemberWithRole(String roleId) {
-    // TODO
-    return Collections.emptyList();
+    return thirdPartyAppMemberRepository.findByRoleId(roleId);
   }
 
   /**
    * 列出用户组成员名单
    */
   public List<String> listGroupMember(String groupId) {
-    // TODO
-    return Collections.emptyList();
+    return thirdPartyAppMemberRepository.findByGroupId(groupId).stream()
+        .map(ThirdPartyAppMember::getUserId)
+        .toList();
   }
 
   /**
    * 列出指定用户所在的用户组及角色
    */
   public List<ThirdPartyAppMember> listGroupRoleWithUser(String userId) {
-    // TODO
-    return Collections.emptyList();
+    return thirdPartyAppMemberRepository.findByUserId(userId);
   }
 
   /**
    * 解绑用户组角色与成员
    */
   public void releaseMember(ThirdPartyAppMember member) {
-    // TODO
+    thirdPartyAppMemberRepository.delete(member);
   }
 
   /**
    * 删除用户组成员
    */
   public void removeMember(String groupId, String userId) {
-    // TODO
+    thirdPartyAppMemberRepository.deleteByGroupIdAndUserId(groupId, userId);
   }
 
   /**
    * 列出所有资源权限（仅当前用户能看的的）
    */
-  public List<String> listAllPermission() {
-    // TODO
-    return Collections.emptyList();
+  public List<String> listAllPermission(String userId) {
+    List<ThirdPartyAppMember> members = thirdPartyAppMemberRepository.findByUserId(userId);
+    if (members.isEmpty()) {
+      return Collections.emptyList();
+    }
+    List<String> roleIds = members.stream()
+        .map(ThirdPartyAppMember::getRoleId)
+        .toList();
+    List<ThirdPartyAppRole> roles = thirdPartyAppRoleRepository.findAllById(roleIds);
+    return listPermissionByRoles(roles);
   }
 
   /**
    * 批量查询用户组角色对该资源的权限
    */
   public List<String> listPermissionByRoles(Collection<ThirdPartyAppRole> roles) {
-    // TODO
-    return Collections.emptyList();
+    if (roles.isEmpty()) {
+      return Collections.emptyList();
+    }
+    List<String> roleIds = roles.stream()
+        .map(ThirdPartyAppRole::getId)
+        .toList();
+    return thirdPartyAppRoleRepository.findPermissionsByRoleIds(roleIds);
   }
 
   /**
    * 为指定角色添加权限
    */
   public void bindRolePermission(String roleId, Collection<String> permissions) {
-    // TODO
+    ThirdPartyAppRole role = thirdPartyAppRoleRepository.findById(roleId)
+        .orElseThrow(() -> new IllegalArgumentException("Role not found with id: " + roleId));
+    role.getPermissions().addAll(permissions);
+    thirdPartyAppRoleRepository.save(role);
   }
 
   /**
    * 为指定角色撤销权限
    */
   public void revokeRolePermission(String roleId, Collection<String> permissions) {
-    // TODO
+    ThirdPartyAppRole role = thirdPartyAppRoleRepository.findById(roleId)
+        .orElseThrow(() -> new IllegalArgumentException("Role not found with id: " + roleId));
+    role.getPermissions().removeAll(permissions);
+    thirdPartyAppRoleRepository.save(role);
   }
 
   /**
    * 校验指定用户是否有指定权限
    */
   public void checkPermission(String userId, String permission) {
-    // TODO
+    List<ThirdPartyAppMember> members = thirdPartyAppMemberRepository.findByUserId(userId);
+    if (members.isEmpty()) {
+      throw new IllegalStateException("User not found in any group");
+    }
+    List<String> roleIds = members.stream()
+        .map(ThirdPartyAppMember::getRoleId)
+        .toList();
+    List<String> permissions = thirdPartyAppRoleRepository.findPermissionsByRoleIds(roleIds);
+    if (!permissions.contains(permission)) {
+      throw new IllegalStateException("Permission denied");
+    }
   }
 }
