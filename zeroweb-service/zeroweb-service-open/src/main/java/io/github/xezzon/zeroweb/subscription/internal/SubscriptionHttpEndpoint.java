@@ -1,6 +1,8 @@
 package io.github.xezzon.zeroweb.subscription.internal;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.subscription.Subscription;
 import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
 import io.github.xezzon.zeroweb.subscription.entity.AddSubscriptionReq;
@@ -44,6 +46,7 @@ public class SubscriptionHttpEndpoint {
    * @param id 订阅标识
    */
   @PutMapping("/audit/{id}")
+  @SaCheckPermission({PermissionConstant.SUBSCRIPTION_AUDIT})
   public void auditSubscription(@PathVariable String id) {
     subscriptionService.auditSubscription(id);
   }

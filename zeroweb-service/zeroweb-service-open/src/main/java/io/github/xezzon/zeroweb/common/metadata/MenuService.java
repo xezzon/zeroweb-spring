@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author xezzon
+ */
 @SuppressWarnings("unused")
 @Service
 public class MenuService implements IMenuService {
@@ -14,8 +17,8 @@ public class MenuService implements IMenuService {
   @Override
   public List<MenuInfo> list() {
     return Stream.of(
-            PermissionConstant.getPermissions()
-        )
+        PermissionConstant.getPermissions()
+    )
         .flatMap(Collection::stream)
         .toList();
   }

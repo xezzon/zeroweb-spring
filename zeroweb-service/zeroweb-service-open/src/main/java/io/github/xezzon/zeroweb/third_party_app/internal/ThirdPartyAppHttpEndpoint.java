@@ -1,6 +1,8 @@
 package io.github.xezzon.zeroweb.third_party_app.internal;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
+import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.subscription.Subscription;
 import io.github.xezzon.zeroweb.subscription.ISubscriptionService4ThirdPartyApp;
@@ -64,6 +66,7 @@ public class ThirdPartyAppHttpEndpoint {
    * @return 所有第三方应用列表
    */
   @GetMapping()
+  @SaCheckPermission({PermissionConstant.THIRD_PARTY_APP_READ})
   public Page<ThirdPartyApp> listThirdPartyApp(ODataRequestParam odata) {
     return thirdPartyAppService.listThirdPartyApp(odata.into());
   }

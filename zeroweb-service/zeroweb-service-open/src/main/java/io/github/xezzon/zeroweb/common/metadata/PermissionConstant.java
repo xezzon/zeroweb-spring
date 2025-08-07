@@ -9,18 +9,14 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 接口权限
+ * @author xezzon
  */
-public final class PermissionConstant {
+public class PermissionConstant {
 
-  public static final String APP_WRITE = "app:write";
-  public static final String AUTHZ_READ = "authz:read";
-  public static final String AUTHZ_ROLE_USER = "authz:role-user";
-  public static final String AUTHZ_ROLE_PERMISSION = "authz:role-permission";
-  public static final String DICT_READ = "dict:read";
-  public static final String DICT_WRITE = "dict:write";
-  public static final String ROLE_READ = "role:read";
-  public static final String ROLE_WRITE = "role:write";
+  public static final String OPENAPI_WRITE = "openapi:write";
+  public static final String OPENAPI_PUBLISH = "openapi:publish";
+  public static final String SUBSCRIPTION_AUDIT = "subscription:audit";
+  public static final String THIRD_PARTY_APP_READ = "third-party-app:read";
 
   private static final List<MenuInfo> PERMISSIONS;
 
