@@ -64,6 +64,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
   @Transactional()
   protected AccessSecret addThirdPartyApp(ThirdPartyApp thirdPartyApp) {
     thirdPartyAppDAO.get().save(thirdPartyApp);
+    // TODO: 废弃 ownerId 字段，将 owner 加入到应用成员
     return this.rollAccessSecret(thirdPartyApp.getId());
   }
 
@@ -74,6 +75,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
    * @return 分页查询结果，包含符合条件的第三方应用列表
    */
   protected Page<ThirdPartyApp> listThirdPartyAppByUser(ODataQueryOption odata, String userId) {
+    // TODO: 根据应用成员表过滤
     return thirdPartyAppDAO.findAllWithUserId(odata, userId);
   }
 

@@ -79,6 +79,7 @@ public class ThirdPartyAppHttpEndpoint {
    */
   @GetMapping("/{appId}/subscription")
   public Page<Subscription> listSubscription(ODataRequestParam odata, @PathVariable String appId) {
+    // TODO: 校验资源权限
     return subscriptionService.listSubscription(odata.into(), appId);
   }
 
@@ -89,6 +90,7 @@ public class ThirdPartyAppHttpEndpoint {
    */
   @PatchMapping("/{appId}/roll")
   public AccessSecret rollAccessSecret(@PathVariable String appId) {
+    // TODO: 校验资源权限
     return thirdPartyAppService.rollAccessSecret(appId);
   }
 }

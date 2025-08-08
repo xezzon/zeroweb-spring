@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="103" author="xezzon" labels="0.6">
+    <createTable tableName="zeroweb_third_party_app_member" remarks="第三方应用成员">
+      <column name="id" type="VARCHAR(64)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="group_id" type="VARCHAR(255)" remarks="第三方应用ID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="user_id" type="VARCHAR(64)" remarks="用户ID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="role_id" type="VARCHAR(64)" remarks="角色ID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="create_time" type="timestamp(3)" remarks="创建时间">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <createIndex tableName="zeroweb_third_party_app_member" indexName="IDX_tpam_group_user">
+      <column name="group_id"/>
+      <column name="user_id"/>
+    </createIndex>
+  </changeSet>
+</databaseChangeLog>

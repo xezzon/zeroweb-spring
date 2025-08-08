@@ -34,6 +34,7 @@ public class SubscriptionHttpEndpoint {
    */
   @PostMapping()
   public Id subscribe(@RequestBody AddSubscriptionReq req) {
+    // TODO: 校验资源权限
     Subscription subscription = req.into();
     subscription.setStatus(SubscriptionStatus.AUDITING);
     subscriptionService.addSubscription(subscription);
