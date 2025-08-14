@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.locale;
 
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
-import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -13,7 +13,8 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
-import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
+import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
+import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
 import io.github.xezzon.zeroweb.locale.entity.AddLanguageReq;
 import io.github.xezzon.zeroweb.locale.entity.ModifyLanguageReq;
@@ -135,9 +136,9 @@ class LocalizedHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .jsonPath("$.code").isEqualTo("RepeatData");
   }
 
   @Test
@@ -208,8 +209,8 @@ class LocalizedHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);
   }
 
   @Test
@@ -227,8 +228,8 @@ class LocalizedHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, RepeatDataException.ERROR_CODE);
   }
 
   @Test
@@ -347,8 +348,8 @@ class LocalizedHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, RepeatDataException.ERROR_CODE);
   }
 
   @Test
@@ -400,8 +401,8 @@ class LocalizedHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.REPEAT_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, RepeatDataException.ERROR_CODE);
   }
 
   @Test
@@ -526,8 +527,8 @@ class LocalizedHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);
   }
 
   @Test
@@ -547,8 +548,8 @@ class LocalizedHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);
   }
 
   @Test
@@ -568,8 +569,8 @@ class LocalizedHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);
   }
 
   @Test

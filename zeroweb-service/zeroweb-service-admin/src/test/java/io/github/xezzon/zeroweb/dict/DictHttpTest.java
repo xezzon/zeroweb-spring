@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.dict;
 
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -13,7 +14,8 @@ import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
-import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
+import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
+import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.dict.entity.AddDictReq;
 import io.github.xezzon.zeroweb.dict.entity.ModifyDictReq;
 import io.github.xezzon.zeroweb.dict.repository.DictRepository;
@@ -135,9 +137,8 @@ class DictHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, RepeatDataException.ERROR_CODE);
   }
 
   @Test
@@ -180,9 +181,8 @@ class DictHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, RepeatDataException.ERROR_CODE);
   }
 
   @Test
@@ -234,9 +234,8 @@ class DictHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, RepeatDataException.ERROR_CODE);
     Dict dict = repository.findById(target.getId()).orElseThrow();
     assertEquals(target.getCode(), dict.getCode());
     assertEquals(target.getTag(), dict.getTag());

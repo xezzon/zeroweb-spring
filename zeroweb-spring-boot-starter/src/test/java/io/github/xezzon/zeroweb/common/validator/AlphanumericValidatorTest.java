@@ -1,10 +1,9 @@
 package io.github.xezzon.zeroweb.common.validator;
 
-import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 
-import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
-import io.github.xezzon.zeroweb.common.exception.ErrorDetail;
-import io.github.xezzon.zeroweb.common.exception.ErrorResponse;
+import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
+import io.github.xezzon.zeroweb.common.exception.ErrorResult;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Locale;
@@ -15,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 /**
  * @author xezzon
@@ -33,40 +31,35 @@ class AlphanumericValidatorTest {
 
   @Test
   void validate() {
-    CommonErrorCode errorCode = CommonErrorCode.ARGUMENT_NOT_VALID;
     ValidEntity entity = new ValidEntity();
     entity.setAlphabet("ABCD@efg.hijk");
     ChildEntity childEntity = new ChildEntity();
     childEntity.setAlphabet("no_rst-uvw");
     entity.setChildEntity(childEntity);
-    ErrorResponse responseBody = webTestClient.post()
+    ErrorResult responseBody = webTestClient.post()
         .uri("/alphanumeric/validate")
         .bodyValue(entity)
         .exchange()
-        .expectStatus().isEqualTo(errorCode.sourceType().getResponseCode())
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code())
-        .expectBody(ErrorResponse.class)
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.ARGUMENT_INVALID)
+        .expectBody(ErrorResult.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(errorCode.code(), responseBody.code());
-    Assertions.assertEquals(
-        MethodArgumentNotValidException.class.getSimpleName(),
-        responseBody.error().getCode()
-    );
-    List<ErrorDetail> details = responseBody.error().getDetails();
+    Assertions.assertEquals("MethodArgumentNotValid", responseBody.getCode());
+    List<ErrorResult.Detail> details = responseBody.getDetails();
     Assertions.assertNotNull(details);
     Assertions.assertEquals(2, details.size());
     Assertions.assertTrue(details.stream()
-        .anyMatch(detail ->
-            Objects.equals(detail.getCode(), "alphabet")
-                && Objects.equals(detail.getMessage(), "不允许的字符@.")
-        )
+        .anyMatch(detail -> Objects.equals(
+            detail.getParameters().get("field"),
+            "alphabet"
+        ))
     );
     Assertions.assertTrue(details.stream()
-        .anyMatch(detail ->
-            Objects.equals(detail.getCode(), "childEntity.alphabet")
-                && Objects.equals(detail.getMessage(), "不允许的字符_-")
-        )
+        .anyMatch(detail -> Objects.equals(
+            detail.getParameters().get("field"),
+            "childEntity.alphabet"
+        ))
     );
   }
 }

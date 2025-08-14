@@ -3,10 +3,10 @@ package io.github.xezzon.zeroweb.auth;
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.ACCESS_KEY_HEADER;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
-import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 
 import cn.hutool.core.util.RandomUtil;
-import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
+import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import jakarta.annotation.Resource;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
@@ -47,13 +47,12 @@ class JwtAuthTest {
 
   @Test
   void notLogin() {
-    CommonErrorCode errorCode = CommonErrorCode.NOT_LOGIN;
     webTestClient.get()
         .uri("/jwt")
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isUnauthorized()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.UNAUTHENTICATED);
   }
 
   @Test

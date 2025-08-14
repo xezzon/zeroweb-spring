@@ -1,22 +1,23 @@
 package io.github.xezzon.zeroweb.call;
 
-import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
-import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
-import io.github.xezzon.zeroweb.common.exception.OpenErrorCode;
+import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.enumeration.HttpMethod;
 import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
 import io.github.xezzon.zeroweb.subscription.Subscription;
 import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
+import io.github.xezzon.zeroweb.subscription.exception.UnsubscribeOpenapiException;
 import io.github.xezzon.zeroweb.subscription.repository.SubscriptionRepository;
 import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
+import io.github.xezzon.zeroweb.third_party_app.exception.InvalidAccessKeyException;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
 import jakarta.annotation.Resource;
@@ -138,7 +139,7 @@ class SubscriptionCallHttpTest {
         .bodyValue(rawBody)
         .exchange()
         .expectStatus().isForbidden()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, OpenErrorCode.UNSUBSCRIBED_OPENAPI.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, UnsubscribeOpenapiException.ERROR_CODE);
   }
 
   @Test
@@ -169,7 +170,7 @@ class SubscriptionCallHttpTest {
         .bodyValue(rawBody)
         .exchange()
         .expectStatus().isForbidden()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, OpenErrorCode.INVALID_ACCESS_KEY.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidAccessKeyException.ERROR_CODE);
   }
 
   @Test
@@ -198,7 +199,7 @@ class SubscriptionCallHttpTest {
         .bodyValue(rawBody)
         .exchange()
         .expectStatus().isForbidden()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, OpenErrorCode.INVALID_ACCESS_KEY.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidAccessKeyException.ERROR_CODE);
   }
 
   @Test
@@ -227,7 +228,7 @@ class SubscriptionCallHttpTest {
         .bodyValue(rawBody)
         .exchange()
         .expectStatus().isForbidden()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, OpenErrorCode.INVALID_ACCESS_KEY.code());
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidAccessKeyException.ERROR_CODE);
   }
 
   @Test
@@ -243,7 +244,6 @@ class SubscriptionCallHttpTest {
     mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
-    final CommonErrorCode errorCode = CommonErrorCode.NOT_LOGIN;
     webTestClient.post()
         .uri(builder -> builder
             .path(SUBSCRIPTION_CALL)
@@ -256,7 +256,8 @@ class SubscriptionCallHttpTest {
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
         .exchange()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, errorCode.code());
+        .expectStatus().isUnauthorized()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.UNAUTHENTICATED);
   }
 
   @Test

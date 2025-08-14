@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.app;
 
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
-import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -13,7 +13,7 @@ import io.github.xezzon.zeroweb.app.entity.UpdateAppReq;
 import io.github.xezzon.zeroweb.app.repository.AppRepository;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
-import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
+import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -100,7 +100,7 @@ class AppHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest();
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS);
   }
 
   @Test
@@ -162,7 +162,7 @@ class AppHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest();
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS);
   }
 
   @Test
@@ -183,8 +183,8 @@ class AppHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.NO_SUCH_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);
   }
 
   @Test
@@ -207,8 +207,8 @@ class AppHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectHeader().valueEquals(ERROR_CODE_HEADER, CommonErrorCode.ARGUMENT_NOT_VALID.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.ARGUMENT_INVALID);
   }
 
   @Test

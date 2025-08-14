@@ -2,20 +2,21 @@ package io.github.xezzon.zeroweb.subscription;
 
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
-import static io.github.xezzon.zeroweb.common.exception.GlobalExceptionHandler.ERROR_CODE_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
-import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
-import io.github.xezzon.zeroweb.common.exception.OpenErrorCode;
-import io.github.xezzon.zeroweb.openapi.enumeration.HttpMethod;
+import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
+import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.openapi.Openapi;
+import io.github.xezzon.zeroweb.openapi.enumeration.HttpMethod;
 import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
-import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
 import io.github.xezzon.zeroweb.subscription.entity.AddSubscriptionReq;
+import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
+import io.github.xezzon.zeroweb.subscription.exception.UnpublishedOpenapiCannotBeSubscribeException;
 import io.github.xezzon.zeroweb.subscription.repository.SubscriptionRepository;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
@@ -167,7 +168,7 @@ class SubscriptionHttpTest {
         .exchange()
         .expectStatus().isForbidden()
         .expectHeader()
-        .valueEquals(ERROR_CODE_HEADER, CommonErrorCode.DATA_PERMISSION_FORBIDDEN.code());
+        .valueEquals(ERROR_CODE_HEADER, DataPermissionForbiddenException.ERROR_CODE);
   }
 
   @Test
@@ -216,10 +217,10 @@ class SubscriptionHttpTest {
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(THIRD_PARTY_APP_OWNER).bearer())
         .exchange()
-        .expectStatus().isBadRequest()
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(
             ERROR_CODE_HEADER,
-            OpenErrorCode.UNPUBLISHED_OPENAPI_CANNOT_BE_SUBSCRIBE.code()
+            UnpublishedOpenapiCannotBeSubscribeException.ERROR_CODE
         );
   }
 
@@ -238,7 +239,7 @@ class SubscriptionHttpTest {
         .exchange()
         .expectStatus().isForbidden()
         .expectHeader()
-        .valueEquals(ERROR_CODE_HEADER, CommonErrorCode.DATA_PERMISSION_FORBIDDEN.code());
+        .valueEquals(ERROR_CODE_HEADER, DataPermissionForbiddenException.ERROR_CODE);
   }
 
   @Test
