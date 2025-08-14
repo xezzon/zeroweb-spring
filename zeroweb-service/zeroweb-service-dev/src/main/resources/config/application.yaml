@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: @project.artifactId@
+    group: @project.groupId@
+    version: @project.version@
+  profiles:
+    include:
+      - common
+      - ${JDBC_TYPE:postgresql}
+      - ${CACHE_TYPE:in-memory}
+      - ${SPRING_ENVIRONMENT:prod}
+  liquibase:
+    tag: @project.version@
+
+server:
+  port: @app.port@

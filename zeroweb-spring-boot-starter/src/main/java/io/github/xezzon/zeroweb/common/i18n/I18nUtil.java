@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
  * @see org.springframework.context.MessageSource#getMessage(String, Object[], Locale)
  */
 @Slf4j
+@Deprecated
 public class I18nUtil {
 
   /**

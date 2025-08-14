@@ -14,7 +14,11 @@ ZeroWeb 是一组 BaaS(Backend as a Service)，可以低成本地实现认证授
   - 单点登录
   - RBAC模型授权
   - 字典管理
+- [研发平台服务](zeroweb-service/zeroweb-service-open/README.md)
   - 国际化管理
+- [系统管理服务](zeroweb-service/zeroweb-service-open/README.md)
+  - 第三方应用管理
+  - 第三方应用调用本系统 HTTP 接口
 - [服务间接口SDK](zeroweb-proto/README.md)
   - 第三方应用管理
   - 对外接口的管理、订阅、调用
