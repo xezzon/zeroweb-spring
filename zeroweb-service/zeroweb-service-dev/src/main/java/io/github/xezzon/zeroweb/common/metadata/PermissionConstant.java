@@ -13,14 +13,8 @@ import java.util.List;
  */
 public final class PermissionConstant {
 
-  public static final String APP_WRITE = "app:write";
-  public static final String AUTHZ_READ = "authz:read";
-  public static final String AUTHZ_ROLE_USER = "authz:role-user";
-  public static final String AUTHZ_ROLE_PERMISSION = "authz:role-permission";
-  public static final String DICT_READ = "dict:read";
-  public static final String DICT_WRITE = "dict:write";
-  public static final String ROLE_READ = "role:read";
-  public static final String ROLE_WRITE = "role:write";
+  public static final String LOCALE_READ = "locale:read";
+  public static final String LOCALE_WRITE = "locale:write";
 
   static final List<MenuInfo> PERMISSIONS;
 
