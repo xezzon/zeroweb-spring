@@ -1,16 +1,18 @@
 package io.github.xezzon.zeroweb.common.exception;
 
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
+
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
-import io.github.xezzon.zeroweb.common.i18n.I18nUtil;
-import io.github.xezzon.zeroweb.core.error.IErrorCode;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.opentelemetry.api.trace.Span;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Optional;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,11 +21,6 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 全局异常处理
- * 错误码: 依据`异常类-错误码`映射查找。
- * HTTP 状态码: 客户端错误返回40x，服务端错误返回500。
- * 异常名称: 异常类的简写名。
- * 异常消息: 客户端异常的异常消息由错误码国际化（语言由 HTTP 请求头定义）得到。服务端异常则返回统一的消息，以便向客户端隐藏细节。
- * 日志：通常的异常日志级别为 WARN，部分异常可视情况提高或降低日志级别。日志的异常消息取自 {@link Throwable#getMessage()}，自行实现的异常会依据异常类名对内容进行国际化。
  * @author xezzon
  */
 @RestControllerAdvice
@@ -31,182 +28,130 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 public class GlobalExceptionHandler {
 
   /**
-   * 错误码的请求头名称
-   */
-  public static final String ERROR_CODE_HEADER = "X-Error-Code";
-
-  /**
    * 业务异常
    */
   @ExceptionHandler(ZerowebBusinessException.class)
-  public ResponseEntity<ErrorResponse> handleException(
+  public ResponseEntity<ErrorResult> handleException(
       ZerowebBusinessException e,
       HttpServletRequest request
   ) {
     log(e, request);
-    // 错误码
-    IErrorCode errorCode = this.getErrorCode(e);
-    // 响应码
-    int responseStatus = errorCode.sourceType().getResponseCode();
-    // 异常名称
-    String errorName = e.getClass().getSimpleName();
-    // 异常消息
-    String errorMessage = e.getLocalizedMessage(request.getLocale(), errorCode.name());
-    // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
-    // 响应体
     return ResponseEntity
-        .status(responseStatus)
-        .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+        .status(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .header(ERROR_CODE_HEADER, e.getCode())
+        .body(new ErrorResult(e));
   }
 
   /**
    * 非业务异常（通用）
    */
   @ExceptionHandler(Throwable.class)
-  public ResponseEntity<ErrorResponse> handleException(
+  public ResponseEntity<ErrorResult> handleException(
       Throwable e,
       HttpServletRequest request
   ) {
     log(e, request);
-    // 错误码
-    IErrorCode errorCode = this.getErrorCode(e);
-    // 响应码
-    int responseStatus = errorCode.sourceType().getResponseCode();
-    // 异常名称
-    String errorName = e.getClass().getSimpleName();
-    // 异常消息
-    String errorMessage = I18nUtil.formatter(IErrorCode.I18N_BASENAME)
-        .locale(request.getLocale())
-        .format(errorCode.name(), CommonErrorCode.UNKNOWN.name());
-    // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
-    // 响应体
     return ResponseEntity
-        .status(responseStatus)
-        .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+        .status(ErrorCodeConstant.SERVER_ERROR_STATUS)
+        .header(ERROR_CODE_HEADER, ErrorCodeConstant.UNKNOWN)
+        .body(new ErrorResult(e));
   }
 
   /**
    * 参数校验不通过
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ErrorResponse> handleException(
+  public ResponseEntity<ErrorResult> handleException(
       MethodArgumentNotValidException e,
       HttpServletRequest request
   ) {
-    // 参数校验错误，降低日志级别
     log(e, request, Level.INFO);
-    // 错误码
-    IErrorCode errorCode = this.getErrorCode(e);
-    // 响应码
-    int responseStatus = HttpResponseStatus.BAD_REQUEST.code();
-    // 异常名称
-    String errorName = e.getClass().getSimpleName();
-    // 异常消息
-    String errorMessage = I18nUtil.formatter(IErrorCode.I18N_BASENAME)
-        .locale(request.getLocale())
-        .format(errorCode.name(), CommonErrorCode.UNKNOWN.name());
-    // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
-    errorDetail.setDetails(e.getFieldErrors().parallelStream()
-        .map(error -> new ErrorDetail(error.getField(), error.getDefaultMessage()))
-        .toList()
-    );
-    // 响应体
+    List<ErrorResult.Detail> errorDetails = e.getFieldErrors().stream()
+        .map(error -> new ErrorResult.Detail(
+            error.getCode(),
+            error.getDefaultMessage(),
+            Map.ofEntries(
+                Map.entry("field", error.getField())
+            )
+        ))
+        .toList();
     return ResponseEntity
-        .status(responseStatus)
-        .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+        .status(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .header(ERROR_CODE_HEADER, ErrorCodeConstant.ARGUMENT_INVALID)
+        .body(new ErrorResult(e, errorDetails));
   }
 
   /**
    * 请求资源不存在
    */
   @ExceptionHandler(NoResourceFoundException.class)
-  public ResponseEntity<ErrorResponse> handleException(
+  public ResponseEntity<ErrorResult> handleException(
       NoResourceFoundException e,
       HttpServletRequest request
-  ) {
+  )
+      throws NoResourceFoundException {
     log(e, request);
-    // 错误码
-    IErrorCode errorCode = this.getErrorCode(e);
-    // 响应码
-    int responseStatus = HttpResponseStatus.NOT_FOUND.code();
-    // 异常名称
-    String errorName = e.getClass().getSimpleName();
-    // 异常消息
-    String errorMessage = I18nUtil.formatter(IErrorCode.I18N_BASENAME)
-        .locale(request.getLocale())
-        .format(errorCode.name(), CommonErrorCode.UNKNOWN.name());
-    // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
-    return ResponseEntity
-        .status(responseStatus)
-        .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+    throw e;
   }
 
   /**
    * 未登录
    */
   @ExceptionHandler(NotLoginException.class)
-  public ResponseEntity<ErrorResponse> handleException(
+  public ResponseEntity<ErrorResult> handleException(
       NotLoginException e,
       HttpServletRequest request
   ) {
     log(e, request);
-    // 错误码
-    IErrorCode errorCode = this.getErrorCode(e);
-    // 响应码
-    int responseStatus = HttpResponseStatus.UNAUTHORIZED.code();
-    // 异常名称
-    String errorName = e.getClass().getSimpleName();
-    // 异常消息
-    String errorMessage = I18nUtil.formatter(IErrorCode.I18N_BASENAME)
-        .locale(request.getLocale())
-        .format(errorCode.name(), CommonErrorCode.UNKNOWN.name());
-    // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
     return ResponseEntity
-        .status(responseStatus)
-        .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+        .status(HttpStatus.UNAUTHORIZED)
+        .header(ERROR_CODE_HEADER, ErrorCodeConstant.UNAUTHENTICATED)
+        .body(new ErrorResult(e));
   }
 
   /**
-   * 未授权
+   * 接口未授权
    */
   @ExceptionHandler({NotRoleException.class, NotPermissionException.class})
-  public ResponseEntity<ErrorResponse> handleForbiddenException(
+  public ResponseEntity<ErrorResult> handleForbiddenException(
       RuntimeException e,
       HttpServletRequest request
   ) {
     log(e, request);
-    // 错误码
-    IErrorCode errorCode = this.getErrorCode(e);
-    // 响应码
-    int responseStatus = HttpResponseStatus.FORBIDDEN.code();
-    // 异常名称
-    String errorName = e.getClass().getSimpleName();
-    // 异常消息
-    String errorMessage = I18nUtil.formatter(IErrorCode.I18N_BASENAME)
-        .locale(request.getLocale())
-        .format(errorCode.name(), CommonErrorCode.UNKNOWN.name());
-    // 异常明细
-    ErrorDetail errorDetail = new ErrorDetail(errorName, errorMessage);
     return ResponseEntity
-        .status(responseStatus)
-        .header(ERROR_CODE_HEADER, errorCode.code())
-        .body(new ErrorResponse(errorCode.code(), errorDetail));
+        .status(HttpStatus.FORBIDDEN)
+        .header(ERROR_CODE_HEADER, ErrorCodeConstant.UNAUTHORIZED)
+        .body(new ErrorResult(e));
   }
 
-  protected IErrorCode getErrorCode(Throwable e) {
-    return Optional.of(e.getClass())
-        .map(CommonErrorCode::mapping)
-        .orElse(CommonErrorCode.UNKNOWN);
+  /**
+   * 资源未授权
+   */
+  @ExceptionHandler(DataPermissionForbiddenException.class)
+  public ResponseEntity<ErrorResult> handleForbiddenException(
+      DataPermissionForbiddenException e,
+      HttpServletRequest request
+  ) {
+    log(e, request);
+    return ResponseEntity
+        .status(HttpStatus.FORBIDDEN)
+        .header(ERROR_CODE_HEADER, e.getCode())
+        .body(new ErrorResult(e));
+  }
+
+  /**
+   * 数据已删除
+   */
+  @ExceptionHandler({EntityNotFoundException.class})
+  public ResponseEntity<ErrorResult> handleDataNotExistException(
+      RuntimeException e,
+      HttpServletRequest request
+  ) {
+    log(e, request);
+    return ResponseEntity
+        .status(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .header(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA)
+        .body(new ErrorResult(e));
   }
 
   protected final void log(Throwable e, HttpServletRequest request, Level logLevel) {

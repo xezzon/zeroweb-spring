@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.auth;
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.BEARER;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,8 +19,9 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.zeroweb.InitializeDataRunner;
 import io.github.xezzon.zeroweb.auth.entity.BasicAuth;
 import io.github.xezzon.zeroweb.auth.entity.OidcToken;
+import io.github.xezzon.zeroweb.auth.exception.InvalidPasswordException;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
-import io.github.xezzon.zeroweb.common.exception.AdminErrorCode;
+import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.crypto.internal.JwtKeyManager;
 import io.github.xezzon.zeroweb.user.User;
 import jakarta.annotation.Resource;
@@ -132,18 +134,16 @@ class AuthnHttpTest {
         .uri(uri)
         .bodyValue(basicAuth1)
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_PASSWORD.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidPasswordException.ERROR_CODE);
     // 密码不正确
     BasicAuth basicAuth2 = new BasicAuth(user.getUsername(), RandomUtil.randomString(9));
     webTestClient.post()
         .uri(uri)
         .bodyValue(basicAuth2)
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(AdminErrorCode.INVALID_PASSWORD.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidPasswordException.ERROR_CODE);
   }
 
   @Test

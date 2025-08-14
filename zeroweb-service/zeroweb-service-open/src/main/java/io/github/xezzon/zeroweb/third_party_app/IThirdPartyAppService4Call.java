@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.third_party_app;
 
-import io.github.xezzon.zeroweb.common.exception.InvalidAccessKeyException;
+import io.github.xezzon.zeroweb.third_party_app.exception.InvalidAccessKeyException;
 import java.time.Instant;
 
 public interface IThirdPartyAppService4Call {

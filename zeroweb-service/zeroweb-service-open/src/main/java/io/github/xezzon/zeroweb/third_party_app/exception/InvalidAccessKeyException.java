@@ -1,4 +1,6 @@
-package io.github.xezzon.zeroweb.common.exception;
+package io.github.xezzon.zeroweb.third_party_app.exception;
+
+import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
 
 /**
  * 无效的访问密钥
@@ -10,7 +12,14 @@ package io.github.xezzon.zeroweb.common.exception;
  */
 public class InvalidAccessKeyException extends ZerowebBusinessException {
 
+  public static final String ERROR_CODE = "CFE03";
+
   public InvalidAccessKeyException() {
-    super();
+    super("An Invalid Access Key");
+  }
+
+  @Override
+  public String getCode() {
+    return ERROR_CODE;
   }
 }

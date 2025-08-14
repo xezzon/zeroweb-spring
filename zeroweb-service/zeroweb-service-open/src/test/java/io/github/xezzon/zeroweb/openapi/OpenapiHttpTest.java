@@ -1,17 +1,19 @@
 package io.github.xezzon.zeroweb.openapi;
 
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
-import io.github.xezzon.zeroweb.common.exception.CommonErrorCode;
-import io.github.xezzon.zeroweb.common.exception.OpenErrorCode;
+import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
+import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.openapi.entity.AddOpenapiReq;
 import io.github.xezzon.zeroweb.openapi.entity.ModifyOpenapiReq;
 import io.github.xezzon.zeroweb.openapi.enumeration.HttpMethod;
 import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
+import io.github.xezzon.zeroweb.openapi.exception.PublishedOpenapiCannotBeModifyException;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -98,9 +100,8 @@ class OpenapiHttpTest {
         .uri(OPENAPI_ADD_URI)
         .bodyValue(req)
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, RepeatDataException.ERROR_CODE);
   }
 
   @Test
@@ -179,9 +180,8 @@ class OpenapiHttpTest {
         .uri(MODIFY_OPENAPI_URI)
         .bodyValue(req)
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.REPEAT_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, RepeatDataException.ERROR_CODE);
     Openapi openapi = repository.findById(target.getId()).orElseThrow();
     assertEquals(target.getCode(), openapi.getCode());
     assertEquals(target.getDestination(), openapi.getDestination());
@@ -203,9 +203,8 @@ class OpenapiHttpTest {
         .uri(MODIFY_OPENAPI_URI)
         .bodyValue(req)
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.NO_SUCH_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);
   }
 
   @Test
@@ -229,9 +228,9 @@ class OpenapiHttpTest {
         .uri(MODIFY_OPENAPI_URI)
         .bodyValue(req)
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(OpenErrorCode.PUBLISHED_OPENAPI_CANNOT_BE_MODIFY.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader()
+        .valueEquals(ERROR_CODE_HEADER, PublishedOpenapiCannotBeModifyException.ERROR_CODE);
 
     req = new ModifyOpenapiReq(
         publishedOpenapi.getId(),
@@ -274,8 +273,7 @@ class OpenapiHttpTest {
             .build(RandomUtil.randomString(8))
         )
         .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.code").isEqualTo(CommonErrorCode.NO_SUCH_DATA.code());
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);
   }
 }
