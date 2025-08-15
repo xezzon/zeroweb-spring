@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
   ) {
     log(e, request);
     return ResponseEntity
-        .status(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .status(e.getHttpStatus())
         .header(ERROR_CODE_HEADER, e.getCode())
         .body(new ErrorResult(e));
   }
@@ -121,21 +121,6 @@ public class GlobalExceptionHandler {
     return ResponseEntity
         .status(HttpStatus.FORBIDDEN)
         .header(ERROR_CODE_HEADER, ErrorCodeConstant.UNAUTHORIZED)
-        .body(new ErrorResult(e));
-  }
-
-  /**
-   * 资源未授权
-   */
-  @ExceptionHandler(DataPermissionForbiddenException.class)
-  public ResponseEntity<ErrorResult> handleForbiddenException(
-      DataPermissionForbiddenException e,
-      HttpServletRequest request
-  ) {
-    log(e, request);
-    return ResponseEntity
-        .status(HttpStatus.FORBIDDEN)
-        .header(ERROR_CODE_HEADER, e.getCode())
         .body(new ErrorResult(e));
   }
 

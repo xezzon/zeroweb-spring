@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.subscription.exception;
 
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 /**
  * 不能调用未订阅的接口
@@ -17,5 +18,10 @@ public class UnsubscribeOpenapiException extends ZerowebBusinessException {
   @Override
   public String getCode() {
     return ERROR_CODE;
+  }
+
+  @Override
+  public int getHttpStatus() {
+    return HttpResponseStatus.FORBIDDEN.code();
   }
 }
