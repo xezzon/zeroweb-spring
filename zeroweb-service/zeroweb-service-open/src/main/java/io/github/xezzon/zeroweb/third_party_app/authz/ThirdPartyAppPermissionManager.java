@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.third_party_app.authz;
 
-import static io.github.xezzon.zeroweb.third_party_app.authz.PermissionConstant.LIST_MEMBER;
+import static io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionConstant.LIST_MEMBER;
 
 import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppMemberService;

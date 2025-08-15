@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.third_party_app.internal;
 
-import static io.github.xezzon.zeroweb.third_party_app.authz.PermissionConstant.ROLL_ACCESS_SECRET;
+import static io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionConstant.ROLL_ACCESS_SECRET;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.github.xezzon.zeroweb.auth.JwtAuth;

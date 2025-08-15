@@ -10,7 +10,7 @@ import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenExceptio
 import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppMemberService;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
-import io.github.xezzon.zeroweb.third_party_app.authz.PermissionConstant;
+import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionConstant;
 import io.github.xezzon.zeroweb.third_party_app.event.ThirdPartyAppCreatedEvent;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
 import java.time.Instant;
@@ -115,7 +115,7 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
         .findByGroupIdAndUserId(appId, currentUser)
         .filter(ThirdPartyAppMember::isOwner)
         .orElseThrow(() -> new DataPermissionForbiddenException(
-            appId, currentUser, PermissionConstant.MOVE_OWNERSHIP
+            appId, currentUser, ThirdPartyAppPermissionConstant.MOVE_OWNERSHIP
         ));
     ThirdPartyAppMember member = thirdPartyAppMemberRepository
         .findByGroupIdAndUserId(appId, target)

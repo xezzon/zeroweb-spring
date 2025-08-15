@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.subscription.internal;
 
-import static io.github.xezzon.zeroweb.subscription.authz.PermissionConstant.LIST_SUBSCRIPTION;
-import static io.github.xezzon.zeroweb.subscription.authz.PermissionConstant.SUBSCRIBE;
+import static io.github.xezzon.zeroweb.subscription.authz.SubscriptionPermissionConstant.LIST_SUBSCRIPTION;
+import static io.github.xezzon.zeroweb.subscription.authz.SubscriptionPermissionConstant.SUBSCRIBE;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;

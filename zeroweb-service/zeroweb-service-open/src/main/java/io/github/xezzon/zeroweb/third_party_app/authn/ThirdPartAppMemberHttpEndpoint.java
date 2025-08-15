@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.third_party_app.authn;
 
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.common.domain.Id;
-import io.github.xezzon.zeroweb.third_party_app.authz.PermissionConstant;
+import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionConstant;
 import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionManager;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +44,7 @@ public class ThirdPartAppMemberHttpEndpoint {
       @RequestParam(required = false, defaultValue = "24") int timeout
   ) {
     thirdPartyAppPermissionManager
-        .check(appId, JwtAuth.getOrThrow().getSub(), PermissionConstant.INVITE_MEMBER);
+        .check(appId, JwtAuth.getOrThrow().getSub(), ThirdPartyAppPermissionConstant.INVITE_MEMBER);
     return thirdPartyAppMemberService.inviteMember(appId, userId, timeout);
   }
 
@@ -66,7 +66,7 @@ public class ThirdPartAppMemberHttpEndpoint {
   @GetMapping("/third-party-app/{appId}/member")
   public List<ThirdPartyAppMember> listMember(@PathVariable String appId) {
     thirdPartyAppPermissionManager
-        .check(appId, JwtAuth.getOrThrow().getSub(), PermissionConstant.LIST_MEMBER);
+        .check(appId, JwtAuth.getOrThrow().getSub(), ThirdPartyAppPermissionConstant.LIST_MEMBER);
     return thirdPartyAppMemberService.listMember(appId);
   }
 
