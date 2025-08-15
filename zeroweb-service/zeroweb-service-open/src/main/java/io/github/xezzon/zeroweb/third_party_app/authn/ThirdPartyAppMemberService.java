@@ -13,6 +13,7 @@ import io.github.xezzon.zeroweb.third_party_app.event.ThirdPartyAppCreatedEvent;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
@@ -94,6 +95,10 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
     thirdPartyAppMember.setRoleId(ThirdPartyAppMember.DEFAULT_ROLE_ID);
     thirdPartyAppMemberRepository.save(thirdPartyAppMember);
     return thirdPartyAppMember.getId();
+  }
+
+  List<ThirdPartyAppMember> listMember(String appId) {
+    return thirdPartyAppMemberRepository.findByGroupIdOrderByCreateTimeDesc(appId);
   }
 
   /**

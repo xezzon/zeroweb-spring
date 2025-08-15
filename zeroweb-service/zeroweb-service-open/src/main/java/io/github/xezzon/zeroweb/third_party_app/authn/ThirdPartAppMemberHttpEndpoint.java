@@ -1,6 +1,8 @@
 package io.github.xezzon.zeroweb.third_party_app.authn;
 
 import io.github.xezzon.zeroweb.common.domain.Id;
+import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -45,5 +47,15 @@ public class ThirdPartAppMemberHttpEndpoint {
   public Id acceptInvitation(@RequestParam String token) {
     String id = thirdPartyAppMemberService.acceptInvitation(token);
     return Id.of(id);
+  }
+
+  /**
+   * 查询制定第三方应用的成员
+   * @param appId 第三方应用ID
+   */
+  @GetMapping("/third-party-app/{appId}/member")
+  public List<ThirdPartyAppMember> listMember(@PathVariable String appId) {
+    // TODO: 校验资源权限
+    return thirdPartyAppMemberService.listMember(appId);
   }
 }
