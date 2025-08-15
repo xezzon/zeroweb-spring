@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.third_party_app.exception;
 
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 /**
  * 无效的访问密钥
@@ -21,5 +22,10 @@ public class InvalidAccessKeyException extends ZerowebBusinessException {
   @Override
   public String getCode() {
     return ERROR_CODE;
+  }
+
+  @Override
+  public int getHttpStatus() {
+    return HttpResponseStatus.FORBIDDEN.code();
   }
 }

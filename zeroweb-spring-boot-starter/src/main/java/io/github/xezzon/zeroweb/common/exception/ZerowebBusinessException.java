@@ -28,4 +28,8 @@ public abstract class ZerowebBusinessException extends RuntimeException {
   }
 
   public abstract String getCode();
+
+  public int getHttpStatus() {
+    return ErrorCodeConstant.CLIENT_ERROR_STATUS;
+  }
 }
