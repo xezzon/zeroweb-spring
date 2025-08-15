@@ -2,7 +2,6 @@
 # See all available variables at https://mega-linter.github.io/configuration.html and in linters documentation
 
 ENABLE:
-  - JAVA
   - PROTOBUF
   - EDITORCONFIG
   - COPYPASTE

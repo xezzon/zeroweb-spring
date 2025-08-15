@@ -6,11 +6,7 @@ name: Lint
 permissions: read-all
 
 on:
-  push:
-    branches: [ "develop", "master", "main" ]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ "develop", "master", "main" ]
+  workflow_dispatch:
 
 jobs:
   linter:
