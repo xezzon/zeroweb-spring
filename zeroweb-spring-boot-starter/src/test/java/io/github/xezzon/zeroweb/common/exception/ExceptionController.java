@@ -39,6 +39,6 @@ public class ExceptionController {
 
   @RequestMapping("/DataPermissionForbiddenException")
   public void dataPermissionForbiddenException() {
-    throw new DataPermissionForbiddenException("无权访问该应用");
+    throw new DataPermissionForbiddenException("", "", "");
   }
 }

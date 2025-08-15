@@ -1,10 +1,13 @@
 package io.github.xezzon.zeroweb.openapi;
 
+import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
+import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.hutool.core.util.RandomUtil;
+import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
@@ -72,6 +75,8 @@ class OpenapiHttpTest {
     );
     Id responseBody = webTestClient.post()
         .uri(OPENAPI_ADD_URI)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .bodyValue(req)
         .exchange()
         .expectStatus().isOk()
@@ -98,6 +103,8 @@ class OpenapiHttpTest {
     );
     webTestClient.post()
         .uri(OPENAPI_ADD_URI)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .bodyValue(req)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
@@ -154,6 +161,8 @@ class OpenapiHttpTest {
     );
     webTestClient.put()
         .uri(MODIFY_OPENAPI_URI)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .bodyValue(req)
         .exchange()
         .expectStatus().isOk();
@@ -178,6 +187,8 @@ class OpenapiHttpTest {
     );
     webTestClient.put()
         .uri(MODIFY_OPENAPI_URI)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .bodyValue(req)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
@@ -201,6 +212,8 @@ class OpenapiHttpTest {
     );
     webTestClient.put()
         .uri(MODIFY_OPENAPI_URI)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .bodyValue(req)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
@@ -226,6 +239,8 @@ class OpenapiHttpTest {
     );
     webTestClient.put()
         .uri(MODIFY_OPENAPI_URI)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .bodyValue(req)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
@@ -240,6 +255,8 @@ class OpenapiHttpTest {
     );
     webTestClient.put()
         .uri(MODIFY_OPENAPI_URI)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .bodyValue(req)
         .exchange()
         .expectStatus().isOk();
@@ -258,6 +275,8 @@ class OpenapiHttpTest {
         .uri(builder -> builder.path(PUBLISH_OPENAPI_URI)
             .build(target.getId())
         )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
     Openapi openapi = repository.findById(target.getId()).orElseThrow();
@@ -272,6 +291,8 @@ class OpenapiHttpTest {
         .uri(builder -> builder.path(PUBLISH_OPENAPI_URI)
             .build(RandomUtil.randomString(8))
         )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);

@@ -11,7 +11,6 @@ import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
 import io.github.xezzon.zeroweb.subscription.exception.UnpublishedOpenapiCannotBeSubscribeException;
 import io.github.xezzon.zeroweb.subscription.exception.UnsubscribeOpenapiException;
 import io.github.xezzon.zeroweb.subscription.repository.SubscriptionRepository;
-import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppService;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,27 +29,22 @@ public class SubscriptionService implements
     ISubscriptionService4Call {
 
   private final SubscriptionRepository subscriptionRepository;
-  private final IThirdPartyAppService thirdPartyAppService;
   private final IOpenapiService4Subscription openapiService;
 
   public SubscriptionService(
       final SubscriptionRepository subscriptionRepository,
-      final IThirdPartyAppService thirdPartyAppService,
       final IOpenapiService4Subscription openapiService
   ) {
     this.subscriptionRepository = subscriptionRepository;
-    this.thirdPartyAppService = thirdPartyAppService;
     this.openapiService = openapiService;
   }
 
   /**
-   * 添加订阅
-   * 跳过已订阅的接口
+   * 添加订阅 跳过已订阅的接口
    * @param subscription 要添加的订阅对象
    * @throws UnpublishedOpenapiCannotBeSubscribeException 如果要订阅的Openapi未发布，则抛出异常
    */
   protected void addSubscription(Subscription subscription) {
-    thirdPartyAppService.checkPermission(subscription.getAppId());
     Openapi openapi = openapiService.getByCode(subscription.getOpenapiCode());
     if (openapi == null || !Objects.equals(openapi.getStatus(), OpenapiStatus.PUBLISHED)) {
       throw new UnpublishedOpenapiCannotBeSubscribeException();
@@ -67,8 +61,7 @@ public class SubscriptionService implements
   }
 
   /**
-   * 审核订阅。审核后订阅即生效，订阅者可以调用接口。
-   * 只对审核中的订阅有效。其他状态不变更。
+   * 审核订阅。审核后订阅即生效，订阅者可以调用接口。 只对审核中的订阅有效。其他状态不变更。
    * @param id 订阅的ID
    */
   protected void auditSubscription(String id) {
@@ -83,7 +76,6 @@ public class SubscriptionService implements
 
   @Override
   public Page<Subscription> listSubscription(ODataQueryOption odata, String appId) {
-    thirdPartyAppService.checkPermission(appId);
     Page<Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
     List<Subscription> subscriptions = subscriptionRepository.findByAppId(appId);
     Map<String, Subscription> subscriptionMap = subscriptions.parallelStream()

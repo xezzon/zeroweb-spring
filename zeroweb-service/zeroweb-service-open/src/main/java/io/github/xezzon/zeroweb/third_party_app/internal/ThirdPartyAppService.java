@@ -4,33 +4,39 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
 import io.github.xezzon.zeroweb.auth.JsonWebToken;
-import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
 import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig.ZerowebJwtConfig;
-import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
-import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppService;
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppService4Call;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
+import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMember;
+import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMemberRepository;
+import io.github.xezzon.zeroweb.third_party_app.event.ThirdPartyAppCreatedEvent;
 import io.github.xezzon.zeroweb.third_party_app.exception.InvalidAccessKeyException;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
+import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
+import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
 /**
@@ -38,22 +44,30 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyAppService4Call {
+public class ThirdPartyAppService implements IThirdPartyAppService4Call {
+
+  private final ThirdPartyAppRepository thirdPartyAppRepository;
 
   public static final String ALGORITHM = "AES";
   private static final int AES_KEY_LENGTH = 256;
   private final ThirdPartyAppDAO thirdPartyAppDAO;
   private final AccessSecretRepository accessSecretRepository;
+  private final ThirdPartyAppMemberRepository thirdPartyAppMemberRepository;
   private final ZerowebJwtConfig zerowebJwtConfig;
+  @Resource
+  private ApplicationEventPublisher eventPublisher;
 
   public ThirdPartyAppService(
       final ThirdPartyAppDAO thirdPartyAppDAO,
       final AccessSecretRepository accessSecretRepository,
-      final ZerowebConfig zerowebConfig
-  ) {
+      ThirdPartyAppMemberRepository thirdPartyAppMemberRepository,
+      final ZerowebConfig zerowebConfig,
+      ThirdPartyAppRepository thirdPartyAppRepository) {
     this.thirdPartyAppDAO = thirdPartyAppDAO;
     this.accessSecretRepository = accessSecretRepository;
+    this.thirdPartyAppMemberRepository = thirdPartyAppMemberRepository;
     this.zerowebJwtConfig = zerowebConfig.getJwt();
+    this.thirdPartyAppRepository = thirdPartyAppRepository;
   }
 
   /**
@@ -64,17 +78,22 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
   @Transactional()
   protected AccessSecret addThirdPartyApp(ThirdPartyApp thirdPartyApp) {
     thirdPartyAppDAO.get().save(thirdPartyApp);
+    eventPublisher.publishEvent(new ThirdPartyAppCreatedEvent(thirdPartyApp));
     return this.rollAccessSecret(thirdPartyApp.getId());
   }
 
   /**
    * 根据用户ID分页查询第三方应用列表
-   * @param odata OData查询选项，用于指定分页和排序等条件
    * @param userId 用户ID
    * @return 分页查询结果，包含符合条件的第三方应用列表
    */
-  protected Page<ThirdPartyApp> listThirdPartyAppByUser(ODataQueryOption odata, String userId) {
-    return thirdPartyAppDAO.findAllWithUserId(odata, userId);
+  protected Page<ThirdPartyApp> listThirdPartyAppByUser(String userId) {
+    List<ThirdPartyAppMember> members = thirdPartyAppMemberRepository.findByUserId(userId);
+    Set<String> appIds = members.stream()
+        .map(ThirdPartyAppMember::getGroupId)
+        .collect(Collectors.toSet());
+    List<ThirdPartyApp> list = thirdPartyAppRepository.findByIdInOrderByCreateTimeDesc(appIds);
+    return new PageImpl<>(list);
   }
 
   /**
@@ -92,7 +111,6 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
    * @return 更新后的应用访问凭据与密钥
    */
   protected AccessSecret rollAccessSecret(String appId) {
-    this.checkPermission(appId);
     try {
       KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
       keyGenerator.init(AES_KEY_LENGTH);
@@ -108,19 +126,6 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
       log.error("Cannot create key pair.", e);
     }
     return null;
-  }
-
-  @Override
-  public void checkPermission(String appId) {
-    Optional<ThirdPartyApp> thirdPartyApp = thirdPartyAppDAO.get().findById(appId);
-    if (thirdPartyApp.isEmpty()
-        || !Objects.equals(
-            thirdPartyApp.get().getOwnerId(),
-            JwtAuth.getOrThrow().getSub()
-        )
-    ) {
-      throw new DataPermissionForbiddenException("应用不存在或无权访问");
-    }
   }
 
   @Override

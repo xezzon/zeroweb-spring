@@ -5,12 +5,14 @@ import io.github.xezzon.zeroweb.metadata.PermissionConstantUtil;
 import java.util.List;
 
 /**
- * 接口权限
+ * @author xezzon
  */
-public final class PermissionConstant {
+public class PermissionConstant {
 
-  public static final String LOCALE_READ = "locale:read";
-  public static final String LOCALE_WRITE = "locale:write";
+  public static final String OPENAPI_WRITE = "openapi:write";
+  public static final String OPENAPI_PUBLISH = "openapi:publish";
+  public static final String SUBSCRIPTION_AUDIT = "subscription:audit";
+  public static final String THIRD_PARTY_APP_READ = "third-party-app:read";
 
   private static final List<MenuInfo> PERMISSIONS;
 

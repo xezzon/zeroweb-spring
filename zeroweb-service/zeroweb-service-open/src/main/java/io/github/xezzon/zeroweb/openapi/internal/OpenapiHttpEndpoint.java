@@ -1,6 +1,8 @@
 package io.github.xezzon.zeroweb.openapi.internal;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.entity.AddOpenapiReq;
@@ -35,6 +37,7 @@ public class OpenapiHttpEndpoint {
    * @return 添加的`对外接口`的唯一标识符
    */
   @PostMapping()
+  @SaCheckPermission({PermissionConstant.OPENAPI_WRITE})
   public Id addOpenapi(@RequestBody @Valid AddOpenapiReq req) {
     Openapi openapi = req.into();
     openapiService.addOpenapi(openapi);
@@ -56,6 +59,7 @@ public class OpenapiHttpEndpoint {
    * @param req 包含更新`对外接口`请求数据的请求体
    */
   @PutMapping()
+  @SaCheckPermission({PermissionConstant.OPENAPI_WRITE})
   public void modifyOpenapi(@RequestBody ModifyOpenapiReq req) {
     Openapi openapi = req.into();
     openapiService.modifyOpenapi(openapi);
@@ -66,6 +70,7 @@ public class OpenapiHttpEndpoint {
    * @param id 要发布的`对外接口`的唯一标识符
    */
   @PutMapping("/publish/{id}")
+  @SaCheckPermission({PermissionConstant.OPENAPI_PUBLISH})
   public void publishOpenapi(@PathVariable String id) {
     openapiService.publishOpenapi(id);
   }

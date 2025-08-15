@@ -19,13 +19,17 @@ import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
 import io.github.xezzon.zeroweb.subscription.exception.UnpublishedOpenapiCannotBeSubscribeException;
 import io.github.xezzon.zeroweb.subscription.repository.SubscriptionRepository;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
+import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMember;
+import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMemberRepository;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -45,7 +49,7 @@ class SubscriptionHttpTest {
   private static final String SUBSCRIPTION_LIST_URI = "/third-party-app/{appId}/subscription";
   private static final String SUBSCRIBE_URI = "/subscription";
   private static final String AUDIT_SUBSCRIPTION_URI = "/subscription/audit/{id}";
-  private static final String THIRD_PARTY_APP_OWNER = RandomUtil.randomString(8);
+  private static final String THIRD_PARTY_APP_MEMBER = UUID.randomUUID().toString();
 
   @Resource
   private WebTestClient webTestClient;
@@ -55,6 +59,8 @@ class SubscriptionHttpTest {
   private OpenapiRepository openapiRepository;
   @Resource
   private ThirdPartyAppRepository thirdPartyAppRepository;
+  @Resource
+  private ThirdPartyAppMemberRepository thirdPartyAppMemberRepository;
 
   List<Subscription> initData() {
     List<Openapi> openapiList = new ArrayList<>(16);
@@ -71,8 +77,13 @@ class SubscriptionHttpTest {
     for (int i = 0, cnt = 8; i < cnt; i++) {
       ThirdPartyApp thirdPartyApp = new ThirdPartyApp();
       thirdPartyApp.setName(RandomUtil.randomString(8));
-      thirdPartyApp.setOwnerId(THIRD_PARTY_APP_OWNER);
+      thirdPartyApp.setOwnerId(UUID.randomUUID().toString());
       thirdPartyAppRepository.save(thirdPartyApp);
+      ThirdPartyAppMember member = new ThirdPartyAppMember();
+      member.setGroupId(thirdPartyApp.getId());
+      member.setUserId(THIRD_PARTY_APP_MEMBER);
+      member.setRoleId(ThirdPartyAppMember.DEFAULT_ROLE_ID);
+      thirdPartyAppMemberRepository.save(member);
 
       RandomUtil.randomEleList(openapiList, 4)
           .stream()
@@ -107,7 +118,11 @@ class SubscriptionHttpTest {
             .build(dataset.get(0).getAppId())
         )
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(THIRD_PARTY_APP_OWNER).bearer())
+        .header(AUTHORIZATION, TestJwtGenerator
+            .userBuilder()
+            .id(THIRD_PARTY_APP_MEMBER)
+            .bearer()
+        )
         .exchange()
         .expectBody(new ParameterizedTypeReference<PagedModel<Subscription>>() {
         })
@@ -164,7 +179,11 @@ class SubscriptionHttpTest {
             .build(dataset.get(0).getAppId())
         )
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .header(AUTHORIZATION, TestJwtGenerator
+            .userBuilder()
+            .permissions(Collections.emptyList())
+            .bearer()
+        )
         .exchange()
         .expectStatus().isForbidden()
         .expectHeader()
@@ -188,7 +207,7 @@ class SubscriptionHttpTest {
         .uri(SUBSCRIBE_URI)
         .bodyValue(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(THIRD_PARTY_APP_OWNER).bearer())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(THIRD_PARTY_APP_MEMBER).bearer())
         .exchange()
         .expectStatus().isOk()
         .expectBody(Id.class)
@@ -215,7 +234,7 @@ class SubscriptionHttpTest {
         .uri(SUBSCRIBE_URI)
         .bodyValue(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(THIRD_PARTY_APP_OWNER).bearer())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(THIRD_PARTY_APP_MEMBER).bearer())
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(
@@ -251,6 +270,8 @@ class SubscriptionHttpTest {
             .path(AUDIT_SUBSCRIPTION_URI)
             .build(target.getId())
         )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
 
