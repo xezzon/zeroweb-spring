@@ -2,11 +2,14 @@ package io.github.xezzon.zeroweb.third_party_app.auth;
 
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
+import io.github.xezzon.zeroweb.third_party_app.authn.InvalidInvitationCodeException;
 import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMember;
 import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMemberRepository;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
@@ -34,7 +37,9 @@ class ThirdPartyAppMemberHttpTest {
   private static final String INVITE_MEMBER = "/third-party-app/{appId}/member";
   private static final String ACCEPT_INVITATION = "/third-party-app/-/member";
   private static final String LIST_MEMBER = "/third-party-app/{appId}/member";
+  private static final String MOVE_OWNERSHIP = "/third-party-app/{appId}/owner";
   private static final String OWNER_ID = UUID.randomUUID().toString();
+  private static final String MEMBER_ID = UUID.randomUUID().toString();
 
   @Resource
   private ThirdPartyAppRepository thirdPartyAppRepository;
@@ -53,10 +58,16 @@ class ThirdPartyAppMemberHttpTest {
     thirdPartyAppRepository.save(thirdPartyApp);
     accessSecretRepository
         .updateSecretKeyById(thirdPartyApp.getId(), RandomUtil.randomString(8));
+
+    ThirdPartyAppMember owner = new ThirdPartyAppMember();
+    owner.setGroupId(thirdPartyApp.getId());
+    owner.setUserId(OWNER_ID);
+    owner.setRoleId(ThirdPartyAppMember.OWNER_ROLE_ID);
+    thirdPartyAppMemberRepository.save(owner);
     ThirdPartyAppMember member = new ThirdPartyAppMember();
     member.setGroupId(thirdPartyApp.getId());
-    member.setUserId(thirdPartyApp.getOwnerId());
-    member.setRoleId(ThirdPartyAppMember.OWNER_ROLE_ID);
+    member.setUserId(MEMBER_ID);
+    member.setRoleId(ThirdPartyAppMember.DEFAULT_ROLE_ID);
     thirdPartyAppMemberRepository.save(member);
   }
 
@@ -147,7 +158,8 @@ class ThirdPartyAppMemberHttpTest {
             .bearer()
         )
         .exchange()
-        .expectStatus().isForbidden();
+        .expectStatus().isForbidden()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidInvitationCodeException.ERROR_CODE);
 
     List<ThirdPartyAppMember> responseBody = webTestClient.get()
         .uri(builder -> builder
@@ -162,7 +174,7 @@ class ThirdPartyAppMemberHttpTest {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(2, responseBody.size());
+    Assertions.assertEquals(3, responseBody.size());
   }
 
   @Test
@@ -195,6 +207,87 @@ class ThirdPartyAppMemberHttpTest {
             .bearer()
         )
         .exchange()
-        .expectStatus().isForbidden();
+        .expectStatus().isForbidden()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidInvitationCodeException.ERROR_CODE);
+  }
+
+  @Test
+  void moveOwnership() {
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+
+    webTestClient.patch()
+        .uri(builder -> builder
+            .path(MOVE_OWNERSHIP)
+            .queryParam("userId", MEMBER_ID)
+            .build(thirdPartyApp.getId())
+        )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(OWNER_ID).bearer())
+        .exchange()
+        .expectStatus().isOk();
+
+    ThirdPartyAppMember oldOwner = thirdPartyAppMemberRepository
+        .findByGroupIdAndUserId(thirdPartyApp.getId(), OWNER_ID)
+        .orElseThrow();
+    Assertions.assertFalse(oldOwner.isOwner());
+    ThirdPartyAppMember newOwner = thirdPartyAppMemberRepository
+        .findByGroupIdAndUserId(thirdPartyApp.getId(), MEMBER_ID)
+        .orElseThrow();
+    Assertions.assertTrue(newOwner.isOwner());
+  }
+
+  @Test
+  void moveOwnership_notOwner() {
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+
+    webTestClient.patch()
+        .uri(builder -> builder
+            .path(MOVE_OWNERSHIP)
+            .queryParam("userId", OWNER_ID)
+            .build(thirdPartyApp.getId())
+        )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(MEMBER_ID).bearer())
+        .exchange()
+        .expectStatus().isForbidden()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, DataPermissionForbiddenException.ERROR_CODE);
+  }
+
+  @Test
+  void moveOwnership_notMember() {
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+
+    webTestClient.patch()
+        .uri(builder -> builder
+            .path(MOVE_OWNERSHIP)
+            .queryParam("userId", UUID.randomUUID().toString())
+            .build(thirdPartyApp.getId())
+        )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(OWNER_ID).bearer())
+        .exchange()
+        .expectStatus().isForbidden()
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, DataPermissionForbiddenException.ERROR_CODE);
+  }
+
+  @Test
+  void moveOwnership_self() {
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+
+    webTestClient.patch()
+        .uri(builder -> builder
+            .path(MOVE_OWNERSHIP)
+            .queryParam("userId", OWNER_ID)
+            .build(thirdPartyApp.getId())
+        )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(OWNER_ID).bearer())
+        .exchange()
+        .expectStatus().isOk();
+
+    ThirdPartyAppMember owner = thirdPartyAppMemberRepository
+        .findByGroupIdAndUserId(thirdPartyApp.getId(), OWNER_ID)
+        .orElseThrow();
+    Assertions.assertTrue(owner.isOwner());
   }
 }

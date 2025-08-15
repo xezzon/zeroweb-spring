@@ -6,6 +6,7 @@ import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
 import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppMemberService;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author xezzon
@@ -40,8 +42,7 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
   }
 
   /**
-   * 生成邀请码。获得邀请码的用户由管理员同意后可以加入对第三方应用的管理。
-   * 邀请码的形式是一个 JWT。过期时间即为邀请码有效时间。载荷中包含应用ID。最后使用应用的密钥进行签名。
+   * 生成邀请码。获得邀请码的用户由管理员同意后可以加入对第三方应用的管理。 邀请码的形式是一个 JWT。过期时间即为邀请码有效时间。载荷中包含应用ID。最后使用应用的密钥进行签名。
    * @param appId 第三方应用ID
    * @param userId 被邀请的用户ID。如果为 null 则邀请码对所有人有效。
    * @param timeout 邀请码有效期。单位`小时`。
@@ -102,11 +103,33 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
   }
 
   /**
+   * 应用所有权转移
+   * @param appId 第三方应用ID
+   * @param target 转移的目标用户
+   */
+  @Transactional
+  void moveOwnership(String appId, String target) {
+    ThirdPartyAppMember owner = thirdPartyAppMemberRepository
+        .findByGroupIdAndUserId(appId, StpUtil.getLoginIdAsString())
+        .orElseThrow(
+            () -> new DataPermissionForbiddenException("Current user is not the owner of app.")
+        );
+    ThirdPartyAppMember member = thirdPartyAppMemberRepository
+        .findByGroupIdAndUserId(appId, target)
+        .orElseThrow(
+            () -> new DataPermissionForbiddenException("Target user is not a member of app.")
+        );
+    owner.moveOwnership(member);
+    thirdPartyAppMemberRepository.save(owner);
+    thirdPartyAppMemberRepository.save(member);
+  }
+
+  /**
    * 新增应用时记录其所有者
    * @param event 新增第三方应用事件
    */
   @EventListener
-  public void listen(ThirdPartyAppCreatedEvent event) {
+  void listen(ThirdPartyAppCreatedEvent event) {
     ThirdPartyApp thirdPartyApp = event.thirdPartyApp();
     ThirdPartyAppMember member = new ThirdPartyAppMember();
     member.setGroupId(thirdPartyApp.getId());

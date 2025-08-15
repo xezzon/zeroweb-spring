@@ -2,6 +2,7 @@ package io.github.xezzon.zeroweb.third_party_app.authn;
 
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.ID_LENGTH;
 
+import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,5 +44,13 @@ public class ThirdPartyAppMember {
 
   public boolean isOwner() {
     return Objects.equals(this.roleId, OWNER_ROLE_ID);
+  }
+
+  void moveOwnership(ThirdPartyAppMember member) {
+    if (!this.isOwner()) {
+      throw new DataPermissionForbiddenException("Current user is not the owner of app.");
+    }
+    this.roleId = DEFAULT_ROLE_ID;
+    member.roleId = OWNER_ROLE_ID;
   }
 }

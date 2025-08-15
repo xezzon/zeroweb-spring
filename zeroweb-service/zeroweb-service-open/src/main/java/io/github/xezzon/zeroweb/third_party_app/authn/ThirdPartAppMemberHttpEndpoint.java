@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.third_party_app.authn;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -57,5 +58,14 @@ public class ThirdPartAppMemberHttpEndpoint {
   public List<ThirdPartyAppMember> listMember(@PathVariable String appId) {
     // TODO: 校验资源权限
     return thirdPartyAppMemberService.listMember(appId);
+  }
+
+  /**
+   * 第三方应用所有权转移
+   * @param userId 转移的目标用户
+   */
+  @PatchMapping("/third-party-app/{appId}/owner")
+  public void moveOwnership(@PathVariable String appId, @RequestParam String userId) {
+    thirdPartyAppMemberService.moveOwnership(appId, userId);
   }
 }
