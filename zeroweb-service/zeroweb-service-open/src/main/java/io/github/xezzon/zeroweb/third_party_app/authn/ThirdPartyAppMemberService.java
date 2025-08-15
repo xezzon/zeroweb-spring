@@ -8,12 +8,15 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppMemberService;
+import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
+import io.github.xezzon.zeroweb.third_party_app.event.ThirdPartyAppCreatedEvent;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 /**
@@ -91,5 +94,19 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
     thirdPartyAppMember.setRoleId(ThirdPartyAppMember.DEFAULT_ROLE_ID);
     thirdPartyAppMemberRepository.save(thirdPartyAppMember);
     return thirdPartyAppMember.getId();
+  }
+
+  /**
+   * 新增应用时记录其所有者
+   * @param event 新增第三方应用事件
+   */
+  @EventListener
+  public void listen(ThirdPartyAppCreatedEvent event) {
+    ThirdPartyApp thirdPartyApp = event.thirdPartyApp();
+    ThirdPartyAppMember member = new ThirdPartyAppMember();
+    member.setGroupId(thirdPartyApp.getId());
+    member.setUserId(thirdPartyApp.getOwnerId());
+    member.setRoleId(ThirdPartyAppMember.OWNER_ROLE_ID);
+    thirdPartyAppMemberRepository.save(member);
   }
 }

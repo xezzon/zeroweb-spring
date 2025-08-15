@@ -15,8 +15,10 @@ import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppService;
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppService4Call;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
-import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
+import io.github.xezzon.zeroweb.third_party_app.event.ThirdPartyAppCreatedEvent;
 import io.github.xezzon.zeroweb.third_party_app.exception.InvalidAccessKeyException;
+import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
+import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -30,6 +32,7 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +48,8 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
   private final ThirdPartyAppDAO thirdPartyAppDAO;
   private final AccessSecretRepository accessSecretRepository;
   private final ZerowebJwtConfig zerowebJwtConfig;
+  @Resource
+  private ApplicationEventPublisher eventPublisher;
 
   public ThirdPartyAppService(
       final ThirdPartyAppDAO thirdPartyAppDAO,
@@ -64,7 +69,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService, IThirdPartyA
   @Transactional()
   protected AccessSecret addThirdPartyApp(ThirdPartyApp thirdPartyApp) {
     thirdPartyAppDAO.get().save(thirdPartyApp);
-    // TODO: 废弃 ownerId 字段，将 owner 加入到应用成员
+    eventPublisher.publishEvent(new ThirdPartyAppCreatedEvent(thirdPartyApp));
     return this.rollAccessSecret(thirdPartyApp.getId());
   }
 
