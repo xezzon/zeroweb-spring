@@ -1,6 +1,9 @@
 package io.github.xezzon.zeroweb.third_party_app.authn;
 
+import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.third_party_app.authz.PermissionConstant;
+import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionManager;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,9 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class ThirdPartAppMemberHttpEndpoint {
 
   private final ThirdPartyAppMemberService thirdPartyAppMemberService;
+  private final ThirdPartyAppPermissionManager thirdPartyAppPermissionManager;
 
-  public ThirdPartAppMemberHttpEndpoint(ThirdPartyAppMemberService thirdPartyAppMemberService) {
+  public ThirdPartAppMemberHttpEndpoint(
+      ThirdPartyAppMemberService thirdPartyAppMemberService,
+      ThirdPartyAppPermissionManager thirdPartyAppPermissionManager
+  ) {
     this.thirdPartyAppMemberService = thirdPartyAppMemberService;
+    this.thirdPartyAppPermissionManager = thirdPartyAppPermissionManager;
   }
 
   /**
@@ -35,7 +43,8 @@ public class ThirdPartAppMemberHttpEndpoint {
       @RequestParam(required = false) String userId,
       @RequestParam(required = false, defaultValue = "24") int timeout
   ) {
-    // TODO: 校验资源权限
+    thirdPartyAppPermissionManager
+        .check(appId, JwtAuth.getOrThrow().getSub(), PermissionConstant.INVITE_MEMBER);
     return thirdPartyAppMemberService.inviteMember(appId, userId, timeout);
   }
 
@@ -51,12 +60,13 @@ public class ThirdPartAppMemberHttpEndpoint {
   }
 
   /**
-   * 查询制定第三方应用的成员
+   * 查询第三方应用的成员
    * @param appId 第三方应用ID
    */
   @GetMapping("/third-party-app/{appId}/member")
   public List<ThirdPartyAppMember> listMember(@PathVariable String appId) {
-    // TODO: 校验资源权限
+    thirdPartyAppPermissionManager
+        .check(appId, JwtAuth.getOrThrow().getSub(), PermissionConstant.LIST_MEMBER);
     return thirdPartyAppMemberService.listMember(appId);
   }
 

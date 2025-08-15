@@ -17,8 +17,10 @@ public class MenuService implements IMenuService {
   @Override
   public List<MenuInfo> list() {
     return Stream.of(
-        PermissionConstant.getPermissions()
-    )
+            PermissionConstant.getPermissions(),
+            io.github.xezzon.zeroweb.third_party_app.authz.PermissionConstant.getPermissions(),
+            io.github.xezzon.zeroweb.subscription.authz.PermissionConstant.getPermissions()
+        )
         .flatMap(Collection::stream)
         .toList();
   }

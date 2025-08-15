@@ -1,15 +1,16 @@
 package io.github.xezzon.zeroweb.third_party_app.authn;
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
 import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppMemberService;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
+import io.github.xezzon.zeroweb.third_party_app.authz.PermissionConstant;
 import io.github.xezzon.zeroweb.third_party_app.event.ThirdPartyAppCreatedEvent;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
 import java.time.Instant;
@@ -78,7 +79,7 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
     } catch (JWTVerificationException e) {
       throw new InvalidInvitationCodeException(e);
     }
-    String userId = StpUtil.getLoginIdAsString();
+    String userId = JwtAuth.getOrThrow().getSub();
     String invitedOne = decodedJWT.getClaim(USER_ID_CLAIM).asString();
     if (invitedOne != null && !Objects.equals(userId, invitedOne)) {
       // 如果邀请码是针对特定用户的，那么需要校验当前用户与被邀请的用户是否一致
@@ -109,19 +110,24 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
    */
   @Transactional
   void moveOwnership(String appId, String target) {
+    String currentUser = JwtAuth.getOrThrow().getSub();
     ThirdPartyAppMember owner = thirdPartyAppMemberRepository
-        .findByGroupIdAndUserId(appId, StpUtil.getLoginIdAsString())
-        .orElseThrow(
-            () -> new DataPermissionForbiddenException("Current user is not the owner of app.")
-        );
+        .findByGroupIdAndUserId(appId, currentUser)
+        .filter(ThirdPartyAppMember::isOwner)
+        .orElseThrow(() -> new DataPermissionForbiddenException(
+            appId, currentUser, PermissionConstant.MOVE_OWNERSHIP
+        ));
     ThirdPartyAppMember member = thirdPartyAppMemberRepository
         .findByGroupIdAndUserId(appId, target)
-        .orElseThrow(
-            () -> new DataPermissionForbiddenException("Target user is not a member of app.")
-        );
+        .orElseThrow(() -> new DataPermissionForbiddenException(appId, target, ""));
     owner.moveOwnership(member);
     thirdPartyAppMemberRepository.save(owner);
     thirdPartyAppMemberRepository.save(member);
+  }
+
+  @Override
+  public Optional<ThirdPartyAppMember> queryMember(String groupId, String userId) {
+    return thirdPartyAppMemberRepository.findByGroupIdAndUserId(groupId, userId);
   }
 
   /**

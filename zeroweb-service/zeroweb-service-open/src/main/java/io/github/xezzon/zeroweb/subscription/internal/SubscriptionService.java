@@ -1,7 +1,5 @@
 package io.github.xezzon.zeroweb.subscription.internal;
 
-import cn.dev33.satoken.stp.StpUtil;
-import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.openapi.IOpenapiService4Subscription;
 import io.github.xezzon.zeroweb.openapi.Openapi;
@@ -13,7 +11,6 @@ import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
 import io.github.xezzon.zeroweb.subscription.exception.UnpublishedOpenapiCannotBeSubscribeException;
 import io.github.xezzon.zeroweb.subscription.exception.UnsubscribeOpenapiException;
 import io.github.xezzon.zeroweb.subscription.repository.SubscriptionRepository;
-import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppService;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,16 +29,13 @@ public class SubscriptionService implements
     ISubscriptionService4Call {
 
   private final SubscriptionRepository subscriptionRepository;
-  private final IThirdPartyAppService thirdPartyAppService;
   private final IOpenapiService4Subscription openapiService;
 
   public SubscriptionService(
       final SubscriptionRepository subscriptionRepository,
-      final IThirdPartyAppService thirdPartyAppService,
       final IOpenapiService4Subscription openapiService
   ) {
     this.subscriptionRepository = subscriptionRepository;
-    this.thirdPartyAppService = thirdPartyAppService;
     this.openapiService = openapiService;
   }
 
@@ -51,7 +45,6 @@ public class SubscriptionService implements
    * @throws UnpublishedOpenapiCannotBeSubscribeException 如果要订阅的Openapi未发布，则抛出异常
    */
   protected void addSubscription(Subscription subscription) {
-    thirdPartyAppService.checkPermission(subscription.getAppId());
     Openapi openapi = openapiService.getByCode(subscription.getOpenapiCode());
     if (openapi == null || !Objects.equals(openapi.getStatus(), OpenapiStatus.PUBLISHED)) {
       throw new UnpublishedOpenapiCannotBeSubscribeException();
@@ -83,10 +76,6 @@ public class SubscriptionService implements
 
   @Override
   public Page<Subscription> listSubscription(ODataQueryOption odata, String appId) {
-    if (!StpUtil.hasPermission(PermissionConstant.SUBSCRIPTION_AUDIT)) {
-      // 应用管理员可以查看所有应用的订阅，非管理员则需要对应的权限
-      thirdPartyAppService.checkPermission(appId);
-    }
     Page<Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
     List<Subscription> subscriptions = subscriptionRepository.findByAppId(appId);
     Map<String, Subscription> subscriptionMap = subscriptions.parallelStream()

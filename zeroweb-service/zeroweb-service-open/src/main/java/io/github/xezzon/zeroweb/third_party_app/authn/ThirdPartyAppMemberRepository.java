@@ -12,4 +12,6 @@ public interface ThirdPartyAppMemberRepository extends JpaRepository<ThirdPartyA
   Optional<ThirdPartyAppMember> findByGroupIdAndUserId(String groupId, String userId);
 
   List<ThirdPartyAppMember> findByGroupIdOrderByCreateTimeDesc(String groupId);
+
+  List<ThirdPartyAppMember> findByUserId(String userId);
 }

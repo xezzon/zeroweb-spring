@@ -62,6 +62,11 @@ class ThirdPartyAppHttpTest {
         repository.save(thirdPartyApp);
         accessSecretRepository
             .updateSecretKeyById(thirdPartyApp.getId(), RandomUtil.randomString(8));
+        ThirdPartyAppMember owner = new ThirdPartyAppMember();
+        owner.setGroupId(thirdPartyApp.getId());
+        owner.setUserId(userId);
+        owner.setRoleId(ThirdPartyAppMember.OWNER_ROLE_ID);
+        thirdPartyAppMemberRepository.save(owner);
         dataset.add(thirdPartyApp);
       }
     }
@@ -136,8 +141,6 @@ class ThirdPartyAppHttpTest {
     Assertions.assertEquals(dataset.size(), responseBody.getPage().getTotalElements());
     List<ThirdPartyApp> except = dataset.parallelStream()
         .sorted(Comparator.comparing(ThirdPartyApp::getCreateTime).reversed())
-        .skip(skip)
-        .limit(top)
         .toList();
     Assertions.assertEquals(except.size(), responseBody.getContent().size());
     for (int i = 0, cnt = responseBody.getContent().size(); i < cnt; i++) {
