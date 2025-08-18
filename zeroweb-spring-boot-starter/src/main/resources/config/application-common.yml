@@ -40,3 +40,9 @@ logging:
 
 sa-token:
   is-read-cookie: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
