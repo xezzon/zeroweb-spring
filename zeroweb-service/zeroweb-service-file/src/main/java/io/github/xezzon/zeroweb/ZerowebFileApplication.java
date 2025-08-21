@@ -1,0 +1,24 @@
+package io.github.xezzon.zeroweb;
+
+import io.github.xezzon.zeroweb.dict.EnableDictScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode;
+
+/**
+ * 附件管理服务
+ * @author xezzon
+ */
+@SpringBootApplication
+@EnableSpringDataWebSupport(pageSerializationMode = PageSerializationMode.VIA_DTO)
+@EnableDictScan
+public class ZerowebFileApplication {
+
+  private ZerowebFileApplication() {
+  }
+
+  static void main(String[] args) {
+    SpringApplication.run(ZerowebFileApplication.class, args);
+  }
+}

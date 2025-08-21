@@ -22,6 +22,16 @@
     },
     {
       "type": "java",
+      "name": "Spring Boot-ZerowebFileApplication<zeroweb-service-file>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "io.github.xezzon.zeroweb.ZerowebFileApplication",
+      "projectName": "zeroweb-service-file",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
       "name": "Spring Boot-ZerowebOpenApplication<zeroweb-service-open>",
       "request": "launch",
       "cwd": "${workspaceFolder}",
