@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -50,13 +51,14 @@ class DictHttpTest {
   private static final String DELETE_DICT_URI = "/dict";
   private static final String GET_DICT_URI = "/dict";
 
+  private final List<Dict> dataset = new ArrayList<>();
   @Resource
   private WebTestClient webTestClient;
   @Resource
   private DictRepository repository;
 
-  List<Dict> initData() {
-    List<Dict> dataset = new ArrayList<>();
+  @BeforeEach
+  void setUp() {
     for (int i = 0; i < 16; i++) {
       Dict parent = new Dict();
       parent.setTag(Dict.DICT_TAG);
@@ -94,7 +96,6 @@ class DictHttpTest {
       repository.save(grandchild);
       child.setChildren(Collections.singletonList(grandchild));
     }
-    return dataset;
   }
 
   @AfterEach
@@ -125,7 +126,7 @@ class DictHttpTest {
 
   @Test
   void addDictTag_repeat() {
-    Dict exist = this.initData().get(0);
+    Dict exist = dataset.get(0);
 
     AddDictReq req = new AddDictReq();
     req.setCode(exist.getCode());
@@ -143,7 +144,7 @@ class DictHttpTest {
 
   @Test
   void addDict() {
-    Dict parent = this.initData().get(0);
+    Dict parent = dataset.get(0);
     AddDictReq req = new AddDictReq();
     req.setTag(parent.getCode());
     req.setCode(RandomUtil.randomString(8));
@@ -166,7 +167,7 @@ class DictHttpTest {
 
   @Test
   void addDict_repeat() {
-    Dict parent = this.initData().get(0);
+    Dict parent = dataset.get(0);
     Dict exist = parent.getChildren().get(0);
 
     AddDictReq req = new AddDictReq();
@@ -187,7 +188,7 @@ class DictHttpTest {
 
   @Test
   void modifyDict() {
-    Dict target = this.initData().get(0);
+    Dict target = dataset.get(0);
 
     ModifyDictReq req = new ModifyDictReq();
     req.setId(target.getId());
@@ -214,8 +215,8 @@ class DictHttpTest {
 
   @Test
   void modifyDict_repeat() {
-    Dict target = this.initData().get(0);
-    Dict repeated = this.initData().get(1);
+    Dict target = dataset.get(0);
+    Dict repeated = dataset.get(1);
     if (RandomUtil.randomBoolean()) {
       repeated = target.getChildren().get(1);
       target = target.getChildren().get(0);
@@ -247,7 +248,6 @@ class DictHttpTest {
 
   @Test
   void updateDictStatus() {
-    List<Dict> dataset = this.initData();
     dataset.addAll(dataset.stream()
         .map(Dict::getChildren)
         .flatMap(List::stream)
@@ -290,7 +290,6 @@ class DictHttpTest {
 
   @Test
   void removeDictTag() {
-    List<Dict> dataset = this.initData();
     Collections.shuffle(dataset);
 
     Dict dict0 = dataset.get(0);
@@ -311,7 +310,6 @@ class DictHttpTest {
 
   @Test
   void removeDictItem() {
-    List<Dict> dataset = this.initData();
     Collections.shuffle(dataset);
 
     Dict dict20 = dataset.get(2).getChildren().get(0);
@@ -338,7 +336,6 @@ class DictHttpTest {
 
   @Test
   void getDictTreeByTag() {
-    List<Dict> dataset = this.initData();
     List<Dict> responseBody = webTestClient.get()
         .uri(uriBuilder -> uriBuilder
             .path(GET_DICT_TREE_BY_TAG_URI)
@@ -374,7 +371,6 @@ class DictHttpTest {
   void pagedList() {
     final int top = 5;
     final int skip = top * 2;
-    List<Dict> dataset = this.initData();
 
     PagedModel<Dict> responseBody = webTestClient.get()
         .uri(builder -> builder

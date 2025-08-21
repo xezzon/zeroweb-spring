@@ -47,6 +47,6 @@ public interface TranslationRepository extends
 
   @Transactional
   @Modifying
-  @Query("update Translation i set i.language = ?1 where i.language = ?2")
-  int updateByLanguage(String newLanguageTag, String oldLanguageTag);
+  @Query("update Translation i set i.language = ?2 where i.language = ?1")
+  int updateByLanguage(String oldLanguageTag, String newLanguageTag);
 }

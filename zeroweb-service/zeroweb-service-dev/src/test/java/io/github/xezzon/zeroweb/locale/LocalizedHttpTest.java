@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -69,7 +70,8 @@ class LocalizedHttpTest {
   @Resource
   private TranslationRepository translationRepository;
 
-  public void initData() {
+  @BeforeEach
+  void setUp() {
     List<Language> languages = languageRepository.findAll().stream()
         .filter(o -> Objects.equals(o.getDictTag(), Language.LANGUAGE_DICT_TAG))
         .toList();
@@ -280,7 +282,6 @@ class LocalizedHttpTest {
 
   @Test
   void listI18nMessageNamespace() {
-    this.initData();
     List<String> except = i18nMessageRepository.findAll()
         .stream()
         .map(I18nMessage::getNamespace)
@@ -306,7 +307,6 @@ class LocalizedHttpTest {
 
   @Test
   void queryI18nMessageList() {
-    this.initData();
     List<I18nMessage> dataset = i18nMessageRepository.findAll();
     List<I18nMessage> except = dataset.stream()
         .filter(it -> Objects.equals(it.getNamespace(), dataset.get(0).getNamespace()))
@@ -336,7 +336,6 @@ class LocalizedHttpTest {
 
   @Test
   void addI18nMessage_repeat() {
-    this.initData();
     I18nMessage except = i18nMessageRepository.findAll().get(0);
     AddI18nMessageReq req = new AddI18nMessageReq(
         except.getNamespace(),
@@ -354,7 +353,6 @@ class LocalizedHttpTest {
 
   @Test
   void updateI18nMessage() throws InterruptedException {
-    this.initData();
     I18nMessage target = i18nMessageRepository.findAll().get(0);
 
     I18nMessage except = new I18nMessage();
@@ -387,7 +385,6 @@ class LocalizedHttpTest {
 
   @Test
   void updateI18nMessage_repeat() {
-    this.initData();
     I18nMessage target = i18nMessageRepository.findAll().get(0);
     I18nMessage repeat = i18nMessageRepository.findAll().get(1);
 
@@ -407,7 +404,6 @@ class LocalizedHttpTest {
 
   @Test
   void deleteI18nMessage() throws InterruptedException {
-    this.initData();
     I18nMessage target = i18nMessageRepository.findAll().get(0);
 
     webTestClient.delete()
@@ -430,7 +426,6 @@ class LocalizedHttpTest {
 
   @Test
   void queryTranslation() {
-    this.initData();
     I18nMessage i18nMessage = i18nMessageRepository.findAll().get(0);
 
     Map<String, String> responseBody = webTestClient.get()
@@ -455,7 +450,6 @@ class LocalizedHttpTest {
 
   @Test
   void insertTranslation() {
-    this.initData();
     I18nMessage targetMessage = i18nMessageRepository.findAll().get(0);
     Language targetLanguage = new Language();
     targetLanguage.setLanguageTag(Locale.TAIWAN.toLanguageTag());
@@ -486,7 +480,6 @@ class LocalizedHttpTest {
 
   @Test
   void updateTranslation() {
-    this.initData();
     Translation target = translationRepository.findAll().get(0);
 
     UpsertTranslationReq req = new UpsertTranslationReq(
@@ -512,7 +505,6 @@ class LocalizedHttpTest {
 
   @Test
   void updateTranslation_noSuchData_language() {
-    this.initData();
     Translation target = translationRepository.findAll().get(0);
 
     UpsertTranslationReq req = new UpsertTranslationReq(
@@ -533,7 +525,6 @@ class LocalizedHttpTest {
 
   @Test
   void updateTranslation_noSuchData_namespace() {
-    this.initData();
     Translation target = translationRepository.findAll().get(0);
 
     UpsertTranslationReq req = new UpsertTranslationReq(
@@ -554,7 +545,6 @@ class LocalizedHttpTest {
 
   @Test
   void updateTranslation_noSuchData_messageKey() {
-    this.initData();
     Translation target = translationRepository.findAll().get(0);
 
     UpsertTranslationReq req = new UpsertTranslationReq(
@@ -575,7 +565,6 @@ class LocalizedHttpTest {
 
   @Test
   void loadTranslation() {
-    this.initData();
     List<Translation> dataset = translationRepository.findAll();
     String targetLanguage = dataset.get(0).getLanguage();
     String targetNamespace = dataset.get(0).getNamespace();

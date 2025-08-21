@@ -4,12 +4,12 @@ import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 
 import cn.hutool.core.util.RandomUtil;
-import io.github.xezzon.zeroweb.InitializeDataRunner;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.role.entity.AddRoleReq;
 import io.github.xezzon.zeroweb.role.repository.RoleRepository;
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -29,28 +29,56 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @DirtiesContext
 class RoleHttpTest {
 
-  private final Role role = new Role();
-
+  private final List<Role> roles = new ArrayList<>();
   @Resource
   private WebTestClient webTestClient;
   @Resource
   private RoleRepository roleRepository;
-  @Resource
-  private InitializeDataRunner dataset;
 
   @BeforeEach
   void setUp() {
-    role.setCode(RandomUtil.randomString(8));
-    role.setValue(role.getCode());
-    role.setName(RandomUtil.randomString(8));
-    role.setInheritable(RandomUtil.randomBoolean());
-    role.setParentId("1");
-    roleRepository.save(role);
+    // 角色
+    {
+      Role role = new Role();
+      role.setCode(RandomUtil.randomString(8));
+      role.setValue(role.getCode());
+      role.setName(RandomUtil.randomString(8));
+      role.setInheritable(true);
+      role.setParentId(RoleConstant.ADMIN_ID);
+      role.setChildren(new ArrayList<>());
+      roles.add(role);
+    }
+    for (int i = 0, cnt = 8; i < cnt; i++) {
+      Role role = new Role();
+      role.setCode(RandomUtil.randomString(8));
+      role.setValue(role.getCode());
+      role.setName(RandomUtil.randomString(8));
+      role.setInheritable(RandomUtil.randomBoolean());
+      role.setParentId(RoleConstant.ADMIN_ID);
+      role.setChildren(new ArrayList<>());
+      roles.add(role);
+    }
+    roleRepository.saveAllAndFlush(roles);
+    // 二级角色
+    List<Role> inheritableRoles = roles.stream()
+        .filter(Role::getInheritable)
+        .toList();
+    for (int i = 0, cnt = 16; i < cnt; i++) {
+      Role parent = RandomUtil.randomEle(inheritableRoles);
+      Role role = new Role();
+      role.setCode(RandomUtil.randomString(8));
+      role.setValue(parent.getCode() + "/" + role.getCode());
+      role.setName(RandomUtil.randomString(8));
+      role.setInheritable(RandomUtil.randomBoolean());
+      role.setParentId(parent.getId());
+      parent.getChildren().add(role);
+      roleRepository.saveAndFlush(role);
+    }
   }
 
   @AfterEach
   void tearDown() {
-    roleRepository.delete(role);
+    roleRepository.deleteAll(roles);
   }
 
   @Test
@@ -77,6 +105,7 @@ class RoleHttpTest {
   @Test
   void deleteRole() {
     long excepted = roleRepository.count();
+    Role role = roles.get(0);
     webTestClient.delete()
         .uri(builder -> builder
             .path("/role/{id}")
@@ -86,7 +115,11 @@ class RoleHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
-    Assertions.assertEquals(excepted - 1, roleRepository.count());
+    int deleteCount = 1;
+    if (role.getChildren() != null) {
+      deleteCount += role.getChildren().size();
+    }
+    Assertions.assertEquals(excepted - deleteCount, roleRepository.count());
   }
 
   @Test
@@ -107,15 +140,15 @@ class RoleHttpTest {
         .flatMap(List::stream)
         .anyMatch(o -> Objects.equals(
             o.getId(),
-            role.getId()
+            roles.get(0).getId()
         ))
     );
   }
 
   @Test
   void listMyRole() {
-    List<Role> roles = RandomUtil.randomEleList(dataset.getRoles(), 2);
-    List<String> roleValues = roles.stream()
+    List<Role> randomRoles = RandomUtil.randomEleList(roles, 2);
+    List<String> roleValues = randomRoles.stream()
         .map(Role::getValue)
         .toList();
     List<Role> responseBody = webTestClient.get()
@@ -131,10 +164,10 @@ class RoleHttpTest {
         .expectBodyList(Role.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    List<String> excepted = roles.stream()
+    List<String> excepted = randomRoles.stream()
         .map(Role::getId)
         .collect(Collectors.toList());
-    excepted.addAll(roles.stream()
+    excepted.addAll(randomRoles.stream()
         .map(Role::getChildren)
         .flatMap(Collection::stream)
         .map(Role::getId)

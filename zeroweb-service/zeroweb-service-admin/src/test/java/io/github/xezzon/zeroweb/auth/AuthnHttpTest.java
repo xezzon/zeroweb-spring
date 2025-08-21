@@ -11,12 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.dev33.satoken.config.SaTokenConfig;
+import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.util.RandomUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import io.github.xezzon.zeroweb.InitializeDataRunner;
 import io.github.xezzon.zeroweb.auth.entity.BasicAuth;
 import io.github.xezzon.zeroweb.auth.entity.OidcToken;
 import io.github.xezzon.zeroweb.auth.exception.InvalidPasswordException;
@@ -24,11 +24,15 @@ import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.crypto.internal.JwtKeyManager;
 import io.github.xezzon.zeroweb.user.User;
+import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
 import java.security.interfaces.ECPublicKey;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,16 +56,18 @@ class AuthnHttpTest {
   private static final GenericContainer<?> redisContainer =
       new GenericContainer<>("redis:7-alpine");
 
+  private final String password = RandomUtil.randomString(8);
+  private final List<User> users = new ArrayList<>();
   @Resource
   private WebTestClient webTestClient;
+  @Resource
+  private UserRepository userRepository;
   @Resource
   private SaTokenConfig saTokenConfig;
   @Resource
   private JwtKeyManager keyManager;
   @Resource
   private ZerowebConfig zerowebConfig;
-  @Resource
-  private InitializeDataRunner dataset;
 
   @BeforeAll
   static void beforeAll() {
@@ -78,12 +84,24 @@ class AuthnHttpTest {
     ));
   }
 
+  @BeforeEach
+  void setUp() {
+    // 用户
+    for (int i = 0, cnt = 8; i < cnt; i++) {
+      User user = new User();
+      user.setUsername(RandomUtil.randomString(8));
+      user.setNickname(RandomUtil.randomString(8));
+      user.setCipher(BCrypt.hashpw(this.password));
+      users.add(user);
+    }
+    userRepository.saveAllAndFlush(users);
+  }
+
   @Test
   void basicLogin() {
     final String uri = BASIC_LOGIN_URI;
     // 数据准备
-    String password = dataset.getPassword();
-    User user = dataset.getUsers().get(0);
+    User user = users.get(0);
 
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
     OidcToken responseBody = webTestClient.post()
@@ -107,9 +125,8 @@ class AuthnHttpTest {
     assertNotNull(responseBody1);
     assertEquals(tokenValue0, responseBody1.getAccessToken());
     // 以不同的用户登录，返回不同的令牌
-    String password2 = dataset.getPassword();
-    User user2 = dataset.getUsers().get(1);
-    BasicAuth basicAuth2 = new BasicAuth(user2.getUsername(), password2);
+    User user2 = users.get(1);
+    BasicAuth basicAuth2 = new BasicAuth(user2.getUsername(), password);
     OidcToken responseBody2 = webTestClient.post()
         .uri(uri)
         .bodyValue(basicAuth2)
@@ -126,8 +143,7 @@ class AuthnHttpTest {
   void basicLogin_invalidToken() {
     final String uri = BASIC_LOGIN_URI;
     // 数据准备
-    String password = dataset.getPassword();
-    User user = dataset.getUsers().get(0);
+    User user = users.get(0);
     // 用户名不正确
     BasicAuth basicAuth1 = new BasicAuth(RandomUtil.randomString(9), password);
     webTestClient.post()
@@ -149,8 +165,7 @@ class AuthnHttpTest {
   @Test
   void self() {
     final String uri = "/auth/self";
-    String password = dataset.getPassword();
-    User user = dataset.getUsers().get(0);
+    User user = users.get(0);
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
     OidcToken responseBody = webTestClient.post()
         .uri(BASIC_LOGIN_URI)
@@ -177,8 +192,7 @@ class AuthnHttpTest {
   @RepeatedTest(2)
   void signJwt() {
     final String uri = "/auth/token";
-    String password = dataset.getPassword();
-    User user = dataset.getUsers().get(0);
+    User user = users.get(0);
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
     OidcToken responseBody = webTestClient.post()
         .uri(BASIC_LOGIN_URI)
@@ -210,8 +224,7 @@ class AuthnHttpTest {
   @Test
   void forwardAuth() {
     final ECPublicKey publicKey = keyManager.getPublicKey();
-    String password = dataset.getPassword();
-    User user = dataset.getUsers().get(0);
+    User user = users.get(0);
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
     OidcToken responseBody = webTestClient.post()
         .uri(BASIC_LOGIN_URI)
