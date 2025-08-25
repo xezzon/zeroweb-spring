@@ -30,8 +30,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -62,9 +64,10 @@ class SubscriptionHttpTest {
   @Resource
   private ThirdPartyAppMemberRepository thirdPartyAppMemberRepository;
 
-  List<Subscription> initData() {
+  @BeforeEach
+  void setUp() {
     List<Openapi> openapiList = new ArrayList<>(16);
-    for (int i = 0, cnt = 16; i < cnt; i++) {
+    for (int i = 0, cnt = Byte.MAX_VALUE; i < cnt; i++) {
       Openapi openapi = new Openapi();
       openapi.setCode(RandomUtil.randomString(8));
       openapi.setDestination(RandomUtil.randomString(8));
@@ -97,7 +100,6 @@ class SubscriptionHttpTest {
           .forEach(subscriptionList::add);
     }
     repository.saveAll(subscriptionList);
-    return subscriptionList;
   }
 
   @AfterEach
@@ -109,7 +111,7 @@ class SubscriptionHttpTest {
   void listSubscription() {
     final int top = 2000;
     final int skip = 0;
-    List<Subscription> dataset = this.initData();
+    List<Subscription> dataset = repository.findAll();
 
     PagedModel<Subscription> responseBody = webTestClient.get()
         .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
@@ -170,7 +172,7 @@ class SubscriptionHttpTest {
   void listSubscription_dataPermission() {
     final int top = 2000;
     final int skip = 0;
-    List<Subscription> dataset = this.initData();
+    List<Subscription> dataset = repository.findAll();
 
     webTestClient.get()
         .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
@@ -192,14 +194,9 @@ class SubscriptionHttpTest {
 
   @Test
   void subscribe() {
-    Openapi openapi;
-    do {
-      this.initData();
-      openapi = openapiRepository.findAll().parallelStream()
-          .filter(Openapi::isPublished)
-          .findAny()
-          .orElse(null);
-    } while (openapi == null);
+    Openapi openapi = openapiRepository.findAll().stream()
+        .filter(Openapi::isPublished)
+        .findAny().orElseThrow();
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
 
     AddSubscriptionReq req = new AddSubscriptionReq(thirdPartyApp.getId(), openapi.getCode());
@@ -219,14 +216,9 @@ class SubscriptionHttpTest {
 
   @Test
   void subscribe_unpublishedOpenapi() {
-    Openapi openapi;
-    do {
-      this.initData();
-      openapi = openapiRepository.findAll().parallelStream()
-          .filter(o -> !o.isPublished())
-          .findAny()
-          .orElse(null);
-    } while (openapi == null);
+    Openapi openapi = openapiRepository.findAll().stream()
+        .filter(Predicate.not(Openapi::isPublished))
+        .findAny().orElseThrow();
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
 
     AddSubscriptionReq req = new AddSubscriptionReq(thirdPartyApp.getId(), openapi.getCode());
@@ -245,7 +237,6 @@ class SubscriptionHttpTest {
 
   @Test
   void subscribe_dataPermissionForbidden() {
-    this.initData();
     Openapi openapi = openapiRepository.findAll().get(0);
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
 
@@ -263,7 +254,7 @@ class SubscriptionHttpTest {
 
   @Test
   void auditSubscription() {
-    Subscription target = this.initData().get(0);
+    Subscription target = repository.findAll().get(0);
 
     webTestClient.put()
         .uri(builder -> builder

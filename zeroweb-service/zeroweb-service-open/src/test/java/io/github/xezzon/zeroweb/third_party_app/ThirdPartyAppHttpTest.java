@@ -14,7 +14,6 @@ import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepositor
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
 import jakarta.annotation.Resource;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
@@ -23,6 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -51,8 +51,8 @@ class ThirdPartyAppHttpTest {
   @Resource
   private WebTestClient webTestClient;
 
-  public List<ThirdPartyApp> initData() {
-    List<ThirdPartyApp> dataset = new ArrayList<>();
+  @BeforeEach
+  void setUp() {
     for (int i = 0, cnt = 8; i < cnt; i++) {
       String userId = UUID.randomUUID().toString();
       for (int j = 0; j < cnt; j++) {
@@ -67,10 +67,8 @@ class ThirdPartyAppHttpTest {
         owner.setUserId(userId);
         owner.setRoleId(ThirdPartyAppMember.OWNER_ROLE_ID);
         thirdPartyAppMemberRepository.save(owner);
-        dataset.add(thirdPartyApp);
       }
     }
-    return dataset;
   }
 
   @AfterEach
@@ -116,7 +114,7 @@ class ThirdPartyAppHttpTest {
   void listMyThirdPartyApp() {
     final int top = 5;
     final int skip = top * 2;
-    List<ThirdPartyApp> dataset = this.initData();
+    List<ThirdPartyApp> dataset = repository.findAll();
     String me = dataset.get(0).getOwnerId();
 
     PagedModel<ThirdPartyApp> responseBody = webTestClient.get()
@@ -152,7 +150,7 @@ class ThirdPartyAppHttpTest {
   void listThirdPartyApp() {
     final int top = 5;
     final int skip = top * 2;
-    List<ThirdPartyApp> dataset = this.initData();
+    List<ThirdPartyApp> dataset = repository.findAll();
 
     PagedModel<ThirdPartyApp> responseBody = webTestClient.get()
         .uri(builder -> builder
@@ -184,7 +182,7 @@ class ThirdPartyAppHttpTest {
 
   @Test
   void rollAccessSecret() {
-    ThirdPartyApp target = this.initData().get(0);
+    ThirdPartyApp target = repository.findAll().get(0);
     AccessSecret responseBody = webTestClient.patch()
         .uri(builder -> builder
             .path(ROLL_ACCESS_SECRET_URI)

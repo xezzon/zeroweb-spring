@@ -15,11 +15,11 @@ import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import jakarta.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -42,17 +42,15 @@ class AppHttpTest {
   @Resource
   private AppRepository repository;
 
-  public List<App> initData() {
-    ArrayList<App> dataset = new ArrayList<>();
+  @BeforeEach
+  void setUp() {
     for (int i = 0, cnt = Byte.MAX_VALUE; i < cnt; i++) {
       App openapi = new App();
       openapi.setName(RandomUtil.randomString(8));
       openapi.setBaseUrl(RandomUtil.randomString(8));
       openapi.setOrdinal(RandomUtil.randomInt());
       repository.save(openapi);
-      dataset.add(openapi);
     }
-    return dataset;
   }
 
   @AfterEach
@@ -105,7 +103,7 @@ class AppHttpTest {
 
   @Test
   void listApp_shouldReturnOk() {
-    List<App> apps = this.initData();
+    List<App> apps = repository.findAll();
     // Act & Assert
     List<App> responseBody = webTestClient.get()
         .uri(LIST_APP_URI)
@@ -124,7 +122,7 @@ class AppHttpTest {
   @Test
   void updateApp() {
     // Arrange
-    List<App> dataset = this.initData();
+    List<App> dataset = repository.findAll();
     App app = dataset.get(0);
     UpdateAppReq req = new UpdateAppReq(
         app.getId(),
@@ -146,7 +144,7 @@ class AppHttpTest {
   @Test
   void updateApp_invalidBaseUrl() {
     // Arrange
-    List<App> dataset = this.initData();
+    List<App> dataset = repository.findAll();
     App app = dataset.get(0);
     UpdateAppReq invalidUrlReq = new UpdateAppReq(
         app.getId(),
@@ -190,7 +188,7 @@ class AppHttpTest {
   @Test
   void updateApp_nullOptionalFields() {
     // Arrange
-    List<App> dataset = this.initData();
+    List<App> dataset = repository.findAll();
     App app = dataset.get(0);
     // Assuming that the app name is optional and can be null
     UpdateAppReq nullOptionalReq = new UpdateAppReq(
@@ -214,7 +212,7 @@ class AppHttpTest {
   @Test
   void updateApp_concurrentUpdates() {
     // Arrange
-    List<App> dataset = this.initData();
+    List<App> dataset = repository.findAll();
     App app = dataset.get(0);
     int concurrentRequests = 16;
     IntStream.range(0, concurrentRequests).parallel()
@@ -238,7 +236,7 @@ class AppHttpTest {
   @Test
   void deleteApp() {
     // Arrange
-    List<App> dataset = this.initData();
+    List<App> dataset = repository.findAll();
     String id = dataset.get(0).getId();
 
     // Act & Assert

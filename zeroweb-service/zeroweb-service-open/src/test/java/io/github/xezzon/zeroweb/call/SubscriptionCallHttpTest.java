@@ -28,14 +28,13 @@ import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.util.function.Tuple4;
-import reactor.util.function.Tuples;
 
 /**
  * @author xezzon
@@ -46,6 +45,10 @@ class SubscriptionCallHttpTest {
 
   private static final String SUBSCRIPTION_CALL = "/call/{openapiCode}";
   private static final String THIRD_PARTY_APP_OWNER = RandomUtil.randomString(8);
+  private final Openapi openapi = new Openapi();
+  private final ThirdPartyApp thirdPartyApp = new ThirdPartyApp();
+  private final Subscription subscription = new Subscription();
+  private final AccessSecret accessSecret = new AccessSecret();
   @Resource
   private WebTestClient webTestClient;
   @Resource
@@ -59,27 +62,26 @@ class SubscriptionCallHttpTest {
   @LocalServerPort
   private int port;
 
-  public Tuple4<Openapi, ThirdPartyApp, Subscription, AccessSecret> initData() {
-    Openapi openapi = new Openapi();
+  @BeforeEach
+  void setUp() {
     openapi.setCode(RandomUtil.randomString(8));
     openapi.setDestination("http://localhost:" + port + "/httpbin/anything/{anything}");
     openapi.setHttpMethod(RandomUtil.randomEle(HttpMethod.values()));
     openapi.setStatus(OpenapiStatus.PUBLISHED);
     openapiRepository.save(openapi);
-    ThirdPartyApp thirdPartyApp = new ThirdPartyApp();
+
     thirdPartyApp.setName(RandomUtil.randomString(8));
     thirdPartyApp.setOwnerId(THIRD_PARTY_APP_OWNER);
     thirdPartyAppRepository.save(thirdPartyApp);
-    Subscription subscription = new Subscription();
+
     subscription.setAppId(thirdPartyApp.getId());
     subscription.setOpenapiCode(openapi.getCode());
     subscription.setStatus(SubscriptionStatus.SUBSCRIBED);
     subscriptionRepository.save(subscription);
-    AccessSecret accessSecret = new AccessSecret();
+
     accessSecret.setId(thirdPartyApp.getId());
     accessSecret.setSecretKey(Base64.getEncoder().encodeToString(RandomUtil.randomBytes(32)));
     accessSecretRepository.save(accessSecret);
-    return Tuples.of(openapi, thirdPartyApp, subscription, accessSecret);
   }
 
   @Test
@@ -88,9 +90,8 @@ class SubscriptionCallHttpTest {
     final String anything = RandomUtil.randomString(8);
     final String hello = RandomUtil.randomString(8);
     long timestamp = Instant.now().toEpochMilli();
-    Tuple4<Openapi, ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
-    byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
+    byte[] secretKey = Base64.getDecoder().decode(accessSecret.getSecretKey());
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
     mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
@@ -100,9 +101,9 @@ class SubscriptionCallHttpTest {
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
             .queryParam("hello", hello)
-            .build(dataset.getT3().getOpenapiCode())
+            .build(subscription.getOpenapiCode())
         )
-        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, dataset.getT4().getAccessKey())
+        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessSecret.getAccessKey())
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
@@ -119,9 +120,8 @@ class SubscriptionCallHttpTest {
     final String anything = RandomUtil.randomString(8);
     final String hello = RandomUtil.randomString(8);
     long timestamp = Instant.now().toEpochMilli();
-    Tuple4<Openapi, ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
-    byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
+    byte[] secretKey = Base64.getDecoder().decode(accessSecret.getSecretKey());
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
     mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
@@ -133,7 +133,7 @@ class SubscriptionCallHttpTest {
             .queryParam("hello", hello)
             .build(RandomUtil.randomString(8))
         )
-        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, dataset.getT4().getAccessKey())
+        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessSecret.getAccessKey())
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
@@ -148,9 +148,8 @@ class SubscriptionCallHttpTest {
     final String anything = RandomUtil.randomString(8);
     final String hello = RandomUtil.randomString(8);
     long timestamp = Instant.now().toEpochMilli();
-    Tuple4<Openapi, ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
-    byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
+    byte[] secretKey = Base64.getDecoder().decode(accessSecret.getSecretKey());
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
     mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
@@ -160,7 +159,7 @@ class SubscriptionCallHttpTest {
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
             .queryParam("hello", hello)
-            .build(dataset.getT3().getOpenapiCode())
+            .build(subscription.getOpenapiCode())
         )
         .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, Base64.getEncoder()
             .encodeToString(RandomUtil.randomString(8).getBytes())
@@ -179,7 +178,6 @@ class SubscriptionCallHttpTest {
     final String anything = RandomUtil.randomString(8);
     final String hello = RandomUtil.randomString(8);
     long timestamp = Instant.now().toEpochMilli();
-    Tuple4<Openapi, ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
     byte[] secretKey = Base64.getDecoder().decode(RandomUtil.randomString(8));
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
@@ -191,9 +189,9 @@ class SubscriptionCallHttpTest {
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
             .queryParam("hello", hello)
-            .build(dataset.getT3().getOpenapiCode())
+            .build(subscription.getOpenapiCode())
         )
-        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, dataset.getT4().getAccessKey())
+        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessSecret.getAccessKey())
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
@@ -208,9 +206,8 @@ class SubscriptionCallHttpTest {
     final String anything = RandomUtil.randomString(8);
     final String hello = RandomUtil.randomString(8);
     long timestamp = Instant.now().toEpochMilli();
-    Tuple4<Openapi, ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
-    byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
+    byte[] secretKey = Base64.getDecoder().decode(accessSecret.getSecretKey());
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
     mac.update(Bytes.concat("tampered message".getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
@@ -220,9 +217,9 @@ class SubscriptionCallHttpTest {
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
             .queryParam("hello", hello)
-            .build(dataset.getT3().getOpenapiCode())
+            .build(subscription.getOpenapiCode())
         )
-        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, dataset.getT4().getAccessKey())
+        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessSecret.getAccessKey())
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
@@ -237,9 +234,8 @@ class SubscriptionCallHttpTest {
     final String anything = RandomUtil.randomString(8);
     final String hello = RandomUtil.randomString(8);
     long timestamp = Instant.now().getEpochSecond();
-    Tuple4<Openapi, ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
-    byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
+    byte[] secretKey = Base64.getDecoder().decode(accessSecret.getSecretKey());
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
     mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
@@ -249,9 +245,9 @@ class SubscriptionCallHttpTest {
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
             .queryParam("hello", hello)
-            .build(dataset.getT3().getOpenapiCode())
+            .build(subscription.getOpenapiCode())
         )
-        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, dataset.getT4().getAccessKey())
+        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessSecret.getAccessKey())
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
         .bodyValue(rawBody)
@@ -265,9 +261,8 @@ class SubscriptionCallHttpTest {
     final String anything = RandomUtil.randomString(8);
     final String hello = RandomUtil.randomString(8);
     long timestamp = Instant.now().toEpochMilli();
-    Tuple4<Openapi, ThirdPartyApp, Subscription, AccessSecret> dataset = this.initData();
     Mac mac = Mac.getInstance(ZerowebOpenConstant.DIGEST_ALGORITHM);
-    byte[] secretKey = Base64.getDecoder().decode(dataset.getT4().getSecretKey());
+    byte[] secretKey = Base64.getDecoder().decode(accessSecret.getSecretKey());
     mac.init(new SecretKeySpec(secretKey, ZerowebOpenConstant.DIGEST_ALGORITHM));
     mac.update(Bytes.concat(Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
@@ -277,9 +272,9 @@ class SubscriptionCallHttpTest {
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
             .queryParam("hello", hello)
-            .build(dataset.getT3().getOpenapiCode())
+            .build(subscription.getOpenapiCode())
         )
-        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, dataset.getT4().getAccessKey())
+        .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessSecret.getAccessKey())
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
         .exchange()

@@ -73,14 +73,15 @@ public class LocalizedService {
    */
   void updateLanguage(final Language language) {
     final Language entity = languageDAO.get().getReferenceById(language.getId());
+    final String oldTag = entity.getLanguageTag();
     languageDAO.getCopier().copy(language, entity);
     /* 前置校验 */
     this.checkRepeat(language);
     /* 持久化 */
     languageDAO.get().save(entity);
     /* 后置处理 */
-    if (!Objects.equals(entity.getLanguageTag(), language.getLanguageTag())) {
-      translationRepository.updateByLanguage(language.getLanguageTag(), entity.getLanguageTag());
+    if (!Objects.equals(oldTag, language.getLanguageTag())) {
+      translationRepository.updateByLanguage(oldTag, language.getLanguageTag());
     }
   }
 

@@ -3,13 +3,15 @@ package io.github.xezzon.zeroweb.auth;
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 
+import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.util.RandomUtil;
-import io.github.xezzon.zeroweb.InitializeDataRunner;
 import io.github.xezzon.zeroweb.auth.repository.RolePermissionRepository;
 import io.github.xezzon.zeroweb.auth.repository.RoleUserRepository;
-import io.github.xezzon.zeroweb.role.RoleConstant;
 import io.github.xezzon.zeroweb.role.Role;
+import io.github.xezzon.zeroweb.role.RoleConstant;
+import io.github.xezzon.zeroweb.role.repository.RoleRepository;
 import io.github.xezzon.zeroweb.user.User;
+import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -35,28 +38,76 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @DirtiesContext
 class AuthzHttpTest {
 
-  @Resource
-  private InitializeDataRunner dataset;
+  private final List<User> users = new ArrayList<>();
+  private final List<Role> roles = new ArrayList<>();
+  private final List<String> permissions = new ArrayList<>();
   @Resource
   private WebTestClient webTestClient;
   @Resource
   private RoleUserRepository roleUserRepository;
   @Resource
   private RolePermissionRepository rolePermissionRepository;
+  @Resource
+  private UserRepository userRepository;
+  @Resource
+  private RoleRepository roleRepository;
+
+  @BeforeEach
+  void setUp() {
+    String password = RandomUtil.randomString(8);
+    // 用户
+    for (int i = 0, cnt = 8; i < cnt; i++) {
+      User user = new User();
+      user.setUsername(RandomUtil.randomString(8));
+      user.setNickname(RandomUtil.randomString(8));
+      user.setCipher(BCrypt.hashpw(password));
+      users.add(user);
+    }
+    userRepository.saveAllAndFlush(users);
+    // 角色
+    for (int i = 0, cnt = 8; i < cnt; i++) {
+      Role role = new Role();
+      role.setCode(RandomUtil.randomString(8));
+      role.setValue(role.getCode());
+      role.setName(RandomUtil.randomString(8));
+      role.setInheritable(i % 4 == 0 || RandomUtil.randomBoolean());
+      role.setParentId("1");
+      role.setChildren(new ArrayList<>());
+      roles.add(role);
+    }
+    roleRepository.saveAllAndFlush(roles);
+    // 二级角色
+    List<Role> inheritableRoles = roles.stream()
+        .filter(Role::getInheritable)
+        .toList();
+    for (int i = 0, cnt = 16; i < cnt; i++) {
+      Role parent = RandomUtil.randomEle(inheritableRoles);
+      Role role = new Role();
+      role.setCode(RandomUtil.randomString(8));
+      role.setValue(parent.getCode() + "/" + role.getCode());
+      role.setName(RandomUtil.randomString(8));
+      role.setInheritable(RandomUtil.randomBoolean());
+      role.setParentId(parent.getId());
+      parent.getChildren().add(role);
+      roleRepository.saveAndFlush(role);
+    }
+    // 权限
+    for (int i = 0, cnt = 8; i < cnt; i++) {
+      permissions.add(RandomUtil.randomString(8));
+    }
+  }
 
   @Test
   void roleUser_admin() {
     long initialSize = roleUserRepository.count();
-    final List<User> userDataset = dataset.getUsers();
-    final List<Role> roleDataset = dataset.getRoles();
     // 角色绑定人员
     List<RoleUser> userBindToRole = new ArrayList<>();
     String roleId;
     {
-      Role role = RandomUtil.randomEle(roleDataset);
+      Role role = RandomUtil.randomEle(roles);
       roleId = role.getId();
-      List<User> users = RandomUtil.randomEleList(userDataset, userDataset.size() - 2);
-      for (User user : users) {
+      List<User> randomUsers = RandomUtil.randomEleList(users, users.size() - 2);
+      for (User user : randomUsers) {
         RoleUser roleUser = new RoleUser();
         roleUser.setRoleId(roleId);
         roleUser.setUserId(user.getId());
@@ -74,10 +125,10 @@ class AuthzHttpTest {
     String userId;
     List<RoleUser> roleBindToUser = new ArrayList<>();
     {
-      User user = RandomUtil.randomEle(userDataset);
+      User user = RandomUtil.randomEle(users);
       userId = user.getId();
-      List<Role> roles = RandomUtil.randomEleList(roleDataset, roleDataset.size() - 2);
-      for (Role role : roles) {
+      List<Role> randomRoles = RandomUtil.randomEleList(roles, roles.size() - 2);
+      for (Role role : randomRoles) {
         RoleUser roleUser = new RoleUser();
         roleUser.setUserId(userId);
         roleUser.setRoleId(role.getId());
@@ -158,25 +209,23 @@ class AuthzHttpTest {
   @Test
   void rolePermission_admin() {
     long initialSize = rolePermissionRepository.count();
-    final List<Role> roleDataset = dataset.getRoles();
-    final List<String> permissionDataset = dataset.getPermissions();
     // 角色绑定权限
     List<RolePermission> permissionBindToRole = new ArrayList<>();
     String roleId;
     {
-      Role role = RandomUtil.randomEle(roleDataset);
+      Role role = RandomUtil.randomEle(roles);
       roleId = role.getId();
-      List<String> permissions = RandomUtil.randomEleList(
-          permissionDataset, permissionDataset.size() - 2
+      List<String> randomPermissions = RandomUtil.randomEleList(
+          permissions, permissions.size() - 2
       );
-      for (String permission : permissions) {
+      for (String permission : randomPermissions) {
         RolePermission rolePermission = new RolePermission();
         rolePermission.setRoleId(roleId);
         rolePermission.setPermission(permission);
         permissionBindToRole.add(rolePermission);
       }
       Set<RolePermission> temp = new HashSet<>();
-      for (String permission : permissions) {
+      for (String permission : randomPermissions) {
         RolePermission rolePermission = new RolePermission();
         rolePermission.setRoleId(role.getParentId());
         rolePermission.setPermission(permission);
@@ -196,16 +245,16 @@ class AuthzHttpTest {
     List<RolePermission> roleBindToPermission = new ArrayList<>();
     String permission;
     {
-      permission = RandomUtil.randomEle(permissionDataset);
-      List<Role> roles = RandomUtil.randomEleList(roleDataset, roleDataset.size() - 2);
-      for (Role role : roles) {
+      permission = RandomUtil.randomEle(permissions);
+      List<Role> randomRoles = RandomUtil.randomEleList(roles, roles.size() - 2);
+      for (Role role : randomRoles) {
         RolePermission rolePermission = new RolePermission();
         rolePermission.setPermission(permission);
         rolePermission.setRoleId(role.getId());
         roleBindToPermission.add(rolePermission);
       }
       Set<RolePermission> temp = new HashSet<>();
-      Set<String> parentIds = roles.stream()
+      Set<String> parentIds = randomRoles.stream()
           .map(Role::getParentId)
           .collect(Collectors.toSet());
       for (String parentId : parentIds) {
@@ -292,8 +341,8 @@ class AuthzHttpTest {
   @Test
   void roleUser_normal_success() {
     long initialSize = roleUserRepository.count();
-    final List<User> userDataset = dataset.getUsers();
-    final List<Role> roleDataset = dataset.getRoles();
+    final List<User> userDataset = users;
+    final List<Role> roleDataset = roles;
 
     // 获取一个有父角色的角色和当前用户
     Role targetRole = roleDataset.stream()
@@ -392,18 +441,15 @@ class AuthzHttpTest {
 
   @Test
   void roleUser_normal_failed() {
-    final List<User> userDataset = dataset.getUsers();
-    final List<Role> roleDataset = dataset.getRoles();
-
     // 获取目标角色和当前用户
-    Role targetRole = RandomUtil.randomEle(roleDataset);
-    User currentUser = userDataset.get(0);
+    Role targetRole = RandomUtil.randomEle(roles);
+    User currentUser = users.get(0);
 
     // 测试角色-用户绑定（当前用户不属于目标角色的上级角色）
     List<RoleUser> userBindToRole = new ArrayList<>();
     RoleUser roleUser = new RoleUser();
     roleUser.setRoleId(targetRole.getId());
-    roleUser.setUserId(userDataset.get(1).getId());
+    roleUser.setUserId(users.get(1).getId());
     userBindToRole.add(roleUser);
 
     webTestClient.put()
@@ -450,17 +496,14 @@ class AuthzHttpTest {
   @Test
   void rolePermission_normal_success() {
     long initialSize = rolePermissionRepository.count();
-    final List<User> userDataset = dataset.getUsers();
-    final List<Role> roleDataset = dataset.getRoles();
-    final List<String> permissionDataset = dataset.getPermissions();
 
     // 获取一个有父角色的角色和当前用户
-    Role targetRole = roleDataset.stream()
+    Role targetRole = roles.stream()
         .filter(role -> Objects.equals(role.getParentId(), RoleConstant.ADMIN_ID))
         .findFirst()
         .orElseThrow();
-    User currentUser = RandomUtil.randomEle(userDataset);
-    String permission = RandomUtil.randomEle(permissionDataset);
+    User currentUser = RandomUtil.randomEle(users);
+    String permission = RandomUtil.randomEle(permissions);
 
     // 设置当前用户为目标角色的上级角色成员
     RoleUser parentRoleUser = new RoleUser();
@@ -587,19 +630,15 @@ class AuthzHttpTest {
 
   @Test
   void rolePermission_normal_failed() {
-    final List<User> userDataset = dataset.getUsers();
-    final List<Role> roleDataset = dataset.getRoles();
-    final List<String> permissionDataset = dataset.getPermissions();
-
     // 获取目标角色和当前用户
-    Role targetRole = RandomUtil.randomEle(roleDataset);
-    User currentUser = RandomUtil.randomEle(userDataset);
+    Role targetRole = RandomUtil.randomEle(roles);
+    User currentUser = RandomUtil.randomEle(users);
 
     // 测试角色-权限绑定（当前用户不属于目标角色的上级角色）
     List<RolePermission> permissionBindToRole = new ArrayList<>();
     RolePermission rolePermission = new RolePermission();
     rolePermission.setRoleId(targetRole.getId());
-    rolePermission.setPermission(RandomUtil.randomEle(permissionDataset));
+    rolePermission.setPermission(RandomUtil.randomEle(permissions));
     permissionBindToRole.add(rolePermission);
 
     webTestClient.put()

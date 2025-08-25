@@ -19,10 +19,10 @@ import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.exception.PublishedOpenapiCannotBeModifyException;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
 import jakarta.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -47,8 +47,8 @@ class OpenapiHttpTest {
   @Resource
   private WebTestClient webTestClient;
 
-  public List<Openapi> initData() {
-    ArrayList<Openapi> dataset = new ArrayList<>();
+  @BeforeEach
+  void setUp() {
     for (int i = 0, cnt = Byte.MAX_VALUE; i < cnt; i++) {
       Openapi openapi = new Openapi();
       openapi.setCode(RandomUtil.randomString(8));
@@ -56,9 +56,7 @@ class OpenapiHttpTest {
       openapi.setHttpMethod(RandomUtil.randomEle(HttpMethod.values()));
       openapi.setStatus(RandomUtil.randomEle(OpenapiStatus.values()));
       repository.save(openapi);
-      dataset.add(openapi);
     }
-    return dataset;
   }
 
   @AfterEach
@@ -93,7 +91,6 @@ class OpenapiHttpTest {
 
   @Test
   void addOpenapi_repeat() {
-    this.initData();
     Openapi exist = repository.findAll().get(0);
 
     AddOpenapiReq req = new AddOpenapiReq(
@@ -115,7 +112,7 @@ class OpenapiHttpTest {
   void pagedList() {
     final int top = 5;
     final int skip = top * 2;
-    List<Openapi> dataset = this.initData();
+    List<Openapi> dataset = repository.findAll();
 
     PagedModel<Openapi> responseBody = webTestClient.get()
         .uri(builder -> builder
@@ -144,14 +141,9 @@ class OpenapiHttpTest {
 
   @Test
   void modifyOpenapi() {
-    Openapi draftOne = null;
-    while (draftOne == null) {
-      List<Openapi> dataset = this.initData();
-      draftOne = dataset.parallelStream()
-          .filter(openapi -> openapi.getStatus() == OpenapiStatus.DRAFT)
-          .findAny()
-          .orElse(null);
-    }
+    Openapi draftOne = repository.findAll().stream()
+        .filter(openapi -> openapi.getStatus() == OpenapiStatus.DRAFT)
+        .findAny().orElseThrow();
 
     ModifyOpenapiReq req = new ModifyOpenapiReq(
         draftOne.getId(),
@@ -175,7 +167,7 @@ class OpenapiHttpTest {
 
   @Test
   void modifyOpenapi_repeat() {
-    List<Openapi> dataset = this.initData();
+    List<Openapi> dataset = repository.findAll();
     Openapi target = dataset.get(0);
     Openapi repeated = dataset.get(1);
 
@@ -202,8 +194,6 @@ class OpenapiHttpTest {
 
   @Test
   void modifyOpenapi_noSuchData() {
-    this.initData();
-
     ModifyOpenapiReq req = new ModifyOpenapiReq(
         RandomUtil.randomString(8),
         RandomUtil.randomString(8),
@@ -222,14 +212,9 @@ class OpenapiHttpTest {
 
   @Test
   void modifyOpenapi_publishedApi() {
-    Openapi publishedOpenapi = null;
-    while (publishedOpenapi == null) {
-      List<Openapi> dataset = this.initData();
-      publishedOpenapi = dataset.parallelStream()
-          .filter(openapi -> openapi.getStatus() == OpenapiStatus.PUBLISHED)
-          .findAny()
-          .orElse(null);
-    }
+    Openapi publishedOpenapi = repository.findAll().stream()
+        .filter(openapi -> openapi.getStatus() == OpenapiStatus.PUBLISHED)
+        .findAny().orElseThrow();
 
     ModifyOpenapiReq req = new ModifyOpenapiReq(
         publishedOpenapi.getId(),
@@ -269,7 +254,7 @@ class OpenapiHttpTest {
 
   @Test
   void publishOpenapi() {
-    Openapi target = this.initData().get(0);
+    Openapi target = repository.findAll().get(0);
 
     webTestClient.put()
         .uri(builder -> builder.path(PUBLISH_OPENAPI_URI)
@@ -285,8 +270,6 @@ class OpenapiHttpTest {
 
   @Test
   void publishOpenapi_noSuchData() {
-    this.initData();
-
     webTestClient.put()
         .uri(builder -> builder.path(PUBLISH_OPENAPI_URI)
             .build(RandomUtil.randomString(8))

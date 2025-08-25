@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -23,13 +25,14 @@ import org.springframework.test.annotation.DirtiesContext;
 @DirtiesContext
 class DictGrpcServerTest {
 
+  private final List<Dict> dataset = new ArrayList<>();
   @Resource
   private DictBlockingStub dictBlockingStub;
   @Resource
   private DictRepository repository;
 
-  List<Dict> initData() {
-    List<Dict> dataset = new ArrayList<>();
+  @BeforeEach
+  void setUp() {
     for (int i = 0; i < 4; i++) {
       Dict parent = new Dict();
       parent.setTag(Dict.DICT_TAG);
@@ -67,12 +70,15 @@ class DictGrpcServerTest {
       repository.save(grandchild);
       child.setChildren(Collections.singletonList(grandchild));
     }
-    return dataset;
+  }
+
+  @AfterEach
+  void tearDown() {
+    repository.deleteAll();
   }
 
   @Test
   void getDictListByTag() {
-    List<Dict> dataset = this.initData();
     DictListResp resp = dictBlockingStub.getDictListByTag(DictReq.newBuilder()
         .setTag(dataset.get(0).getCode())
         .build()
@@ -88,10 +94,8 @@ class DictGrpcServerTest {
 
   @Test
   void importDict() {
-    this.initData();
-    final List<Dict> dataset = repository.findAll();
     int loopTimes = 4;
-    int count = 0;
+    long count = repository.count();
     List<DictImportReq> tagList = new ArrayList<>();
     for (int i = 0; i < loopTimes; i++) {
       tagList.add(DictImportReq.newBuilder()
@@ -151,7 +155,7 @@ class DictGrpcServerTest {
         .addAllData(itemList)
         .build();
     dictBlockingStub.importDict(dictImportReqList);
-    assertEquals(dataset.size() + count, repository.count());
+    assertEquals(count, repository.count());
     Dict result = repository.findByTagAndCode(
         Dict.DICT_TAG,
         tagList.get(0).getCode()

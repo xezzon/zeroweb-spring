@@ -4,8 +4,8 @@ import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.util.RandomUtil;
-import io.github.xezzon.zeroweb.InitializeDataRunner;
 import io.github.xezzon.zeroweb.common.constant.CharacterConstant;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
@@ -15,6 +15,8 @@ import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -30,12 +32,24 @@ class UserHttpTest {
 
   private static final String USER_REGISTER_URI = "/user/register";
 
+  private final User user = new User();
   @Resource
   private UserRepository repository;
   @Resource
   private WebTestClient webTestClient;
-  @Resource
-  private InitializeDataRunner dataset;
+
+  @BeforeEach
+  void setUp() {
+    user.setUsername(RandomUtil.randomString(8));
+    user.setNickname(RandomUtil.randomString(8));
+    user.setCipher(BCrypt.hashpw(RandomUtil.randomString(8)));
+    repository.save(user);
+  }
+
+  @AfterEach
+  void tearDown() {
+    repository.deleteAll();
+  }
 
   @Test
   @Transactional
@@ -64,11 +78,8 @@ class UserHttpTest {
 
   @Test
   void addUser_repeat() {
-    // 数据准备
-    User data = dataset.getUsers().get(0);
-
     RegisterUserReq req = new RegisterUserReq();
-    req.setUsername(data.getUsername());
+    req.setUsername(user.getUsername());
     req.setNickname(RandomUtil.randomString(8));
     req.setPassword(
         RandomUtil.randomString(String.valueOf(CharacterConstant.getLowercase()), 4)
