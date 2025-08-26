@@ -11,6 +11,14 @@ spring:
       - ${SPRING_ENVIRONMENT:prod}
   liquibase:
     tag: @project.version@
+  servlet:
+    multipart:
+      max-file-size: ${zeroweb.file.max-size:1}MB
 
 server:
   port: @app.port@
+
+zeroweb:
+  file:
+    provider: ${ZEROWEB_FILE_PROVIDER:FS}
+    max-part-size: ${ZEROWEB_FILE_MAX_PART_SIZE:1}

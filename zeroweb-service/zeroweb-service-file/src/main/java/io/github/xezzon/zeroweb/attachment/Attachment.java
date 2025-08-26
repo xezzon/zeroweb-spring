@@ -7,6 +7,8 @@ import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
@@ -53,9 +55,11 @@ public class Attachment {
   String bizId;
   /// 存储后端
   @Column(name = "provider", nullable = false, updatable = false)
+  @Enumerated(EnumType.STRING)
   FileProviderEnum provider;
   /// 附件状态
   @Column(name = "status", nullable = false)
+  @Enumerated(EnumType.STRING)
   AttachmentStatusEnum status;
   /// 上传者
   @Column(name = "owner_id", length = DatabaseConstant.ID_LENGTH)
