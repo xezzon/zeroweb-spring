@@ -45,9 +45,7 @@
   </modules>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
     <sonar.organization>xezzon</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.coverage.jacoco.xmlReportPaths>
@@ -153,19 +151,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.central</groupId>
-        <artifactId>central-publishing-maven-plugin</artifactId>
-        <configuration>
-          <excludeArtifacts>
-            <excludeArtifact>report-aggregate</excludeArtifact>
-            <excludeArtifact>zeroweb-service</excludeArtifact>
-            <excludeArtifact>zeroweb-service-admin</excludeArtifact>
-            <excludeArtifact>zeroweb-service-dev</excludeArtifact>
-            <excludeArtifact>zeroweb-service-open</excludeArtifact>
-          </excludeArtifacts>
-        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -15,9 +15,6 @@
   <description>与 ZeroWeb 微服务进行交互的 Java SDK</description>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
@@ -55,6 +52,10 @@
           </sourceDirectories>
           <cleanOutputDirectories>true</cleanOutputDirectories>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
