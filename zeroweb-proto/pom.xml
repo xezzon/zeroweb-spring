@@ -47,23 +47,14 @@
     </resources>
     <plugins>
       <plugin>
-        <groupId>org.xolstice.maven.plugins</groupId>
+        <groupId>io.github.ascopes</groupId>
         <artifactId>protobuf-maven-plugin</artifactId>
         <configuration>
-          <protoSourceRoot>proto</protoSourceRoot>
+          <sourceDirectories>
+            <sourceDirectory>proto</sourceDirectory>
+          </sourceDirectories>
+          <cleanOutputDirectories>true</cleanOutputDirectories>
         </configuration>
-        <executions>
-          <execution>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>compile</goal>
-              <goal>compile-custom</goal>
-            </goals>
-            <configuration>
-              <pluginParameter>jakarta_omit,@generated=omit</pluginParameter>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

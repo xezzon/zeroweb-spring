@@ -7,12 +7,10 @@ import org.springframework.grpc.client.ImportGrpcClients;
 import org.springframework.stereotype.Component;
 
 /**
- * 构造 gRPC 客户端 Bean。
  * @author xezzon
  */
 @ImportGrpcClients(
-    prefix = "default",
-    target = "admin",
+    target = "in-process:admin",
     types = {
         DictBlockingStub.class,
         DictStub.class,
@@ -20,5 +18,6 @@ import org.springframework.stereotype.Component;
     }
 )
 @Component
-public class GrpcClientFactory {
+public class GrpcInprocessClientFactory {
+
 }
