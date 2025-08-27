@@ -39,9 +39,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Service
 @Slf4j
 public class ThirdPartyAppService implements IThirdPartyAppService4Call {
@@ -70,11 +68,10 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
     this.thirdPartyAppRepository = thirdPartyAppRepository;
   }
 
-  /**
-   * 添加第三方应用并生成访问密钥
-   * @param thirdPartyApp 要添加的第三方应用对象
-   * @return 生成的访问密钥对象
-   */
+  /// 添加第三方应用并生成访问密钥
+  ///
+  /// @param thirdPartyApp 要添加的第三方应用对象
+  /// @return 生成的访问密钥对象
   @Transactional()
   protected AccessSecret addThirdPartyApp(ThirdPartyApp thirdPartyApp) {
     thirdPartyAppDAO.get().save(thirdPartyApp);
@@ -82,11 +79,10 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
     return this.rollAccessSecret(thirdPartyApp.getId());
   }
 
-  /**
-   * 根据用户ID分页查询第三方应用列表
-   * @param userId 用户ID
-   * @return 分页查询结果，包含符合条件的第三方应用列表
-   */
+  /// 根据用户ID分页查询第三方应用列表
+  ///
+  /// @param userId 用户ID
+  /// @return 分页查询结果，包含符合条件的第三方应用列表
   protected Page<ThirdPartyApp> listThirdPartyAppByUser(String userId) {
     List<ThirdPartyAppMember> members = thirdPartyAppMemberRepository.findByUserId(userId);
     Set<String> appIds = members.stream()
@@ -96,20 +92,18 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
     return new PageImpl<>(list);
   }
 
-  /**
-   * 分页查询第三方应用列表
-   * @param odata OData查询选项，用于指定分页和排序等条件
-   * @return 分页查询结果，包含符合条件的第三方应用列表
-   */
+  /// 分页查询第三方应用列表
+  ///
+  /// @param odata OData查询选项，用于指定分页和排序等条件
+  /// @return 分页查询结果，包含符合条件的第三方应用列表
   protected Page<ThirdPartyApp> listThirdPartyApp(ODataQueryOption odata) {
     return thirdPartyAppDAO.findAll(odata);
   }
 
-  /**
-   * 更新密钥
-   * @param appId 应用标识
-   * @return 更新后的应用访问凭据与密钥
-   */
+  /// 更新密钥
+  ///
+  /// @param appId 应用标识
+  /// @return 更新后的应用访问凭据与密钥
   protected AccessSecret rollAccessSecret(String appId) {
     try {
       KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
@@ -154,14 +148,13 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
         .sign(new JwtClaimWrapper(claim));
   }
 
-  /**
-   * 校验摘要
-   * @param appId 应用标识
-   * @param body 消息体
-   * @param signature 摘要
-   * @param salt 盐值
-   * @throws InvalidAccessKeyException 签名校验失败
-   */
+  /// 校验摘要
+  ///
+  /// @param appId 应用标识
+  /// @param body 消息体
+  /// @param signature 摘要
+  /// @param salt 盐值
+  /// @throws InvalidAccessKeyException 签名校验失败
   private void validateSignature(
       final String appId,
       final byte[] body,
@@ -183,7 +176,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
       }
     } catch (InvalidAccessKeyException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (Exception _) {
       throw new InvalidAccessKeyException();
     }
   }

@@ -4,9 +4,7 @@ import io.github.xezzon.zeroweb.metadata.MenuInfo;
 import io.github.xezzon.zeroweb.metadata.PermissionConstantUtil;
 import java.util.List;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 public class PermissionConstant {
 
   public static final String OPENAPI_WRITE = "openapi:write";

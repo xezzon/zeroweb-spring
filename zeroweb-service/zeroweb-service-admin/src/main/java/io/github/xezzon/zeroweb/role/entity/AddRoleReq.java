@@ -7,14 +7,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/**
- * 新增角色
- * @param code 角色简码
- * @param name 角色名称
- * @param inheritable 是否允许该角色新建其下级角色
- * @param parentId 上级角色
- * @author xezzon
- */
+/// 新增角色
+///
+/// @param code 角色简码
+/// @param name 角色名称
+/// @param inheritable 是否允许该角色新建其下级角色
+/// @param parentId 上级角色
+/// @author xezzon
 public record AddRoleReq(
     String code,
     String name,

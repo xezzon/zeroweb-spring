@@ -10,19 +10,15 @@ import java.util.Base64;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * 第三方应用访问凭据与密钥
- * @author xezzon
- */
+/// 第三方应用访问凭据与密钥
+/// @author xezzon
 @Getter
 @Setter
 @Entity
 @Table(name = ThirdPartyApp.TABLE_NAME)
 public class AccessSecret {
 
-  /**
-   * 第三方应用标识
-   */
+  /// 第三方应用标识
   @Id
   @Column(
       name = ThirdPartyApp.ID_COLUMN,
@@ -32,15 +28,11 @@ public class AccessSecret {
       length = DatabaseConstant.ID_LENGTH
   )
   String id;
-  /**
-   * 第三方应用密钥
-   */
+  /// 第三方应用密钥
   @Column(name = "secret_key", nullable = false, length = 64)
   String secretKey;
 
-  /**
-   * @return 第三方应用访问凭据
-   */
+  /// @return 第三方应用访问凭据
   public String getAccessKey() {
     byte[] accessKey = this.id.getBytes(StandardCharsets.UTF_8);
     return Base64.getEncoder()

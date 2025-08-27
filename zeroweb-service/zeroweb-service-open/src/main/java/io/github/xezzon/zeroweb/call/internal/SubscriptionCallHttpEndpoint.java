@@ -9,8 +9,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import com.auth0.jwt.JWT;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
 import io.github.xezzon.zeroweb.auth.JwtFilter;
-import io.github.xezzon.zeroweb.subscription.Subscription;
 import io.github.xezzon.zeroweb.subscription.ISubscriptionService4Call;
+import io.github.xezzon.zeroweb.subscription.Subscription;
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppService4Call;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
@@ -29,10 +29,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
-/**
- * 订阅服务调用记录
- * @author xezzon
- */
+/// 订阅服务调用记录
+///
+/// @author xezzon
 @RestController
 @RequestMapping("/call")
 public class SubscriptionCallHttpEndpoint {
@@ -48,9 +47,7 @@ public class SubscriptionCallHttpEndpoint {
     this.thirdPartyAppService = thirdPartyAppService;
   }
 
-  /**
-   * 转发 GET 请求
-   */
+  /// 转发 GET 请求
   @GetMapping(value = "/{openapiCode}")
   public ResponseEntity<byte[]> forwardForSafe(
       @PathVariable String openapiCode,
@@ -68,9 +65,7 @@ public class SubscriptionCallHttpEndpoint {
     return forward(openapiCode, body, accessKey, timestamp, signature, headers, parameterMap);
   }
 
-  /**
-   * 转发非 GET 请求
-   */
+  /// 转发非 GET 请求
   @RequestMapping(value = "/{openapiCode}", method = {POST, PUT, DELETE, PATCH})
   public ResponseEntity<byte[]> forwardForUnsafe(
       @PathVariable String openapiCode,
@@ -88,17 +83,16 @@ public class SubscriptionCallHttpEndpoint {
     return forward(openapiCode, body, accessKey, timestamp, signature, headers, parameterMap);
   }
 
-  /**
-   * 转发请求
-   * @param openapiCode 对外路径
-   * @param body 请求体
-   * @param originalHeaders 请求头
-   * @param accessKey AccessKey（请求头）
-   * @param timestamp 时间戳（请求头）
-   * @param signature 签名（请求头）
-   * @param parameterMap 原始请求参数
-   * @return 响应体
-   */
+  /// 转发请求
+  ///
+  /// @param openapiCode 对外路径
+  /// @param body 请求体
+  /// @param originalHeaders 请求头
+  /// @param accessKey AccessKey（请求头）
+  /// @param timestamp 时间戳（请求头）
+  /// @param signature 签名（请求头）
+  /// @param parameterMap 原始请求参数
+  /// @return 响应体
   private ResponseEntity<byte[]> forward(
       String openapiCode, byte[] body, String accessKey, Instant timestamp, String signature,
       HttpHeaders originalHeaders, Map<String, String[]> parameterMap
@@ -113,7 +107,7 @@ public class SubscriptionCallHttpEndpoint {
     originalHeaders.remove(ZerowebOpenConstant.SIGNATURE_HEADER.toLowerCase());
     originalHeaders.remove(JwtFilter.PUBLIC_KEY_HEADER.toLowerCase());
     return RestClient.builder()
-        .defaultStatusHandler(HttpStatusCode::isError, (req, resp) -> {
+        .defaultStatusHandler(HttpStatusCode::isError, (_, _) -> {
         })
         .build()
         // 请求方法由对外接口定义

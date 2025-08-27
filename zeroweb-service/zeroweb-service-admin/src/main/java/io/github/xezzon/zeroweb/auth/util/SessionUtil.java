@@ -5,9 +5,7 @@ import io.github.xezzon.zeroweb.user.User;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 public final class SessionUtil {
 
   public static final String USER = "user";

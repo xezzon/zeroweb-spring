@@ -7,9 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Mapper
 public interface DictRespConverter extends From<Dict, DictResp> {
 

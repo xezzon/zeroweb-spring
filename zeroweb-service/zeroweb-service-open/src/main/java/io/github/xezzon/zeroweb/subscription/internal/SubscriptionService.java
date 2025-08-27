@@ -20,9 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Service
 public class SubscriptionService implements
     ISubscriptionService4ThirdPartyApp,
@@ -39,11 +37,12 @@ public class SubscriptionService implements
     this.openapiService = openapiService;
   }
 
-  /**
-   * 添加订阅 跳过已订阅的接口
-   * @param subscription 要添加的订阅对象
-   * @throws UnpublishedOpenapiCannotBeSubscribeException 如果要订阅的Openapi未发布，则抛出异常
-   */
+  /// 添加订阅
+  ///
+  /// 跳过已订阅的接口
+  ///
+  /// @param subscription 要添加的订阅对象
+  /// @throws UnpublishedOpenapiCannotBeSubscribeException 如果要订阅的Openapi未发布，则抛出异常
   protected void addSubscription(Subscription subscription) {
     Openapi openapi = openapiService.getByCode(subscription.getOpenapiCode());
     if (openapi == null || !Objects.equals(openapi.getStatus(), OpenapiStatus.PUBLISHED)) {
@@ -60,10 +59,11 @@ public class SubscriptionService implements
     subscriptionRepository.save(subscription);
   }
 
-  /**
-   * 审核订阅。审核后订阅即生效，订阅者可以调用接口。 只对审核中的订阅有效。其他状态不变更。
-   * @param id 订阅的ID
-   */
+  /// 审核订阅。审核后订阅即生效，订阅者可以调用接口。
+  ///
+  /// 只对审核中的订阅有效。其他状态不变更。
+  ///
+  /// @param id 订阅的ID
   protected void auditSubscription(String id) {
     Subscription entity = subscriptionRepository.getReferenceById(id);
     if (!Objects.equals(entity.getSubscriptionStatus(), SubscriptionStatus.AUDITING)) {

@@ -9,9 +9,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Repository;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Repository
 public class LanguageDAO extends BaseDAO<Language, String, LanguageRepository> {
 

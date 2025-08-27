@@ -13,9 +13,7 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Repository
 public class I18nMessageDAO extends BaseDAO<I18nMessage, String, I18nMessageRepository> {
 
@@ -29,7 +27,7 @@ public class I18nMessageDAO extends BaseDAO<I18nMessage, String, I18nMessageRepo
   }
 
   Page<I18nMessage> findAllWithNamespace(final String namespace, final ODataQueryOption odata) {
-    final Specification<I18nMessage> spec = (root, query, cb) ->
+    final Specification<I18nMessage> spec = (root, _, cb) ->
         cb.equal(root.get(I18nMessage_.namespace), namespace);
     final Sort sort = Sort.by(Order.asc(I18nMessage_.MESSAGE_KEY));
     return super.findAll(odata, spec, sort);

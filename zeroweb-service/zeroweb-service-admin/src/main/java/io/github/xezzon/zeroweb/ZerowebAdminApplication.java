@@ -6,19 +6,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode;
 
-/**
- * 系统管理服务
- * @author xezzon
- */
+/// 系统管理服务
+/// @author xezzon
 @SpringBootApplication
 @EnableSpringDataWebSupport(pageSerializationMode = PageSerializationMode.VIA_DTO)
 @EnableDictScan
 public class ZerowebAdminApplication {
 
-  /**
-   * 系统管理服务入口
-   * @param args 应用启动参数
-   */
+  /// 系统管理服务入口
+  /// @param args 应用启动参数
   public static void main(String[] args) {
     SpringApplication.run(ZerowebAdminApplication.class, args);
   }

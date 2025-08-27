@@ -21,10 +21,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-/**
- * JWT 密钥管理器，用于生成、保存和加载 JWT 密钥对以及签发 JWT。
- * @author xezzon
- */
+/// JWT 密钥管理器，用于生成、保存和加载 JWT 密钥对以及签发 JWT。
+///
+/// @author xezzon
 @Component
 @Slf4j
 public class JwtKeyManager implements JwtCryptoService {
@@ -39,9 +38,11 @@ public class JwtKeyManager implements JwtCryptoService {
     this.zerowebJwtConfig = zerowebConfig.getJwt();
   }
 
-  /**
-   * 在应用启动后，加载私钥。 如果无法找到私钥文件或解析失败，则生成新的密钥对并保存私钥文件。 加载成功后，将公钥广播出去。
-   */
+  /// 在应用启动后，加载私钥。
+  ///
+  /// 如果无法找到私钥文件或解析失败，则生成新的密钥对并保存私钥文件。
+  ///
+  /// 加载成功后，将公钥广播出去。
   @PostConstruct
   public void loadPrivateKey() {
     PemClasspathReaderAndWriter pemReaderAndWriter =
@@ -88,35 +89,31 @@ public class JwtKeyManager implements JwtCryptoService {
         .sign(claimWrapper);
   }
 
-  /**
-   * 获取私钥
-   * @return 返回ECPrivateKey类型的私钥
-   */
+  /// 获取私钥
+  ///
+  /// @return 返回ECPrivateKey类型的私钥
   java.security.interfaces.ECPrivateKey getPrivateKey() {
     return (java.security.interfaces.ECPrivateKey) this.privateKey;
   }
 
-  /**
-   * 获取公钥
-   * @return 返回ECPublicKey类型的公钥
-   */
+  /// 获取公钥
+  ///
+  /// @return 返回ECPublicKey类型的公钥
   public java.security.interfaces.ECPublicKey getPublicKey() {
     return (java.security.interfaces.ECPublicKey) this.publicKey;
   }
 
-  /**
-   * 打印公钥到控制台
-   * @param event 公钥
-   */
+  /// 打印公钥到控制台
+  ///
+  /// @param event 公钥
   @EventListener
   public void printPublicKey(PublicKeyGeneratedEvent event) {
     log.info("Current JWT Public Key is: {}", event.getPublicKey());
   }
 
-  /**
-   * 将公钥保存到文件中（PKCS8）
-   * @param event 公钥
-   */
+  /// 将公钥保存到文件中（PKCS8）
+  ///
+  /// @param event 公钥
   @EventListener
   public void savePublicKeyToClasspath(PublicKeyGeneratedEvent event) {
     ASN1PublicKeyWriter asn1Writer =

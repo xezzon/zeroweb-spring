@@ -8,14 +8,13 @@ import org.hibernate.validator.constraints.URL;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-/**
- * 更新服务信息
- * @param id 服务ID
- * @param name 服务名称
- * @param baseUrl 服务基础访问路径
- * @param ordinal 排序值 顺序越小越靠前
- * @author xezzon
- */
+/// 更新服务信息
+///
+/// @param id 服务ID
+/// @param name 服务名称
+/// @param baseUrl 服务基础访问路径
+/// @param ordinal 排序值 顺序越小越靠前
+/// @author xezzon
 public record UpdateAppReq(
     String id,
     @NotNull

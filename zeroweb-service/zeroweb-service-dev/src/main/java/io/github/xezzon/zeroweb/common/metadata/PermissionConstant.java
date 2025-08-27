@@ -4,9 +4,7 @@ import io.github.xezzon.zeroweb.metadata.MenuInfo;
 import io.github.xezzon.zeroweb.metadata.PermissionConstantUtil;
 import java.util.List;
 
-/**
- * 接口权限
- */
+/// 接口权限
 public final class PermissionConstant {
 
   public static final String LOCALE_READ = "locale:read";

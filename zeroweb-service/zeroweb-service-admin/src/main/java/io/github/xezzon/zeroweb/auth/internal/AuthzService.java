@@ -10,10 +10,10 @@ import io.github.xezzon.zeroweb.auth.repository.RolePermissionRepository;
 import io.github.xezzon.zeroweb.auth.repository.RoleUserRepository;
 import io.github.xezzon.zeroweb.auth.util.SessionUtil;
 import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
-import io.github.xezzon.zeroweb.role.Role;
 import io.github.xezzon.zeroweb.role.IRoleService4Auth;
-import io.github.xezzon.zeroweb.user.User;
+import io.github.xezzon.zeroweb.role.Role;
 import io.github.xezzon.zeroweb.user.IUserService4Auth;
+import io.github.xezzon.zeroweb.user.User;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -44,11 +44,10 @@ public class AuthzService {
     this.roleService = roleService;
   }
 
-  /**
-   * 查询角色绑定的用户
-   * @param roleId 角色ID
-   * @return 用户信息列表
-   */
+  /// 查询角色绑定的用户
+  ///
+  /// @param roleId 角色ID
+  /// @return 用户信息列表
   List<User> queryUserByRole(final String roleId) {
     final List<RoleUser> roleUsers = roleUserRepository.findByRoleId(roleId);
     final Set<String> userIds = roleUsers.stream()
@@ -57,10 +56,9 @@ public class AuthzService {
     return userService.findByIdIn(userIds);
   }
 
-  /**
-   * 将用户绑定到角色
-   * @param roleUser 用户-角色绑定关系
-   */
+  /// 将用户绑定到角色
+  ///
+  /// @param roleUser 用户-角色绑定关系
   @Transactional
   public void bindUserToRole(RoleUser roleUser) {
     final String roleId = roleUser.getRoleId();
@@ -75,10 +73,9 @@ public class AuthzService {
     roleUserRepository.save(roleUser);
   }
 
-  /**
-   * 解除用户与角色的关联
-   * @param roleUser 角色ID、用户ID
-   */
+  /// 解除用户与角色的关联
+  ///
+  /// @param roleUser 角色ID、用户ID
   @Transactional
   public void releaseRoleUser(RoleUser roleUser) {
     final String roleId = roleUser.getRoleId();
@@ -92,11 +89,10 @@ public class AuthzService {
     roleUserRepository.deleteByRoleIdAndUserId(roleId, userId);
   }
 
-  /**
-   * 查询用户关联的角色
-   * @param userId 用户ID
-   * @return 角色信息集合
-   */
+  /// 查询用户关联的角色
+  ///
+  /// @param userId 用户ID
+  /// @return 角色信息集合
   List<Role> queryRoleByUser(final String userId) {
     final List<RoleUser> roleUsers = roleUserRepository.findByUserId(userId);
     final Set<String> roleIds = roleUsers.stream()
@@ -105,11 +101,10 @@ public class AuthzService {
     return roleService.findByIdIn(roleIds);
   }
 
-  /**
-   * 批量查询角色关联的接口权限
-   * @param roleIds 角色ID集合
-   * @return 接口权限集合
-   */
+  /// 批量查询角色关联的接口权限
+  ///
+  /// @param roleIds 角色ID集合
+  /// @return 接口权限集合
   Set<String> queryPermissionByRole(final Collection<String> roleIds) {
     final List<RolePermission> rolePermissions = rolePermissionRepository.findByRoleIdIn(roleIds);
     return rolePermissions.stream()
@@ -117,10 +112,9 @@ public class AuthzService {
         .collect(Collectors.toSet());
   }
 
-  /**
-   * 将接口权限绑定到角色
-   * @param rolePermission 角色-接口权限绑定关系
-   */
+  /// 将接口权限绑定到角色
+  ///
+  /// @param rolePermission 角色-接口权限绑定关系
   @Transactional
   public void bindPermissionToRole(RolePermission rolePermission) {
     final String roleId = rolePermission.getRoleId();
@@ -146,10 +140,9 @@ public class AuthzService {
     rolePermissionRepository.save(rolePermission);
   }
 
-  /**
-   * 解除角色与接口权限的关联
-   * @param rolePermission 角色-接口权限关系
-   */
+  /// 解除角色与接口权限的关联
+  ///
+  /// @param rolePermission 角色-接口权限关系
   @Transactional
   public void releaseRolePermission(RolePermission rolePermission) {
     final String roleId = rolePermission.getRoleId();
@@ -166,11 +159,10 @@ public class AuthzService {
     rolePermissionRepository.deleteByRoleIdInAndPermission(roleIds, permission);
   }
 
-  /**
-   * 查询接口权限关联的角色集合
-   * @param permission 接口权限编码
-   * @return 角色信息集合
-   */
+  /// 查询接口权限关联的角色集合
+  ///
+  /// @param permission 接口权限编码
+  /// @return 角色信息集合
   List<Role> queryRoleByPermission(final String permission) {
     final List<RolePermission> rolePermissions = rolePermissionRepository.findByPermission(
         permission);
@@ -180,10 +172,9 @@ public class AuthzService {
     return roleService.findByIdIn(roleIds);
   }
 
-  /**
-   * 用户登录后，将授权信息加载到会话中
-   * @param event 用户登录事件
-   */
+  /// 用户登录后，将授权信息加载到会话中
+  ///
+  /// @param event 用户登录事件
   @EventListener
   protected void listen(final UserLoginEvent event) {
     final List<Role> roles = this.queryRoleByUser(event.getUser().getId());
@@ -198,10 +189,9 @@ public class AuthzService {
     SessionUtil.savePermissions(permissions);
   }
 
-  /**
-   * 校验当前用户是否有指定角色的上级角色
-   * @param roleId 角色ID
-   */
+  /// 校验当前用户是否有指定角色的上级角色
+  ///
+  /// @param roleId 角色ID
   void checkParentRole(final String roleId) {
     final Role parent = roleService.findParent(roleId).orElseThrow();
     StpUtil.checkRole(parent.getValue());

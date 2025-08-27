@@ -6,9 +6,7 @@ import io.github.xezzon.zeroweb.user.UserGrpc.UserBlockingStub;
 import org.springframework.grpc.client.ImportGrpcClients;
 import org.springframework.stereotype.Component;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @ImportGrpcClients(
     target = "in-process:admin",
     types = {

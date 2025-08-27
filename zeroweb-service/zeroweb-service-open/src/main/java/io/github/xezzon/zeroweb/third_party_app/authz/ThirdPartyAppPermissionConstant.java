@@ -4,9 +4,7 @@ import io.github.xezzon.zeroweb.metadata.MenuInfo;
 import io.github.xezzon.zeroweb.metadata.PermissionConstantUtil;
 import java.util.List;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 public class ThirdPartyAppPermissionConstant {
 
   public static final String INVITE_MEMBER = "third-party-app:#:invite-member";

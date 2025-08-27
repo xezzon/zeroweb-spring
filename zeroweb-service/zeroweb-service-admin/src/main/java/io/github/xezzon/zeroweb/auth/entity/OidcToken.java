@@ -6,11 +6,10 @@ import io.github.xezzon.zeroweb.auth.AuthHttpConstant;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * 遵循OIDC规范的Token响应体
- * @author xezzon
- * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html">OIDC规范</a>
- */
+/// 遵循OIDC规范的Token响应体
+///
+/// @see <a href="https://openid.net/specs/openid-connect-core-1_0.html">OIDC规范</a>
+/// @author xezzon
 @Getter
 @Setter
 @JsonNaming(SnakeCaseStrategy.class)
@@ -18,9 +17,7 @@ public class OidcToken {
 
   private String accessToken;
   private String refreshToken;
-  /**
-   * 过期时间 单位：秒
-   */
+  /// 过期时间 单位：秒
   private Long expiresIn;
   private String idToken;
 

@@ -2,9 +2,7 @@ package io.github.xezzon.zeroweb.openapi.exception;
 
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 public class PublishedOpenapiCannotBeModifyException extends ZerowebBusinessException {
 
   public static final String ERROR_CODE = "CFE01";

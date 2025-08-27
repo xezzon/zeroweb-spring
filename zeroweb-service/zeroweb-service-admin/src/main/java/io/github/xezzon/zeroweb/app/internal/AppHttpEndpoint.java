@@ -1,8 +1,8 @@
 package io.github.xezzon.zeroweb.app.internal;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import io.github.xezzon.zeroweb.app.entity.AddAppReq;
 import io.github.xezzon.zeroweb.app.App;
+import io.github.xezzon.zeroweb.app.entity.AddAppReq;
 import io.github.xezzon.zeroweb.app.entity.UpdateAppReq;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 服务管理
- * @author xezzon
- */
+/// 服务管理
+///
+/// @author xezzon
 @RestController
 @RequestMapping("/app")
 public class AppHttpEndpoint {
@@ -31,10 +30,9 @@ public class AppHttpEndpoint {
     this.appService = appService;
   }
 
-  /**
-   * 新增服务
-   * @param req 服务基础信息
-   */
+  /// 新增服务
+  ///
+  /// @param req 服务基础信息
   @SaCheckPermission({PermissionConstant.APP_WRITE})
   @PostMapping()
   public Id addApp(@RequestBody @Validated final AddAppReq req) {
@@ -43,19 +41,17 @@ public class AppHttpEndpoint {
     return Id.of(app.getId());
   }
 
-  /**
-   * 查询服务列表
-   * @return 服务列表
-   */
+  /// 查询服务列表
+  ///
+  /// @return 服务列表
   @GetMapping()
   public List<App> listApp() {
     return appService.listApp();
   }
 
-  /**
-   * 更新服务
-   * @param req 服务基础信息
-   */
+  /// 更新服务
+  ///
+  /// @param req 服务基础信息
   @SaCheckPermission({PermissionConstant.APP_WRITE})
   @PutMapping
   public void updateApp(@RequestBody @Validated final UpdateAppReq req) {
@@ -63,10 +59,9 @@ public class AppHttpEndpoint {
     appService.updateApp(app);
   }
 
-  /**
-   * 删除服务
-   * @param id 服务ID
-   */
+  /// 删除服务
+  ///
+  /// @param id 服务ID
   @SaCheckPermission({PermissionConstant.APP_WRITE})
   @DeleteMapping("/{id}")
   public void deleteApp(@PathVariable final String id) {

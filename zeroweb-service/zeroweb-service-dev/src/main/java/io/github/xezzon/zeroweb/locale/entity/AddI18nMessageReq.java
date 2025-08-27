@@ -7,10 +7,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/**
- * 新增国际化内容的请求参数
- * @author xezzon
- */
+/// 新增国际化内容的请求参数
+///
+/// @author xezzon
 public record AddI18nMessageReq(
     String namespace,
     String messageKey

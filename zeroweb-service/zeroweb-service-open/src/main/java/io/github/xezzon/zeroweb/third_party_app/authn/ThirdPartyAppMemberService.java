@@ -23,9 +23,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Service
 public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
 
@@ -42,13 +40,14 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
     this.accessSecretRepository = accessSecretRepository;
   }
 
-  /**
-   * 生成邀请码。获得邀请码的用户由管理员同意后可以加入对第三方应用的管理。 邀请码的形式是一个 JWT。过期时间即为邀请码有效时间。载荷中包含应用ID。最后使用应用的密钥进行签名。
-   * @param appId 第三方应用ID
-   * @param userId 被邀请的用户ID。如果为 null 则邀请码对所有人有效。
-   * @param timeout 邀请码有效期。单位`小时`。
-   * @return 邀请码
-   */
+  /// 生成邀请码。获得邀请码的用户由管理员同意后可以加入对第三方应用的管理。
+  ///
+  /// 邀请码的形式是一个 JWT。过期时间即为邀请码有效时间。载荷中包含应用ID。最后使用应用的密钥进行签名。
+  ///
+  /// @param appId 第三方应用ID
+  /// @param userId 被邀请的用户ID。如果为 null 则邀请码对所有人有效。
+  /// @param timeout 邀请码有效期。单位`小时`。
+  /// @return 邀请码
   String inviteMember(String appId, @Nullable String userId, int timeout) {
     AccessSecret accessSecret = accessSecretRepository.findById(appId).orElseThrow();
     Instant current = Instant.now();
@@ -62,10 +61,9 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
     return builder.sign(Algorithm.HMAC256(accessSecret.getSecretKey()));
   }
 
-  /**
-   * 接收邀请的人，将其添加到用户组成员中。
-   * @param token 邀请码
-   */
+  /// 接收邀请的人，将其添加到用户组成员中。
+  ///
+  /// @param token 邀请码
   String acceptInvitation(String token) {
     DecodedJWT decodedJWT = JWT.decode(token);
     String appId = decodedJWT.getClaim(GROUP_ID_CLAIM).asString();
@@ -103,11 +101,10 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
     return thirdPartyAppMemberRepository.findByGroupIdOrderByCreateTimeDesc(appId);
   }
 
-  /**
-   * 应用所有权转移
-   * @param appId 第三方应用ID
-   * @param target 转移的目标用户
-   */
+  /// 应用所有权转移
+  ///
+  /// @param appId 第三方应用ID
+  /// @param target 转移的目标用户
   @Transactional
   void moveOwnership(String appId, String target) {
     String currentUser = JwtAuth.getOrThrow().getSub();
@@ -130,10 +127,9 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
     return thirdPartyAppMemberRepository.findByGroupIdAndUserId(groupId, userId);
   }
 
-  /**
-   * 新增应用时记录其所有者
-   * @param event 新增第三方应用事件
-   */
+  /// 新增应用时记录其所有者
+  ///
+  /// @param event 新增第三方应用事件
   @EventListener
   void listen(ThirdPartyAppCreatedEvent event) {
     ThirdPartyApp thirdPartyApp = event.thirdPartyApp();

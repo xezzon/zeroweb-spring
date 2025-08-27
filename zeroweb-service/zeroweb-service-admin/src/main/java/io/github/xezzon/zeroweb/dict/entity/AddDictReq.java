@@ -10,33 +10,21 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Getter
 @Setter
 public class AddDictReq implements Into<Dict> {
 
-  /**
-   * 字典目
-   */
+  /// 字典目
   @Nullable
   private String tag;
-  /**
-   * 字典键
-   */
+  /// 字典键
   private String code;
-  /**
-   * 字典值
-   */
+  /// 字典值
   private String label;
-  /**
-   * 排序号
-   */
+  /// 排序号
   private Integer ordinal;
-  /**
-   * 上级字典ID
-   */
+  /// 上级字典ID
   @Nullable
   private String parentId;
 

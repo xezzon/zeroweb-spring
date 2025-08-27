@@ -4,9 +4,7 @@ import io.github.xezzon.zeroweb.metadata.MenuInfo;
 import io.github.xezzon.zeroweb.metadata.PermissionConstantUtil;
 import java.util.List;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 public class SubscriptionPermissionConstant {
 
   public static final String SUBSCRIBE = "subscription:#:add";

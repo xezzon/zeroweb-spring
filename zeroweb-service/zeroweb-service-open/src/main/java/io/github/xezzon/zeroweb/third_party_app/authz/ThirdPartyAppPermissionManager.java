@@ -9,9 +9,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import org.springframework.stereotype.Component;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Component
 public class ThirdPartyAppPermissionManager {
 

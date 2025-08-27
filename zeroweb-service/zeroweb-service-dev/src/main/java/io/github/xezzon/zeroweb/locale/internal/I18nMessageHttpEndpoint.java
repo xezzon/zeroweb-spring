@@ -18,10 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 国际化内容及文本管理
- * @author xezzon
- */
+/// 国际化内容及文本管理
+///
+/// @author xezzon
 @RestController
 @RequestMapping("/i18n")
 public class I18nMessageHttpEndpoint {
@@ -32,10 +31,9 @@ public class I18nMessageHttpEndpoint {
     this.localizedService = localizedService;
   }
 
-  /**
-   * 新增国际化内容
-   * @param req 国际化内容
-   */
+  /// 新增国际化内容
+  ///
+  /// @param req 国际化内容
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PostMapping()
   public Id addI18nMessage(@RequestBody final AddI18nMessageReq req) {
@@ -44,22 +42,20 @@ public class I18nMessageHttpEndpoint {
     return Id.of(i18nMessage.getId());
   }
 
-  /**
-   * 列举国际化内容命名空间
-   * @return 国际化内容命名空间
-   */
+  /// 列举国际化内容命名空间
+  ///
+  /// @return 国际化内容命名空间
   @SaCheckPermission({PermissionConstant.LOCALE_READ})
   @GetMapping()
   public List<String> listI18nNamespace() {
     return localizedService.listI18nNamespace();
   }
 
-  /**
-   * 分页查询国际化内容
-   * @param namespace 命名空间
-   * @param odata 分页查询参数
-   * @return 国际化内容列表
-   */
+  /// 分页查询国际化内容
+  ///
+  /// @param namespace 命名空间
+  /// @param odata 分页查询参数
+  /// @return 国际化内容列表
   @SaCheckPermission({PermissionConstant.LOCALE_READ})
   @GetMapping("/{namespace}")
   public Page<I18nMessage> queryI18nMessageList(
@@ -69,32 +65,29 @@ public class I18nMessageHttpEndpoint {
     return localizedService.queryI18nMessageList(namespace, odata.into());
   }
 
-  /**
-   * 更新国际化内容
-   * @param i18nMessage 国际化内容
-   */
+  /// 更新国际化内容
+  ///
+  /// @param i18nMessage 国际化内容
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
   public void updateI18nMessage(@RequestBody final I18nMessage i18nMessage) {
     localizedService.updateI18nMessage(i18nMessage);
   }
 
-  /**
-   * 删除国际化内容
-   * @param id 国际化内容ID
-   */
+  /// 删除国际化内容
+  ///
+  /// @param id 国际化内容ID
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @DeleteMapping("/{id}")
   public void deleteI18nMessage(@PathVariable final String id) {
     localizedService.deleteI18nMessage(id);
   }
 
-  /**
-   * 查询国际化文本
-   * @param namespace 命名空间
-   * @param messageKey 国际化内容
-   * @return 语言-国际化文本
-   */
+  /// 查询国际化文本
+  ///
+  /// @param namespace 命名空间
+  /// @param messageKey 国际化内容
+  /// @return 语言-国际化文本
   @GetMapping("/{namespace}/{messageKey}")
   public Map<String, String> queryTranslation(
       @PathVariable final String namespace,

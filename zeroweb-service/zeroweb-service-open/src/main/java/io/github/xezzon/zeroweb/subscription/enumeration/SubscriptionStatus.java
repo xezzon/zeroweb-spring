@@ -2,9 +2,7 @@ package io.github.xezzon.zeroweb.subscription.enumeration;
 
 import io.github.xezzon.tao.dict.IDict;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 public enum SubscriptionStatus implements IDict {
 
   NONE("未订阅"),

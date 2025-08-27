@@ -4,10 +4,9 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
-/**
- * 邀请码已过期，或者不允许被当前用户使用
- * @author xezzon
- */
+/// 邀请码已过期，或者不允许被当前用户使用
+///
+/// @author xezzon
 public class InvalidInvitationCodeException extends ZerowebBusinessException {
 
   public static final String ERROR_CODE = "CFE05";
