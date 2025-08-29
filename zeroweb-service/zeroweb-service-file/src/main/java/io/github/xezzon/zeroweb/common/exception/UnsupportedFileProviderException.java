@@ -1,0 +1,19 @@
+package io.github.xezzon.zeroweb.common.exception;
+
+import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
+
+/// 启用的存储后端未正确配置
+/// @author xezzon
+public class UnsupportedFileProviderException extends ZerowebBusinessException {
+
+  public static final String ERROR_CODE = "SFC01";
+
+  public UnsupportedFileProviderException(FileProviderEnum provider) {
+    super(provider + " is not configured correctly.");
+  }
+
+  @Override
+  public String getCode() {
+    return ERROR_CODE;
+  }
+}

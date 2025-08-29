@@ -3,6 +3,9 @@ package io.github.xezzon.zeroweb.attachment.internal;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentReq;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentResp;
+import io.github.xezzon.zeroweb.attachment.entity.UploadAddress;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,5 +31,13 @@ public class AttachmentHttpEndpoint {
   public AddAttachmentResp addAttachment(@RequestBody AddAttachmentReq req) {
     Attachment attachment = req.into();
     return attachmentService.addAttachment(attachment);
+  }
+
+  /// 获取附件上传地址
+  /// @param id 附件ID
+  /// @return 上传地址
+  @GetMapping("/{id}/endpoint/upload")
+  public UploadAddress getUploadAddress(@PathVariable String id) {
+    return attachmentService.getUploadAddress(id);
   }
 }

@@ -53,6 +53,7 @@
     </sonar.coverage.jacoco.xmlReportPaths>
     <!-- 依赖版本 -->
     <sa-token.version>1.39.0</sa-token.version>
+    <aws.java.sdk.version>2.32.31</aws.java.sdk.version>
     <!-- 插件版本 -->
   </properties>
 
@@ -72,6 +73,13 @@
         <groupId>cn.dev33</groupId>
         <artifactId>sa-token-bom</artifactId>
         <version>${sa-token.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>${aws.java.sdk.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

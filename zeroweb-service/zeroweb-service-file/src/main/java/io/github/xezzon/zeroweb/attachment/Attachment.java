@@ -12,6 +12,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -68,4 +70,10 @@ public class Attachment {
   @Column(name = "create_time", nullable = false, updatable = false)
   @CreatedDate
   Instant createTime;
+
+  public String objectKey() {
+    return DateTimeFormatter.ofPattern("yyyy/MM/dd").withZone(ZoneOffset.UTC)
+        .format(this.createTime)
+        + "/" + this.id;
+  }
 }

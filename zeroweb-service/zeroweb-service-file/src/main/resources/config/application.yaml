@@ -22,3 +22,11 @@ zeroweb:
   file:
     provider: ${ZEROWEB_FILE_PROVIDER:FS}
     max-part-size: ${ZEROWEB_FILE_MAX_PART_SIZE:1}
+    fs:
+      base-path: ${ZEROWEB_FS_BASEPATH}
+    s3:
+      endpoint: ${S3_ENDPOINT}
+      region: ${S3_REGION:us-east-1}
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+      bucket: ${S3_BUCKET}
