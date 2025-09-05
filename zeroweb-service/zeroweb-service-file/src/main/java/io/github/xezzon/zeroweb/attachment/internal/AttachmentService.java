@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.attachment.internal;
 
 import io.github.xezzon.zeroweb.attachment.Attachment;
+import io.github.xezzon.zeroweb.attachment.IAttachmentService;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentResp;
 import io.github.xezzon.zeroweb.attachment.entity.UploadAddress;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 /// @author xezzon
 @Service
-public class AttachmentService {
+public class AttachmentService implements IAttachmentService {
 
   private final AttachmentRepository attachmentRepository;
   private final ZerowebFileConfig zerowebFileConfig;
@@ -26,6 +27,11 @@ public class AttachmentService {
     this.attachmentRepository = attachmentRepository;
     this.zerowebFileConfig = zerowebFileConfig;
     this.storageServiceFactory = storageServiceFactory;
+  }
+
+  @Override
+  public Attachment queryById(String id) {
+    return attachmentRepository.findById(id).orElseThrow();
   }
 
   AddAttachmentResp addAttachment(Attachment attachment) {

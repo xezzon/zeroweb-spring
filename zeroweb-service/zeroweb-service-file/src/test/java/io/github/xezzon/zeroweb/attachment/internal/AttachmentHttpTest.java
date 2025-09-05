@@ -13,10 +13,11 @@ import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
+import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
-import io.github.xezzon.zeroweb.storage.file.FsService;
 import jakarta.annotation.Resource;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -53,6 +54,8 @@ class AttachmentHttpTest {
   private AttachmentRepository repository;
   @Resource
   private ZerowebFileConfig zerowebFileConfig;
+  @Resource
+  private ZerowebFsConfig zerowebFsConfig;
 
   @BeforeEach
   void setUp() throws Exception {
@@ -78,7 +81,7 @@ class AttachmentHttpTest {
 
     AddAttachmentReq req = new AddAttachmentReq(
         RandomUtil.randomString(8),
-        new String(RandomUtil.randomBytes(256 / 8)),
+        RandomUtil.randomString(44),
         RandomUtil.randomLong(),
         RandomUtil.randomString(8),
         RandomUtil.randomString(8),
@@ -107,7 +110,7 @@ class AttachmentHttpTest {
   void addAttachment_notLogin() {
     AddAttachmentReq req = new AddAttachmentReq(
         RandomUtil.randomString(8),
-        new String(RandomUtil.randomBytes(256 / 8)),
+        RandomUtil.randomString(44),
         RandomUtil.randomLong(),
         RandomUtil.randomString(8),
         RandomUtil.randomString(8),
@@ -127,7 +130,7 @@ class AttachmentHttpTest {
   }
 
   @Test
-  void getUploadAddress() {
+  void upload() throws IOException {
     UploadAddress responseBody = webTestClient.get()
         .uri(GET_UPLOAD_ADDRESS, attachment.getId())
         .exchange()
@@ -135,8 +138,23 @@ class AttachmentHttpTest {
         .expectBody(UploadAddress.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(attachment.getId(), responseBody.id());
-    Assertions.assertEquals(attachment.getProvider(), responseBody.provider());
-    Assertions.assertEquals(FsService.UPLOAD_ENDPOINT, responseBody.endpoint());
+
+    webTestClient.put()
+        .uri(responseBody.endpoint())
+        .bodyValue(Files.readAllBytes(resource))
+        .exchange()
+        .expectStatus().isOk();
+    // 重复上传，测试幂等性
+    webTestClient.put()
+        .uri(responseBody.endpoint())
+        .bodyValue(Files.readAllBytes(resource))
+        .exchange()
+        .expectStatus().isOk();
+
+    Path path = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
+    Assertions.assertTrue(Files.exists(path));
+    Assertions.assertArrayEquals(Files.readAllBytes(resource), Files.readAllBytes(path));
+
+    Files.delete(path);
   }
 }
