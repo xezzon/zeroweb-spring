@@ -104,20 +104,6 @@
       <artifactId>postgresql</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- 代码生成 -->
-    <dependency>
-      <groupId>org.mapstruct</groupId>
-      <artifactId>mapstruct-processor</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate.orm</groupId>
-      <artifactId>hibernate-jpamodelgen</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.github.therapi</groupId>
-      <artifactId>therapi-runtime-javadoc-scribe</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
