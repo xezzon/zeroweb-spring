@@ -1,9 +1,6 @@
 package io.github.xezzon.zeroweb.third_party_app.authn;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator.Builder;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
@@ -13,11 +10,20 @@ import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
 import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionConstant;
 import io.github.xezzon.zeroweb.third_party_app.event.ThirdPartyAppCreatedEvent;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Jwts.SIG;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.MacAlgorithm;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.crypto.SecretKey;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -51,34 +57,38 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
   String inviteMember(String appId, @Nullable String userId, int timeout) {
     AccessSecret accessSecret = accessSecretRepository.findById(appId).orElseThrow();
     Instant current = Instant.now();
-    Builder builder = JWT.create()
-        .withClaim(GROUP_ID_CLAIM, appId)
-        .withIssuedAt(current)
-        .withExpiresAt(current.plus(timeout, ChronoUnit.HOURS));
+    JwtBuilder jwtBuilder = Jwts.builder()
+        .claim(GROUP_ID_CLAIM, appId)
+        .issuedAt(Date.from(current))
+        .expiration(Date.from(current.plus(timeout, ChronoUnit.HOURS)));
     if (userId != null) {
-      builder.withClaim(USER_ID_CLAIM, userId);
+      jwtBuilder.claim(USER_ID_CLAIM, userId);
     }
-    return builder.sign(Algorithm.HMAC256(accessSecret.getSecretKey()));
+    MacAlgorithm algorithm = SIG.HS256;
+    SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(accessSecret.getSecretKey()));
+    return jwtBuilder.signWith(key, algorithm).compact();
   }
 
   /// 接收邀请的人，将其添加到用户组成员中。
   ///
   /// @param token 邀请码
   String acceptInvitation(String token) {
-    DecodedJWT decodedJWT = JWT.decode(token);
-    String appId = decodedJWT.getClaim(GROUP_ID_CLAIM).asString();
+    DecodedJWT payload = JWT.decode(token);
+    String appId = payload.getClaim(GROUP_ID_CLAIM).asString();
     AccessSecret accessSecret = accessSecretRepository.findById(appId)
         .orElseThrow();
     // 验证邀请码的有效性
     try {
-      JWT.require(Algorithm.HMAC256(accessSecret.getSecretKey()))
+
+      Jwts.parser()
+          .verifyWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(accessSecret.getSecretKey())))
           .build()
-          .verify(decodedJWT);
-    } catch (JWTVerificationException e) {
+          .parseSignedClaims(token);
+    } catch (JwtException e) {
       throw new InvalidInvitationCodeException(e);
     }
     String userId = JwtAuth.getOrThrow().getSub();
-    String invitedOne = decodedJWT.getClaim(USER_ID_CLAIM).asString();
+    String invitedOne = payload.getClaim(USER_ID_CLAIM).asString();
     if (invitedOne != null && !Objects.equals(userId, invitedOne)) {
       // 如果邀请码是针对特定用户的，那么需要校验当前用户与被邀请的用户是否一致
       throw new InvalidInvitationCodeException();

@@ -39,11 +39,12 @@ public interface TranslationRepository extends
       @Param("n") II18nMessage newI18nMessage
   );
 
-  @Transactional
-  long deleteByNamespaceAndMessageKey(String namespace, String messageKey);
 
   @Transactional
-  long deleteByLanguage(String language);
+  void deleteByNamespaceAndMessageKey(String namespace, String messageKey);
+
+  @Transactional
+  void deleteByLanguage(String language);
 
   @Transactional
   @Modifying

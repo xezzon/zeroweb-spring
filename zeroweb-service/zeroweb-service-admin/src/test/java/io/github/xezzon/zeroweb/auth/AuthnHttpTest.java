@@ -13,18 +13,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.util.RandomUtil;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.zeroweb.auth.entity.BasicAuth;
 import io.github.xezzon.zeroweb.auth.entity.OidcToken;
 import io.github.xezzon.zeroweb.auth.exception.InvalidPasswordException;
-import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.crypto.internal.JwtKeyManager;
 import io.github.xezzon.zeroweb.user.User;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
 import jakarta.annotation.Resource;
 import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
@@ -64,8 +62,6 @@ class AuthnHttpTest {
   private SaTokenConfig saTokenConfig;
   @Resource
   private JwtKeyManager keyManager;
-  @Resource
-  private ZerowebConfig zerowebConfig;
 
   @BeforeAll
   static void beforeAll() {
@@ -99,7 +95,7 @@ class AuthnHttpTest {
   void basicLogin() {
     final String uri = BASIC_LOGIN_URI;
     // 数据准备
-    User user = users.get(0);
+    User user = users.getFirst();
 
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
     OidcToken responseBody = webTestClient.post()
@@ -141,7 +137,7 @@ class AuthnHttpTest {
   void basicLogin_invalidToken() {
     final String uri = BASIC_LOGIN_URI;
     // 数据准备
-    User user = users.get(0);
+    User user = users.getFirst();
     // 用户名不正确
     BasicAuth basicAuth1 = new BasicAuth(RandomUtil.randomString(9), password);
     webTestClient.post()
@@ -163,7 +159,7 @@ class AuthnHttpTest {
   @Test
   void self() {
     final String uri = "/auth/self";
-    User user = users.get(0);
+    User user = users.getFirst();
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
     OidcToken responseBody = webTestClient.post()
         .uri(BASIC_LOGIN_URI)
@@ -178,6 +174,7 @@ class AuthnHttpTest {
         .uri(uri)
         .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
         .exchange()
+        .expectStatus().isOk()
         .expectBody(new ParameterizedTypeReference<Map<String, Object>>() {
         })
         .returnResult()
@@ -190,7 +187,7 @@ class AuthnHttpTest {
   @RepeatedTest(2)
   void signJwt() {
     final String uri = "/auth/token";
-    User user = users.get(0);
+    User user = users.getFirst();
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
     OidcToken responseBody = webTestClient.post()
         .uri(BASIC_LOGIN_URI)
@@ -211,18 +208,18 @@ class AuthnHttpTest {
     assertNotNull(responseBody1);
 
     ECPublicKey publicKey = keyManager.getPublicKey();
-    JWTVerifier verifier = JWT.require(Algorithm.ECDSA256(publicKey))
-        .withIssuer(zerowebConfig.getJwt().getIssuer())
-        .build();
-    DecodedJWT jwt = assertDoesNotThrow(() -> verifier.verify(responseBody1.getIdToken()));
-    final JwtClaimWrapper claimWrapper = new JwtClaimWrapper(jwt);
-    assertEquals(user.getId(), claimWrapper.getSub());
+    Claims payload = assertDoesNotThrow(() -> Jwts.parser()
+        .verifyWith(publicKey).build()
+        .parseSignedClaims(responseBody1.getIdToken())
+        .getPayload()
+    );
+    assertEquals(user.getId(), payload.getSubject());
   }
 
   @Test
   void forwardAuth() {
     final ECPublicKey publicKey = keyManager.getPublicKey();
-    User user = users.get(0);
+    User user = users.getFirst();
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
     OidcToken responseBody = webTestClient.post()
         .uri(BASIC_LOGIN_URI)
@@ -242,9 +239,9 @@ class AuthnHttpTest {
         )
         .expectHeader().value(AUTHORIZATION, bearer -> {
           String jwt = bearer.substring(BEARER.length()).trim();
-          JWTVerifier verifier = JWT.require(Algorithm.ECDSA256(publicKey)).build();
-          DecodedJWT excepted = verifier.verify(responseBody.getIdToken());
-          DecodedJWT actual = verifier.verify(jwt);
+          JwtParser parser = Jwts.parser().verifyWith(publicKey).build();
+          Claims excepted = parser.parseSignedClaims(responseBody.getIdToken()).getPayload();
+          Claims actual = parser.parseSignedClaims(jwt).getPayload();
           assertEquals(excepted.getSubject(), actual.getSubject());
         });
 
@@ -257,9 +254,9 @@ class AuthnHttpTest {
         )
         .expectHeader().value(AUTHORIZATION, bearer -> {
           String jwt = bearer.substring(BEARER.length()).trim();
-          JWTVerifier verifier = JWT.require(Algorithm.ECDSA256(publicKey)).build();
-          DecodedJWT excepted = verifier.verify(responseBody.getIdToken());
-          DecodedJWT actual = verifier.verify(jwt);
+          JwtParser parser = Jwts.parser().verifyWith(publicKey).build();
+          Claims excepted = parser.parseSignedClaims(responseBody.getIdToken()).getPayload();
+          Claims actual = parser.parseSignedClaims(jwt).getPayload();
           assertEquals(excepted.getSubject(), actual.getSubject());
         });
   }

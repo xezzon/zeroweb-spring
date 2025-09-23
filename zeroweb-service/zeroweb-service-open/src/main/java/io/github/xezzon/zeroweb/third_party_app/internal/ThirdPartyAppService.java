@@ -5,7 +5,6 @@ import com.google.common.primitives.Longs;
 import io.github.xezzon.zeroweb.ZerowebOpenConstant;
 import io.github.xezzon.zeroweb.auth.JsonWebToken;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
-import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig.ZerowebJwtConfig;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
@@ -18,10 +17,10 @@ import io.github.xezzon.zeroweb.third_party_app.event.ThirdPartyAppCreatedEvent;
 import io.github.xezzon.zeroweb.third_party_app.exception.InvalidAccessKeyException;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
+import io.jsonwebtoken.Jwts.SIG;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Collections;
@@ -29,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -46,8 +44,6 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
 
   private final ThirdPartyAppRepository thirdPartyAppRepository;
 
-  public static final String ALGORITHM = "AES";
-  private static final int AES_KEY_LENGTH = 256;
   private final ThirdPartyAppDAO thirdPartyAppDAO;
   private final AccessSecretRepository accessSecretRepository;
   private final ThirdPartyAppMemberRepository thirdPartyAppMemberRepository;
@@ -105,21 +101,14 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
   /// @param appId 应用标识
   /// @return 更新后的应用访问凭据与密钥
   protected AccessSecret rollAccessSecret(String appId) {
-    try {
-      KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
-      keyGenerator.init(AES_KEY_LENGTH);
-      SecretKey secretKey = keyGenerator.generateKey();
-      AccessSecret accessSecret = new AccessSecret();
-      accessSecret.setId(appId);
-      accessSecret.setSecretKey(Base64.getEncoder()
-          .encodeToString(secretKey.getEncoded())
-      );
-      accessSecretRepository.updateSecretKeyById(accessSecret.getId(), accessSecret.getSecretKey());
-      return accessSecret;
-    } catch (NoSuchAlgorithmException e) {
-      log.error("Cannot create key pair.", e);
-    }
-    return null;
+    SecretKey secretKey = SIG.HS256.key().build();
+    AccessSecret accessSecret = new AccessSecret();
+    accessSecret.setId(appId);
+    accessSecret.setSecretKey(Base64.getEncoder()
+        .encodeToString(secretKey.getEncoded())
+    );
+    accessSecretRepository.updateSecretKeyById(accessSecret.getId(), accessSecret.getSecretKey());
+    return accessSecret;
   }
 
   @Override
@@ -145,7 +134,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
         .issuer(zerowebJwtConfig.getIssuer())
         .issuedAt(iat)
         .timeout(zerowebJwtConfig.getTimeout())
-        .sign(new JwtClaimWrapper(claim));
+        .sign(claim);
   }
 
   /// 校验摘要

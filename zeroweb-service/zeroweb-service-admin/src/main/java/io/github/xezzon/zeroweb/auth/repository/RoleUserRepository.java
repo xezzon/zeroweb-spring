@@ -16,7 +16,7 @@ public interface RoleUserRepository extends
   boolean existsByRoleIdAndUserId(String roleId, String userId);
 
   @Transactional
-  long deleteByRoleIdAndUserId(String roleId, String userId);
+  void deleteByRoleIdAndUserId(String roleId, String userId);
 
   List<RoleUser> findByUserId(String userId);
 }

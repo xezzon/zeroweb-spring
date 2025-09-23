@@ -3,7 +3,6 @@ package io.github.xezzon.zeroweb.auth.internal;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
-import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.auth.event.UserLoginEvent;
 import io.github.xezzon.zeroweb.auth.exception.InvalidPasswordException;
 import io.github.xezzon.zeroweb.auth.util.SessionUtil;
@@ -94,8 +93,7 @@ public class AuthnService {
   /// @return 返回生成的JWT签名字符串
   protected String signJwt() {
     final JwtClaim claim = this.getCustomClaim();
-    final JwtClaimWrapper jwtBuilder = new JwtClaimWrapper(claim);
-    return jwtCryptoService.signJwt(jwtBuilder);
+    return jwtCryptoService.signJwt(claim);
   }
 
   /// 用户登录后，将用户信息加载到会话中

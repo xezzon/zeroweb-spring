@@ -39,7 +39,7 @@ public class UserSpanAttributeFilter implements Filter {
         JwtAuth.get().ifPresent(claimWrapper -> {
           span.setAttribute(USER_ID, claimWrapper.getSub());
           span.setAttribute(USER_NAME, claimWrapper.getPreferredUsername());
-          span.setAttribute(AttributeKey.stringArrayKey(USER_ROLES), claimWrapper.getRoles());
+          span.setAttribute(AttributeKey.stringArrayKey(USER_ROLES), claimWrapper.getRolesList());
           span.setAttribute(USER_FULL_NAME, claimWrapper.getNickname());
         });
       }

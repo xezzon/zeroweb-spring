@@ -14,7 +14,9 @@ import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMember;
 import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMemberRepository;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
+import io.jsonwebtoken.Jwts.SIG;
 import jakarta.annotation.Resource;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -54,8 +56,9 @@ class ThirdPartyAppMemberHttpTest {
     thirdPartyApp.setName(RandomUtil.randomString(8));
     thirdPartyApp.setOwnerId(OWNER_ID);
     thirdPartyAppRepository.save(thirdPartyApp);
+    String secretKey = Base64.getEncoder().encodeToString(SIG.HS256.key().build().getEncoded());
     accessSecretRepository
-        .updateSecretKeyById(thirdPartyApp.getId(), RandomUtil.randomString(8));
+        .updateSecretKeyById(thirdPartyApp.getId(), secretKey);
 
     ThirdPartyAppMember owner = new ThirdPartyAppMember();
     owner.setGroupId(thirdPartyApp.getId());
@@ -76,7 +79,7 @@ class ThirdPartyAppMemberHttpTest {
 
   @Test
   void addMember_general() {
-    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     String token = webTestClient.post()
         .uri(builder -> builder
@@ -113,7 +116,7 @@ class ThirdPartyAppMemberHttpTest {
   @Test
   void addMember_particular() {
     String invitedUser = UUID.randomUUID().toString();
-    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     String token = webTestClient.post()
         .uri(builder -> builder
@@ -177,7 +180,7 @@ class ThirdPartyAppMemberHttpTest {
 
   @Test
   void addMember_timeout() {
-    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     String token = webTestClient.post()
         .uri(builder -> builder
@@ -211,7 +214,7 @@ class ThirdPartyAppMemberHttpTest {
 
   @Test
   void moveOwnership() {
-    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     webTestClient.patch()
         .uri(builder -> builder
@@ -236,7 +239,7 @@ class ThirdPartyAppMemberHttpTest {
 
   @Test
   void moveOwnership_notOwner() {
-    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     webTestClient.patch()
         .uri(builder -> builder
@@ -253,7 +256,7 @@ class ThirdPartyAppMemberHttpTest {
 
   @Test
   void moveOwnership_notMember() {
-    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     webTestClient.patch()
         .uri(builder -> builder
@@ -270,7 +273,7 @@ class ThirdPartyAppMemberHttpTest {
 
   @Test
   void moveOwnership_self() {
-    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     webTestClient.patch()
         .uri(builder -> builder

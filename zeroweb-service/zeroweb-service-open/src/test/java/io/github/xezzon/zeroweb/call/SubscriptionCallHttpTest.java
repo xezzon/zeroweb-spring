@@ -20,6 +20,7 @@ import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
 import io.github.xezzon.zeroweb.third_party_app.exception.InvalidAccessKeyException;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
+import io.jsonwebtoken.Jwts.SIG;
 import jakarta.annotation.Resource;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -78,7 +79,9 @@ class SubscriptionCallHttpTest {
     subscriptionRepository.save(subscription);
 
     accessSecret.setId(thirdPartyApp.getId());
-    accessSecret.setSecretKey(Base64.getEncoder().encodeToString(RandomUtil.randomBytes(32)));
+    accessSecret.setSecretKey(Base64.getEncoder()
+        .encodeToString(SIG.HS256.key().build().getEncoded())
+    );
     accessSecretRepository.save(accessSecret);
   }
 

@@ -12,17 +12,17 @@ import java.util.Optional;
  */
 public class JwtAuth {
 
-  private static final ThreadLocal<JwtClaimWrapper> CLAIM = new InheritableThreadLocal<>();
+  private static final ThreadLocal<JwtClaim> CLAIM = new InheritableThreadLocal<>();
 
   private JwtAuth() {
   }
 
   /**
    * 保存 Authorization 请求头中携带的 JWT
-   * @param claimWrapper JWT对象
+   * @param claim JWT对象
    */
-  public static void save(final JwtClaimWrapper claimWrapper) {
-    CLAIM.set(claimWrapper);
+  public static void save(final JwtClaim claim) {
+    CLAIM.set(claim);
   }
 
   /**
@@ -30,7 +30,7 @@ public class JwtAuth {
    * 如果没获取到则返回 {@link Optional#empty()}
    * @return 当前认证信息
    */
-  public static Optional<JwtClaimWrapper> get() {
+  public static Optional<JwtClaim> get() {
     return Optional.ofNullable(CLAIM.get());
   }
 
@@ -39,7 +39,7 @@ public class JwtAuth {
    * @return 认证信息
    * @throws NotLoginException 没有认证
    */
-  public static JwtClaimWrapper getOrThrow() {
+  public static JwtClaim getOrThrow() {
     return get()
         .orElseThrow(() ->
             new NotLoginException(DEFAULT_MESSAGE, null, NOT_TOKEN)

@@ -17,7 +17,7 @@ public interface RolePermissionRepository extends
   boolean existsByRoleIdAndPermission(String roleId, String permission);
 
   @Transactional
-  long deleteByRoleIdInAndPermission(Collection<String> roleIds, String permission);
+  void deleteByRoleIdInAndPermission(Collection<String> roleIds, String permission);
 
   List<RolePermission> findByPermission(String permission);
 }

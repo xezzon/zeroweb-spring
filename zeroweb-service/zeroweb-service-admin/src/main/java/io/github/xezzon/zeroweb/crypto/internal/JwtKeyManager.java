@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.crypto.internal;
 
 import io.github.xezzon.zeroweb.auth.JsonWebToken;
-import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.JwtClaim;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig.ZerowebJwtConfig;
 import io.github.xezzon.zeroweb.core.crypto.ASN1PublicKeyWriter;
@@ -9,10 +9,9 @@ import io.github.xezzon.zeroweb.core.crypto.PemClasspathReaderAndWriter;
 import io.github.xezzon.zeroweb.core.crypto.SecretKeyUtil;
 import io.github.xezzon.zeroweb.crypto.JwtCryptoService;
 import io.github.xezzon.zeroweb.crypto.event.PublicKeyGeneratedEvent;
+import io.jsonwebtoken.Jwts.SIG;
 import jakarta.annotation.PostConstruct;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.Instant;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class JwtKeyManager implements JwtCryptoService {
 
-  public static final String ALGORITHM = "EC";
   private static final String KEY_FOLDER = "pem/";
   private final ZerowebJwtConfig zerowebJwtConfig;
   private PrivateKey privateKey;
@@ -56,14 +54,7 @@ public class JwtKeyManager implements JwtCryptoService {
     }
     if (this.privateKey == null) {
       /* 获取不到文件或解析不了 则生成一对密钥 */
-      KeyPairGenerator keyPairGenerator;
-      try {
-        keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
-      } catch (NoSuchAlgorithmException e) {
-        log.error("Cannot create key pair.", e);
-        return;
-      }
-      KeyPair ecc = keyPairGenerator.generateKeyPair();
+      KeyPair ecc = SIG.ES256.keyPair().build();
       this.privateKey = ecc.getPrivate();
       this.publicKey = ecc.getPublic();
       /* 保存私钥 */
@@ -80,13 +71,13 @@ public class JwtKeyManager implements JwtCryptoService {
   }
 
   @Override
-  public String signJwt(@NotNull final JwtClaimWrapper claimWrapper) {
+  public String signJwt(final @NotNull JwtClaim claim) {
     Instant iat = Instant.now();
     return JsonWebToken.signer(this.getPrivateKey())
         .issuer(zerowebJwtConfig.getIssuer())
         .issuedAt(iat)
         .timeout(zerowebJwtConfig.getTimeout())
-        .sign(claimWrapper);
+        .sign(claim);
   }
 
   /// 获取私钥

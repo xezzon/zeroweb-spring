@@ -4,8 +4,8 @@ import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.BEARER;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
+import io.jsonwebtoken.Jwts.SIG;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -32,13 +32,12 @@ public class TestJwtGenerator {
 
   static {
     try {
-      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
-      KeyPair keyPair = keyPairGenerator.generateKeyPair();
+      KeyPair keyPair = SIG.ES256.keyPair().build();
       PRIVATE_KEY = (ECPrivateKey) keyPair.getPrivate();
       PUBLIC_KEY = (ECPublicKey) keyPair.getPublic();
       KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
       keyGenerator.init(256);
-      SECRET_KEY = keyGenerator.generateKey();
+      SECRET_KEY = SIG.HS256.key().build();
     } catch (NoSuchAlgorithmException e) {
       throw new ZerowebRuntimeException(e);
     }
@@ -108,16 +107,19 @@ public class TestJwtGenerator {
       return this;
     }
 
-    public String jwt() {
-      final JwtClaim claim = jwtBuilder
+    public JwtClaim jwtClaim() {
+      return jwtBuilder
           .setNickname(RandomUtil.randomString(8))
           .addAllGroups(Collections.emptyList())
           .build();
+    }
+
+    public String jwt() {
       return this.signer
           .issuer("xezzon.github.io")
           .issuedAt(Instant.now())
           .timeout(60 * 60L)
-          .sign(new JwtClaimWrapper(claim));
+          .sign(this.jwtClaim());
     }
 
     public String bearer() {
