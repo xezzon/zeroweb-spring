@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.auth;
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.BEARER;
 
 import cn.hutool.core.util.RandomUtil;
+import com.fasterxml.uuid.Generators;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import io.jsonwebtoken.Jwts.SIG;
 import java.security.KeyPair;
@@ -13,7 +14,6 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import org.jetbrains.annotations.TestOnly;
@@ -56,7 +56,7 @@ public class TestJwtGenerator {
 
   public static Builder userBuilder() {
     return new Builder(PRIVATE_KEY)
-        .id(UUID.randomUUID().toString())
+        .id(Generators.timeBasedEpochRandomGenerator().generate().toString())
         .username(RandomUtil.randomString(8))
         .roles(Collections.singletonList("test"))
         .permissions(Collections.singletonList("*"));
@@ -64,7 +64,7 @@ public class TestJwtGenerator {
 
   public static Builder appBuilder() {
     return new Builder(SECRET_KEY)
-        .id(UUID.randomUUID().toString())
+        .id(Generators.timeBasedEpochRandomGenerator().generate().toString())
         .username(RandomUtil.randomString(8))
         .roles(Collections.singletonList("*"))
         .permissions(Collections.singletonList("*"));

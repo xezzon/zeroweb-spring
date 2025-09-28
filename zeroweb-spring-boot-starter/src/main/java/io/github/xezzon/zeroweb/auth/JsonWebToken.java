@@ -1,5 +1,6 @@
 package io.github.xezzon.zeroweb.auth;
 
+import com.fasterxml.uuid.Generators;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtParser;
@@ -16,7 +17,6 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import javax.crypto.SecretKey;
 import org.jetbrains.annotations.NotNull;
 
@@ -157,7 +157,7 @@ public final class JsonWebToken {
           .issuer(this.issuer)
           .issuedAt(Date.from(this.issuedAt))
           .expiration(Date.from(this.expiresAt()))
-          .id(UUID.randomUUID().toString())
+          .id(Generators.timeBasedEpochRandomGenerator().generate().toString())
           ;
     }
 
