@@ -16,10 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 语言管理
- * @author xezzon
- */
+/// 语言管理
+///
+/// @author xezzon
 @RestController
 @RequestMapping("/language")
 public class LanguageHttpEndpoint {
@@ -30,10 +29,9 @@ public class LanguageHttpEndpoint {
     this.localizedService = localizedService;
   }
 
-  /**
-   * 新增语言
-   * @param req 语言
-   */
+  /// 新增语言
+  ///
+  /// @param req 语言
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PostMapping()
   public Id addLanguage(@RequestBody final AddLanguageReq req) {
@@ -42,19 +40,17 @@ public class LanguageHttpEndpoint {
     return Id.of(language.getId());
   }
 
-  /**
-   * 查询语言列表
-   * @return 语言列表
-   */
+  /// 查询语言列表
+  ///
+  /// @return 语言列表
   @GetMapping()
   public List<Language> queryLanguageList() {
     return localizedService.queryLanguageList();
   }
 
-  /**
-   * 更新语言
-   * @param req 语言
-   */
+  /// 更新语言
+  ///
+  /// @param req 语言
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
   public void updateLanguage(@RequestBody final ModifyLanguageReq req) {
@@ -62,10 +58,9 @@ public class LanguageHttpEndpoint {
     localizedService.updateLanguage(language);
   }
 
-  /**
-   * 删除语言
-   * @param id 语言ID
-   */
+  /// 删除语言
+  ///
+  /// @param id 语言ID
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @DeleteMapping("/{id}")
   public void deleteLanguage(@PathVariable final String id) {

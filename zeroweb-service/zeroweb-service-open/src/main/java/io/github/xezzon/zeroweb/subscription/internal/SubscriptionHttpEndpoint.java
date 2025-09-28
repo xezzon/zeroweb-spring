@@ -21,10 +21,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 接口订阅管理
- * @author xezzon
- */
+/// 接口订阅管理
+///
+/// @author xezzon
 @RestController
 public class SubscriptionHttpEndpoint {
 
@@ -39,12 +38,11 @@ public class SubscriptionHttpEndpoint {
     this.subscriptionPermissionManager = subscriptionPermissionManager;
   }
 
-  /**
-   * 查询所有已发布的对外接口以及指定第三方应用的订阅情况
-   * @param odata 查询参数
-   * @param appId 第三方应用ID
-   * @return 所有已发布的对外接口以及指定第三方应用的订阅情况
-   */
+  /// 查询所有已发布的对外接口以及指定第三方应用的订阅情况
+  ///
+  /// @param odata 查询参数
+  /// @param appId 第三方应用ID
+  /// @return 所有已发布的对外接口以及指定第三方应用的订阅情况
   @GetMapping("/third-party-app/{appId}/subscription")
   public Page<Subscription> listSubscription(ODataRequestParam odata, @PathVariable String appId) {
     if (!StpUtil.hasPermission(PermissionConstant.SUBSCRIPTION_AUDIT)) {
@@ -54,11 +52,10 @@ public class SubscriptionHttpEndpoint {
     return subscriptionService.listSubscription(odata.into(), appId);
   }
 
-  /**
-   * 订阅对外接口
-   * @param req 接口订阅信息
-   * @return 订阅标识
-   */
+  /// 订阅对外接口
+  ///
+  /// @param req 接口订阅信息
+  /// @return 订阅标识
   @PostMapping("/subscription")
   public Id subscribe(@RequestBody AddSubscriptionReq req) {
     subscriptionPermissionManager.check(req.appId(), JwtAuth.getOrThrow().getSub(), SUBSCRIBE);
@@ -68,11 +65,11 @@ public class SubscriptionHttpEndpoint {
     return Id.of(subscription.getId());
   }
 
-  /**
-   * 审核订阅
-   * 审核后第三方应用即可调用该接口
-   * @param id 订阅标识
-   */
+  /// 审核订阅
+  ///
+  /// 审核后第三方应用即可调用该接口
+  ///
+  /// @param id 订阅标识
   @PutMapping("/subscription/audit/{id}")
   @SaCheckPermission({PermissionConstant.SUBSCRIPTION_AUDIT})
   public void auditSubscription(@PathVariable String id) {

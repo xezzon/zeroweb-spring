@@ -1,12 +1,23 @@
 package io.github.xezzon.zeroweb.auth;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Jwts.SIG;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.MacAlgorithm;
+import io.jsonwebtoken.security.SignatureAlgorithm;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.time.Instant;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import javax.crypto.SecretKey;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -14,6 +25,43 @@ import org.jetbrains.annotations.NotNull;
  * @author xezzon
  */
 public final class JsonWebToken {
+
+  /**
+   * 用户名
+   */
+  public static final String USERNAME_CLAIM = "preferred_username";
+  /**
+   * 昵称
+   */
+  public static final String NICKNAME_CLAIM = "nickname";
+  /**
+   * 角色
+   */
+  public static final String ROLES_CLAIM = "roles";
+  /**
+   * 用户组
+   */
+  public static final String GROUPS_CLAIM = "groups";
+  /**
+   * 权限
+   */
+  public static final String PERMISSION_CLAIM = "entitlements";
+  /**
+   * 授权方 - ID 令牌的发行方
+   */
+  public static final String AUTHORIZED_PARTY_CLAIM = "azp";
+  /**
+   * 授权方： ZeroWeb
+   */
+  public static final String AZP_VALUE = "zeroweb";
+  /**
+   * 令牌有效时长（秒）
+   */
+  public static final String TIMEOUT_CLAIM = "exi";
+  /**
+   * JWT默认过期时间（秒）
+   */
+  public static final Long DEFAULT_TIMEOUT = 2 * 60L;
 
   private JsonWebToken() {
   }
@@ -24,7 +72,7 @@ public final class JsonWebToken {
    * @return JWT签发器
    */
   public static Signer signer(final ECPrivateKey privateKey) {
-    return new Signer(Algorithm.ECDSA256(privateKey));
+    return new EcdsaSigner(privateKey);
   }
 
   /**
@@ -33,7 +81,7 @@ public final class JsonWebToken {
    * @return JWT 签发器
    */
   public static Signer signer(final byte[] secretKey) {
-    return new Signer(Algorithm.HMAC256(secretKey));
+    return new HmacSigner(Keys.hmacShaKeyFor(secretKey));
   }
 
   /**
@@ -42,7 +90,7 @@ public final class JsonWebToken {
    * @return JWT 解码器
    */
   public static Decoder decoder(final ECPublicKey publicKey) {
-    return new Decoder(Algorithm.ECDSA256(publicKey));
+    return new EcdsaDecoder(publicKey);
   }
 
   /**
@@ -51,18 +99,14 @@ public final class JsonWebToken {
    * @return JWT 解码器
    */
   public static Decoder decoder(final byte[] secretKey) {
-    return new Decoder(Algorithm.HMAC256(secretKey));
+    return new HmacDecoder(Keys.hmacShaKeyFor(secretKey));
   }
 
   /**
    * JWT 签发器
    */
-  public static final class Signer {
+  public abstract static class Signer {
 
-    /**
-     * 签名算法及密钥
-     */
-    private final Algorithm algorithm;
     /**
      * JWT签发者
      */
@@ -74,11 +118,7 @@ public final class JsonWebToken {
     /**
      * JWT过期时间
      */
-    private Long timeout;
-
-    private Signer(final Algorithm algorithm) {
-      this.algorithm = algorithm;
-    }
+    private Long timeout = DEFAULT_TIMEOUT;
 
     /**
      * @param issuer JWT签发者
@@ -99,59 +139,137 @@ public final class JsonWebToken {
     /**
      * @param timeout JWT有效期，单位（秒）
      */
-    public Signer timeout(final Long timeout) {
+    public Signer timeout(@NotNull final Long timeout) {
       this.timeout = timeout;
       return this;
+    }
+
+    protected JwtBuilder payload(final JwtClaim claim) {
+      return Jwts.builder()
+          .subject(claim.getSub())
+          .claim(USERNAME_CLAIM, claim.getPreferredUsername())
+          .claim(NICKNAME_CLAIM, claim.getNickname())
+          .claim(ROLES_CLAIM, claim.getRolesList())
+          .claim(GROUPS_CLAIM, Collections.emptyList())
+          .claim(PERMISSION_CLAIM, claim.getEntitlementsList())
+          .claim(AUTHORIZED_PARTY_CLAIM, AZP_VALUE)
+          .claim(TIMEOUT_CLAIM, this.timeout)
+          .issuer(this.issuer)
+          .issuedAt(Date.from(this.issuedAt))
+          .expiration(Date.from(this.expiresAt()))
+          .id(UUID.randomUUID().toString())
+          ;
     }
 
     /**
      * @return JWT过期时间
      */
     private Instant expiresAt() {
-      if (this.issuedAt != null && this.timeout != null) {
-        return this.issuedAt.plusSeconds(timeout);
-      }
-      return null;
+      return this.issuedAt.plusSeconds(timeout);
     }
 
     /**
      * 签发JWT
-     * @param claimWrapper JWT自定义载荷内容
+     * @param claim JWT自定义载荷内容
      * @return JWT字符串
      */
-    public String sign(final JwtClaimWrapper claimWrapper) {
-      return claimWrapper.jwtBuilder()
-          .withIssuer(issuer)
-          .withIssuedAt(issuedAt)
-          .withClaim(JwtClaimWrapper.TIMEOUT_CLAIM, timeout)
-          .withExpiresAt(this.expiresAt())
-          .withJWTId(UUID.randomUUID().toString())
-          .sign(algorithm);
+    public abstract String sign(final JwtClaim claim);
+  }
+
+  static class EcdsaSigner extends Signer {
+
+    /**
+     * 签名算法
+     */
+    private final SignatureAlgorithm algorithm = SIG.ES256;
+    /**
+     * 签名密钥
+     */
+    private final PrivateKey key;
+
+    private EcdsaSigner(PrivateKey key) {
+      this.key = key;
+    }
+
+    @Override
+    public String sign(final JwtClaim claim) {
+      return this.payload(claim).signWith(key, algorithm).compact();
+    }
+  }
+
+  static class HmacSigner extends Signer {
+
+    /**
+     * 签名算法
+     */
+    private final MacAlgorithm algorithm = SIG.HS256;
+    /**
+     * 签名密钥
+     */
+    private final SecretKey key;
+
+    HmacSigner(SecretKey key) {
+      this.key = key;
+    }
+
+    @Override
+    public String sign(JwtClaim claim) {
+      return this.payload(claim).signWith(key, algorithm).compact();
     }
   }
 
   /**
    * JWT解码器
    */
-  public static class Decoder {
-
-    /**
-     * 验签算法及密钥
-     */
-    private final Algorithm algorithm;
-
-    public Decoder(final Algorithm algorithm) {
-      this.algorithm = algorithm;
-    }
+  public abstract static class Decoder {
 
     /**
      * 验签并解码
      * @param token JWT字符串
      * @return JWT对象
      */
-    JwtClaimWrapper decode(final String token) {
-      final JWTVerifier verifier = JWT.require(algorithm).build();
-      return new JwtClaimWrapper(verifier.verify(token));
+    @SuppressWarnings("unchecked")
+    JwtClaim decode(final String token) {
+      Claims payload = this.parser().parseSignedClaims(token).getPayload();
+      return JwtClaim.newBuilder()
+          .setSub(payload.getSubject())
+          .setPreferredUsername(payload.get(USERNAME_CLAIM, String.class))
+          .setNickname(payload.get(NICKNAME_CLAIM, String.class))
+          .addAllRoles(payload.get(ROLES_CLAIM, List.class))
+          .addAllEntitlements(payload.get(PERMISSION_CLAIM, List.class))
+          .addAllGroups(payload.get(GROUPS_CLAIM, List.class))
+          .setExi(payload.get(TIMEOUT_CLAIM, Long.class))
+          .build();
+    }
+
+    protected abstract JwtParser parser();
+  }
+
+  static class EcdsaDecoder extends Decoder {
+
+    private final PublicKey key;
+
+    private EcdsaDecoder(final PublicKey key) {
+      this.key = key;
+    }
+
+    @Override
+    protected JwtParser parser() {
+      return Jwts.parser().verifyWith(key).build();
+    }
+  }
+
+  static class HmacDecoder extends Decoder {
+
+    private final SecretKey key;
+
+    HmacDecoder(SecretKey key) {
+      this.key = key;
+    }
+
+    @Override
+    protected JwtParser parser() {
+      return Jwts.parser().verifyWith(key).build();
     }
   }
 }

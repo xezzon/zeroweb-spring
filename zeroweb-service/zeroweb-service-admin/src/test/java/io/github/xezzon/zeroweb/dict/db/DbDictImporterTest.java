@@ -1,9 +1,9 @@
 package io.github.xezzon.zeroweb.dict.db;
 
-import io.github.xezzon.zeroweb.dict.internal.DictDbHandler;
+import io.github.xezzon.zeroweb.dict.Dict;
 import io.github.xezzon.zeroweb.dict.DictImporter;
 import io.github.xezzon.zeroweb.dict.TestEnum;
-import io.github.xezzon.zeroweb.dict.Dict;
+import io.github.xezzon.zeroweb.dict.internal.DictDbHandler;
 import io.github.xezzon.zeroweb.dict.repository.DictRepository;
 import jakarta.annotation.Resource;
 import java.util.List;
@@ -13,9 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootTest
 @DirtiesContext
 class DbDictImporterTest {

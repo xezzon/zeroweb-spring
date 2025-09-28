@@ -14,9 +14,6 @@
   <description>Spring Boot 通用配置</description>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
@@ -39,6 +36,10 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.grpc</groupId>
@@ -92,16 +93,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.mapstruct</groupId>
-      <artifactId>mapstruct-processor</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate.orm</groupId>
-      <artifactId>hibernate-jpamodelgen</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webflux</artifactId>
       <scope>test</scope>
@@ -119,8 +110,8 @@
       <artifactId>bcpkix-jdk18on</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.auth0</groupId>
-      <artifactId>java-jwt</artifactId>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
     </dependency>
     <dependency>
       <groupId>cn.dev33</groupId>
@@ -136,4 +127,13 @@
       <artifactId>groovy</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

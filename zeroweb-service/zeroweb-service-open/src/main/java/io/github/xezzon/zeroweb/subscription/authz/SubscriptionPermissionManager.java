@@ -4,9 +4,7 @@ import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenExceptio
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppMemberService;
 import org.springframework.stereotype.Component;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Component
 public class SubscriptionPermissionManager {
 

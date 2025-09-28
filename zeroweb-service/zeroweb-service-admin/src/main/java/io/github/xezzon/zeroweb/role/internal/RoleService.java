@@ -18,9 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Service
 public class RoleService implements ITreeService<Role, String>, IRoleService4Auth {
 
@@ -63,10 +61,9 @@ public class RoleService implements ITreeService<Role, String>, IRoleService4Aut
     this.deleteRole(Collections.singleton(role.get()));
   }
 
-  /**
-   * 递归删除下级角色
-   * @param roles 下级角色
-   */
+  /// 递归删除下级角色
+  ///
+  /// @param roles 下级角色
   @Transactional
   void deleteRole(final Collection<Role> roles) {
     if (roles.isEmpty()) {

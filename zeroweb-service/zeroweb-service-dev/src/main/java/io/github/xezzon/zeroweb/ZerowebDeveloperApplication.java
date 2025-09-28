@@ -5,10 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode;
 
-/**
- * 研发平台服务
- * @author xezzon
- */
+/// 研发平台服务
+///
+/// @author xezzon
 @SpringBootApplication
 @EnableSpringDataWebSupport(pageSerializationMode = PageSerializationMode.VIA_DTO)
 public class ZerowebDeveloperApplication {

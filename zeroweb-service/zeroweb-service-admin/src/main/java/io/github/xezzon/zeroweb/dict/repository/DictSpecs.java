@@ -4,13 +4,11 @@ import io.github.xezzon.zeroweb.dict.Dict;
 import io.github.xezzon.zeroweb.dict.Dict_;
 import org.springframework.data.jpa.domain.Specification;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 public class DictSpecs {
 
   public static Specification<Dict> isDictTag() {
-    return (root, query, criteriaBuilder) ->
+    return (root, _, criteriaBuilder) ->
         criteriaBuilder.equal(root.get(Dict_.TAG), Dict.DICT_TAG);
   }
 

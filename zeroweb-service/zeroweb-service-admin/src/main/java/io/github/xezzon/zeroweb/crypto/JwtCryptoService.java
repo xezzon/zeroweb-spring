@@ -1,17 +1,13 @@
 package io.github.xezzon.zeroweb.crypto;
 
-import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.JwtClaim;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 public interface JwtCryptoService {
 
-  /**
-   * 签发JWT
-   * @param claimWrapper jwt构造器
-   * @return JWT字符串
-   */
-  String signJwt(@NotNull JwtClaimWrapper claimWrapper);
+  /// 签发JWT
+  /// @param claim jwt构造器
+  /// @return JWT字符串
+  String signJwt(@NotNull JwtClaim claim);
 }

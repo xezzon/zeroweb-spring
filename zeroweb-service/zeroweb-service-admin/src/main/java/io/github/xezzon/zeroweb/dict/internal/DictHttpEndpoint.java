@@ -22,10 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 字典管理
- * @author xezzon
- */
+/// 字典管理
+///
+/// @author xezzon
 @RestController
 @RequestMapping("/dict")
 public class DictHttpEndpoint {
@@ -36,11 +35,10 @@ public class DictHttpEndpoint {
     this.dictService = dictService;
   }
 
-  /**
-   * 新增字典目/字典项
-   * @param req 对于字典项，字典目、上级ID不能为空
-   * @return 字典ID
-   */
+  /// 新增字典目/字典项
+  ///
+  /// @param req 对于字典项，字典目、上级ID不能为空
+  /// @return 字典ID
   @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @PostMapping()
   public Id addDict(@RequestBody AddDictReq req) {
@@ -54,31 +52,28 @@ public class DictHttpEndpoint {
     return Id.of(dict.getId());
   }
 
-  /**
-   * 分页查询字典目列表
-   * @return 字典目列表
-   */
+  /// 分页查询字典目列表
+  ///
+  /// @return 字典目列表
   @SaCheckPermission({PermissionConstant.DICT_READ})
   @GetMapping()
   public Page<Dict> getDictTagList(ODataRequestParam odata) {
     return dictService.pagedList(odata.into());
   }
 
-  /**
-   * 查询指定字典目下所有字典项的列表
-   * @param tag 字典目编码
-   * @return 字典项列表（树形结构）
-   */
+  /// 查询指定字典目下所有字典项的列表
+  ///
+  /// @param tag 字典目编码
+  /// @return 字典项列表（树形结构）
   @GetMapping("/tag/{tag}")
   public List<Dict> getDictTreeByTag(@PathVariable String tag) {
     List<Dict> dictItemList = dictService.getDictItemList(tag);
     return Tree.fold(dictItemList);
   }
 
-  /**
-   * 更新字典目/字典项
-   * @param req 字典
-   */
+  /// 更新字典目/字典项
+  ///
+  /// @param req 字典
   @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @PutMapping()
   public void modifyDict(@RequestBody ModifyDictReq req) {
@@ -86,11 +81,10 @@ public class DictHttpEndpoint {
     dictService.modifyDict(dict);
   }
 
-  /**
-   * 批量更新字典状态
-   * @param ids 字典ID集合
-   * @param enabled 更新后的字典启用状态
-   */
+  /// 批量更新字典状态
+  ///
+  /// @param ids 字典ID集合
+  /// @param enabled 更新后的字典启用状态
   @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @PutMapping("/update-status")
   public void updateDictStatus(
@@ -100,10 +94,9 @@ public class DictHttpEndpoint {
     dictService.updateDictStatus(ids, enabled);
   }
 
-  /**
-   * 批量删除字典目/字典项
-   * @param ids 字典ID集合
-   */
+  /// 批量删除字典目/字典项
+  ///
+  /// @param ids 字典ID集合
   @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @DeleteMapping()
   public void removeDict(@RequestBody Collection<String> ids) {

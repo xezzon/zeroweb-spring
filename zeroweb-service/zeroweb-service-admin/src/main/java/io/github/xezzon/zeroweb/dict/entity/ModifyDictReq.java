@@ -3,37 +3,23 @@ package io.github.xezzon.zeroweb.dict.entity;
 import io.github.xezzon.tao.trait.From;
 import io.github.xezzon.tao.trait.Into;
 import io.github.xezzon.zeroweb.dict.Dict;
-import lombok.Getter;
-import lombok.Setter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Getter
-@Setter
-public class ModifyDictReq implements Into<Dict> {
-
-  private String id;
-  /**
-   * 字典键
-   */
-  private String code;
-  /**
-   * 字典值
-   */
-  private String label;
-  /**
-   * 排序号
-   */
-  private Integer ordinal;
-  /**
-   * 上级字典ID
-   */
-  private String parentId;
-  /**
-   * 启用状态
-   */
-  private Boolean enabled;
+/// @param code 字典键
+/// @param label 字典值
+/// @param ordinal 排序号
+/// @param parentId 上级字典ID
+/// @param enabled 启用状态
+public record ModifyDictReq(
+    String id,
+    String code,
+    String label,
+    Integer ordinal,
+    String parentId,
+    Boolean enabled
+) implements Into<Dict> {
 
   @Override
   public Dict into() {

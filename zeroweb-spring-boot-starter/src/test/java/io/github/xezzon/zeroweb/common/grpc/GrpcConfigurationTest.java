@@ -1,9 +1,6 @@
 package io.github.xezzon.zeroweb.common.grpc;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
-import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.dict.DictGrpc.DictBlockingStub;
 import io.github.xezzon.zeroweb.dict.DictImportReqList;
@@ -28,12 +25,8 @@ class GrpcConfigurationTest {
 
   @Test
   void jwtInterceptor() {
-    final String jwtString = TestJwtGenerator.userBuilder()
-        .username("test")
-        .jwt();
-    final DecodedJWT jwt = JWT.decode(jwtString);
-    final JwtClaimWrapper claimWrapper = new JwtClaimWrapper(jwt);
-    JwtAuth.save(claimWrapper);
+    final TestJwtGenerator.Builder jwtBuilder = TestJwtGenerator.userBuilder().username("test");
+    JwtAuth.save(jwtBuilder.jwtClaim());
     Assertions.assertDoesNotThrow(() ->
         dictBlockingStub.getDictListByTag(DictReq.newBuilder().build())
     );

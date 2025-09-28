@@ -8,9 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Repository
 public interface I18nMessageRepository extends
     JpaRepository<I18nMessage, String>,

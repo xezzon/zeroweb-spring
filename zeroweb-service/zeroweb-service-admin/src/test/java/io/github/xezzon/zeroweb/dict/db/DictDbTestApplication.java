@@ -4,9 +4,7 @@ import io.github.xezzon.zeroweb.dict.EnableDictScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootApplication(scanBasePackages = "io.github.xezzon.zeroweb")
 @EnableDictScan
 public class DictDbTestApplication {

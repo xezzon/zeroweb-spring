@@ -90,7 +90,7 @@ zeroweb-service-admin
 开始开发前，请保证以下开发环境已经安装完成：
 
 - [Git](https://git-scm.com/downloads)
-- [OpenJDK 17](https://adoptium.net/zh-CN/temurin/releases/?version=17&package=jdk)
+- [OpenJDK 25](https://adoptium.net/zh-CN/temurin/releases/?version=25&package=jdk)
 - [Maven](https://maven.apache.org/download.cgi)
 - [Docker](https://www.docker.com)/[Podman](https://podman.io/)
 

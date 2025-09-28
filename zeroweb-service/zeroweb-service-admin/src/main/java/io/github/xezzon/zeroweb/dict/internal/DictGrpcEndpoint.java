@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.dict.internal;
 
 import com.google.protobuf.Empty;
+import io.github.xezzon.zeroweb.dict.Dict;
 import io.github.xezzon.zeroweb.dict.DictGrpc.DictImplBase;
 import io.github.xezzon.zeroweb.dict.DictImportReqList;
 import io.github.xezzon.zeroweb.dict.DictListResp;
@@ -8,14 +9,11 @@ import io.github.xezzon.zeroweb.dict.DictReq;
 import io.github.xezzon.zeroweb.dict.DictResp;
 import io.github.xezzon.zeroweb.dict.converter.DictImportReqConverter;
 import io.github.xezzon.zeroweb.dict.converter.DictRespConverter;
-import io.github.xezzon.zeroweb.dict.Dict;
 import io.grpc.stub.StreamObserver;
 import java.util.List;
 import org.springframework.grpc.server.service.GrpcService;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @GrpcService
 public class DictGrpcEndpoint extends DictImplBase {
 
@@ -25,9 +23,7 @@ public class DictGrpcEndpoint extends DictImplBase {
     this.dictService = dictService;
   }
 
-  /**
-   * 查询指定字典目下所有字典项的列表（服务间接口）
-   */
+  /// 查询指定字典目下所有字典项的列表（服务间接口）
   @Override
   public void getDictListByTag(DictReq request, StreamObserver<DictListResp> responseObserver) {
     List<Dict> dictItemList = dictService.getDictItemList(request.getTag());
@@ -41,9 +37,7 @@ public class DictGrpcEndpoint extends DictImplBase {
     responseObserver.onCompleted();
   }
 
-  /**
-   * 导入字典数据（服务间接口）
-   */
+  /// 导入字典数据（服务间接口）
   @Override
   public void importDict(DictImportReqList request, StreamObserver<Empty> responseObserver) {
     List<Dict> dictList = request.getDataList().parallelStream()

@@ -10,10 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 用户管理
- * @author xezzon
- */
+/// 用户管理
+///
+/// @author xezzon
 @RequestMapping("/user")
 @RestController
 public class UserHttpEndpoint {
@@ -24,15 +23,14 @@ public class UserHttpEndpoint {
     this.userService = userService;
   }
 
-  /**
-   * 用户注册
-   * @param req 用户名、昵称、密码等
-   * @return 用户ID
-   */
+  /// 用户注册
+  ///
+  /// @param req 用户名、昵称、密码等
+  /// @return 用户ID
   @PostMapping("/register")
   public Id register(@RequestBody @Validated RegisterUserReq req) {
     User user = req.into();
-    String cipher = BCrypt.hashpw(req.getPassword(), BCrypt.gensalt());
+    String cipher = BCrypt.hashpw(req.password(), BCrypt.gensalt());
     user.setCipher(cipher);
     userService.addUser(user);
     return Id.of(user.getId());

@@ -2,7 +2,6 @@ package io.github.xezzon.zeroweb.auth;
 
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.BEARER;
-import static io.github.xezzon.zeroweb.auth.JwtClaimWrapper.DEFAULT_TIMEOUT;
 
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.zeroweb.common.exception.InvalidTokenException;
@@ -21,7 +20,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.interfaces.ECPublicKey;
 import java.util.Base64;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -51,7 +49,7 @@ public class JwtFilter implements Filter {
         String token = authorization.substring(BEARER.length()).trim();
         String publicKeyASN1 = httpRequest.getHeader(PUBLIC_KEY_HEADER);
         String accessKey = httpRequest.getHeader(ACCESS_KEY_HEADER);
-        final JwtClaimWrapper claimWrapper;
+        final JwtClaim claimWrapper;
         if (publicKeyASN1 != null && !publicKeyASN1.isEmpty()) {
           // 前端调用经过网关验证，使用公钥验证
           claimWrapper = validateWithPublicKey(token, publicKeyASN1);
@@ -61,7 +59,7 @@ public class JwtFilter implements Filter {
         } else {
           throw new BreakException();
         }
-        final Long timeout = Optional.ofNullable(claimWrapper.getExi()).orElse(DEFAULT_TIMEOUT);
+        final long timeout = claimWrapper.getExi();
         StpUtil.login(claimWrapper.getSub(), timeout);
         JwtAuth.save(claimWrapper);
       }
@@ -75,7 +73,7 @@ public class JwtFilter implements Filter {
     JwtAuth.clear();
   }
 
-  public JwtClaimWrapper validateWithPublicKey(final String token, final String publicKeyASN1) {
+  public JwtClaim validateWithPublicKey(final String token, final String publicKeyASN1) {
     try {
       ASN1PublicKeyReader asn1Reader = new DerStringReader(publicKeyASN1);
       ECPublicKey publicKey = (ECPublicKey) SecretKeyUtil.readPublicKey(asn1Reader);
@@ -86,7 +84,7 @@ public class JwtFilter implements Filter {
     }
   }
 
-  public JwtClaimWrapper validateWithAccessKey(final String token, final String accessKey) {
+  public JwtClaim validateWithAccessKey(final String token, final String accessKey) {
     return JsonWebToken.decoder(Base64.getDecoder().decode(accessKey))
         .decode(token);
   }

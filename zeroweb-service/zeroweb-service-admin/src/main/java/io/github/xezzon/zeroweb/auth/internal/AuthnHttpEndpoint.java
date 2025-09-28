@@ -28,10 +28,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 认证管理
- * @author xezzon
- */
+/// 认证管理
+///
+/// @author xezzon
 @RequestMapping("/auth")
 @RestController
 public class AuthnHttpEndpoint {
@@ -46,11 +45,10 @@ public class AuthnHttpEndpoint {
     this.zerowebJwtConfig = zerowebConfig.getJwt();
   }
 
-  /**
-   * 用户名口令认证
-   * @param basicAuth 用户名、口令
-   * @return 令牌（即 Session ID）
-   */
+  /// 用户名口令认证
+  ///
+  /// @param basicAuth 用户名、口令
+  /// @return 令牌（即 Session ID）
   @PostMapping("/login/basic")
   public OidcToken basicLogin(@RequestBody final BasicAuth basicAuth) {
     authnService.basicLogin(basicAuth.username(), basicAuth.password());
@@ -60,9 +58,7 @@ public class AuthnHttpEndpoint {
     return new OidcToken(accessToken, idToken, expiredIn);
   }
 
-  /**
-   * @return 当前用户的认证信息
-   */
+  /// @return 当前用户的认证信息
   @GetMapping("/self")
   public ResponseEntity<byte[]> self() throws InvalidProtocolBufferException {
     if (!StpUtil.isLogin()) {
@@ -84,9 +80,7 @@ public class AuthnHttpEndpoint {
         .body(payload);
   }
 
-  /**
-   * @return 用户令牌
-   */
+  /// @return 用户令牌
   @SaCheckLogin
   @GetMapping("/token")
   public OidcToken getSsoToken(HttpServletResponse response) {

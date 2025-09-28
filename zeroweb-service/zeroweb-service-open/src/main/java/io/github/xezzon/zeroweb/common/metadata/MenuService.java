@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SuppressWarnings("unused")
 @Service
 public class MenuService implements IMenuService {

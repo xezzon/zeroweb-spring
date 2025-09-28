@@ -2,10 +2,9 @@ package io.github.xezzon.zeroweb.openapi.enumeration;
 
 import io.github.xezzon.tao.dict.IDict;
 
-/**
- * 接口状态
- * @author xezzon
- */
+/// 接口状态
+///
+/// @author xezzon
 public enum OpenapiStatus implements IDict {
 
   DRAFT("草稿"),

@@ -5,7 +5,6 @@ import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
-import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
@@ -53,7 +52,7 @@ public class GrpcJwtInterceptor implements ServerInterceptor, ClientInterceptor 
       final byte[] jwtClaimBytes = requestHeaders.get(BEARER);
       if (jwtClaimBytes != null) {
         final JwtClaim claim = JwtClaim.parseFrom(jwtClaimBytes);
-        JwtAuth.save(new JwtClaimWrapper(claim));
+        JwtAuth.save(claim);
       }
     } catch (RuntimeException | InvalidProtocolBufferException e) {
       log.error("Parse JWT failed.", e);
@@ -79,8 +78,8 @@ public class GrpcJwtInterceptor implements ServerInterceptor, ClientInterceptor 
     return new SimpleForwardingClientCall<>(next.newCall(method, callOptions)) {
       @Override
       public void start(Listener<RespT> responseListener, Metadata headers) {
-        JwtAuth.get().ifPresent(claimWrapper ->
-            headers.put(BEARER, claimWrapper.jwtClaim().toByteArray())
+        JwtAuth.get().ifPresent(claim ->
+            headers.put(BEARER, claim.toByteArray())
         );
         super.start(responseListener, headers);
       }

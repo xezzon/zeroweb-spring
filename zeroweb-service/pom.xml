@@ -21,9 +21,7 @@
   </modules>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>25</maven.compiler.release>
     <!-- 应用端口号 -->
     <app.port>8080</app.port>
     <grpc.port>9090</grpc.port>
@@ -105,20 +103,6 @@
       <groupId>org.testcontainers</groupId>
       <artifactId>postgresql</artifactId>
       <scope>test</scope>
-    </dependency>
-    <!-- 代码生成 -->
-    <dependency>
-      <groupId>org.mapstruct</groupId>
-      <artifactId>mapstruct-processor</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate.orm</groupId>
-      <artifactId>hibernate-jpamodelgen</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.github.therapi</groupId>
-      <artifactId>therapi-runtime-javadoc-scribe</artifactId>
     </dependency>
   </dependencies>
 
@@ -248,7 +232,9 @@
                   <OTEL_EXPORTER_OTLP_PROTOCOL>grpc</OTEL_EXPORTER_OTLP_PROTOCOL>
                   <OTEL_SERVICE_NAME>${project.artifactId}</OTEL_SERVICE_NAME>
                   <OTEL_SDK_DISABLED>true</OTEL_SDK_DISABLED>
-                  <OTEL_JAVA_EXTENSIONS>${agent-path}/${otel-ali-extension.name}</OTEL_JAVA_EXTENSIONS>
+                  <OTEL_JAVA_EXTENSIONS>
+                    ${agent-path}/${otel-ali-extension.name}
+                  </OTEL_JAVA_EXTENSIONS>
                 </environment>
                 <ports>
                   <port>${app.port}</port>
@@ -260,6 +246,7 @@
                 </volumes>
                 <jvmFlags>
                   <jvmFlag>-javaagent:${agent-path}/${opentelemetry-javaagent.name}</jvmFlag>
+                  <jvmFlag>-XX:+UseZGC</jvmFlag>
                 </jvmFlags>
                 <appRoot>${workdir}</appRoot>
                 <workingDirectory>${workdir}</workingDirectory>

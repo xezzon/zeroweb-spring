@@ -13,10 +13,9 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
-/**
- * 第三方应用
- * @author xezzon
- */
+/// 第三方应用
+///
+/// @author xezzon
 @Getter
 @Setter
 @ToString
@@ -27,9 +26,7 @@ public class ThirdPartyApp implements IEntity<String> {
   public static final String TABLE_NAME = "zeroweb_third_party_app";
   public static final String ID_COLUMN = "id";
 
-  /**
-   * 第三方应用标识
-   */
+  /// 第三方应用标识
   @Id
   @Column(
       name = ID_COLUMN,
@@ -39,19 +36,13 @@ public class ThirdPartyApp implements IEntity<String> {
   )
   @IdGenerator
   String id;
-  /**
-   * 第三方应用名称
-   */
+  /// 第三方应用名称
   @Column(name = "name", nullable = false)
   String name;
-  /**
-   * 第三方应用所有者标识
-   */
+  /// 第三方应用所有者标识
   @Column(name = "owner_id", nullable = false, length = DatabaseConstant.ID_LENGTH)
   String ownerId;
-  /**
-   * 创建时间
-   */
+  /// 创建时间
   @Column(name = "create_time", nullable = false, updatable = false)
   @CreationTimestamp
   Instant createTime;

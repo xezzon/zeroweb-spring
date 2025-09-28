@@ -7,10 +7,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/**
- * @param name 第三方应用名称
- * @author xezzon
- */
+/// @param name 第三方应用名称
+/// @author xezzon
 public record AddThirdPartyAppReq(
     String name
 ) implements Into<ThirdPartyApp> {

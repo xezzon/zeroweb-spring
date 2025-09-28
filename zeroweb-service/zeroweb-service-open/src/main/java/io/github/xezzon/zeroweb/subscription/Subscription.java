@@ -19,10 +19,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * 订阅的对外接口
- * @author xezzon
- */
+/// 订阅的对外接口
+/// @author xezzon
 @Getter
 @Setter
 @ToString
@@ -32,32 +30,22 @@ public class Subscription implements IEntity<String> {
 
   public static final String OPENAPI_CODE_COLUMN = "openapi_code";
 
-  /**
-   * 订阅标识
-   */
+  /// 订阅标识
   @Id
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   @IdGenerator
   String id;
-  /**
-   * 第三方应用标识
-   */
+  /// 第三方应用标识
   @Column(name = "app_id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   String appId;
-  /**
-   * 对外接口编码
-   */
+  /// 对外接口编码
   @Column(name = OPENAPI_CODE_COLUMN, nullable = false, updatable = false)
   String openapiCode;
-  /**
-   * 订阅状态
-   */
+  /// 订阅状态
   @Column(name = "status", nullable = false)
   @Enumerated(EnumType.STRING)
   SubscriptionStatus status;
-  /**
-   * 对外接口详情
-   */
+  /// 对外接口详情
   @ManyToOne
   @JoinColumn(
       name = OPENAPI_CODE_COLUMN,

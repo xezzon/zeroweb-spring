@@ -17,10 +17,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * 对外接口
- * @author xezzon
- */
+/// 对外接口
+/// @author xezzon
 @Getter
 @Setter
 @ToString
@@ -31,35 +29,27 @@ public class Openapi implements IEntity<String> {
   public static final String ID_COLUMN = "id";
   public static final String CODE_COLUMN = "code";
 
-  /**
-   * 对外接口标识
-   */
+  /// 对外接口标识
   @Id
   @Column(name = ID_COLUMN, nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   @IdGenerator
   String id;
-  /**
-   * 接口编码
-   * 即第三方接口调用的路径
-   */
+  /// 接口编码
+  ///
+  /// 即第三方接口调用的路径
   @Column(name = CODE_COLUMN, nullable = false, unique = true)
   String code;
-  /**
-   * 后端地址
-   * 即该接口应该转发到的后端地址
-   */
+  /// 后端地址
+  ///
+  /// 即该接口应该转发到的后端地址
   @Column(name = "destination", nullable = false, length = 2083)
   @JsonInclude(Include.NON_NULL)
   String destination;
-  /**
-   * 请求接口的HTTP方法
-   */
+  /// 请求接口的HTTP方法
   @Column(name = "http_method", nullable = false, length = 16)
   @Enumerated(EnumType.STRING)
   HttpMethod httpMethod;
-  /**
-   * 接口状态
-   */
+  /// 接口状态
   @Column(name = "status", nullable = false)
   @Enumerated(EnumType.STRING)
   OpenapiStatus status;

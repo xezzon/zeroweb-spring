@@ -11,10 +11,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * 服务
- * @author xezzon
- */
+/// 服务
+/// @author xezzon
 @Getter
 @Setter
 @ToString
@@ -26,19 +24,15 @@ public class App implements IEntity<String> {
   @IdGenerator
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   private String id;
-  /**
-   * 应用名称
-   */
+  /// 应用名称
   @Column(name = "name", nullable = false)
   private String name;
-  /**
-   * 服务基础访问路径
-   */
+  /// 服务基础访问路径
   @Column(name = "base_url", nullable = false, length = 2083)
   private String baseUrl;
-  /**
-   * 服务顺序 顺序越小越靠前
-   */
+  /// 服务顺序
+  ///
+  /// 顺序越小越靠前
   @Column(name = "ordinal", nullable = false)
   private Integer ordinal;
 }

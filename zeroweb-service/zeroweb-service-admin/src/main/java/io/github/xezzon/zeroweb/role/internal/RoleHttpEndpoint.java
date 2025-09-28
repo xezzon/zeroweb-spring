@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 角色管理
- * @author xezzon
- */
+/// 角色管理
+///
+/// @author xezzon
 @RestController
 @RequestMapping("/role")
 public class RoleHttpEndpoint {
@@ -31,11 +30,10 @@ public class RoleHttpEndpoint {
     this.roleService = roleService;
   }
 
-  /**
-   * 新增角色
-   * @param req 角色信息
-   * @return 角色ID
-   */
+  /// 新增角色
+  ///
+  /// @param req 角色信息
+  /// @return 角色ID
   @SaCheckPermission({PermissionConstant.ROLE_WRITE})
   @PostMapping()
   public Id addRole(@RequestBody final AddRoleReq req) {
@@ -44,10 +42,9 @@ public class RoleHttpEndpoint {
     return Id.of(role.getId());
   }
 
-  /**
-   * 查询角色列表
-   * @return 角色列表（树形）
-   */
+  /// 查询角色列表
+  ///
+  /// @return 角色列表（树形）
   @SaCheckPermission({PermissionConstant.ROLE_READ})
   @GetMapping()
   public List<Role> listAllRole() {
@@ -57,20 +54,18 @@ public class RoleHttpEndpoint {
     );
   }
 
-  /**
-   * 删除角色
-   * @param id 角色ID
-   */
+  /// 删除角色
+  ///
+  /// @param id 角色ID
   @SaCheckPermission({PermissionConstant.ROLE_WRITE})
   @DeleteMapping("/{id}")
   public void deleteRole(@PathVariable final String id) {
     roleService.deleteRole(id);
   }
 
-  /**
-   * 查询当前登陆人的角色及它们的下一级角色
-   * @return 角色列表
-   */
+  /// 查询当前登陆人的角色及它们的下一级角色
+  ///
+  /// @return 角色列表
   @SaCheckLogin
   @GetMapping("/mine")
   public List<Role> listMyRole() {

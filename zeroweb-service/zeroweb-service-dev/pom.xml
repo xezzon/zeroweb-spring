@@ -15,9 +15,6 @@
   <description>研发平台服务</description>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <app.port>9991</app.port>
   </properties>
 </project>

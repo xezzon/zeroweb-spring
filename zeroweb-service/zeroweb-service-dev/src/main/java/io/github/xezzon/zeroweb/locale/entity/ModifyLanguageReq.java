@@ -6,14 +6,13 @@ import io.github.xezzon.zeroweb.locale.Language;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-/**
- * 修改语言的请求参数
- * @param languageTag 语言标签
- * @param description 语言描述
- * @param ordinal 排序序号
- * @param enabled 是否启用
- * @author xezzon
- */
+/// 修改语言的请求参数
+///
+/// @param languageTag 语言标签
+/// @param description 语言描述
+/// @param ordinal 排序序号
+/// @param enabled 是否启用
+/// @author xezzon
 public record ModifyLanguageReq(
     String id,
     String languageTag,

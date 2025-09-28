@@ -15,14 +15,16 @@ public class JwtStpInterface implements StpInterface {
   @Override
   public List<String> getPermissionList(Object loginId, String loginType) {
     return JwtAuth.get()
-        .map(JwtClaimWrapper::getEntitlements)
+        .map(JwtClaim::getEntitlementsList)
+        .map(Collections::unmodifiableList)
         .orElse(Collections.emptyList());
   }
 
   @Override
   public List<String> getRoleList(Object loginId, String loginType) {
     return JwtAuth.get()
-        .map(JwtClaimWrapper::getRoles)
+        .map(JwtClaim::getRolesList)
+        .map(Collections::unmodifiableList)
         .orElse(Collections.emptyList());
   }
 }

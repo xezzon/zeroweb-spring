@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.common.grpc;
 
 import com.google.protobuf.Empty;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
-import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
+import io.github.xezzon.zeroweb.auth.JwtClaim;
 import io.github.xezzon.zeroweb.dict.DictGrpc;
 import io.github.xezzon.zeroweb.dict.DictImportReqList;
 import io.github.xezzon.zeroweb.dict.DictListResp;
@@ -20,7 +20,7 @@ class TestDictGrpcServer extends DictGrpc.DictImplBase {
 
   @Override
   public void getDictListByTag(DictReq request, StreamObserver<DictListResp> responseObserver) {
-    JwtClaimWrapper claimWrapper = Assertions.assertDoesNotThrow(() -> JwtAuth.get().orElseThrow());
+    JwtClaim claimWrapper = Assertions.assertDoesNotThrow(() -> JwtAuth.get().orElseThrow());
     Assertions.assertEquals("test", claimWrapper.getPreferredUsername());
     responseObserver.onNext(DictListResp.newBuilder()
         .addAllData(Collections.emptyList())

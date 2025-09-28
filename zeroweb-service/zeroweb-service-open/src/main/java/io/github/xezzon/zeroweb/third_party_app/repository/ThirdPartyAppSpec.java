@@ -4,9 +4,7 @@ import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp_;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 public class ThirdPartyAppSpec {
 
   private ThirdPartyAppSpec() {

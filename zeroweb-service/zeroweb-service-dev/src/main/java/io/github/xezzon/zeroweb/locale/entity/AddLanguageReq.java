@@ -7,14 +7,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/**
- * 新增语言的请求参数
- * @param languageTag 语言标签
- * @param description 语言描述
- * @param ordinal 排序
- * @param enabled 是否启用
- * @author xezzon
- */
+/// 新增语言的请求参数
+///
+/// @param languageTag 语言标签
+/// @param description 语言描述
+/// @param ordinal 排序
+/// @param enabled 是否启用
+/// @author xezzon
 public record AddLanguageReq(
     String languageTag,
     String description,

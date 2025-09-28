@@ -23,9 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext
 class UserHttpTest {
@@ -54,10 +52,9 @@ class UserHttpTest {
   @Test
   @Transactional
   void addUser() {
-    RegisterUserReq req = new RegisterUserReq();
-    req.setUsername(RandomUtil.randomString(9));
-    req.setNickname(RandomUtil.randomString(9));
-    req.setPassword(
+    RegisterUserReq req = new RegisterUserReq(
+        RandomUtil.randomString(9),
+        RandomUtil.randomString(9),
         RandomUtil.randomString(String.valueOf(CharacterConstant.getLowercase()), 4)
             + RandomUtil.randomString(String.valueOf(CharacterConstant.getUppercase()), 4)
             + RandomUtil.randomString(String.valueOf(CharacterConstant.getDigit()), 4)
@@ -78,10 +75,9 @@ class UserHttpTest {
 
   @Test
   void addUser_repeat() {
-    RegisterUserReq req = new RegisterUserReq();
-    req.setUsername(user.getUsername());
-    req.setNickname(RandomUtil.randomString(8));
-    req.setPassword(
+    RegisterUserReq req = new RegisterUserReq(
+        user.getUsername(),
+        RandomUtil.randomString(8),
         RandomUtil.randomString(String.valueOf(CharacterConstant.getLowercase()), 4)
             + RandomUtil.randomString(String.valueOf(CharacterConstant.getUppercase()), 4)
             + RandomUtil.randomString(String.valueOf(CharacterConstant.getDigit()), 4)

@@ -37,9 +37,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext
 class DictHttpTest {
@@ -190,13 +188,14 @@ class DictHttpTest {
   void modifyDict() {
     Dict target = dataset.get(0);
 
-    ModifyDictReq req = new ModifyDictReq();
-    req.setId(target.getId());
-    req.setCode(RandomUtil.randomString(8));
-    req.setLabel(RandomUtil.randomString(8));
-    req.setOrdinal(RandomUtil.randomInt());
-    req.setParentId(target.getParentId());
-    req.setEnabled(RandomUtil.randomBoolean());
+    ModifyDictReq req = new ModifyDictReq(
+        target.getId(),
+        RandomUtil.randomString(8),
+        RandomUtil.randomString(8),
+        RandomUtil.randomInt(),
+        target.getParentId(),
+        RandomUtil.randomBoolean()
+    );
     webTestClient.put()
         .uri(MODIFY_DICT_URI)
         .bodyValue(req)
@@ -205,12 +204,12 @@ class DictHttpTest {
         .exchange()
         .expectStatus().isOk();
     Dict dict = repository.findById(target.getId()).orElseThrow();
-    assertEquals(req.getCode(), dict.getCode());
+    assertEquals(req.code(), dict.getCode());
     assertEquals(target.getTag(), dict.getTag());
-    assertEquals(req.getLabel(), dict.getLabel());
-    assertEquals(req.getOrdinal(), dict.getOrdinal());
+    assertEquals(req.label(), dict.getLabel());
+    assertEquals(req.ordinal(), dict.getOrdinal());
     assertEquals(target.getParentId(), dict.getParentId());
-    assertEquals(req.getEnabled(), dict.getEnabled());
+    assertEquals(req.enabled(), dict.getEnabled());
   }
 
   @Test
@@ -222,13 +221,14 @@ class DictHttpTest {
       target = target.getChildren().get(0);
     }
 
-    ModifyDictReq req = new ModifyDictReq();
-    req.setId(target.getId());
-    req.setCode(repeated.getCode());
-    req.setLabel(RandomUtil.randomString(8));
-    req.setOrdinal(RandomUtil.randomInt());
-    req.setParentId(target.getParentId());
-    req.setEnabled(RandomUtil.randomBoolean());
+    ModifyDictReq req = new ModifyDictReq(
+        target.getId(),
+        repeated.getCode(),
+        RandomUtil.randomString(8),
+        RandomUtil.randomInt(),
+        target.getParentId(),
+        RandomUtil.randomBoolean()
+    );
     webTestClient.put()
         .uri(MODIFY_DICT_URI)
         .bodyValue(req)

@@ -11,11 +11,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * 国际化内容
- *
- * @author xezzon
- */
+/// 国际化内容
+///
+/// @author xezzon
 @Getter
 @Setter
 @ToString
@@ -27,14 +25,10 @@ public class I18nMessage implements IEntity<String>, II18nMessage {
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   @IdGenerator
   private String id;
-  /**
-   * 命名空间
-   */
+  /// 命名空间
   @Column(name = "namespace", nullable = false)
   private String namespace;
-  /**
-   * 国际化内容
-   */
+  /// 国际化内容
   @Column(name = "message_key", nullable = false)
   private String messageKey;
 }

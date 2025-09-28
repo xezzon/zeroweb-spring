@@ -15,9 +15,6 @@
   <description>开放平台服务</description>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <app.port>9011</app.port>
     <grpc.port>9012</grpc.port>
   </properties>
@@ -27,6 +24,11 @@
       <artifactId>zeroweb-open-sdk</artifactId>
       <groupId>io.github.xezzon</groupId>
       <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.auth0</groupId>
+      <artifactId>java-jwt</artifactId>
+      <version>4.5.0</version>
     </dependency>
   </dependencies>
 </project>

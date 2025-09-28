@@ -3,8 +3,8 @@ package io.github.xezzon.zeroweb.openapi.internal;
 import io.github.xezzon.zeroweb.common.jpa.BaseDAO;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.openapi.Openapi;
-import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.Openapi_;
+import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -14,9 +14,7 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Repository
 public class OpenapiDAO extends BaseDAO<Openapi, String, OpenapiRepository> {
 
@@ -36,7 +34,7 @@ public class OpenapiDAO extends BaseDAO<Openapi, String, OpenapiRepository> {
   }
 
   public Page<Openapi> listPublishedOpenapi(ODataQueryOption odata) {
-    Specification<Openapi> spec = (root, query, cb) ->
+    Specification<Openapi> spec = (root, _, cb) ->
         cb.equal(root.get(Openapi_.status), OpenapiStatus.PUBLISHED);
     Sort sort = Sort.by(Order.asc(Openapi_.CODE));
     return super.findAll(odata, spec, sort);

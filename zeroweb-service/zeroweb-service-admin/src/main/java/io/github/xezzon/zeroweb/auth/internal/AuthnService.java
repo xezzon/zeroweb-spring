@@ -3,7 +3,6 @@ package io.github.xezzon.zeroweb.auth.internal;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
-import io.github.xezzon.zeroweb.auth.JwtClaimWrapper;
 import io.github.xezzon.zeroweb.auth.event.UserLoginEvent;
 import io.github.xezzon.zeroweb.auth.exception.InvalidPasswordException;
 import io.github.xezzon.zeroweb.auth.util.SessionUtil;
@@ -17,10 +16,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-/**
- * 认证服务
- * @author xezzon
- */
+/// 认证服务
+///
+/// @author xezzon
 @Service
 public class AuthnService {
 
@@ -37,14 +35,14 @@ public class AuthnService {
     this.jwtCryptoService = jwtCryptoService;
   }
 
-  /**
-   * 校验用户名、口令
-   * 校验通过后将用户信息写入 Session
-   * @param username 用户名
-   * @param password 口令
-   * @throws InvalidPasswordException 用户不存在时抛出异常
-   * @throws InvalidPasswordException 用户名、密码不匹配时抛出异常
-   */
+  /// 校验用户名、口令
+  ///
+  /// 校验通过后将用户信息写入 Session
+  ///
+  /// @param username 用户名
+  /// @param password 口令
+  /// @throws InvalidPasswordException 用户不存在时抛出异常
+  /// @throws InvalidPasswordException 用户名、密码不匹配时抛出异常
   protected void basicLogin(String username, String password) {
     final User user = userService.getUserByUsername(username);
     /* 校验用户名、口令 */
@@ -72,10 +70,9 @@ public class AuthnService {
     );
   }
 
-  /**
-   * 获取当前用户的认证信息
-   * @return 认证信息
-   */
+  /// 获取当前用户的认证信息
+  ///
+  /// @return 认证信息
   protected JwtClaim getCustomClaim() {
     final User user = SessionUtil.loadUser();
     final Set<String> roles = SessionUtil.loadRoles();
@@ -89,20 +86,19 @@ public class AuthnService {
         .build();
   }
 
-  /**
-   * 生成并返回JWT（JSON Web Token）签名。 JWT中包含认证信息
-   * @return 返回生成的JWT签名字符串
-   */
+  /// 生成并返回JWT（JSON Web Token）签名。
+  ///
+  /// JWT中包含认证信息
+  ///
+  /// @return 返回生成的JWT签名字符串
   protected String signJwt() {
     final JwtClaim claim = this.getCustomClaim();
-    final JwtClaimWrapper jwtBuilder = new JwtClaimWrapper(claim);
-    return jwtCryptoService.signJwt(jwtBuilder);
+    return jwtCryptoService.signJwt(claim);
   }
 
-  /**
-   * 用户登录后，将用户信息加载到会话中
-   * @param event 用户登录事件
-   */
+  /// 用户登录后，将用户信息加载到会话中
+  ///
+  /// @param event 用户登录事件
   @EventListener
   protected void listen(final UserLoginEvent event) {
     SessionUtil.saveUser(event.getUser());

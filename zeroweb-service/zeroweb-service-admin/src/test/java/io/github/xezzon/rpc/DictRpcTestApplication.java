@@ -8,9 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootApplication(scanBasePackages = "io.github.xezzon.zeroweb")
 @Import(ExcludeDbTrait.class)
 @EnableDictScan

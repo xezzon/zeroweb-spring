@@ -2,19 +2,19 @@ package io.github.xezzon.zeroweb.dict.internal;
 
 import io.github.xezzon.zeroweb.common.marker.DbTrait;
 import io.github.xezzon.zeroweb.common.marker.RpcTrait;
+import io.github.xezzon.zeroweb.dict.Dict;
 import io.github.xezzon.zeroweb.dict.DictImportReqList;
 import io.github.xezzon.zeroweb.dict.DictImporter;
 import io.github.xezzon.zeroweb.dict.DictRpcHandler;
 import io.github.xezzon.zeroweb.dict.converter.DictImportReqConverter;
-import io.github.xezzon.zeroweb.dict.Dict;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/**
- * 字典管理在本服务实现，所以不需要以 RPC 调用的方式导入字典。
- * 实现比 {@link  RpcTrait} 优先级更高的 {@link DbTrait} 接口，以覆盖 {@link DictRpcHandler}。
- * @author xezzon
- */
+/// 字典管理在本服务实现，所以不需要以 RPC 调用的方式导入字典。
+///
+/// 实现比 [RpcTrait] 优先级更高的 [DbTrait] 接口，以覆盖 [DictRpcHandler]。
+///
+/// @author xezzon
 @Service
 public class DictDbHandler implements DictImporter, DbTrait {
 
