@@ -1,8 +1,8 @@
 package io.github.xezzon.zeroweb.common.jpa;
 
+import com.fasterxml.uuid.Generators;
 import io.github.xezzon.tao.data.IdGenerator;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
-import java.util.UUID;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +21,6 @@ public class UuidIdGenerator implements IdGenerator {
 
   @Override
   public String nextId() {
-    return UUID.randomUUID().toString();
+    return Generators.timeBasedEpochRandomGenerator().generate().toString();
   }
 }
