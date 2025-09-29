@@ -41,6 +41,7 @@ class AttachmentHttpTest {
 
   private static final String ADD_ATTACHMENT = "/attachment";
   private static final String GET_UPLOAD_ADDRESS = "/attachment/{id}/endpoint/upload";
+  private static final String FINISH_UPLOAD = "/attachment/{id}/status/done";
   private static final String FILE_NAME = "test.txt";
 
   private final Path resource = ResourceUtil.getResourceFromClasspath(FILE_NAME);
@@ -156,5 +157,19 @@ class AttachmentHttpTest {
     Assertions.assertArrayEquals(Files.readAllBytes(resource), Files.readAllBytes(path));
 
     Files.delete(path);
+  }
+
+  @Test
+  void finishUpload() {
+    Attachment before = repository.findById(attachment.getId()).orElseThrow();
+    Assertions.assertEquals(AttachmentStatusEnum.UPLOADING, before.getStatus());
+
+    webTestClient.put()
+        .uri(FINISH_UPLOAD, attachment.getId())
+        .exchange()
+        .expectStatus().isOk();
+
+    Attachment after = repository.findById(attachment.getId()).orElseThrow();
+    Assertions.assertEquals(AttachmentStatusEnum.DONE, after.getStatus());
   }
 }

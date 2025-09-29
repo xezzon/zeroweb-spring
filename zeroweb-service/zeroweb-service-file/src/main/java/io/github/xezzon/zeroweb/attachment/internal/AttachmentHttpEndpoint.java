@@ -7,6 +7,7 @@ import io.github.xezzon.zeroweb.attachment.entity.UploadAddress;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,5 +40,12 @@ public class AttachmentHttpEndpoint {
   @GetMapping("/{id}/endpoint/upload")
   public UploadAddress getUploadAddress(@PathVariable String id) {
     return attachmentService.getUploadAddress(id);
+  }
+
+  /// 文件上传完成后，将其状态变更为已完成
+  /// @param id 附件ID
+  @PutMapping("/{id}/status/done")
+  public void finishUpload(@PathVariable String id) {
+    attachmentService.updateStatus(id);
   }
 }

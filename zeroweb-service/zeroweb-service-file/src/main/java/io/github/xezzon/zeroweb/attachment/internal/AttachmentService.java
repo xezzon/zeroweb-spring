@@ -4,6 +4,7 @@ import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.IAttachmentService;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentResp;
 import io.github.xezzon.zeroweb.attachment.entity.UploadAddress;
+import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
@@ -48,5 +49,13 @@ public class AttachmentService implements IAttachmentService {
     Attachment attachment = attachmentRepository.findById(id).orElseThrow();
     IStorageService storageService = storageServiceFactory.get(attachment.getProvider());
     return storageService.getUploadAddress(attachment);
+  }
+
+  void updateStatus(String id) {
+    attachmentRepository.findById(id)
+        .ifPresent(attachment -> {
+          attachment.setStatus(AttachmentStatusEnum.DONE);
+          attachmentRepository.save(attachment);
+        });
   }
 }
