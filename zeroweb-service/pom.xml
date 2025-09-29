@@ -22,11 +22,13 @@
 
   <properties>
     <maven.compiler.release>25</maven.compiler.release>
+    <mainClass/>
     <!-- 应用端口号 -->
     <app.port>8080</app.port>
     <grpc.port>9090</grpc.port>
     <!-- Testcontainers -->
-    <testcontainers.postgresql.url>jdbc:tc:postgresql:17-alpine:///postgres
+    <testcontainers.postgresql.url>
+      jdbc:tc:postgresql:17-alpine:///postgres
     </testcontainers.postgresql.url>
   </properties>
 
@@ -206,6 +208,7 @@
             </executions>
             <configuration>
               <from>
+                <image>eclipse-temurin:${maven.compiler.release}-jre</image>
                 <platforms>
                   <platform>
                     <architecture>amd64</architecture>
@@ -251,6 +254,7 @@
                 <appRoot>${workdir}</appRoot>
                 <workingDirectory>${workdir}</workingDirectory>
                 <format>Docker</format>
+                <mainClass>${mainClass}</mainClass>
               </container>
               <extraDirectories>
                 <paths>

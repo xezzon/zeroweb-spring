@@ -16,5 +16,6 @@
 
   <properties>
     <app.port>9991</app.port>
+    <mainClass>io.github.xezzon.zeroweb.ZerowebDeveloperApplication</mainClass>
   </properties>
 </project>
