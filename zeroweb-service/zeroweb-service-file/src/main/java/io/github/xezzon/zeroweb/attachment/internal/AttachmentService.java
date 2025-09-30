@@ -10,6 +10,7 @@ import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.storage.IStorageService;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /// @author xezzon
@@ -57,5 +58,9 @@ public class AttachmentService implements IAttachmentService {
           attachment.setStatus(AttachmentStatusEnum.DONE);
           attachmentRepository.save(attachment);
         });
+  }
+
+  List<Attachment> queryByBiz(String bizType, String bizId) {
+    return attachmentRepository.findByBizTypeAndBizId(bizType, bizId);
   }
 }

@@ -4,12 +4,14 @@ import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentReq;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentResp;
 import io.github.xezzon.zeroweb.attachment.entity.UploadAddress;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /// @author xezzon
@@ -47,5 +49,17 @@ public class AttachmentHttpEndpoint {
   @PutMapping("/{id}/status/done")
   public void finishUpload(@PathVariable String id) {
     attachmentService.updateStatus(id);
+  }
+
+  /// 查询表单关联的附件
+  /// @param bizType 业务类型
+  /// @param bizId 业务ID
+  /// @return 附件信息集合（不包含下载地址）
+  @GetMapping("/list")
+  public List<Attachment> queryByBiz(
+      @RequestParam String bizType,
+      @RequestParam String bizId
+  ) {
+    return attachmentService.queryByBiz(bizType, bizId);
   }
 }

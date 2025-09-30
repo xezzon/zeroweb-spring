@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +43,7 @@ class AttachmentHttpTest {
   private static final String ADD_ATTACHMENT = "/attachment";
   private static final String GET_UPLOAD_ADDRESS = "/attachment/{id}/endpoint/upload";
   private static final String FINISH_UPLOAD = "/attachment/{id}/status/done";
+  private static final String QUERY_BY_BIZ = "/attachment/list";
   private static final String FILE_NAME = "test.txt";
 
   private final Path resource = ResourceUtil.getResourceFromClasspath(FILE_NAME);
@@ -171,5 +173,52 @@ class AttachmentHttpTest {
 
     Attachment after = repository.findById(attachment.getId()).orElseThrow();
     Assertions.assertEquals(AttachmentStatusEnum.DONE, after.getStatus());
+  }
+
+  @Test
+  void queryByBiz() {
+    List<Attachment> responseBody = webTestClient.get()
+        .uri(uri -> uri.path(QUERY_BY_BIZ)
+            .queryParam("bizType", attachment.getBizType())
+            .queryParam("bizId", attachment.getBizId())
+            .build()
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBodyList(Attachment.class)
+        .returnResult().getResponseBody();
+    Assertions.assertNotNull(responseBody);
+
+    Assertions.assertEquals(1, responseBody.size());
+    Assertions.assertEquals(attachment.getId(), responseBody.getFirst().getId());
+  }
+
+  @Test
+  void queryByBiz_empty() {
+    List<Attachment> responseBody = webTestClient.get()
+        .uri(uri -> uri.path(QUERY_BY_BIZ)
+            .queryParam("bizType", RandomUtil.randomString(6))
+            .queryParam("bizId", attachment.getBizId())
+            .build()
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBodyList(Attachment.class)
+        .returnResult().getResponseBody();
+    Assertions.assertNotNull(responseBody);
+    Assertions.assertTrue(responseBody.isEmpty());
+
+    List<Attachment> responseBody2 = webTestClient.get()
+        .uri(uri -> uri.path(QUERY_BY_BIZ)
+            .queryParam("bizType", attachment.getBizType())
+            .queryParam("bizId", UUID.randomUUID().toString())
+            .build()
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBodyList(Attachment.class)
+        .returnResult().getResponseBody();
+    Assertions.assertNotNull(responseBody2);
+    Assertions.assertTrue(responseBody2.isEmpty());
   }
 }
