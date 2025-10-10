@@ -4,6 +4,7 @@ import static cn.dev33.satoken.exception.NotLoginException.DEFAULT_MESSAGE;
 import static cn.dev33.satoken.exception.NotLoginException.NOT_TOKEN;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import io.grpc.Context;
 import java.util.Optional;
 
 /**
@@ -12,17 +13,10 @@ import java.util.Optional;
  */
 public class JwtAuth {
 
-  private static final ThreadLocal<JwtClaim> CLAIM = new InheritableThreadLocal<>();
+  public static final ScopedValue<JwtClaim> CLAIM = ScopedValue.newInstance();
+  public static final Context.Key<JwtClaim> CONTEXT = Context.key("JwtClaim");
 
   private JwtAuth() {
-  }
-
-  /**
-   * 保存 Authorization 请求头中携带的 JWT
-   * @param claim JWT对象
-   */
-  public static void save(final JwtClaim claim) {
-    CLAIM.set(claim);
   }
 
   /**
@@ -31,6 +25,13 @@ public class JwtAuth {
    * @return 当前认证信息
    */
   public static Optional<JwtClaim> get() {
+    JwtClaim grpcContext = CONTEXT.get();
+    if (grpcContext != null) {
+      return Optional.of(grpcContext);
+    }
+    if (!CLAIM.isBound()) {
+      return Optional.empty();
+    }
     return Optional.ofNullable(CLAIM.get());
   }
 
@@ -44,12 +45,5 @@ public class JwtAuth {
         .orElseThrow(() ->
             new NotLoginException(DEFAULT_MESSAGE, null, NOT_TOKEN)
         );
-  }
-
-  /**
-   * 清楚 ThreadLocal 防止内存泄漏
-   */
-  public static void clear() {
-    CLAIM.remove();
   }
 }

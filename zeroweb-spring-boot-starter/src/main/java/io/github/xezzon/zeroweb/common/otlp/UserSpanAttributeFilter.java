@@ -43,7 +43,7 @@ public class UserSpanAttributeFilter implements Filter {
           span.setAttribute(USER_FULL_NAME, claimWrapper.getNickname());
         });
       }
-    } catch (RuntimeException ignored) {
+    } catch (RuntimeException _) {
       // ignored
     }
     chain.doFilter(request, response);

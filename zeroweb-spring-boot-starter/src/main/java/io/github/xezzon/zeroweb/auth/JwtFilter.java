@@ -40,37 +40,32 @@ public class JwtFilter implements Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws ServletException, IOException {
+    JwtClaim claim = null;
     try {
       if (request instanceof HttpServletRequest httpRequest) {
-        String authorization = httpRequest.getHeader(AUTHORIZATION);
-        if (authorization == null || !authorization.startsWith(BEARER)) {
-          throw new BreakException();
-        }
-        String token = authorization.substring(BEARER.length()).trim();
-        String publicKeyASN1 = httpRequest.getHeader(PUBLIC_KEY_HEADER);
-        String accessKey = httpRequest.getHeader(ACCESS_KEY_HEADER);
-        final JwtClaim claimWrapper;
-        if (publicKeyASN1 != null && !publicKeyASN1.isEmpty()) {
-          // 前端调用经过网关验证，使用公钥验证
-          claimWrapper = validateWithPublicKey(token, publicKeyASN1);
-        } else if (accessKey != null && !accessKey.isEmpty()) {
-          // 第三方系统调用经过网关验证，使用AccessKey验证
-          claimWrapper = validateWithAccessKey(token, accessKey);
-        } else {
-          throw new BreakException();
-        }
-        final long timeout = claimWrapper.getExi();
-        StpUtil.login(claimWrapper.getSub(), timeout);
-        JwtAuth.save(claimWrapper);
+        claim = this.getJwtClaim(httpRequest);
+        final long timeout = claim.getExi();
+        StpUtil.login(claim.getSub(), timeout);
       }
-    } catch (BreakException | ZerowebRuntimeException ignored) {
+    } catch (BreakException | ZerowebRuntimeException _) {
       // 流程控制中断，无需任何处理
     } catch (Exception e) {
       // 解析JWT失败，视为没有携带Token，不影响正常的流程执行
       log.error("Failed to parse the JWT", e);
     }
-    chain.doFilter(request, response);
-    JwtAuth.clear();
+    try {
+      ScopedValue.where(JwtAuth.CLAIM, claim)
+          .call(() -> {
+            chain.doFilter(request, response);
+            return null;
+          });
+    } catch (Exception e) {
+      throw switch (e) {
+        case ServletException se -> throw se;
+        case IOException ie -> throw ie;
+        default -> new ZerowebRuntimeException(e);
+      };
+    }
   }
 
   public JwtClaim validateWithPublicKey(final String token, final String publicKeyASN1) {
@@ -87,5 +82,24 @@ public class JwtFilter implements Filter {
   public JwtClaim validateWithAccessKey(final String token, final String accessKey) {
     return JsonWebToken.decoder(Base64.getDecoder().decode(accessKey))
         .decode(token);
+  }
+
+  private JwtClaim getJwtClaim(HttpServletRequest request) throws BreakException {
+    String authorization = request.getHeader(AUTHORIZATION);
+    if (authorization == null || !authorization.startsWith(BEARER)) {
+      throw new BreakException();
+    }
+    String token = authorization.substring(BEARER.length()).trim();
+    String publicKeyASN1 = request.getHeader(PUBLIC_KEY_HEADER);
+    String accessKey = request.getHeader(ACCESS_KEY_HEADER);
+    if (publicKeyASN1 != null && !publicKeyASN1.isEmpty()) {
+      // 前端调用经过网关验证，使用公钥验证
+      return validateWithPublicKey(token, publicKeyASN1);
+    } else if (accessKey != null && !accessKey.isEmpty()) {
+      // 第三方系统调用经过网关验证，使用AccessKey验证
+      return validateWithAccessKey(token, accessKey);
+    } else {
+      throw new BreakException();
+    }
   }
 }
