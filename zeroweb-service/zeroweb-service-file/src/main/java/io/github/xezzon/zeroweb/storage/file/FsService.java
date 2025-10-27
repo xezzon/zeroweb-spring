@@ -55,6 +55,11 @@ public class FsService implements IStorageService {
     );
   }
 
+  @Override
+  public UploadAddress getUploadAddress(Attachment attachment, int partNumber) {
+    throw new UnsupportedOperationException();
+  }
+
   void upload(String id, byte[] fileContent) {
     Attachment attachment = attachmentService.queryById(id);
     Path path = zerowebFsConfig.getBasePath()

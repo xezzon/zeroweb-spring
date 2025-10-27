@@ -13,7 +13,7 @@ spring:
     tag: @project.version@
   servlet:
     multipart:
-      max-file-size: ${zeroweb.file.max-size:1}MB
+      max-file-size: ${zeroweb.file.max-part-size:1}MB
 
 server:
   port: @app.port@
@@ -21,7 +21,7 @@ server:
 zeroweb:
   file:
     provider: ${ZEROWEB_FILE_PROVIDER:FS}
-    max-part-size: ${ZEROWEB_FILE_MAX_PART_SIZE:1}
+    max-part-size: ${ZEROWEB_FILE_MAX_PART_SIZE:5}
     fs:
       base-path: ${ZEROWEB_FS_BASEPATH}
     s3:

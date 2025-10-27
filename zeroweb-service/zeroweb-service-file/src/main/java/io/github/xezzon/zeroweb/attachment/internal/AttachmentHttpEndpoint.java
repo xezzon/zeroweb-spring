@@ -44,6 +44,15 @@ public class AttachmentHttpEndpoint {
     return attachmentService.getUploadAddress(id);
   }
 
+  /// 获取附件分片上传地址
+  /// @param id 附件ID
+  /// @param partNumber 分片序号
+  /// @return 上传地址
+  @GetMapping("/{id}/endpoint/upload/{partNumber}")
+  public UploadAddress getUploadAddress(@PathVariable String id, @PathVariable int partNumber) {
+    return attachmentService.getUploadAddress(id, partNumber);
+  }
+
   /// 文件上传完成后，将其状态变更为已完成
   /// @param id 附件ID
   @PutMapping("/{id}/status/done")

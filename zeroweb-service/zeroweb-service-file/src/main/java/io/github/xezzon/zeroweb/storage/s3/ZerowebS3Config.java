@@ -16,6 +16,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
@@ -43,6 +44,19 @@ public class ZerowebS3Config {
   @Bean
   S3Presigner s3Presigner(AwsCredentialsProvider credentialsProvider) {
     return S3Presigner.builder()
+        .endpointOverride(URI.create(endpoint))
+        .credentialsProvider(credentialsProvider)
+        .region(Region.of(region))
+        .serviceConfiguration(S3Configuration.builder()
+            .pathStyleAccessEnabled(true)
+            .build()
+        )
+        .build();
+  }
+
+  @Bean
+  S3Client s3Client(AwsCredentialsProvider credentialsProvider) {
+    return S3Client.builder()
         .endpointOverride(URI.create(endpoint))
         .credentialsProvider(credentialsProvider)
         .region(Region.of(region))
