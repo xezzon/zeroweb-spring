@@ -17,15 +17,14 @@ import org.springframework.stereotype.Component;
 @Fallback
 public class StripedLock implements LockProvider {
 
-  private final Striped<@NotNull Lock> stripedLocks = Striped.lazyWeakLock(10);
-
   @Override
   public LockAdaptor of(String name, int timeout) {
     return new InnerLock(timeout);
   }
 
-  public class InnerLock implements LockAdaptor {
+  public static class InnerLock implements LockAdaptor {
 
+    private final Striped<@NotNull Lock> stripedLocks = Striped.lazyWeakLock(100);
     private final int timeout;
 
     public InnerLock(int timeout) {

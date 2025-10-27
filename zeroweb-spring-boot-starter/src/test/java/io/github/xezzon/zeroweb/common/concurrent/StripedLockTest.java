@@ -20,10 +20,12 @@ import org.springframework.test.annotation.DirtiesContext;
 @DirtiesContext
 class StripedLockTest {
 
+  private final LockProvider lockProvider;
   private final LockAdaptor lockAdaptor;
 
   @Autowired
   StripedLockTest(LockProvider lockProvider) {
+    this.lockProvider = lockProvider;
     this.lockAdaptor = lockProvider.of("test", 1);
   }
 
@@ -40,7 +42,10 @@ class StripedLockTest {
           try {
             lockAdaptor.tryLock("resourceId", () -> {
               // 验证互斥性：在进入临界区前，isLocked 必须为 false
-              Assertions.assertFalse(isLocked.getAndSet(true), "Lock should be held by only one thread at a time");
+              Assertions.assertFalse(
+                  isLocked.getAndSet(true),
+                  "Lock should be held by only one thread at a time"
+              );
               counter.incrementAndGet();
               try {
                 Thread.sleep(50); // 模拟临界区内的操作延迟
@@ -94,6 +99,93 @@ class StripedLockTest {
 
       lockReleasedLatch.await(3, TimeUnit.SECONDS); // 等待第一个线程释放锁
       longHoldingExecutor.shutdownNow(); // 关闭线程池
+    }
+  }
+
+  @Test
+  void testTryLock_differentResourceTypesAreIndependent() throws InterruptedException {
+    LockAdaptor lockAdaptor1 = lockProvider.of("resourceType1", 1);
+    LockAdaptor lockAdaptor2 = lockProvider.of("resourceType2", 1);
+
+    AtomicBoolean lock1Acquired = new AtomicBoolean(false);
+    AtomicBoolean lock2Acquired = new AtomicBoolean(false);
+    CountDownLatch latch = new CountDownLatch(2);
+
+    try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+      // 锁超时时间为1s，任务执行时间100ms。
+      // 获取到锁会将AtomicBoolean设为true。两个任务的AtomicBoolean均为true说明不同资源类型之间的锁互不干扰。
+      executorService.submit(() -> {
+        lockAdaptor1.tryLock("resourceId", () -> {
+          lock1Acquired.set(true);
+          try {
+            Thread.sleep(100); // 模拟操作
+          } catch (InterruptedException _) {
+            Thread.currentThread().interrupt();
+          }
+          return null;
+        });
+        latch.countDown();
+      });
+
+      executorService.submit(() -> {
+        lockAdaptor2.tryLock("resourceId", () -> {
+          lock2Acquired.set(true);
+          try {
+            Thread.sleep(100); // 模拟操作
+          } catch (InterruptedException _) {
+            Thread.currentThread().interrupt();
+          }
+          return null;
+        });
+        latch.countDown();
+      });
+
+      latch.await(5, TimeUnit.SECONDS);
+
+      Assertions.assertTrue(lock1Acquired.get(), "Lock for resourceType1 should be acquired");
+      Assertions.assertTrue(lock2Acquired.get(), "Lock for resourceType2 should be acquired");
+    }
+  }
+
+  @Test
+  void testTryLock_differentResourceIdsAreIndependent() throws InterruptedException {
+    AtomicBoolean lock1Acquired = new AtomicBoolean(false);
+    AtomicBoolean lock2Acquired = new AtomicBoolean(false);
+    CountDownLatch latch = new CountDownLatch(2);
+
+    try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+      // 锁超时时间为1s，任务执行时间100ms。
+      // 获取到锁会将AtomicBoolean设为true。两个任务的AtomicBoolean均为true说明不同资源ID之间的锁互不干扰。
+      executorService.submit(() -> {
+        lockAdaptor.tryLock("resourceId1", () -> {
+          lock1Acquired.set(true);
+          try {
+            Thread.sleep(100); // 模拟操作
+          } catch (InterruptedException _) {
+            Thread.currentThread().interrupt();
+          }
+          return null;
+        });
+        latch.countDown();
+      });
+
+      executorService.submit(() -> {
+        lockAdaptor.tryLock("resourceId2", () -> {
+          lock2Acquired.set(true);
+          try {
+            Thread.sleep(100); // 模拟操作
+          } catch (InterruptedException _) {
+            Thread.currentThread().interrupt();
+          }
+          return null;
+        });
+        latch.countDown();
+      });
+
+      latch.await(5, TimeUnit.SECONDS);
+
+      Assertions.assertTrue(lock1Acquired.get(), "Lock for resourceId1 should be acquired");
+      Assertions.assertTrue(lock2Acquired.get(), "Lock for resourceId2 should be acquired");
     }
   }
 }
