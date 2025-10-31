@@ -1,8 +1,9 @@
 package io.github.xezzon.zeroweb.storage;
 
 import io.github.xezzon.zeroweb.attachment.Attachment;
-import io.github.xezzon.zeroweb.attachment.entity.UploadAddress;
+import io.github.xezzon.zeroweb.attachment.entity.UploadInfo.Address;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
+import io.github.xezzon.zeroweb.common.exception.UnsupportedFileProviderException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -19,7 +20,7 @@ public interface IStorageService {
   /// 获取附件的上传地址
   /// @param attachment 附件
   /// @return 上传地址
-  UploadAddress getUploadAddress(Attachment attachment);
+  Address getUploadAddress(Attachment attachment);
 
   /**
    * 获取附件分段上传地址
@@ -27,7 +28,7 @@ public interface IStorageService {
    * @param partNumber 分段序号
    * @return 上传地址
    */
-  UploadAddress getUploadAddress(Attachment attachment, int partNumber);
+  Address getUploadAddress(Attachment attachment, int partNumber);
 
   @Component
   class Factory {
@@ -40,7 +41,11 @@ public interface IStorageService {
     }
 
     public IStorageService get(FileProviderEnum provider) {
-      return serviceMap.get(provider);
+      IStorageService storageService = serviceMap.get(provider);
+      if (storageService == null) {
+        throw new UnsupportedFileProviderException(provider);
+      }
+      return storageService;
     }
   }
 }

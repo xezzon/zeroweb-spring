@@ -2,7 +2,7 @@ package io.github.xezzon.zeroweb.storage.s3;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.attachment.Attachment;
-import io.github.xezzon.zeroweb.attachment.entity.UploadAddress;
+import io.github.xezzon.zeroweb.attachment.entity.UploadInfo.Address;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentCreatedEvent;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
@@ -112,12 +112,12 @@ class S3ServiceTest {
 
   @Test
   void getUploadAddress() throws Exception {
-    UploadAddress uploadAddress = s3Service.getUploadAddress(attachment);
+    Address uploadInfo = s3Service.getUploadAddress(attachment);
 
     try (HttpClient httpClient = HttpClient.newHttpClient()) {
       final HttpResponse<byte[]> response = httpClient.send(
           HttpRequest.newBuilder()
-              .uri(URI.create(uploadAddress.endpoint()))
+              .uri(URI.create(uploadInfo.getEndpoint()))
               .header("Content-Type", Files.probeContentType(resource))
               .header("x-amz-meta-filename", resource.toFile().getName())
               .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.SHA256.toString())
@@ -160,12 +160,12 @@ class S3ServiceTest {
     eventPublisher.publishEvent(new AttachmentCreatedEvent(attachment1));
     Assertions.assertTrue(s3UploadIdRepository.existsById(attachment1.getId()));
 
-    int partSize = zerowebFileConfig.getMaxPartSize() * 1024 * 1024;
+    int partSize = zerowebFileConfig.getMaxPartSize();
     int partCount = Math.toIntExact((file.length() - 1) / partSize) + 1;
     try (HttpClient httpClient = HttpClient.newHttpClient()) {
       int fromIndex = 0;
       for (int partNumber = 1; partNumber <= partCount; partNumber++) {
-        UploadAddress uploadAddress = s3Service.getUploadAddress(attachment1, partNumber);
+        Address uploadInfo = s3Service.getUploadAddress(attachment1, partNumber);
         int toIndex = fromIndex + partSize;
         byte[] partContent = Arrays.copyOfRange(resourceContent, fromIndex, toIndex);
         String partChecksum = Base64.getEncoder().encodeToString(
@@ -177,7 +177,7 @@ class S3ServiceTest {
 
         final HttpResponse<byte[]> response = httpClient.send(
             HttpRequest.newBuilder()
-                .uri(URI.create(uploadAddress.endpoint()))
+                .uri(URI.create(uploadInfo.getEndpoint()))
                 .header("x-amz-checksum-sha256", partChecksum)
                 .PUT(HttpRequest.BodyPublishers.ofByteArray(partContent))
                 .build(),

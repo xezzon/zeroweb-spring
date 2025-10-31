@@ -22,5 +22,9 @@ public class ZerowebFileConfig {
   /// 大于该大小的需要进行分片上传
   ///
   /// 单位 MB
-  private Integer maxPartSize = 1;
+  private Integer maxPartSize = 5;
+
+  public int getMaxPartSize() {
+    return this.maxPartSize * 1024 * 1024;
+  }
 }

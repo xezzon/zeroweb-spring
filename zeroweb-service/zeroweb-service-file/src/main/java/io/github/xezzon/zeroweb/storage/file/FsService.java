@@ -3,7 +3,7 @@ package io.github.xezzon.zeroweb.storage.file;
 import com.google.common.hash.Hashing;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.IAttachmentService;
-import io.github.xezzon.zeroweb.attachment.entity.UploadAddress;
+import io.github.xezzon.zeroweb.attachment.entity.UploadInfo.Address;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.exception.WriteFileException;
@@ -43,20 +43,16 @@ public class FsService implements IStorageService {
   }
 
   @Override
-  public UploadAddress getUploadAddress(Attachment attachment) {
+  public Address getUploadAddress(Attachment attachment) {
     String endpoint = UriComponentsBuilder
         .fromPath(UPLOAD_ENDPOINT)
         .buildAndExpand(attachment.getId())
         .toUriString();
-    return new UploadAddress(
-        attachment.getId(),
-        attachment.getProvider(),
-        endpoint
-    );
+    return new Address(endpoint);
   }
 
   @Override
-  public UploadAddress getUploadAddress(Attachment attachment, int partNumber) {
+  public Address getUploadAddress(Attachment attachment, int partNumber) {
     throw new UnsupportedOperationException();
   }
 

@@ -7,7 +7,7 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentReq;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentResp;
-import io.github.xezzon.zeroweb.attachment.entity.UploadAddress;
+import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
@@ -49,8 +49,8 @@ class AttachmentHttpTest {
   private final Path resource = ResourceUtil.getResourceFromClasspath(FILE_NAME);
   private final Attachment attachment = new Attachment();
 
-  @Value("${spring.servlet.multipart.max-file-size}")
-  private String maxFileSize;
+  @Value("${zeroweb.file.max-part-size}")
+  private int maxFileSize;
   @Resource
   private WebTestClient webTestClient;
   @Resource
@@ -85,22 +85,26 @@ class AttachmentHttpTest {
     AddAttachmentReq req = new AddAttachmentReq(
         RandomUtil.randomString(8),
         RandomUtil.randomString(44),
-        RandomUtil.randomLong(),
+        RandomUtil.randomLong(5) * 1024 * 1024,
         RandomUtil.randomString(8),
         RandomUtil.randomString(8),
         UUID.randomUUID().toString()
     );
-    AddAttachmentResp responseBody = webTestClient.post()
+    UploadInfo responseBody = webTestClient.post()
         .uri(ADD_ATTACHMENT)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(userId).bearer())
         .bodyValue(req)
         .exchange()
         .expectStatus().isOk()
-        .expectBody(AddAttachmentResp.class)
+        .expectBody(UploadInfo.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
-    Assertions.assertEquals(maxFileSize, responseBody.maxPartSize() + "MB");
+    Assertions.assertEquals(
+        (req.size() - 1) / (maxFileSize * 1024L * 1024) + 1,
+        responseBody.partCount()
+    );
+    Assertions.assertEquals(responseBody.partCount(), responseBody.addresses().size());
     Attachment actual = repository.findById(responseBody.id()).orElseThrow();
     Assertions.assertEquals(zerowebFileConfig.getProvider(), actual.getProvider());
     Assertions.assertEquals(AttachmentStatusEnum.UPLOADING, actual.getStatus());
@@ -114,7 +118,7 @@ class AttachmentHttpTest {
     AddAttachmentReq req = new AddAttachmentReq(
         RandomUtil.randomString(8),
         RandomUtil.randomString(44),
-        RandomUtil.randomLong(),
+        RandomUtil.randomLong(5) * 1024 * 1024,
         RandomUtil.randomString(8),
         RandomUtil.randomString(8),
         UUID.randomUUID().toString()
@@ -134,22 +138,22 @@ class AttachmentHttpTest {
 
   @Test
   void upload() throws IOException {
-    UploadAddress responseBody = webTestClient.get()
+    UploadInfo responseBody = webTestClient.get()
         .uri(GET_UPLOAD_ADDRESS, attachment.getId())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(UploadAddress.class)
+        .expectBody(UploadInfo.class)
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
 
     webTestClient.put()
-        .uri(responseBody.endpoint())
+        .uri(responseBody.addresses().getFirst().getEndpoint())
         .bodyValue(Files.readAllBytes(resource))
         .exchange()
         .expectStatus().isOk();
     // 重复上传，测试幂等性
     webTestClient.put()
-        .uri(responseBody.endpoint())
+        .uri(responseBody.addresses().getFirst().getEndpoint())
         .bodyValue(Files.readAllBytes(resource))
         .exchange()
         .expectStatus().isOk();

@@ -2,8 +2,7 @@ package io.github.xezzon.zeroweb.attachment.internal;
 
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentReq;
-import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentResp;
-import io.github.xezzon.zeroweb.attachment.entity.UploadAddress;
+import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +30,7 @@ public class AttachmentHttpEndpoint {
   /// @param req 文件信息
   /// @return 文件上传元数据
   @PostMapping()
-  public AddAttachmentResp addAttachment(@RequestBody AddAttachmentReq req) {
+  public UploadInfo addAttachment(@RequestBody AddAttachmentReq req) {
     Attachment attachment = req.into();
     return attachmentService.addAttachment(attachment);
   }
@@ -40,17 +39,12 @@ public class AttachmentHttpEndpoint {
   /// @param id 附件ID
   /// @return 上传地址
   @GetMapping("/{id}/endpoint/upload")
-  public UploadAddress getUploadAddress(@PathVariable String id) {
-    return attachmentService.getUploadAddress(id);
-  }
-
-  /// 获取附件分片上传地址
-  /// @param id 附件ID
-  /// @param partNumber 分片序号
-  /// @return 上传地址
-  @GetMapping("/{id}/endpoint/upload/{partNumber}")
-  public UploadAddress getUploadAddress(@PathVariable String id, @PathVariable int partNumber) {
-    return attachmentService.getUploadAddress(id, partNumber);
+  public UploadInfo getUploadAddress(
+      @PathVariable final String id,
+      @RequestParam final String checksum,
+      @RequestParam final int fileSize
+  ) {
+    return attachmentService.getUploadAddress(id, checksum, fileSize);
   }
 
   /// 文件上传完成后，将其状态变更为已完成
