@@ -45,6 +45,11 @@ public record UploadInfo(
       this.endpoint = endpoint;
     }
 
+    public Address(int partNumber, String endpoint) {
+      this.partNumber = partNumber;
+      this.endpoint = endpoint;
+    }
+
     public Address(int partNumber, String endpoint, String callback) {
       this.partNumber = partNumber;
       this.endpoint = endpoint;
