@@ -135,6 +135,10 @@
               <artifactId>hibernate-jpamodelgen</artifactId>
             </path>
             <path>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-configuration-processor</artifactId>
+            </path>
+            <path>
               <groupId>com.github.therapi</groupId>
               <artifactId>therapi-runtime-javadoc-scribe</artifactId>
             </path>
