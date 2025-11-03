@@ -87,13 +87,13 @@ public class FsService implements IStorageService {
     try {
       // 校验哈希、大小
       if (!Objects.equals(fileContent.length, attachment.getSize().intValue())) {
-        throw new UploadFileException("Invalid size.");
+        throw new IncorrectFileException("Invalid size.");
       }
       if (!Objects.equals(
           Base64.getEncoder().encodeToString(Hashing.sha256().hashBytes(fileContent).asBytes()),
           attachment.getChecksum()
       )) {
-        throw new UploadFileException("Invalid checksum.");
+        throw new IncorrectFileException("Invalid checksum.");
       }
       // 递归创建其父目录
       Files.createDirectories(path.getParent());
@@ -167,14 +167,14 @@ public class FsService implements IStorageService {
       // 校验哈希、大小
       byte[] mergedFileContent = mergedFileStream.toByteArray();
       if (!Objects.equals(mergedFileContent.length, attachment.getSize().intValue())) {
-        throw new UploadFileException("Invalid size.");
+        throw new IncorrectFileException("Invalid size.");
       }
       if (!Objects.equals(
           Base64.getEncoder()
               .encodeToString(Hashing.sha256().hashBytes(mergedFileContent).asBytes()),
           attachment.getChecksum()
       )) {
-        throw new UploadFileException("Invalid checksum.");
+        throw new IncorrectFileException("Invalid checksum.");
       }
 
       // 递归创建其父目录

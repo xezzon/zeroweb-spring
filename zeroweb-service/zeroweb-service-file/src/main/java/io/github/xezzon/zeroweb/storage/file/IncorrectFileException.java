@@ -1,0 +1,19 @@
+package io.github.xezzon.zeroweb.storage.file;
+
+import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
+
+/// 上传文件的内容与创建的附件不一致
+/// @author xezzon
+public class IncorrectFileException extends ZerowebBusinessException {
+
+  public static final String ERROR_CODE = "SFC02";
+
+  public IncorrectFileException(String message) {
+    super(message);
+  }
+
+  @Override
+  public String getCode() {
+    return ERROR_CODE;
+  }
+}

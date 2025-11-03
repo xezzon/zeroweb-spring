@@ -12,7 +12,7 @@ import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.storage.IStorageService;
-import io.github.xezzon.zeroweb.storage.file.UploadFileException;
+import io.github.xezzon.zeroweb.storage.file.IncorrectFileException;
 import jakarta.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
@@ -65,10 +65,10 @@ public class AttachmentService implements IAttachmentService {
     Attachment attachment = attachmentRepository.findById(id).orElseThrow();
     // 断点续传的内容要与之前的内容一致
     if (!Objects.equals(attachment.getChecksum(), checksum)) {
-      throw new UploadFileException("Invalid checksum.");
+      throw new IncorrectFileException("Invalid checksum.");
     }
     if (!Objects.equals(attachment.getSize(), fileSize)) {
-      throw new UploadFileException("Invalid size.");
+      throw new IncorrectFileException("Invalid size.");
     }
     IStorageService storageService = storageServiceFactory.get(attachment.getProvider());
     int partCount = Math.toIntExact(

@@ -1,3 +1,2 @@
 SPRING_ENVIRONMENT: test
 JDBC_TYPE: @db.type@
-ZEROWEB_FS_BASEPATH: /srv/zeroweb/Uploads/test

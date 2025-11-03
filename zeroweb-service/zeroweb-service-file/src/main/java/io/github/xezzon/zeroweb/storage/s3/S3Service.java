@@ -125,7 +125,7 @@ public class S3Service implements IStorageService {
         );
   }
 
-  private String createMultipartUpload(Attachment attachment) {
+  private S3UploadId createMultipartUpload(Attachment attachment) {
     CreateMultipartUploadResponse response = s3Client.createMultipartUpload(builder -> builder
         .bucket(zerowebS3Config.getBucket())
         .key(attachment.objectKey())
@@ -136,7 +136,7 @@ public class S3Service implements IStorageService {
     );
     S3UploadId s3UploadId = new S3UploadId(attachment.getId(), response.uploadId());
     s3UploadIdRepository.save(s3UploadId);
-    return response.uploadId();
+    return s3UploadId;
   }
 
   @EventListener
@@ -173,10 +173,7 @@ public class S3Service implements IStorageService {
               .bucket(zerowebS3Config.getBucket())
               .key(attachment.objectKey())
               .uploadId(s3UploadId.getUploadId())
-              .multipartUpload(multipartUpload -> multipartUpload
-                  .parts(uploadedParts)
-                  .build()
-              )
+              .multipartUpload(multipartUpload -> multipartUpload.parts(uploadedParts))
           );
         });
   }

@@ -4,16 +4,17 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.entity.UploadInfo.Address;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
-import io.github.xezzon.zeroweb.attachment.event.AttachmentCreatedEvent;
-import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
+import io.github.xezzon.zeroweb.storage.StorageContext;
 import io.github.xezzon.zeroweb.storage.s3.entity.S3Etag;
+import io.github.xezzon.zeroweb.storage.s3.entity.S3UploadId;
 import io.github.xezzon.zeroweb.storage.s3.repository.S3UploadIdRepository;
 import jakarta.annotation.Resource;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -22,13 +23,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.zip.CRC32;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -42,6 +44,7 @@ import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.ChecksumAlgorithm;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListPartsResponse;
 
 /// @author xezzon
 @SpringBootTest
@@ -61,8 +64,6 @@ class S3ServiceTest {
   private AttachmentRepository attachmentRepository;
   @Resource
   private S3UploadIdRepository s3UploadIdRepository;
-  @Resource
-  private ApplicationEventPublisher eventPublisher;
   @Resource
   private ZerowebFileConfig zerowebFileConfig;
 
@@ -143,56 +144,74 @@ class S3ServiceTest {
     File file = largeFileResource.toFile();
     String resourceType = Files.probeContentType(largeFileResource);
     byte[] resourceContent = Files.readAllBytes(largeFileResource);
-    Attachment attachment1 = new Attachment();
-    attachment1.setName(FILE_NAME);
-    attachment1.setChecksum(Base64.getEncoder().encodeToString(
+    Attachment largeFileAttachment = new Attachment();
+    largeFileAttachment.setName(FILE_NAME);
+    largeFileAttachment.setChecksum(Base64.getEncoder().encodeToString(
         Hashing.sha256()
             .hashBytes(resourceContent)
             .asBytes()
     ));
-    attachment1.setSize(file.length());
-    attachment1.setType(resourceType);
-    attachment1.setBizType(RandomUtil.randomString(8));
-    attachment1.setBizId(UUID.randomUUID().toString());
-    attachment1.setProvider(FileProviderEnum.S3);
-    attachment1.setStatus(AttachmentStatusEnum.UPLOADING);
-    attachmentRepository.save(attachment1);
-    eventPublisher.publishEvent(new AttachmentCreatedEvent(attachment1));
-    Assertions.assertTrue(s3UploadIdRepository.existsById(attachment1.getId()));
+    largeFileAttachment.setSize(file.length());
+    largeFileAttachment.setType(resourceType);
+    largeFileAttachment.setBizType(RandomUtil.randomString(8));
+    largeFileAttachment.setBizId(UUID.randomUUID().toString());
+    largeFileAttachment.setProvider(FileProviderEnum.S3);
+    largeFileAttachment.setStatus(AttachmentStatusEnum.UPLOADING);
+    attachmentRepository.save(largeFileAttachment);
 
+    CRC32 crc32 = new CRC32();
+    crc32.update(resourceContent);
     int partSize = zerowebFileConfig.getMaxPartSize();
     int partCount = Math.toIntExact((file.length() - 1) / partSize) + 1;
-    try (HttpClient httpClient = HttpClient.newHttpClient()) {
-      int fromIndex = 0;
-      for (int partNumber = 1; partNumber <= partCount; partNumber++) {
-        Address uploadInfo = s3Service.getUploadAddress(attachment1, partNumber);
-        int toIndex = fromIndex + partSize;
-        byte[] partContent = Arrays.copyOfRange(resourceContent, fromIndex, toIndex);
-        String partChecksum = Base64.getEncoder().encodeToString(
-            Hashing.sha256()
-                .hashBytes(partContent)
-                .asBytes()
-        );
-        fromIndex = toIndex;
+    ScopedValue.where(StorageContext.CRC, String.valueOf(crc32.getValue()))
+        .run(() -> {
+          try (HttpClient httpClient = HttpClient.newHttpClient()) {
+            int fromIndex = 0;
+            for (int partNumber = 1; partNumber <= partCount; partNumber++) {
+              Address uploadInfo = s3Service.getUploadAddress(largeFileAttachment, partNumber);
+              int toIndex = fromIndex + partSize;
+              byte[] partContent = Arrays.copyOfRange(resourceContent, fromIndex, toIndex);
+              String partChecksum = Base64.getEncoder().encodeToString(
+                  Hashing.sha256()
+                      .hashBytes(partContent)
+                      .asBytes()
+              );
+              fromIndex = toIndex;
 
-        final HttpResponse<byte[]> response = httpClient.send(
-            HttpRequest.newBuilder()
-                .uri(URI.create(uploadInfo.getEndpoint()))
-                .header("x-amz-checksum-sha256", partChecksum)
-                .PUT(HttpRequest.BodyPublishers.ofByteArray(partContent))
-                .build(),
-            HttpResponse.BodyHandlers.ofByteArray()
-        );
+              final HttpResponse<byte[]> response = httpClient.send(
+                  HttpRequest.newBuilder()
+                      .uri(URI.create(uploadInfo.getEndpoint()))
+                      .PUT(HttpRequest.BodyPublishers.ofByteArray(partContent))
+                      .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.SHA256.toString())
+                      .header("x-amz-checksum-sha256", attachment.getChecksum())
+                      .build(),
+                  HttpResponse.BodyHandlers.ofByteArray()
+              );
 
-        Assertions.assertEquals(200, response.statusCode());
-        s3Service.upsertEtag(new S3Etag(
-            attachment1.getId(),
-            partNumber,
-            String.join(",", response.headers().allValues("etag")),
-            partChecksum
-        ));
-      }
-    }
-    eventPublisher.publishEvent(new AttachmentUploadedEvent(attachment1));
+              Assertions.assertEquals(
+                  200,
+                  response.statusCode(),
+                  () -> new String(response.body())
+              );
+              s3Service.upsertEtag(new S3Etag(
+                  largeFileAttachment.getId(),
+                  partNumber,
+                  String.join(",", response.headers().allValues("etag")),
+                  partChecksum
+              ));
+            }
+          } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+        });
+
+    Optional<S3UploadId> s3UploadId = s3UploadIdRepository.findById(largeFileAttachment.getId());
+    Assertions.assertTrue(s3UploadId.isPresent());
+    ListPartsResponse listPartsResponse = s3Client.listParts(builder -> builder
+        .bucket(BUCKET)
+        .key(largeFileAttachment.objectKey())
+        .uploadId(s3UploadId.get().getUploadId())
+    );
+    Assertions.assertEquals(partCount, listPartsResponse.parts().size());
   }
 }
