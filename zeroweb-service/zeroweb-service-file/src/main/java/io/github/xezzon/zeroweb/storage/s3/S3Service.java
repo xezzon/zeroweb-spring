@@ -7,6 +7,7 @@ import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.storage.IStorageService;
+import io.github.xezzon.zeroweb.storage.StorageContext;
 import io.github.xezzon.zeroweb.storage.s3.entity.S3Etag;
 import io.github.xezzon.zeroweb.storage.s3.entity.S3UploadId;
 import io.github.xezzon.zeroweb.storage.s3.repository.S3EtagRepository;
@@ -91,7 +92,8 @@ public class S3Service implements IStorageService {
       return null;
     }
 
-    S3UploadId s3UploadId = s3UploadIdRepository.findById(attachment.getId()).orElseThrow();
+    S3UploadId s3UploadId = s3UploadIdRepository.findById(attachment.getId())
+        .orElseGet(() -> this.createMultipartUpload(attachment));
     PresignedUploadPartRequest presignedUploadPartRequest = s3Presigner
         .presignUploadPart(presignRequest -> presignRequest
             .signatureDuration(Duration.ofMinutes(10))
@@ -130,11 +132,12 @@ public class S3Service implements IStorageService {
         .bucket(zerowebS3Config.getBucket())
         .key(attachment.objectKey())
         .contentType(attachment.getType())
-        .checksumAlgorithm(ChecksumAlgorithm.SHA256)
-        .checksumType(ChecksumType.COMPOSITE)
         .metadata(Collections.singletonMap("filename", attachment.getName()))
+        .checksumType(ChecksumType.FULL_OBJECT)
+        .checksumAlgorithm(ChecksumAlgorithm.CRC32)
     );
-    S3UploadId s3UploadId = new S3UploadId(attachment.getId(), response.uploadId());
+    String crc = StorageContext.CRC.get();
+    S3UploadId s3UploadId = new S3UploadId(attachment.getId(), response.uploadId(), crc);
     s3UploadIdRepository.save(s3UploadId);
     return s3UploadId;
   }
@@ -165,7 +168,6 @@ public class S3Service implements IStorageService {
               .map(s3Etag -> CompletedPart.builder()
                   .partNumber(s3Etag.getPartNumber())
                   .eTag(s3Etag.getEtag())
-                  .checksumSHA256(s3Etag.getChecksum())
                   .build()
               )
               .toList();
@@ -174,6 +176,8 @@ public class S3Service implements IStorageService {
               .key(attachment.objectKey())
               .uploadId(s3UploadId.getUploadId())
               .multipartUpload(multipartUpload -> multipartUpload.parts(uploadedParts))
+              .checksumType(ChecksumType.FULL_OBJECT)
+              .checksumCRC32(s3UploadId.getCrc())
           );
         });
   }

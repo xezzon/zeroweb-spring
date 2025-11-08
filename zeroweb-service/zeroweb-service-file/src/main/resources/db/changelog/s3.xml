@@ -13,6 +13,9 @@
       <column name="upload_id" type="VARCHAR(512)" remarks="S3上传ID">
         <constraints nullable="false"/>
       </column>
+      <column name="crc" type="VARCHAR(64)" remarks="循环冗余校验和">
+        <constraints nullable="false"/>
+      </column>
     </createTable>
     <createTable tableName="zeroweb_s3_etag" ifNotExists="true">
       <column name="id" type="VARCHAR(64)">

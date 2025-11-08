@@ -17,19 +17,21 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner.Builder;
 
 /// @author xezzon
 @Setter
 @Configuration
 @ConfigurationProperties(prefix = ZerowebS3Config.PREFIX)
-@ConditionalOnProperty(name = "S3_ENDPOINT")
+@ConditionalOnProperty(name = "S3_BUCKET")
 public class ZerowebS3Config {
 
   static final String PREFIX = ZerowebFileConfig.PREFIX + ".s3";
 
-  private String endpoint;
+  private URI endpoint;
   private String accessKey;
   private String secretKey;
   private String region;
@@ -43,8 +45,11 @@ public class ZerowebS3Config {
 
   @Bean
   S3Presigner s3Presigner(AwsCredentialsProvider credentialsProvider) {
-    return S3Presigner.builder()
-        .endpointOverride(URI.create(endpoint))
+    Builder builder = S3Presigner.builder();
+    if (endpoint != null) {
+      builder.endpointOverride(endpoint);
+    }
+    return builder
         .credentialsProvider(credentialsProvider)
         .region(Region.of(region))
         .serviceConfiguration(S3Configuration.builder()
@@ -56,8 +61,11 @@ public class ZerowebS3Config {
 
   @Bean
   S3Client s3Client(AwsCredentialsProvider credentialsProvider) {
-    return S3Client.builder()
-        .endpointOverride(URI.create(endpoint))
+    S3ClientBuilder builder = S3Client.builder();
+    if (endpoint != null) {
+      builder.endpointOverride(endpoint);
+    }
+    return builder
         .credentialsProvider(credentialsProvider)
         .region(Region.of(region))
         .serviceConfiguration(S3Configuration.builder()

@@ -35,13 +35,19 @@ public final class S3UploadId {
    */
   @Column(name = "upload_id", nullable = false, updatable = false, length = 512)
   private String uploadId;
+  /**
+   * 循环冗余校验和。用于 S3 的完整对象校验
+   */
+  @Column(name = "crc", nullable = false, updatable = false)
+  private String crc;
 
   public S3UploadId() {
     super();
   }
 
-  public S3UploadId(String attachmentId, String uploadId) {
+  public S3UploadId(String attachmentId, String uploadId, String crc) {
     this.attachmentId = attachmentId;
     this.uploadId = uploadId;
+    this.crc = crc;
   }
 }

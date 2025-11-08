@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.attachment.internal;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentReq;
 import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
+import io.github.xezzon.zeroweb.storage.StorageContext;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,9 +31,13 @@ public class AttachmentHttpEndpoint {
   /// @param req 文件信息
   /// @return 文件上传元数据
   @PostMapping()
-  public UploadInfo addAttachment(@RequestBody AddAttachmentReq req) {
+  public UploadInfo addAttachment(
+      @RequestBody AddAttachmentReq req,
+      @RequestParam(required = false) String crc
+  ) {
     Attachment attachment = req.into();
-    return attachmentService.addAttachment(attachment);
+    return ScopedValue.where(StorageContext.CRC, crc)
+        .call(() -> attachmentService.addAttachment(attachment));
   }
 
   /// 获取附件上传地址
@@ -42,9 +47,11 @@ public class AttachmentHttpEndpoint {
   public UploadInfo getUploadAddress(
       @PathVariable final String id,
       @RequestParam final String checksum,
-      @RequestParam final int fileSize
+      @RequestParam final int fileSize,
+      @RequestParam(required = false) final String crc
   ) {
-    return attachmentService.getUploadAddress(id, checksum, fileSize);
+    return ScopedValue.where(StorageContext.CRC, crc)
+        .call(() -> attachmentService.getUploadAddress(id, checksum, fileSize));
   }
 
   /// 文件上传完成后，将其状态变更为已完成
