@@ -1,13 +1,13 @@
 package io.github.xezzon.zeroweb.storage.s3;
 
 import io.github.xezzon.zeroweb.attachment.Attachment;
-import io.github.xezzon.zeroweb.attachment.entity.UploadInfo.Address;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentCreatedEvent;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.storage.IStorageService;
 import io.github.xezzon.zeroweb.storage.StorageContext;
+import io.github.xezzon.zeroweb.storage.UploadEndpoint;
 import io.github.xezzon.zeroweb.storage.s3.entity.S3Etag;
 import io.github.xezzon.zeroweb.storage.s3.entity.S3UploadId;
 import io.github.xezzon.zeroweb.storage.s3.repository.S3EtagRepository;
@@ -35,7 +35,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 @ConditionalOnBean(ZerowebS3Config.class)
 public class S3Service implements IStorageService {
 
-  public static final String ETAG_CALLBACK_URL = "/s3/{id}/etag";
+  static final String ETAG_CALLBACK_URL = "/s3/{id}/etag";
   private final ZerowebFileConfig zerowebFileConfig;
   private final ZerowebS3Config zerowebS3Config;
   private final S3Presigner s3Presigner;
@@ -64,8 +64,7 @@ public class S3Service implements IStorageService {
     return FileProviderEnum.S3;
   }
 
-  @Override
-  public Address getUploadAddress(Attachment attachment) {
+  public UploadEndpoint getUploadAddress(Attachment attachment) {
     PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder()
         .signatureDuration(Duration.ofMinutes(10))
         .putObjectRequest(builder -> builder
@@ -80,16 +79,20 @@ public class S3Service implements IStorageService {
         .build();
     PresignedPutObjectRequest presignedPutObjectRequest = s3Presigner
         .presignPutObject(putObjectPresignRequest);
-    return new Address(presignedPutObjectRequest.url().toString());
+    return new UploadEndpoint(presignedPutObjectRequest.url().toString());
   }
 
   @Override
-  public Address getUploadAddress(Attachment attachment, int partNumber) {
+  public UploadEndpoint getUploadAddress(Attachment attachment, int partNumber) {
+    return this.getUploadAddress(attachment, partNumber, StorageContext.CRC.get());
+  }
+
+  public UploadEndpoint getUploadAddress(Attachment attachment, int partNumber, String crc) {
     // 如果分段已上传，则跳过
     Optional<S3Etag> etag = s3EtagRepository
         .findByAttachmentIdAndPartNumber(attachment.getId(), partNumber);
     if (etag.isPresent()) {
-      return null;
+      return new UploadEndpoint(partNumber);
     }
 
     S3UploadId s3UploadId = s3UploadIdRepository.findById(attachment.getId())
@@ -97,18 +100,23 @@ public class S3Service implements IStorageService {
     PresignedUploadPartRequest presignedUploadPartRequest = s3Presigner
         .presignUploadPart(presignRequest -> presignRequest
             .signatureDuration(Duration.ofMinutes(10))
-            .uploadPartRequest(partRequest -> partRequest
-                .bucket(zerowebS3Config.getBucket())
-                .key(attachment.objectKey())
-                .uploadId(s3UploadId.getUploadId())
-                .partNumber(partNumber)
-            )
+            .uploadPartRequest(partRequest -> {
+              partRequest
+                  .bucket(zerowebS3Config.getBucket())
+                  .key(attachment.objectKey())
+                  .uploadId(s3UploadId.getUploadId())
+                  .partNumber(partNumber);
+              if (crc != null) {
+                partRequest.checksumAlgorithm(ChecksumAlgorithm.CRC32)
+                    .checksumCRC32(crc);
+              }
+            })
         );
     String callbackUrl = UriComponentsBuilder
         .fromPath(ETAG_CALLBACK_URL)
         .buildAndExpand(attachment.getId())
         .toUriString();
-    return new Address(
+    return new UploadEndpoint(
         partNumber,
         presignedUploadPartRequest.url().toString(),
         callbackUrl

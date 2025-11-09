@@ -6,7 +6,7 @@ import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
 /// @author xezzon
 public class IncorrectFileException extends ZerowebBusinessException {
 
-  public static final String ERROR_CODE = "SFC02";
+  public static final String ERROR_CODE = "CFC02";
 
   public IncorrectFileException(String message) {
     super(message);

@@ -3,7 +3,6 @@ package io.github.xezzon.zeroweb.storage.file;
 import com.google.common.hash.Hashing;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.IAttachmentService;
-import io.github.xezzon.zeroweb.attachment.entity.UploadInfo.Address;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentCreatedEvent;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
@@ -11,6 +10,7 @@ import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.exception.WriteFileException;
 import io.github.xezzon.zeroweb.storage.IStorageService;
+import io.github.xezzon.zeroweb.storage.UploadEndpoint;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -35,8 +35,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 public class FsService implements IStorageService {
 
-  public static final String UPLOAD_ENDPOINT = "/file/{id}/upload";
-  public static final String MULTIPART_UPLOAD_ENDPOINT = "/file/{id}/upload/{partNumber}";
+  static final String UPLOAD_ENDPOINT = "/fs/{id}/upload";
+  static final String MULTIPART_UPLOAD_ENDPOINT = "/fs/{id}/upload/{partNumber}";
   private static final Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir"));
   private final ZerowebFsConfig zerowebFsConfig;
   private final ZerowebFileConfig zerowebFileConfig;
@@ -57,27 +57,25 @@ public class FsService implements IStorageService {
     return FileProviderEnum.FS;
   }
 
-  @Override
-  public Address getUploadAddress(Attachment attachment) {
+  public UploadEndpoint getUploadAddress(Attachment attachment) {
     String endpoint = UriComponentsBuilder
         .fromPath(UPLOAD_ENDPOINT)
         .buildAndExpand(attachment.getId())
         .toUriString();
-    return new Address(endpoint);
+    return new UploadEndpoint(endpoint);
   }
 
-  @Override
-  public Address getUploadAddress(Attachment attachment, int partNumber) {
+  public UploadEndpoint getUploadAddress(Attachment attachment, int partNumber) {
     // 文件已存在，则跳过
     if (Files.exists(TEMP_DIR.resolve(attachment.getId()).resolve(String.valueOf(partNumber)))) {
-      return null;
+      return new UploadEndpoint(partNumber);
     }
 
     String endpoint = UriComponentsBuilder
         .fromPath(MULTIPART_UPLOAD_ENDPOINT)
         .buildAndExpand(attachment.getId(), partNumber)
         .toUriString();
-    return new Address(partNumber, endpoint);
+    return new UploadEndpoint(partNumber, endpoint);
   }
 
   void upload(String id, byte[] fileContent) {

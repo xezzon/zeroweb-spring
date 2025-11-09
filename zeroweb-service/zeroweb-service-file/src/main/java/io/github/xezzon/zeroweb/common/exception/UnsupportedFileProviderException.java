@@ -16,4 +16,9 @@ public class UnsupportedFileProviderException extends ZerowebBusinessException {
   public String getCode() {
     return ERROR_CODE;
   }
+
+  @Override
+  public int getHttpStatus() {
+    return ErrorCodeConstant.SERVER_ERROR_STATUS;
+  }
 }

@@ -1,14 +1,15 @@
 package io.github.xezzon.zeroweb.storage.s3;
 
+import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.attachment.Attachment;
-import io.github.xezzon.zeroweb.attachment.entity.UploadInfo.Address;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
 import io.github.xezzon.zeroweb.storage.StorageContext;
+import io.github.xezzon.zeroweb.storage.UploadEndpoint;
 import io.github.xezzon.zeroweb.storage.s3.entity.S3Etag;
 import io.github.xezzon.zeroweb.storage.s3.entity.S3UploadId;
 import io.github.xezzon.zeroweb.storage.s3.repository.S3UploadIdRepository;
@@ -34,8 +35,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MinIOContainer;
+import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.shaded.com.google.common.hash.Hashing;
+import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -51,7 +54,9 @@ import software.amazon.awssdk.services.s3.model.ListPartsResponse;
 @DirtiesContext
 class S3ServiceTest {
 
-  private static final MinIOContainer CONTAINER = new MinIOContainer("minio/minio:latest");
+  private static final LocalStackContainer CONTAINER = new LocalStackContainer(
+      DockerImageName.parse("localstack/localstack:s3-latest")
+  );
   private static final String BUCKET = "test";
   private static final String FILE_NAME = "test.txt";
   private static final String LARGE_FILE_NAME = "large_file.jpg";
@@ -71,9 +76,9 @@ class S3ServiceTest {
   static void beforeAll() {
     CONTAINER.start();
     s3Client = S3Client.builder()
-        .endpointOverride(URI.create(CONTAINER.getS3URL()))
+        .endpointOverride(CONTAINER.getEndpointOverride(Service.S3))
         .credentialsProvider(StaticCredentialsProvider.create(
-            AwsBasicCredentials.create(CONTAINER.getUserName(), CONTAINER.getPassword())
+            AwsBasicCredentials.create(CONTAINER.getAccessKey(), CONTAINER.getSecretKey())
         ))
         .region(Region.US_EAST_1)
         .serviceConfiguration(S3Configuration.builder()
@@ -87,9 +92,9 @@ class S3ServiceTest {
   @DynamicPropertySource
   static void properties(DynamicPropertyRegistry registry) {
     registry.add("ZEROWEB_FILE_PROVIDER", () -> "s3");
-    registry.add("S3_ENDPOINT", CONTAINER::getS3URL);
-    registry.add("S3_ACCESS_KEY", CONTAINER::getUserName);
-    registry.add("S3_SECRET_KEY", CONTAINER::getPassword);
+    registry.add("S3_ENDPOINT", () -> CONTAINER.getEndpointOverride(Service.S3));
+    registry.add("S3_ACCESS_KEY", CONTAINER::getAccessKey);
+    registry.add("S3_SECRET_KEY", CONTAINER::getSecretKey);
     registry.add("S3_BUCKET", () -> BUCKET);
   }
 
@@ -113,7 +118,7 @@ class S3ServiceTest {
 
   @Test
   void getUploadAddress() throws Exception {
-    Address uploadInfo = s3Service.getUploadAddress(attachment);
+    UploadEndpoint uploadInfo = s3Service.getUploadAddress(attachment);
 
     try (HttpClient httpClient = HttpClient.newHttpClient()) {
       final HttpResponse<byte[]> response = httpClient.send(
@@ -161,29 +166,34 @@ class S3ServiceTest {
 
     CRC32 crc32 = new CRC32();
     crc32.update(resourceContent);
+    String checksum = Base64.getEncoder().encodeToString(
+        HexUtil.decodeHex(Long.toHexString(crc32.getValue()))
+    );
     int partSize = zerowebFileConfig.getMaxPartSize();
     int partCount = Math.toIntExact((file.length() - 1) / partSize) + 1;
-    ScopedValue.where(StorageContext.CRC, String.valueOf(crc32.getValue()))
+    ScopedValue.where(StorageContext.CRC, checksum)
         .run(() -> {
           try (HttpClient httpClient = HttpClient.newHttpClient()) {
             int fromIndex = 0;
             for (int partNumber = 1; partNumber <= partCount; partNumber++) {
-              Address uploadInfo = s3Service.getUploadAddress(largeFileAttachment, partNumber);
               int toIndex = fromIndex + partSize;
               byte[] partContent = Arrays.copyOfRange(resourceContent, fromIndex, toIndex);
+              final CRC32 partCrc32 = new CRC32();
+              partCrc32.update(partContent);
               String partChecksum = Base64.getEncoder().encodeToString(
-                  Hashing.sha256()
-                      .hashBytes(partContent)
-                      .asBytes()
+                  HexUtil.decodeHex(Long.toHexString(partCrc32.getValue()))
               );
               fromIndex = toIndex;
+              UploadEndpoint uploadInfo = s3Service
+                  .getUploadAddress(largeFileAttachment, partNumber, partChecksum);
 
               final HttpResponse<byte[]> response = httpClient.send(
                   HttpRequest.newBuilder()
                       .uri(URI.create(uploadInfo.getEndpoint()))
                       .PUT(HttpRequest.BodyPublishers.ofByteArray(partContent))
-                      .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.SHA256.toString())
-                      .header("x-amz-checksum-sha256", attachment.getChecksum())
+                      // 兼容 MinIO、LocalStack
+                      .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
+                      .header("x-amz-checksum-crc32", partChecksum)
                       .build(),
                   HttpResponse.BodyHandlers.ofByteArray()
               );
