@@ -17,6 +17,7 @@ import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
+import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
 import io.github.xezzon.zeroweb.storage.s3.ZerowebS3Config;
 import io.github.xezzon.zeroweb.storage.s3.entity.S3Etag;
@@ -30,6 +31,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -41,6 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -67,19 +70,21 @@ abstract class AttachmentHttpTest {
   private static final String GET_UPLOAD_ADDRESS = "/attachment/{id}/endpoint/upload";
   private static final String FINISH_UPLOAD = "/attachment/{id}/status/done";
   private static final String QUERY_BY_BIZ = "/attachment/list";
+  private static final String GET_DOWNLOAD_ADDRESS = "/attachment/{id}/endpoint/download";
   private static final String FILE_NAME = "test.txt";
   private static final String LARGE_FILE = "large_file.jpg";
 
-  private final Path resource = ResourceUtil.getResourceFromClasspath(FILE_NAME);
+  final Path resource = ResourceUtil.getResourceFromClasspath(FILE_NAME);
   private final Path largeFileResource = ResourceUtil.getResourceFromClasspath(LARGE_FILE);
   private final Attachment attachment = new Attachment();
   private Attachment largeFileAttachment = new Attachment();
+  private final Attachment attachmentForDownloading = new Attachment();
   private final List<byte[]> largeFileParts = new ArrayList<>();
 
   @Resource
   private WebTestClient webTestClient;
   @Resource
-  private AttachmentRepository repository;
+  AttachmentRepository repository;
   @Resource
   private ZerowebFileConfig zerowebFileConfig;
   @LocalServerPort
@@ -90,6 +95,8 @@ abstract class AttachmentHttpTest {
   abstract boolean fileExist(Attachment attachment);
 
   abstract void assertIncorrectFileStatus(int status);
+
+  abstract void saveFile(Attachment attachment) throws IOException;
 
   @BeforeEach
   void setUp_file() throws Exception {
@@ -132,6 +139,25 @@ abstract class AttachmentHttpTest {
     largeFileAttachment.setBizId(UUID.randomUUID().toString());
     largeFileAttachment.setProvider(zerowebFileConfig.getProvider());
     largeFileAttachment.setStatus(AttachmentStatusEnum.UPLOADING);
+  }
+
+  @BeforeEach
+  void setUp_download() throws IOException {
+    File file = resource.toFile();
+    attachmentForDownloading.setName(FILE_NAME);
+    attachmentForDownloading.setChecksum(Base64.getEncoder().encodeToString(
+        Hashing.sha256()
+            .hashBytes(Files.readAllBytes(resource))
+            .asBytes()
+    ));
+    attachmentForDownloading.setSize(file.length());
+    attachmentForDownloading.setType(Files.probeContentType(resource));
+    attachmentForDownloading.setBizType(RandomUtil.randomString(8));
+    attachmentForDownloading.setBizId(UUID.randomUUID().toString());
+    attachmentForDownloading.setProvider(zerowebFileConfig.getProvider());
+    attachmentForDownloading.setStatus(AttachmentStatusEnum.UPLOADING);
+    repository.save(attachmentForDownloading);
+    this.saveFile(attachmentForDownloading);
   }
 
   @Test
@@ -692,6 +718,31 @@ abstract class AttachmentHttpTest {
     Assertions.assertTrue(responseBody2.isEmpty());
   }
 
+  @Test
+  void download() throws IOException {
+    DownloadEndpoint downloadEndpoint = webTestClient.get()
+        .uri(uri -> uri
+            .path(GET_DOWNLOAD_ADDRESS)
+            .build(attachmentForDownloading.getId())
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(DownloadEndpoint.class).returnResult().getResponseBody();
+    Assertions.assertNotNull(downloadEndpoint);
+
+    byte[] fileContent = webTestClient.get()
+        .uri(localhost(downloadEndpoint.getEndpoint()))
+        .exchange()
+        .expectStatus().isOk()
+        .expectHeader().valueEquals("Content-Type", attachment.getType())
+        .expectBody(new ParameterizedTypeReference<byte[]>() {
+        })
+        .returnResult().getResponseBody();
+    Assertions.assertNotNull(fileContent);
+    byte[] expect = Files.readAllBytes(resource);
+    Assertions.assertArrayEquals(expect, fileContent);
+  }
+
   private URI localhost(String uri) {
     return URI.create("http://localhost:" + port).resolve(URI.create(uri));
   }
@@ -751,6 +802,19 @@ class S3HttpTest extends AttachmentHttpTest {
   void assertIncorrectFileStatus(int status) {
     Assertions.assertEquals(ErrorCodeConstant.SERVER_ERROR_STATUS, status);
   }
+
+  @Override
+  void saveFile(Attachment attachment) {
+    s3Client.putObject(
+        builder -> builder
+            .bucket(zerowebS3Config.getBucket())
+            .key(attachment.objectKey())
+            .metadata(Collections.singletonMap("filename", attachment.getName()))
+            .contentType(attachment.getType())
+            .contentLength(attachment.getSize()),
+        resource
+    );
+  }
 }
 
 @ActiveProfiles("fs")
@@ -773,5 +837,11 @@ class FsHttpTest extends AttachmentHttpTest {
   @Override
   void assertIncorrectFileStatus(int status) {
     Assertions.assertEquals(ErrorCodeConstant.CLIENT_ERROR_STATUS, status);
+  }
+
+  @Override
+  void saveFile(Attachment attachment) throws IOException {
+    Path path = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
+    Files.copy(resource, path);
   }
 }

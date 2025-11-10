@@ -5,6 +5,7 @@ import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentCreatedEvent;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
+import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.IStorageService;
 import io.github.xezzon.zeroweb.storage.StorageContext;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
@@ -26,6 +27,7 @@ import software.amazon.awssdk.services.s3.model.ChecksumType;
 import software.amazon.awssdk.services.s3.model.CompletedPart;
 import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedUploadPartRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
@@ -118,7 +120,8 @@ public class S3Service implements IStorageService {
                   .uploadId(s3UploadId.getUploadId())
                   .partNumber(partNumber);
               if (crc != null) {
-                partRequest.checksumAlgorithm(ChecksumAlgorithm.CRC32)
+                partRequest
+                    .checksumAlgorithm(ChecksumAlgorithm.CRC32)
                     .checksumCRC32(crc);
               }
             })
@@ -131,6 +134,22 @@ public class S3Service implements IStorageService {
         partNumber,
         presignedUploadPartRequest.url().toString(),
         callbackUrl
+    );
+  }
+
+  @Override
+  public DownloadEndpoint getDownloadEndpoint(Attachment attachment) {
+    PresignedGetObjectRequest presigned = s3Presigner.presignGetObject(
+        builder -> builder
+            .signatureDuration(Duration.ofHours(12))
+            .getObjectRequest(getObject -> getObject
+                .bucket(zerowebS3Config.getBucket())
+                .key(attachment.objectKey())
+                .responseContentType(attachment.getType())
+            )
+    );
+    return new DownloadEndpoint(
+        presigned.url().toString()
     );
   }
 

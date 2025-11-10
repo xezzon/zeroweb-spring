@@ -1,6 +1,4 @@
-package io.github.xezzon.zeroweb.storage.file;
-
-import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
+package io.github.xezzon.zeroweb.common.exception;
 
 /// 上传文件的内容与创建的附件不一致
 /// @author xezzon

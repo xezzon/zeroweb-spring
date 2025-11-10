@@ -35,6 +35,11 @@ public interface IStorageService {
   /// @return 上传地址
   UploadEndpoint getUploadAddress(Attachment attachment, int partNumber);
 
+  /// 获取附件下载地址
+  /// @param attachment 附件信息
+  /// @return 下载地址
+  DownloadEndpoint getDownloadEndpoint(Attachment attachment);
+
   @Component
   class Factory {
 

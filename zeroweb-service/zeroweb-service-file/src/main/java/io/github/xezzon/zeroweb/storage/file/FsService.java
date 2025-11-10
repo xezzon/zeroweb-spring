@@ -8,7 +8,10 @@ import io.github.xezzon.zeroweb.attachment.event.AttachmentCreatedEvent;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
+import io.github.xezzon.zeroweb.common.exception.IncorrectFileException;
+import io.github.xezzon.zeroweb.common.exception.ReadFileException;
 import io.github.xezzon.zeroweb.common.exception.WriteFileException;
+import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.IStorageService;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
 import java.io.ByteArrayOutputStream;
@@ -37,14 +40,14 @@ public class FsService implements IStorageService {
 
   static final String UPLOAD_ENDPOINT = "/fs/{id}/upload";
   static final String MULTIPART_UPLOAD_ENDPOINT = "/fs/{id}/upload/{partNumber}";
+  static final String DOWNLOAD_ENDPOINT = "/fs/{id}/download";
   private static final Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir"));
   private final ZerowebFsConfig zerowebFsConfig;
   private final IAttachmentService attachmentService;
 
   public FsService(
       final ZerowebFsConfig zerowebFsConfig,
-      @Lazy final IAttachmentService attachmentService
-  ) {
+      @Lazy final IAttachmentService attachmentService) {
     this.zerowebFsConfig = zerowebFsConfig;
     this.attachmentService = attachmentService;
   }
@@ -58,14 +61,12 @@ public class FsService implements IStorageService {
   public UploadInfo getUploadInfo(Attachment attachment) {
     int partSize = zerowebFsConfig.getPartSize();
     int partCount = Math.toIntExact(
-        (attachment.getSize() - 1) / partSize + 1
-    );
+        (attachment.getSize() - 1) / partSize + 1);
     return new UploadInfo(
         attachment.getId(),
         attachment.getProvider(),
         partCount,
-        partSize
-    );
+        partSize);
   }
 
   public UploadEndpoint getUploadAddress(Attachment attachment) {
@@ -89,6 +90,16 @@ public class FsService implements IStorageService {
     return new UploadEndpoint(partNumber, endpoint);
   }
 
+  @Override
+  public DownloadEndpoint getDownloadEndpoint(Attachment attachment) {
+    String endpoint = UriComponentsBuilder
+        .fromPath(DOWNLOAD_ENDPOINT)
+        .buildAndExpand(attachment.getId())
+        .toUriString();
+    return new DownloadEndpoint(
+        endpoint);
+  }
+
   void upload(String id, byte[] fileContent) {
     Attachment attachment = attachmentService.queryById(id);
     Path path = zerowebFsConfig.getBasePath()
@@ -100,8 +111,7 @@ public class FsService implements IStorageService {
       }
       if (!Objects.equals(
           Base64.getEncoder().encodeToString(Hashing.sha256().hashBytes(fileContent).asBytes()),
-          attachment.getChecksum()
-      )) {
+          attachment.getChecksum())) {
         throw new IncorrectFileException("Invalid checksum.");
       }
       // 递归创建其父目录
@@ -127,6 +137,17 @@ public class FsService implements IStorageService {
       Files.write(tempFile, fileContent, StandardOpenOption.CREATE);
     } catch (IOException e) {
       throw new WriteFileException(e);
+    }
+  }
+
+  byte[] download(String id) {
+    Attachment attachment = attachmentService.queryById(id);
+    Path path = zerowebFsConfig.getBasePath()
+        .resolve(attachment.objectKey());
+    try {
+      return Files.readAllBytes(path);
+    } catch (IOException e) {
+      throw new ReadFileException(e);
     }
   }
 
@@ -162,8 +183,7 @@ public class FsService implements IStorageService {
 
     try (
         Stream<Path> parts = Files.list(tempAttachmentDir);
-        ByteArrayOutputStream mergedFileStream = new ByteArrayOutputStream()
-    ) {
+        ByteArrayOutputStream mergedFileStream = new ByteArrayOutputStream()) {
       // 合并分段文件
       List<Path> partFiles = parts
           .filter(Files::isRegularFile)
@@ -181,8 +201,7 @@ public class FsService implements IStorageService {
       if (!Objects.equals(
           Base64.getEncoder()
               .encodeToString(Hashing.sha256().hashBytes(mergedFileContent).asBytes()),
-          attachment.getChecksum()
-      )) {
+          attachment.getChecksum())) {
         throw new IncorrectFileException("Invalid checksum.");
       }
 
