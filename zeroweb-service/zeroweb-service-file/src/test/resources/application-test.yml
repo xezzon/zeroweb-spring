@@ -1,0 +1,4 @@
+spring:
+  datasource:
+    url: @db.url@
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

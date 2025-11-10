@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="101" author="xezzon" labels="0.7">
+    <createTable tableName="zeroweb_attachment" remarks="附件" ifNotExists="true">
+      <column name="id" type="VARCHAR(64)" remarks="附件ID">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(2048)" remarks="文件名">
+        <constraints nullable="false"/>
+      </column>
+      <column name="checksum" type="VARCHAR(128)" remarks="文件摘要">
+        <constraints nullable="false"/>
+      </column>
+      <column name="size" type="BIGINT" remarks="文件大小。单位：字节。">
+        <constraints nullable="false"/>
+      </column>
+      <column name="type" type="VARCHAR(100)" remarks="MIME 类型">
+        <constraints nullable="false"/>
+      </column>
+      <column name="biz_type" type="VARCHAR(100)" remarks="业务类型">
+        <constraints nullable="false"/>
+      </column>
+      <column name="biz_id" type="VARCHAR(64)" remarks="业务ID">
+        <constraints/>
+      </column>
+      <column name="provider" type="VARCHAR(100)" remarks="存储后端">
+        <constraints nullable="false"/>
+      </column>
+      <column name="status" type="VARCHAR(100)" remarks="附件状态">
+        <constraints nullable="false"/>
+      </column>
+      <column name="owner_id" type="VARCHAR(64)" remarks="上传者">
+        <constraints/>
+      </column>
+      <column name="create_time" type="TIMESTAMP" remarks="上传时间">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <createIndex tableName="zeroweb_attachment" indexName="IX_t_a_biz">
+      <column name="biz_type"/>
+      <column name="biz_id"/>
+    </createIndex>
+    <createIndex tableName="zeroweb_attachment" indexName="IX_t_a_owner">
+      <column name="owner_id"/>
+    </createIndex>
+  </changeSet>
+</databaseChangeLog>

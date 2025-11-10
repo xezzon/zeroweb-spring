@@ -17,6 +17,7 @@
   <modules>
     <module>zeroweb-service-admin</module>
     <module>zeroweb-service-dev</module>
+    <module>zeroweb-service-file</module>
     <module>zeroweb-service-open</module>
   </modules>
 

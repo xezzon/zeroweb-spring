@@ -44,6 +44,24 @@ services:
     depends_on:
       - postgresql
       - zeroweb-service-admin
+  zeroweb-service-file:
+    image: ghcr.io/xezzon/zeroweb-service-file:latest
+    networks:
+      - gateway
+      - db
+    environment:
+      - DB_URL=postgresql:5432/zeroweb
+      - DB_USERNAME=postgres_user
+      - DB_PASSWORD=postgres_password
+      - spring.grpc.client.channels.user.address=zeroweb-service-admin:9002
+      - spring.grpc.client.channels.dict.address=zeroweb-service-admin:9002
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.zeroweb-service-file.rule=PathPrefix(`/api/file`)
+      - traefik.http.routers.zeroweb-service-file.middlewares=jwt-auth@file,stripprefix-api@file
+    depends_on:
+      - postgresql
+      - zeroweb-service-admin
   zeroweb-service-open:
     image: ghcr.io/xezzon/zeroweb-service-open:latest
     networks:

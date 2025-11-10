@@ -17,6 +17,7 @@
 - `zeroweb-service`: 包含若干子模块，每一个模块是一个微服务构件。
   - `zeroweb-service-admin`: 系统管理服务。
   - `zeroweb-service-dev`: 研发平台服务。
+  - `zeroweb-service-file`: 附件管理服务。
   - `zeroweb-service-open`: 开放平台服务。
 
 ### 包名

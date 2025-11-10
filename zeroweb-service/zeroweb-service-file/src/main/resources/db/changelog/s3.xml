@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="101" author="xezzon" labels="0.7">
+    <createTable tableName="zeroweb_s3_upload_id" ifNotExists="true">
+      <column name="attachment_id" type="VARCHAR(64)" remarks="附件ID">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="upload_id" type="VARCHAR(512)" remarks="S3上传ID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="crc" type="VARCHAR(64)" remarks="循环冗余校验和">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <createTable tableName="zeroweb_s3_etag" ifNotExists="true">
+      <column name="id" type="VARCHAR(64)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="attachment_id" type="VARCHAR(64)" remarks="附件ID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="part_number" type="INTEGER" remarks="分段序号">
+        <constraints nullable="false"/>
+      </column>
+      <column name="etag" type="VARCHAR(255)" remarks="S3 ETag">
+        <constraints nullable="false"/>
+      </column>
+      <column name="checksum" type="VARCHAR(128)" remarks="分段摘要">
+      </column>
+    </createTable>
+    <createIndex tableName="zeroweb_s3_etag" indexName="UK_t_se_ai_pn" unique="true">
+      <column name="attachment_id"/>
+      <column name="part_number"/>
+    </createIndex>
+  </changeSet>
+</databaseChangeLog>

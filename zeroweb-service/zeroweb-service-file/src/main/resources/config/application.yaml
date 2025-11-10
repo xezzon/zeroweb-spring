@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: @project.artifactId@
+    group: @project.groupId@
+    version: @project.version@
+  profiles:
+    include:
+      - common
+      - ${JDBC_TYPE:postgresql}
+      - ${CACHE_TYPE:in-memory}
+      - ${SPRING_ENVIRONMENT:prod}
+  liquibase:
+    tag: @project.version@
+  servlet:
+    multipart:
+      max-file-size: 5MB
+
+server:
+  port: @app.port@
+
+zeroweb:
+  file:
+    provider: ${ZEROWEB_FILE_PROVIDER:FS}
+    fs:
+      base-path: ${ZEROWEB_FS_BASEPATH}
+    s3:
+      endpoint: ${S3_ENDPOINT:}
+      region: ${S3_REGION:us-east-1}
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+      bucket: ${S3_BUCKET}
+      part-size: ${S3_PART_SIZE:5}
