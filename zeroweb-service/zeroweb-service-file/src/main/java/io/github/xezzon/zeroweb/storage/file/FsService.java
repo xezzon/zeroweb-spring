@@ -6,6 +6,7 @@ import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.IAttachmentService;
 import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentCreatedEvent;
+import io.github.xezzon.zeroweb.attachment.event.AttachmentDeletedEvent;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -255,5 +257,14 @@ public class FsService implements IStorageService {
         log.warn("Failed to clean up temporary directory: {}", e.getMessage());
       }
     }
+  }
+
+  /// 附件删除后，将对应的文件也删除
+  @EventListener
+  @Async()
+  void listen(AttachmentDeletedEvent event) throws IOException {
+    final Attachment attachment = event.attachment();
+    Path path = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
+    Files.deleteIfExists(path);
   }
 }

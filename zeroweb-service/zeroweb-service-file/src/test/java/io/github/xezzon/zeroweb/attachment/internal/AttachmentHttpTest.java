@@ -69,6 +69,7 @@ abstract class AttachmentHttpTest {
   private static final String FINISH_UPLOAD = "/attachment/{id}/status/done";
   private static final String QUERY_BY_BIZ = "/attachment/list";
   private static final String GET_DOWNLOAD_ADDRESS = "/attachment/{id}/endpoint/download";
+  private static final String DELETE_ATTACHMENT = "/attachment/{id}";
   private static final String FILE_NAME = "test.txt";
   private static final String LARGE_FILE = "large_file.jpg";
 
@@ -742,6 +743,19 @@ abstract class AttachmentHttpTest {
     Assertions.assertArrayEquals(expect, fileContent);
   }
 
+  @Test
+  void deleteAttachment() {
+    webTestClient.delete()
+        .uri(builder -> builder
+            .path(DELETE_ATTACHMENT)
+            .build(attachment.getId())
+        )
+        .exchange()
+        .expectStatus().isOk();
+    Assertions.assertFalse(repository.existsById(attachment.getId()));
+    Assertions.assertFalse(this.fileExist(attachment));
+  }
+
   private URI localhost(String uri) {
     return URI.create("http://localhost:" + port).resolve(URI.create(uri));
   }
@@ -790,11 +804,15 @@ class S3HttpTest extends AttachmentHttpTest {
 
   @Override
   boolean fileExist(Attachment attachment) {
-    s3Client.headObject(builder -> builder
-        .bucket(BUCKET)
-        .key(attachment.objectKey())
-    );
-    return true;
+    try {
+      s3Client.headObject(builder -> builder
+          .bucket(BUCKET)
+          .key(attachment.objectKey())
+      );
+      return true;
+    } catch (RuntimeException _) {
+      return false;
+    }
   }
 
   @Override

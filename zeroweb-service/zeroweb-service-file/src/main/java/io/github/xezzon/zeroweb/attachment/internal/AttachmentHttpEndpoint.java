@@ -7,6 +7,7 @@ import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.StorageContext;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
 import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -96,5 +97,12 @@ public class AttachmentHttpEndpoint {
   @GetMapping("/{id}/endpoint/download")
   public DownloadEndpoint getDownloadEndpoint(@PathVariable final String id) {
     return attachmentService.getDownloadEndpoint(id);
+  }
+
+  /// 删除附件
+  /// @param id 附件ID
+  @DeleteMapping("/{id}")
+  public void deleteAttachment(@PathVariable final String id) {
+    attachmentService.deleteAttachment(id);
   }
 }
