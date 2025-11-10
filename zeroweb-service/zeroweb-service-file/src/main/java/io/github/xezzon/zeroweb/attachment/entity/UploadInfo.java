@@ -12,6 +12,6 @@ public record UploadInfo(
     String id,
     FileProviderEnum provider,
     int partCount,
-    int partSize
+    long partSize
 ) {
 }

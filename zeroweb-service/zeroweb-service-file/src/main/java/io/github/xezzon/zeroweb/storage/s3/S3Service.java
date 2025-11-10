@@ -65,7 +65,7 @@ public class S3Service implements IStorageService {
 
   @Override
   public UploadInfo getUploadInfo(Attachment attachment) {
-    int partSize = zerowebS3Config.getPartSize();
+    long partSize = zerowebS3Config.getPartSize();
     int partCount = Math.toIntExact(
         (attachment.getSize() - 1) / partSize + 1
     );
@@ -77,6 +77,7 @@ public class S3Service implements IStorageService {
     );
   }
 
+  /// 创建预签名的 S3 URL，返回给前端
   public UploadEndpoint getUploadAddress(Attachment attachment) {
     PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder()
         .signatureDuration(Duration.ofMinutes(10))
@@ -95,6 +96,7 @@ public class S3Service implements IStorageService {
     return new UploadEndpoint(presignedPutObjectRequest.url().toString());
   }
 
+  /// 创建预签名的 S3 URL，返回给前端
   @Override
   public UploadEndpoint getUploadAddress(Attachment attachment, int partNumber) {
     return this.getUploadAddress(attachment, partNumber, StorageContext.CRC.get());
@@ -165,6 +167,9 @@ public class S3Service implements IStorageService {
         );
   }
 
+  /// 开启一次分段上传
+  /// @param attachment 附件
+  /// @return 上传ID
   private S3UploadId createMultipartUpload(Attachment attachment) {
     CreateMultipartUploadResponse response = s3Client.createMultipartUpload(builder -> builder
         .bucket(zerowebS3Config.getBucket())
@@ -180,6 +185,7 @@ public class S3Service implements IStorageService {
     return s3UploadId;
   }
 
+  /// 文件上传前，先调用 S3 开启一次分段上传
   @EventListener
   void listen(AttachmentCreatedEvent event) {
     Attachment attachment = event.attachment();
@@ -192,6 +198,7 @@ public class S3Service implements IStorageService {
     this.createMultipartUpload(attachment);
   }
 
+  /// 文件上传后，调用 S3 完成分段合并
   @EventListener
   void listen(AttachmentUploadedEvent event) {
     Attachment attachment = event.attachment();

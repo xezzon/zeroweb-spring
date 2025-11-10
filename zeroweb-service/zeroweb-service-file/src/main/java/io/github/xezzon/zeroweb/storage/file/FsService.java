@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.storage.file;
 
 import com.google.common.hash.Hashing;
+import com.google.common.hash.HashingOutputStream;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.IAttachmentService;
 import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
@@ -14,11 +15,11 @@ import io.github.xezzon.zeroweb.common.exception.WriteFileException;
 import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.IStorageService;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Base64;
 import java.util.Comparator;
@@ -59,14 +60,15 @@ public class FsService implements IStorageService {
 
   @Override
   public UploadInfo getUploadInfo(Attachment attachment) {
-    int partSize = zerowebFsConfig.getPartSize();
+    long partSize = zerowebFsConfig.getPartSize();
     int partCount = Math.toIntExact(
         (attachment.getSize() - 1) / partSize + 1);
     return new UploadInfo(
         attachment.getId(),
         attachment.getProvider(),
         partCount,
-        partSize);
+        partSize
+    );
   }
 
   public UploadEndpoint getUploadAddress(Attachment attachment) {
@@ -97,7 +99,8 @@ public class FsService implements IStorageService {
         .buildAndExpand(attachment.getId())
         .toUriString();
     return new DownloadEndpoint(
-        endpoint);
+        endpoint
+    );
   }
 
   void upload(String id, byte[] fileContent) {
@@ -130,6 +133,10 @@ public class FsService implements IStorageService {
   }
 
   void upload(String id, int partNumber, byte[] fileContent) {
+    Attachment attachment = attachmentService.queryById(id);
+    if (attachment == null) {
+      throw new IncorrectFileException("Invalid attachment.");
+    }
     Path tempFile = TEMP_DIR
         .resolve(id)
         .resolve(String.valueOf(partNumber));
@@ -151,6 +158,7 @@ public class FsService implements IStorageService {
     }
   }
 
+  /// 大文件上传前，需要新建 ID 同名的临时目录
   @EventListener
   void listen(AttachmentCreatedEvent event) {
     Attachment attachment = event.attachment();
@@ -168,6 +176,8 @@ public class FsService implements IStorageService {
     }
   }
 
+  /// 大文件上传后，将分片合并
+  @SuppressWarnings("UnstableApiUsage")
   @EventListener
   void listen(AttachmentUploadedEvent event) {
     Attachment attachment = event.attachment();
@@ -181,42 +191,57 @@ public class FsService implements IStorageService {
     Path tempAttachmentDir = TEMP_DIR.resolve(attachment.getId());
     Path finalPath = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
 
+    Path mergedTemp;
+    try {
+      mergedTemp = Files.createTempFile("merge-", ".tmp");
+    } catch (IOException e) {
+      throw new WriteFileException("Fail to create  merge temporary file.", e);
+    }
+
     try (
         Stream<Path> parts = Files.list(tempAttachmentDir);
-        ByteArrayOutputStream mergedFileStream = new ByteArrayOutputStream()) {
+        HashingOutputStream hashingStream = new HashingOutputStream(
+            Hashing.sha256(),
+            Files.newOutputStream(
+                mergedTemp,
+                StandardOpenOption.WRITE,
+                StandardOpenOption.TRUNCATE_EXISTING
+            )
+        )
+    ) {
       // 合并分段文件
       List<Path> partFiles = parts
           .filter(Files::isRegularFile)
           .sorted(Comparator.comparingInt(p -> Integer.parseInt(p.getFileName().toString())))
           .toList();
+      long mergedSize = 0L;
       for (Path partFile : partFiles) {
-        Files.copy(partFile, mergedFileStream);
+        mergedSize += Files.copy(partFile, hashingStream);
       }
-
-      // 校验哈希、大小
-      byte[] mergedFileContent = mergedFileStream.toByteArray();
-      if (!Objects.equals(mergedFileContent.length, attachment.getSize().intValue())) {
+      hashingStream.flush();
+      if (!Objects.equals(mergedSize, attachment.getSize())) {
+        Files.deleteIfExists(mergedTemp);
         throw new IncorrectFileException("Invalid size.");
       }
-      if (!Objects.equals(
-          Base64.getEncoder()
-              .encodeToString(Hashing.sha256().hashBytes(mergedFileContent).asBytes()),
-          attachment.getChecksum())) {
+      String checksum = Base64.getEncoder()
+          .encodeToString(hashingStream.hash().asBytes());
+      if (!Objects.equals(checksum, attachment.getChecksum())) {
+        Files.deleteIfExists(mergedTemp);
         throw new IncorrectFileException("Invalid checksum.");
       }
 
-      // 递归创建其父目录
       Files.createDirectories(finalPath.getParent());
-      // 设置文件可访问性
+      Files.move(mergedTemp, finalPath, StandardCopyOption.REPLACE_EXISTING);
       File file = finalPath.toFile();
       file.setReadable(true, true);
       file.setWritable(true, true);
       file.setExecutable(false);
-      file.createNewFile();
-      // 写入文件内容
-      Files.write(finalPath, mergedFileContent, StandardOpenOption.CREATE);
-
     } catch (IOException e) {
+      try {
+        Files.deleteIfExists(mergedTemp);
+      } catch (IOException suppressed) {
+        log.warn("Failed to clean merged temp file: {}", suppressed.getMessage());
+      }
       throw new WriteFileException(e);
     } finally {
       // 清理临时文件

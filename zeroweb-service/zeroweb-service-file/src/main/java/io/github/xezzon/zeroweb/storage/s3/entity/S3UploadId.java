@@ -9,19 +9,16 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * @author xezzon
- */
+/// S3 的上传 ID
+/// @author xezzon
 @Getter
 @Setter
 @ToString
 @Entity
 @Table(name = "zeroweb_s3_upload_id")
-public final class S3UploadId {
+public class S3UploadId {
 
-  /**
-   * 附件ID
-   */
+  /// 附件ID
   @Id
   @Column(
       name = "attachment_id",
@@ -30,14 +27,10 @@ public final class S3UploadId {
       length = DatabaseConstant.ID_LENGTH
   )
   private String attachmentId;
-  /**
-   * S3上传ID
-   */
+  /// S3上传ID
   @Column(name = "upload_id", nullable = false, updatable = false, length = 512)
   private String uploadId;
-  /**
-   * 循环冗余校验和。用于 S3 的完整对象校验
-   */
+  /// 循环冗余校验和。用于 S3 的完整对象校验
   @Column(name = "crc", nullable = false, updatable = false)
   private String crc;
 

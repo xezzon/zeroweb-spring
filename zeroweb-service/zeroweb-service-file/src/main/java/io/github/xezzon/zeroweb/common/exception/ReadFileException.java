@@ -1,8 +1,7 @@
 package io.github.xezzon.zeroweb.common.exception;
 
-/**
- * @author xezzon
- */
+/// 文件下载错误
+/// @author xezzon
 public class ReadFileException extends ZerowebRuntimeException {
 
   public ReadFileException(Throwable cause) {

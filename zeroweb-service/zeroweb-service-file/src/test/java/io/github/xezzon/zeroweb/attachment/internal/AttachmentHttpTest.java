@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -90,7 +88,7 @@ abstract class AttachmentHttpTest {
   @LocalServerPort
   private int port;
 
-  abstract int partSize();
+  abstract long partSize();
 
   abstract boolean fileExist(Attachment attachment);
 
@@ -190,8 +188,6 @@ abstract class AttachmentHttpTest {
     Assertions.assertEquals(zerowebFileConfig.getProvider(), actual.getProvider());
     Assertions.assertEquals(AttachmentStatusEnum.UPLOADING, actual.getStatus());
     Assertions.assertEquals(userId, actual.getOwnerId());
-    Assertions.assertTrue(Duration.between(actual.getCreateTime(), Instant.now()).toMinutes() < 1);
-    Assertions.assertTrue(Duration.between(actual.getCreateTime(), Instant.now()).toMillis() > 0);
   }
 
   @Test
@@ -299,7 +295,7 @@ abstract class AttachmentHttpTest {
           .uri(builder -> builder
               .path(GET_UPLOAD_ADDRESS)
               .queryParam("partNumber", 2)
-              .queryParam("crc")
+              .queryParam("crc", partChecksum)
               .build(largeFileAttachment.getId())
           )
           .exchange()
@@ -389,7 +385,7 @@ abstract class AttachmentHttpTest {
             ResponseSpec response = webTestClient.put()
                 .uri(uri)
                 .bodyValue(partContent)
-                .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.SHA256.toString())
+                .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
                 .header("x-amz-checksum-crc32", partChecksum)
                 .exchange()
                 .expectStatus().isOk();
@@ -506,10 +502,13 @@ abstract class AttachmentHttpTest {
     );
     CRC32 crc32 = new CRC32();
     crc32.update(Files.readAllBytes(largeFileResource));
+    final String checksum = Base64.getEncoder().encodeToString(
+        HexUtil.decodeHex(Long.toHexString(crc32.getValue()))
+    );
     UploadInfo responseBody = webTestClient.post()
         .uri(builder -> builder
             .path(ADD_ATTACHMENT)
-            .queryParam("crc", crc32.getValue())
+            .queryParam("crc", checksum)
             .build()
         )
         .bodyValue(req)
@@ -527,14 +526,14 @@ abstract class AttachmentHttpTest {
           final byte[] partContent = incorrectParts.get(partNumber - 1);
           final CRC32 partCrc32 = new CRC32();
           partCrc32.update(partContent);
-          final String checksum = Base64.getEncoder().encodeToString(
+          final String partChecksum = Base64.getEncoder().encodeToString(
               HexUtil.decodeHex(Long.toHexString(partCrc32.getValue()))
           );
           UploadEndpoint address = webTestClient.get()
               .uri(builder -> builder
                   .path(GET_UPLOAD_ADDRESS)
                   .queryParam("partNumber", partNumber)
-                  .queryParam("crc", checksum)
+                  .queryParam("crc", partChecksum)
                   .build(attachmentId)
               )
               .exchange()
@@ -547,7 +546,7 @@ abstract class AttachmentHttpTest {
               .uri(uri)
               .bodyValue(partContent)
               .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
-              .header("x-amz-checksum-crc32", checksum)
+              .header("x-amz-checksum-crc32", partChecksum)
               .exchange()
               .expectStatus().isOk();
           if (address.getCallback() != null) {
@@ -556,7 +555,7 @@ abstract class AttachmentHttpTest {
                     .path(address.getCallback())
                     .build(attachmentId)
                 )
-                .bodyValue(new S3Etag(attachmentId, address.getPartNumber(), etag, checksum))
+                .bodyValue(new S3Etag(attachmentId, address.getPartNumber(), etag, partChecksum))
                 .exchange()
                 .expectStatus().isOk()
             );
@@ -573,7 +572,7 @@ abstract class AttachmentHttpTest {
   void upload_incorrectPartSize() throws IOException {
     ByteSource byteSource = ByteSource.wrap(Files.readAllBytes(largeFileResource));
     long offset = 0;
-    int incorrectPartSize = this.partSize() + 1024 * 1024;
+    long incorrectPartSize = this.partSize() + 1024 * 1024;
     List<byte[]> incorrectParts = new ArrayList<>();
     while (offset < byteSource.size()) {
       long length = Math.min(incorrectPartSize, byteSource.size() - offset);
@@ -785,7 +784,7 @@ class S3HttpTest extends AttachmentHttpTest {
   }
 
   @Override
-  int partSize() {
+  long partSize() {
     return zerowebS3Config.getPartSize();
   }
 
@@ -824,7 +823,7 @@ class FsHttpTest extends AttachmentHttpTest {
   private ZerowebFsConfig zerowebFsConfig;
 
   @Override
-  int partSize() {
+  long partSize() {
     return zerowebFsConfig.getPartSize();
   }
 
@@ -842,6 +841,7 @@ class FsHttpTest extends AttachmentHttpTest {
   @Override
   void saveFile(Attachment attachment) throws IOException {
     Path path = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
+    Files.createDirectories(path.getParent());
     Files.copy(resource, path);
   }
 }

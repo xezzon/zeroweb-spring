@@ -14,9 +14,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-/**
- * @author xezzon
- */
+/// 文件系统存储配置
+/// @author xezzon
 @Setter
 @Configuration
 @ConfigurationProperties(prefix = ZerowebFsConfig.PREFIX)
@@ -25,7 +24,9 @@ public class ZerowebFsConfig {
 
   static final String PREFIX = ZerowebFileConfig.PREFIX + ".fs";
 
+  /// 文件存储基础路径
   private String basePath;
+  /// Web 容器上传配置
   @Resource
   private MultipartProperties multipartProperties;
 
@@ -39,8 +40,9 @@ public class ZerowebFsConfig {
     return Path.of(basePath);
   }
 
-  public int getPartSize() {
-    return Math.toIntExact(multipartProperties.getMaxFileSize().toBytes());
+  /// @return 文件存储的分片大小。单位 Byte
+  public long getPartSize() {
+    return multipartProperties.getMaxFileSize().toBytes();
   }
 }
 

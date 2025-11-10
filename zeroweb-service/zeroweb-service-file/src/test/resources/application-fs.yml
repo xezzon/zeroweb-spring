@@ -1,2 +1,2 @@
 ZEROWEB_FILE_PROVIDER: fs
-ZEROWEB_FS_BASEPATH: /srv/zeroweb/Uploads/test
+ZEROWEB_FS_BASEPATH: /tmp/zeroweb/Uploads/test

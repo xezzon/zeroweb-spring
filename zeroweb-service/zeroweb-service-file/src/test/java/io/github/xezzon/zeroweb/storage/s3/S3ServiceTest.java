@@ -168,14 +168,14 @@ class S3ServiceTest {
     String checksum = Base64.getEncoder().encodeToString(
         HexUtil.decodeHex(Long.toHexString(crc32.getValue()))
     );
-    int partSize = zerowebS3Config.getPartSize();
+    long partSize = zerowebS3Config.getPartSize();
     int partCount = Math.toIntExact((file.length() - 1) / partSize) + 1;
     ScopedValue.where(StorageContext.CRC, checksum)
         .run(() -> {
           try (HttpClient httpClient = HttpClient.newHttpClient()) {
             int fromIndex = 0;
             for (int partNumber = 1; partNumber <= partCount; partNumber++) {
-              int toIndex = fromIndex + partSize;
+              int toIndex = fromIndex + Math.toIntExact(partSize);
               byte[] partContent = Arrays.copyOfRange(resourceContent, fromIndex, toIndex);
               final CRC32 partCrc32 = new CRC32();
               partCrc32.update(partContent);

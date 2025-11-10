@@ -10,9 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * @author xezzon
- */
+/// S3 上传分片的响应
+/// @author xezzon
 @Getter
 @Setter
 @ToString
@@ -24,9 +23,7 @@ public class S3Etag {
   @IdGenerator
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   private String id;
-  /**
-   * 附件ID
-   */
+  /// 附件ID
   @Column(
       name = "attachment_id",
       nullable = false,
@@ -34,19 +31,13 @@ public class S3Etag {
       length = DatabaseConstant.ID_LENGTH
   )
   private String attachmentId;
-  /**
-   * 分段序号
-   */
+  /// 分段序号
   @Column(name = "part_number", nullable = false, updatable = false)
   private Integer partNumber;
-  /**
-   * S3 ETag
-   */
+  /// S3 ETag
   @Column(name = "etag", nullable = false)
   private String etag;
-  /**
-   * 分片摘要
-   */
+  /// 分片摘要
   @Column(name = "checksum")
   private String checksum;
 

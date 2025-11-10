@@ -53,8 +53,9 @@ public class FsHttpEndpoint {
   public void upload(
       @PathVariable final String id,
       @PathVariable final int partNumber,
-      @RequestBody byte[] fileContent) {
-    fsService.upload(id, partNumber, fileContent);
+      @RequestBody byte[] fileContent
+  ) {
+    fsService().upload(id, partNumber, fileContent);
   }
 
   /// 下载文件

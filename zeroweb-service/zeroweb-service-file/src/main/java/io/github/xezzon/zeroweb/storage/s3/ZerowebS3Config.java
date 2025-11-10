@@ -31,10 +31,17 @@ public class ZerowebS3Config {
 
   static final String PREFIX = ZerowebFileConfig.PREFIX + ".s3";
 
+  /// S3 调用地址。
+  ///
+  /// 如果是 AWS S3，无需填写；如果是其他兼容 S3 的服务，则必填。
   private URI endpoint;
   private String accessKey;
   private String secretKey;
+  /// S3 服务所在区域
+  ///
+  /// 兼容 S3 的服务无需填写
   private String region;
+  /// 存储桶
   @Getter
   private String bucket;
   /// 单个分片最大大小
@@ -44,8 +51,8 @@ public class ZerowebS3Config {
   /// 单位 MB
   private Integer partSize = 5;
 
-  public int getPartSize() {
-    return this.partSize * 1024 * 1024;
+  public long getPartSize() {
+    return this.partSize * 1024L * 1024;
   }
 
   @Bean

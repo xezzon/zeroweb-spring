@@ -17,11 +17,9 @@ public interface IStorageService {
   /// 存储类型
   FileProviderEnum provider();
 
-  /**
-   * 获取上传元数据
-   * @param attachment 附件
-   * @return 上传元数据
-   */
+  /// 获取上传元数据
+  /// @param attachment 附件
+  /// @return 上传元数据
   UploadInfo getUploadInfo(Attachment attachment);
 
   /// 获取附件的上传地址

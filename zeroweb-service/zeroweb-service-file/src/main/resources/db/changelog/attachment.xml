@@ -41,5 +41,12 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
+    <createIndex tableName="zeroweb_attachment" indexName="IX_t_a_biz">
+      <column name="biz_type"/>
+      <column name="biz_id"/>
+    </createIndex>
+    <createIndex tableName="zeroweb_attachment" indexName="IX_t_a_owner">
+      <column name="owner_id"/>
+    </createIndex>
   </changeSet>
 </databaseChangeLog>
