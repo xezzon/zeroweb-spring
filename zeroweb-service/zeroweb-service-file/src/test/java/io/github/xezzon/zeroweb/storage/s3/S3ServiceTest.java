@@ -6,7 +6,6 @@ import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
-import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
 import io.github.xezzon.zeroweb.storage.StorageContext;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
@@ -70,7 +69,7 @@ class S3ServiceTest {
   @Resource
   private S3UploadIdRepository s3UploadIdRepository;
   @Resource
-  private ZerowebFileConfig zerowebFileConfig;
+  private ZerowebS3Config zerowebS3Config;
 
   @BeforeAll
   static void beforeAll() {
@@ -169,7 +168,7 @@ class S3ServiceTest {
     String checksum = Base64.getEncoder().encodeToString(
         HexUtil.decodeHex(Long.toHexString(crc32.getValue()))
     );
-    int partSize = zerowebFileConfig.getMaxPartSize();
+    int partSize = zerowebS3Config.getPartSize();
     int partCount = Math.toIntExact((file.length() - 1) / partSize) + 1;
     ScopedValue.where(StorageContext.CRC, checksum)
         .run(() -> {

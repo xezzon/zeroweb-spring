@@ -37,6 +37,16 @@ public class ZerowebS3Config {
   private String region;
   @Getter
   private String bucket;
+  /// 单个分片最大大小
+  ///
+  /// 大于该大小的需要进行分片上传
+  ///
+  /// 单位 MB
+  private Integer partSize = 5;
+
+  public int getPartSize() {
+    return this.partSize * 1024 * 1024;
+  }
 
   @Bean
   AwsCredentialsProvider credentialsProvider() {

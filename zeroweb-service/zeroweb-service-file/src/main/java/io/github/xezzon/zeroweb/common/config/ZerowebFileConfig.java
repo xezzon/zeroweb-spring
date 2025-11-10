@@ -17,14 +17,4 @@ public class ZerowebFileConfig {
 
   /// 存储后端
   private FileProviderEnum provider = FileProviderEnum.FS;
-  /// 单个分片最大大小
-  ///
-  /// 大于该大小的需要进行分片上传
-  ///
-  /// 单位 MB
-  private Integer maxPartSize = 5;
-
-  public int getMaxPartSize() {
-    return this.maxPartSize * 1024 * 1024;
-  }
 }

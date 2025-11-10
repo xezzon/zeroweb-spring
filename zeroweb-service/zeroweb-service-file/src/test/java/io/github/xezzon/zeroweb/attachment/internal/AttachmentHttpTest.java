@@ -18,6 +18,7 @@ import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
+import io.github.xezzon.zeroweb.storage.s3.ZerowebS3Config;
 import io.github.xezzon.zeroweb.storage.s3.entity.S3Etag;
 import jakarta.annotation.Resource;
 import java.io.File;
@@ -84,6 +85,8 @@ abstract class AttachmentHttpTest {
   @LocalServerPort
   private int port;
 
+  abstract int partSize();
+
   abstract boolean fileExist(Attachment attachment);
 
   abstract void assertIncorrectFileStatus(int status);
@@ -111,7 +114,7 @@ abstract class AttachmentHttpTest {
     ByteSource byteSource = ByteSource.wrap(Files.readAllBytes(largeFileResource));
     long offset = 0;
     while (offset < byteSource.size()) {
-      long length = Math.min(zerowebFileConfig.getMaxPartSize(), byteSource.size() - offset);
+      long length = Math.min(this.partSize(), byteSource.size() - offset);
       largeFileParts.add(byteSource.slice(offset, length).read());
       offset += length;
     }
@@ -154,7 +157,7 @@ abstract class AttachmentHttpTest {
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
     Assertions.assertEquals(
-        (req.size() - 1) / (zerowebFileConfig.getMaxPartSize()) + 1,
+        (req.size() - 1) / (this.partSize()) + 1,
         responseBody.partCount()
     );
     Attachment actual = repository.findById(responseBody.id()).orElseThrow();
@@ -462,7 +465,7 @@ abstract class AttachmentHttpTest {
     long offset = 0;
     List<byte[]> incorrectParts = new ArrayList<>();
     while (offset < byteSource.size()) {
-      long length = Math.min(zerowebFileConfig.getMaxPartSize(), byteSource.size() - offset);
+      long length = Math.min(this.partSize(), byteSource.size() - offset);
       incorrectParts.add(byteSource.slice(offset, length).read());
       offset += length;
     }
@@ -544,7 +547,7 @@ abstract class AttachmentHttpTest {
   void upload_incorrectPartSize() throws IOException {
     ByteSource byteSource = ByteSource.wrap(Files.readAllBytes(largeFileResource));
     long offset = 0;
-    int incorrectPartSize = zerowebFileConfig.getMaxPartSize() + 1024 * 1024;
+    int incorrectPartSize = this.partSize() + 1024 * 1024;
     List<byte[]> incorrectParts = new ArrayList<>();
     while (offset < byteSource.size()) {
       long length = Math.min(incorrectPartSize, byteSource.size() - offset);
@@ -702,6 +705,8 @@ class S3HttpTest extends AttachmentHttpTest {
   ).withServices(Service.S3);
   private static final String BUCKET = "test";
   private static S3Client s3Client = null;
+  @Resource
+  private ZerowebS3Config zerowebS3Config;
 
   @BeforeAll
   static void beforeAll() {
@@ -729,6 +734,11 @@ class S3HttpTest extends AttachmentHttpTest {
   }
 
   @Override
+  int partSize() {
+    return zerowebS3Config.getPartSize();
+  }
+
+  @Override
   boolean fileExist(Attachment attachment) {
     s3Client.headObject(builder -> builder
         .bucket(BUCKET)
@@ -748,6 +758,11 @@ class FsHttpTest extends AttachmentHttpTest {
 
   @Resource
   private ZerowebFsConfig zerowebFsConfig;
+
+  @Override
+  int partSize() {
+    return zerowebFsConfig.getPartSize();
+  }
 
   @Override
   boolean fileExist(Attachment attachment) {

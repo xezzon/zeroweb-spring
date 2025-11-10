@@ -1,10 +1,10 @@
 package io.github.xezzon.zeroweb.storage.s3;
 
 import io.github.xezzon.zeroweb.attachment.Attachment;
+import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentCreatedEvent;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
-import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.storage.IStorageService;
 import io.github.xezzon.zeroweb.storage.StorageContext;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
@@ -36,7 +36,6 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 public class S3Service implements IStorageService {
 
   static final String ETAG_CALLBACK_URL = "/s3/{id}/etag";
-  private final ZerowebFileConfig zerowebFileConfig;
   private final ZerowebS3Config zerowebS3Config;
   private final S3Presigner s3Presigner;
   private final S3Client s3Client;
@@ -48,20 +47,32 @@ public class S3Service implements IStorageService {
       final S3Presigner s3Presigner,
       final S3Client s3Client,
       final S3UploadIdRepository s3UploadIdRepository,
-      final S3EtagRepository s3EtagRepository,
-      final ZerowebFileConfig zerowebFileConfig
+      final S3EtagRepository s3EtagRepository
   ) {
     this.zerowebS3Config = zerowebS3Config;
     this.s3Presigner = s3Presigner;
     this.s3Client = s3Client;
     this.s3UploadIdRepository = s3UploadIdRepository;
     this.s3EtagRepository = s3EtagRepository;
-    this.zerowebFileConfig = zerowebFileConfig;
   }
 
   @Override
   public FileProviderEnum provider() {
     return FileProviderEnum.S3;
+  }
+
+  @Override
+  public UploadInfo getUploadInfo(Attachment attachment) {
+    int partSize = zerowebS3Config.getPartSize();
+    int partCount = Math.toIntExact(
+        (attachment.getSize() - 1) / partSize + 1
+    );
+    return new UploadInfo(
+        attachment.getId(),
+        attachment.getProvider(),
+        partCount,
+        partSize
+    );
   }
 
   public UploadEndpoint getUploadAddress(Attachment attachment) {
@@ -156,7 +167,7 @@ public class S3Service implements IStorageService {
     if (attachment.getProvider() != FileProviderEnum.S3) {
       return;
     }
-    if (attachment.getSize() <= zerowebFileConfig.getMaxPartSize()) {
+    if (attachment.getSize() <= zerowebS3Config.getPartSize()) {
       return;
     }
     this.createMultipartUpload(attachment);

@@ -3,10 +3,10 @@ package io.github.xezzon.zeroweb.storage.file;
 import com.google.common.hash.Hashing;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.IAttachmentService;
+import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentCreatedEvent;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
-import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.exception.WriteFileException;
 import io.github.xezzon.zeroweb.storage.IStorageService;
@@ -39,22 +39,33 @@ public class FsService implements IStorageService {
   static final String MULTIPART_UPLOAD_ENDPOINT = "/fs/{id}/upload/{partNumber}";
   private static final Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir"));
   private final ZerowebFsConfig zerowebFsConfig;
-  private final ZerowebFileConfig zerowebFileConfig;
   private final IAttachmentService attachmentService;
 
   public FsService(
       final ZerowebFsConfig zerowebFsConfig,
-      final ZerowebFileConfig zerowebFileConfig,
       @Lazy final IAttachmentService attachmentService
   ) {
     this.zerowebFsConfig = zerowebFsConfig;
-    this.zerowebFileConfig = zerowebFileConfig;
     this.attachmentService = attachmentService;
   }
 
   @Override
   public FileProviderEnum provider() {
     return FileProviderEnum.FS;
+  }
+
+  @Override
+  public UploadInfo getUploadInfo(Attachment attachment) {
+    int partSize = zerowebFsConfig.getPartSize();
+    int partCount = Math.toIntExact(
+        (attachment.getSize() - 1) / partSize + 1
+    );
+    return new UploadInfo(
+        attachment.getId(),
+        attachment.getProvider(),
+        partCount,
+        partSize
+    );
   }
 
   public UploadEndpoint getUploadAddress(Attachment attachment) {
@@ -125,7 +136,7 @@ public class FsService implements IStorageService {
     if (attachment.getProvider() != provider()) {
       return;
     }
-    if (attachment.getSize() <= zerowebFileConfig.getMaxPartSize()) {
+    if (attachment.getSize() <= zerowebFsConfig.getPartSize()) {
       return;
     }
 
@@ -142,7 +153,7 @@ public class FsService implements IStorageService {
     if (attachment.getProvider() != provider()) {
       return;
     }
-    if (attachment.getSize() <= zerowebFileConfig.getMaxPartSize()) {
+    if (attachment.getSize() <= zerowebFsConfig.getPartSize()) {
       return;
     }
 

@@ -68,15 +68,8 @@ public class AttachmentService implements IAttachmentService {
     if (!Objects.equals(attachment.getSize(), fileSize)) {
       throw new IncorrectFileException("Invalid size.");
     }
-    int partCount = Math.toIntExact(
-        (attachment.getSize() - 1) / zerowebFileConfig.getMaxPartSize() + 1
-    );
-    return new UploadInfo(
-        id,
-        attachment.getProvider(),
-        partCount,
-        zerowebFileConfig.getMaxPartSize()
-    );
+    IStorageService storageService = storageServiceFactory.get(attachment.getProvider());
+    return storageService.getUploadInfo(attachment);
   }
 
   UploadEndpoint getUploadEndpoint(String id, int partNumber) {
