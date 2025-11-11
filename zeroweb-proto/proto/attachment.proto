@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package io.github.xezzon.zeroweb.attachment;
+
+option java_multiple_files = true;
+option java_outer_classname = "AttachmentProto";
+option java_package = "io.github.xezzon.zeroweb.attachment";
+
+// 文件元数据
+message FileMetadata {
+  // 文件名
+  string name = 1;
+  // MIME 类型
+  string type = 2;
+  // 业务类型
+  string biz_type = 3;
+  // 业务ID
+  string biz_id = 4;
+}
+
+// 文件上传请求
+message FileUploadRequest {
+  // 文件元数据
+  FileMetadata metadata = 1;
+  // 文件内容
+  bytes chunk = 2;
+}
+
+// 文件上传相应
+message FileUploadResponse {
+  // 附件ID
+  string id = 1;
+}
+
+// 附件管理服务
+service Attachment {
+  // 文件上传
+  rpc uploadFile(stream FileUploadRequest) returns (FileUploadResponse);
+}

@@ -16,6 +16,7 @@ import io.github.xezzon.zeroweb.common.exception.ReadFileException;
 import io.github.xezzon.zeroweb.common.exception.WriteFileException;
 import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.IStorageService;
+import io.github.xezzon.zeroweb.storage.StorageContext;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +53,8 @@ public class FsService implements IStorageService {
 
   public FsService(
       final ZerowebFsConfig zerowebFsConfig,
-      @Lazy final IAttachmentService attachmentService) {
+      @Lazy final IAttachmentService attachmentService
+  ) {
     this.zerowebFsConfig = zerowebFsConfig;
     this.attachmentService = attachmentService;
   }
@@ -116,20 +118,21 @@ public class FsService implements IStorageService {
     );
   }
 
-  void upload(String id, byte[] fileContent) {
-    Attachment attachment = attachmentService.queryById(id);
-    Path path = zerowebFsConfig.getBasePath()
-        .resolve(attachment.objectKey());
+  @Override
+  public void upload(Attachment attachment, byte[] fileContent) {
+    Path path = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
+    // 校验哈希、大小
+    if (!Objects.equals(fileContent.length, attachment.getSize().intValue())) {
+      throw new IncorrectFileException("Invalid size.");
+    }
+    if (!Objects.equals(
+        Base64.getEncoder().encodeToString(Hashing.sha256().hashBytes(fileContent).asBytes()),
+        attachment.getChecksum())
+    ) {
+      throw new IncorrectFileException("Invalid checksum.");
+    }
+
     try {
-      // 校验哈希、大小
-      if (!Objects.equals(fileContent.length, attachment.getSize().intValue())) {
-        throw new IncorrectFileException("Invalid size.");
-      }
-      if (!Objects.equals(
-          Base64.getEncoder().encodeToString(Hashing.sha256().hashBytes(fileContent).asBytes()),
-          attachment.getChecksum())) {
-        throw new IncorrectFileException("Invalid checksum.");
-      }
       // 递归创建其父目录
       Files.createDirectories(path.getParent());
       // 新建文件并设置其可访问性（所有者可读、可写，所有人不可执行）
@@ -143,6 +146,11 @@ public class FsService implements IStorageService {
     } catch (IOException e) {
       throw new WriteFileException(e);
     }
+  }
+
+  void upload(String id, byte[] fileContent) {
+    Attachment attachment = attachmentService.queryById(id);
+    this.upload(attachment, fileContent);
   }
 
   void upload(String id, int partNumber, byte[] fileContent) {
@@ -181,6 +189,10 @@ public class FsService implements IStorageService {
     if (attachment.getSize() <= zerowebFsConfig.getPartSize()) {
       return;
     }
+    if (!StorageContext.CRC.isBound()) {
+      // gRPC 调用，无需开启分段上传
+      return;
+    }
 
     try {
       Files.createDirectories(TEMP_DIR.resolve(attachment.getId()));
@@ -202,7 +214,9 @@ public class FsService implements IStorageService {
     }
 
     Path tempAttachmentDir = TEMP_DIR.resolve(attachment.getId());
-    Path finalPath = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
+    if (!tempAttachmentDir.toFile().exists()) {
+      return;
+    }
 
     Path mergedTemp;
     try {
@@ -243,6 +257,7 @@ public class FsService implements IStorageService {
         throw new IncorrectFileException("Invalid checksum.");
       }
 
+      Path finalPath = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
       Files.createDirectories(finalPath.getParent());
       Files.move(mergedTemp, finalPath, StandardCopyOption.REPLACE_EXISTING);
       File file = finalPath.toFile();

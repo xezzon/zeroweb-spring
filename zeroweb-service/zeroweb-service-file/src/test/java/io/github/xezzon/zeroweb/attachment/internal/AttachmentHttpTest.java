@@ -17,6 +17,7 @@ import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.constant.BannerConstant;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
+import io.github.xezzon.zeroweb.common.exception.ReadFileException;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
 import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
@@ -55,10 +56,12 @@ import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.ChecksumAlgorithm;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -93,7 +96,7 @@ abstract class AttachmentHttpTest {
 
   abstract long partSize();
 
-  abstract boolean fileExist(Attachment attachment);
+  abstract byte[] readFile(Attachment attachment);
 
   abstract void assertIncorrectFileStatus(int status);
 
@@ -244,16 +247,17 @@ abstract class AttachmentHttpTest {
         .expectBody(UploadEndpoint.class).returnResult().getResponseBody();
     Assertions.assertNotNull(uploadEndpoint);
 
+    byte[] fileContent = Files.readAllBytes(resource);
     webTestClient.put()
         .uri(localhost(uploadEndpoint.getEndpoint()))
-        .bodyValue(Files.readAllBytes(resource))
+        .bodyValue(fileContent)
         .header("Content-Type", Files.probeContentType(resource))
         .header("x-amz-meta-filename", attachment.getName())
         .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.SHA256.toString())
         .header("x-amz-checksum-sha256", attachment.getChecksum())
         .exchange()
         .expectStatus().isOk();
-    Assertions.assertTrue(fileExist(attachment));
+    Assertions.assertArrayEquals(fileContent, readFile(attachment));
   }
 
   @Test
@@ -379,7 +383,10 @@ abstract class AttachmentHttpTest {
         .uri(FINISH_UPLOAD, attachmentId)
         .exchange()
         .expectStatus().isOk();
-    Assertions.assertTrue(fileExist(largeFileAttachment));
+    Assertions.assertArrayEquals(
+        Files.readAllBytes(largeFileResource),
+        readFile(largeFileAttachment)
+    );
   }
 
   @Test
@@ -603,7 +610,10 @@ abstract class AttachmentHttpTest {
         .uri(FINISH_UPLOAD, attachmentId)
         .exchange()
         .expectStatus().isOk();
-    Assertions.assertTrue(fileExist(largeFileAttachment));
+    Assertions.assertArrayEquals(
+        byteSource.read(),
+        readFile(largeFileAttachment)
+    );
   }
 
   @Test
@@ -721,7 +731,10 @@ abstract class AttachmentHttpTest {
         .uri(FINISH_UPLOAD, attachmentId)
         .exchange()
         .expectStatus().isOk();
-    Assertions.assertTrue(fileExist(largeFileAttachment));
+    Assertions.assertArrayEquals(
+        Files.readAllBytes(largeFileResource),
+        readFile(largeFileAttachment)
+    );
   }
 
   @Test
@@ -820,7 +833,7 @@ abstract class AttachmentHttpTest {
         .exchange()
         .expectStatus().isOk();
     Assertions.assertFalse(repository.existsById(attachment.getId()));
-    Assertions.assertFalse(this.fileExist(attachment));
+    Assertions.assertArrayEquals(new byte[0], this.readFile(attachment));
   }
 
   private URI localhost(String uri) {
@@ -872,15 +885,15 @@ class S3HttpTest extends AttachmentHttpTest {
   }
 
   @Override
-  boolean fileExist(Attachment attachment) {
+  byte[] readFile(final Attachment attachment) {
     try {
-      s3Client.headObject(builder -> builder
-          .bucket(BUCKET)
+      ResponseBytes<GetObjectResponse> response = s3Client.getObjectAsBytes(builder -> builder
+          .bucket(zerowebS3Config.getBucket())
           .key(attachment.objectKey())
       );
-      return true;
-    } catch (RuntimeException _) {
-      return false;
+      return response.asByteArray();
+    } catch (Exception _) {
+      return new byte[0];
     }
   }
 
@@ -927,9 +940,16 @@ class FsHttpTest extends AttachmentHttpTest {
   }
 
   @Override
-  boolean fileExist(Attachment attachment) {
+  byte[] readFile(final Attachment attachment) {
     Path path = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
-    return Files.exists(path);
+    if (!path.toFile().exists()) {
+      return new byte[0];
+    }
+    try {
+      return Files.readAllBytes(path);
+    } catch (IOException e) {
+      throw new ReadFileException(e);
+    }
   }
 
   @Override
