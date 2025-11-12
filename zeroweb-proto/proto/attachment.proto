@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package io.github.xezzon.zeroweb.attachment;
 
+import "google/protobuf/timestamp.proto";
+
 option java_multiple_files = true;
 option java_outer_classname = "AttachmentProto";
 option java_package = "io.github.xezzon.zeroweb.attachment";
@@ -26,14 +28,55 @@ message FileUploadRequest {
   bytes chunk = 2;
 }
 
-// 文件上传相应
+// 文件上传响应
 message FileUploadResponse {
   // 附件ID
   string id = 1;
+}
+
+// 查询附件列表请求
+message QueryAttachmentListRequest {
+  // 业务类型
+  string biz_type = 1;
+  // 业务ID
+  string biz_id = 2;
+}
+
+// 附件状态
+enum AttachmentStatus {
+  // 正在上传
+  UPLOADING = 0;
+  // 上传完成
+  DONE = 1;
+}
+
+message AttachmentItem {
+  // 附件ID
+  string id = 1;
+  // 文件名
+  string name = 2;
+  // 文件摘要
+  string checksum = 3;
+  // 文件大小。单位：字节。
+  uint64 size = 4;
+  // MIME 类型
+  string type = 5;
+  // 附件状态
+  AttachmentStatus status = 9;
+  // 上传者
+  optional string owner_id = 10;
+  // 上传时间
+  google.protobuf.Timestamp create_time = 11;
+}
+
+message AttachmentList {
+  repeated AttachmentItem items = 1;
 }
 
 // 附件管理服务
 service Attachment {
   // 文件上传
   rpc uploadFile(stream FileUploadRequest) returns (FileUploadResponse);
+  // 查询文件列表
+  rpc queryAttachment(QueryAttachmentListRequest) returns (AttachmentList);
 }
