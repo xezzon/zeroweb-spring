@@ -8,7 +8,6 @@ import io.github.xezzon.zeroweb.dict.DictListResp;
 import io.github.xezzon.zeroweb.dict.DictReq;
 import io.github.xezzon.zeroweb.dict.DictResp;
 import io.github.xezzon.zeroweb.dict.converter.DictImportReqConverter;
-import io.github.xezzon.zeroweb.dict.converter.DictRespConverter;
 import io.grpc.stub.StreamObserver;
 import java.util.List;
 import org.springframework.grpc.server.service.GrpcService;
@@ -28,7 +27,15 @@ public class DictGrpcEndpoint extends DictImplBase {
   public void getDictListByTag(DictReq request, StreamObserver<DictListResp> responseObserver) {
     List<Dict> dictItemList = dictService.getDictItemList(request.getTag());
     List<DictResp> dictRespList = dictItemList.parallelStream()
-        .map(DictRespConverter.INSTANCE::from)
+        .map(dict -> DictResp.newBuilder()
+            .setId(dict.getId())
+            .setTag(dict.getTag())
+            .setCode(dict.getCode())
+            .setLabel(dict.getLabel())
+            .setOrdinal(dict.getOrdinal())
+            .setParentId(dict.getParentId())
+            .build()
+        )
         .toList();
     responseObserver.onNext(DictListResp.newBuilder()
         .addAllData(dictRespList)
