@@ -906,7 +906,7 @@ class S3HttpTest extends AttachmentHttpTest {
   void expire(final Attachment attachment) {
     s3UploadIdRepository.findById(attachment.getId())
         .ifPresent(s3UploadId -> s3Client.abortMultipartUpload(builder -> builder
-            .bucket(zerowebS3Config.getBucket())
+            .bucket(BUCKET)
             .key(attachment.objectKey())
             .uploadId(s3UploadId.getUploadId())
         ));
@@ -916,7 +916,7 @@ class S3HttpTest extends AttachmentHttpTest {
   void saveFile(Attachment attachment) {
     s3Client.putObject(
         builder -> builder
-            .bucket(zerowebS3Config.getBucket())
+            .bucket(BUCKET)
             .key(attachment.objectKey())
             .metadata(Collections.singletonMap("filename", attachment.getName()))
             .contentType(attachment.getType())

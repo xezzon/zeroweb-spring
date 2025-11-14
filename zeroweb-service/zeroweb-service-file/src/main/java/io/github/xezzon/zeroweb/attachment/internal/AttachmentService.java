@@ -103,6 +103,11 @@ public class AttachmentService implements IAttachmentService {
     return storageService.getDownloadEndpoint(attachment);
   }
 
+  byte[] download(final Attachment attachment) {
+    IStorageService storageService = storageServiceFactory.get(attachment.getProvider());
+    return storageService.download(attachment);
+  }
+
   void deleteAttachment(String id) {
     attachmentRepository.findById(id)
         .ifPresent(attachment -> {

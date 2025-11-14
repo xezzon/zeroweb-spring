@@ -7,6 +7,8 @@ import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentBlockingStub;
 import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentStub;
 import io.github.xezzon.zeroweb.attachment.AttachmentList;
+import io.github.xezzon.zeroweb.attachment.FileDownloadRequest;
+import io.github.xezzon.zeroweb.attachment.FileDownloadResponse;
 import io.github.xezzon.zeroweb.attachment.FileMetadata;
 import io.github.xezzon.zeroweb.attachment.FileUploadRequest;
 import io.github.xezzon.zeroweb.attachment.FileUploadResponse;
@@ -25,6 +27,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -60,9 +63,12 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 abstract class AttachmentGrpcTest {
 
   private static final String FILE_NAME = "test.txt";
+  private static final String LARGE_FILE_NAME = "large_file.jpg";
 
   final Path resource = ResourceUtil.getResourceFromClasspath(FILE_NAME);
+  final Path largeFileResource = ResourceUtil.getResourceFromClasspath(LARGE_FILE_NAME);
   private final Attachment attachment = new Attachment();
+  private final Attachment largeFileAttachment = new Attachment();
 
   @Resource
   private AttachmentRepository repository;
@@ -71,10 +77,16 @@ abstract class AttachmentGrpcTest {
   @Resource
   private AttachmentBlockingStub blockingStub;
 
+  abstract FileProviderEnum provider();
+
+  abstract byte[] readFile(final Attachment attachment);
+
+  abstract void saveFile(Attachment attachment, Path resource) throws IOException;
+
   static Stream<Path> files() {
     return Stream.of(
-        ResourceUtil.getResourceFromClasspath("test.txt"),
-        ResourceUtil.getResourceFromClasspath("large_file.jpg")
+        ResourceUtil.getResourceFromClasspath(FILE_NAME),
+        ResourceUtil.getResourceFromClasspath(LARGE_FILE_NAME)
     );
   }
 
@@ -94,6 +106,26 @@ abstract class AttachmentGrpcTest {
     attachment.setProvider(this.provider());
     attachment.setStatus(AttachmentStatusEnum.UPLOADING);
     repository.save(attachment);
+    this.saveFile(attachment, resource);
+  }
+
+  @BeforeEach
+  void setUp_largeFile() throws IOException {
+    File file = largeFileResource.toFile();
+    largeFileAttachment.setName(LARGE_FILE_NAME);
+    largeFileAttachment.setChecksum(Base64.getEncoder().encodeToString(
+        Hashing.sha256()
+            .hashBytes(Files.readAllBytes(largeFileResource))
+            .asBytes()
+    ));
+    largeFileAttachment.setSize(file.length());
+    largeFileAttachment.setType(Files.probeContentType(largeFileResource));
+    largeFileAttachment.setBizType(RandomUtil.randomString(8));
+    largeFileAttachment.setBizId(UUID.randomUUID().toString());
+    largeFileAttachment.setProvider(this.provider());
+    largeFileAttachment.setStatus(AttachmentStatusEnum.UPLOADING);
+    repository.save(largeFileAttachment);
+    this.saveFile(largeFileAttachment, largeFileResource);
   }
 
   @ParameterizedTest
@@ -153,10 +185,6 @@ abstract class AttachmentGrpcTest {
     );
   }
 
-  abstract FileProviderEnum provider();
-
-  abstract byte[] readFile(final Attachment attachment);
-
   @Test
   void queryByBiz() {
     AttachmentList responseBody = blockingStub.queryAttachment(
@@ -187,6 +215,78 @@ abstract class AttachmentGrpcTest {
             .build()
     );
     Assertions.assertEquals(0, responseBody2.getItemsCount());
+  }
+
+  @Test
+  void download() throws IOException, InterruptedException {
+    final CountDownLatch latch = new CountDownLatch(1);
+    final FileDownloadResponse[] response = new FileDownloadResponse[1];
+
+    attachmentStub.downloadFile(
+        FileDownloadRequest.newBuilder()
+            .setId(attachment.getId())
+            .build(),
+        new StreamObserver<>() {
+          @Override
+          public void onNext(FileDownloadResponse value) {
+            response[0] = value;
+          }
+
+          @Override
+          public void onError(Throwable t) {
+            log.error("Download failed.", t);
+            latch.countDown();
+          }
+
+          @Override
+          public void onCompleted() {
+            latch.countDown();
+          }
+        }
+    );
+
+    Assertions.assertTrue(latch.await(10, TimeUnit.SECONDS));
+    Assertions.assertNotNull(response[0]);
+    Assertions.assertEquals(attachment.getId(), response[0].getMetadata().getId());
+    Assertions.assertArrayEquals(
+        Files.readAllBytes(resource),
+        response[0].getChunk().toByteArray()
+    );
+  }
+
+  @Test
+  void download_largeFile() throws IOException, InterruptedException {
+    final CountDownLatch latch = new CountDownLatch(1);
+    final FileDownloadResponse[] response = new FileDownloadResponse[1];
+
+    attachmentStub.downloadFile(FileDownloadRequest.newBuilder()
+            .setId(largeFileAttachment.getId())
+            .build(),
+        new StreamObserver<>() {
+          @Override
+          public void onNext(FileDownloadResponse value) {
+            response[0] = value;
+          }
+
+          @Override
+          public void onError(Throwable t) {
+            log.error("Download failed.", t);
+            latch.countDown();
+          }
+
+          @Override
+          public void onCompleted() {
+            latch.countDown();
+          }
+        });
+
+    Assertions.assertTrue(latch.await(10, TimeUnit.SECONDS));
+    Assertions.assertNotNull(response[0]);
+    Assertions.assertEquals(largeFileAttachment.getId(), response[0].getMetadata().getId());
+    Assertions.assertArrayEquals(
+        Files.readAllBytes(largeFileResource),
+        response[0].getChunk().toByteArray()
+    );
   }
 }
 
@@ -243,6 +343,19 @@ class S3GrpcTest extends AttachmentGrpcTest {
       return new byte[0];
     }
   }
+
+  @Override
+  void saveFile(final Attachment attachment, final Path resource) {
+    s3Client.putObject(
+        builder -> builder
+            .bucket(BUCKET)
+            .key(attachment.objectKey())
+            .metadata(Collections.singletonMap("filename", attachment.getName()))
+            .contentType(attachment.getType())
+            .contentLength(attachment.getSize()),
+        resource
+    );
+  }
 }
 
 @ActiveProfiles("fs")
@@ -269,5 +382,12 @@ class FsGrpcTest extends AttachmentGrpcTest {
     } catch (IOException e) {
       throw new WriteFileException(e);
     }
+  }
+
+  @Override
+  void saveFile(final Attachment attachment, final Path resource) throws IOException {
+    Path path = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
+    Files.createDirectories(path.getParent());
+    Files.copy(resource, path);
   }
 }

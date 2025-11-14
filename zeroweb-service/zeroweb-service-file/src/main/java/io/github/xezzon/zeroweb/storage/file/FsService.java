@@ -148,6 +148,17 @@ public class FsService implements IStorageService {
     }
   }
 
+  @Override
+  public byte[] download(final Attachment attachment) {
+    Path path = zerowebFsConfig.getBasePath()
+        .resolve(attachment.objectKey());
+    try {
+      return Files.readAllBytes(path);
+    } catch (IOException e) {
+      throw new ReadFileException(e);
+    }
+  }
+
   void upload(String id, byte[] fileContent) {
     Attachment attachment = attachmentService.queryById(id);
     this.upload(attachment, fileContent);
@@ -170,13 +181,7 @@ public class FsService implements IStorageService {
 
   byte[] download(String id) {
     Attachment attachment = attachmentService.queryById(id);
-    Path path = zerowebFsConfig.getBasePath()
-        .resolve(attachment.objectKey());
-    try {
-      return Files.readAllBytes(path);
-    } catch (IOException e) {
-      throw new ReadFileException(e);
-    }
+    return this.download(attachment);
   }
 
   /// 大文件上传前，需要新建 ID 同名的临时目录

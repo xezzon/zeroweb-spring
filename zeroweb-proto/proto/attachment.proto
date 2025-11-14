@@ -73,10 +73,26 @@ message AttachmentList {
   repeated AttachmentItem items = 1;
 }
 
+// 文件下载响应
+message FileDownloadResponse {
+  // 文件元数据
+  AttachmentItem metadata = 1;
+  // 文件内容
+  bytes chunk = 2;
+}
+
 // 附件管理服务
 service Attachment {
   // 文件上传
   rpc uploadFile(stream FileUploadRequest) returns (FileUploadResponse);
   // 查询文件列表
   rpc queryAttachment(QueryAttachmentListRequest) returns (AttachmentList);
+  // 文件下载
+  rpc downloadFile(FileDownloadRequest) returns (stream FileDownloadResponse);
+}
+
+// 文件下载请求
+message FileDownloadRequest {
+  // 附件ID
+  string id = 1;
 }

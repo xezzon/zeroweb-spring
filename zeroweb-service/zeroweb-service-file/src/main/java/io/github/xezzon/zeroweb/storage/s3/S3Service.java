@@ -20,12 +20,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ChecksumAlgorithm;
 import software.amazon.awssdk.services.s3.model.ChecksumType;
 import software.amazon.awssdk.services.s3.model.CompletedPart;
 import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListPartsResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchUploadException;
 import software.amazon.awssdk.services.s3.model.Part;
@@ -182,6 +184,16 @@ public class S3Service implements IStorageService {
             .metadata(Collections.singletonMap(FILENAME_METADATA_KEY, attachment.getName())),
         RequestBody.fromBytes(fileContent)
     );
+  }
+
+  @Override
+  public byte[] download(final Attachment attachment) {
+    ResponseBytes<GetObjectResponse> response = s3Client.getObjectAsBytes(builder -> builder
+        .bucket(zerowebS3Config.getBucket())
+        .key(attachment.objectKey())
+        .responseContentType(attachment.getType())
+    );
+    return response.asByteArray();
   }
 
   /// 开启一次分段上传

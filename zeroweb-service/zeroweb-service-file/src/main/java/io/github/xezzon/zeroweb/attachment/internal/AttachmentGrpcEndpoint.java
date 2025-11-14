@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.attachment.internal;
 
 import com.google.common.hash.Hashing;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentImplBase;
@@ -8,6 +9,8 @@ import io.github.xezzon.zeroweb.attachment.AttachmentItem;
 import io.github.xezzon.zeroweb.attachment.AttachmentItem.Builder;
 import io.github.xezzon.zeroweb.attachment.AttachmentList;
 import io.github.xezzon.zeroweb.attachment.AttachmentStatus;
+import io.github.xezzon.zeroweb.attachment.FileDownloadRequest;
+import io.github.xezzon.zeroweb.attachment.FileDownloadResponse;
 import io.github.xezzon.zeroweb.attachment.FileMetadata;
 import io.github.xezzon.zeroweb.attachment.FileUploadRequest;
 import io.github.xezzon.zeroweb.attachment.FileUploadResponse;
@@ -84,30 +87,50 @@ public class AttachmentGrpcEndpoint extends AttachmentImplBase {
     List<Attachment> attachments = attachmentService
         .queryByBiz(request.getBizType(), request.getBizId());
     List<AttachmentItem> attachmentList = attachments.stream()
-        .map(attachment -> {
-          Builder builder = AttachmentItem.newBuilder();
-          builder
-              .setId(attachment.getId())
-              .setName(attachment.getName())
-              .setChecksum(attachment.getChecksum())
-              .setSize(attachment.getSize())
-              .setType(attachment.getType())
-              .setStatus(AttachmentStatus.valueOf(attachment.getStatus().name()))
-              .setCreateTime(Timestamp.newBuilder()
-                  .setSeconds(attachment.getCreateTime().getEpochSecond())
-                  .setNanos(attachment.getCreateTime().getNano())
-                  .build()
-              );
-          if (attachment.getOwnerId() != null) {
-            builder.setOwnerId(attachment.getOwnerId());
-          }
-          return builder.build();
-        })
+        .map(AttachmentConverter::from)
         .toList();
     responseObserver.onNext(AttachmentList.newBuilder()
         .addAllItems(attachmentList)
         .build()
     );
     responseObserver.onCompleted();
+  }
+
+  @Override
+  public void downloadFile(
+      final FileDownloadRequest request,
+      final StreamObserver<FileDownloadResponse> responseObserver
+  ) {
+    Attachment attachment = attachmentService.queryById(request.getId());
+    byte[] content = attachmentService.download(attachment);
+    responseObserver.onNext(FileDownloadResponse.newBuilder()
+        .setMetadata(AttachmentConverter.from(attachment))
+        .setChunk(ByteString.copyFrom(content))
+        .build()
+    );
+    responseObserver.onCompleted();
+  }
+}
+
+interface AttachmentConverter {
+
+  static AttachmentItem from(Attachment attachment) {
+    Builder builder = AttachmentItem.newBuilder();
+    builder
+        .setId(attachment.getId())
+        .setName(attachment.getName())
+        .setChecksum(attachment.getChecksum())
+        .setSize(attachment.getSize())
+        .setType(attachment.getType())
+        .setStatus(AttachmentStatus.valueOf(attachment.getStatus().name()))
+        .setCreateTime(Timestamp.newBuilder()
+            .setSeconds(attachment.getCreateTime().getEpochSecond())
+            .setNanos(attachment.getCreateTime().getNano())
+            .build()
+        );
+    if (attachment.getOwnerId() != null) {
+      builder.setOwnerId(attachment.getOwnerId());
+    }
+    return builder.build();
   }
 }
