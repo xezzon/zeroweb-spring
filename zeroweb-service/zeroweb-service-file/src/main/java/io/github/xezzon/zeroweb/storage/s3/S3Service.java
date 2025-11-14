@@ -10,24 +10,24 @@ import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.IStorageService;
 import io.github.xezzon.zeroweb.storage.StorageContext;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
-import io.github.xezzon.zeroweb.storage.s3.entity.S3Etag;
 import io.github.xezzon.zeroweb.storage.s3.entity.S3UploadId;
-import io.github.xezzon.zeroweb.storage.s3.repository.S3EtagRepository;
 import io.github.xezzon.zeroweb.storage.s3.repository.S3UploadIdRepository;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ChecksumAlgorithm;
 import software.amazon.awssdk.services.s3.model.ChecksumType;
 import software.amazon.awssdk.services.s3.model.CompletedPart;
 import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
+import software.amazon.awssdk.services.s3.model.ListPartsResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchUploadException;
+import software.amazon.awssdk.services.s3.model.Part;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
@@ -35,29 +35,26 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedUploadPartReq
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 /// @author xezzon
+@Slf4j
 @Service
 @ConditionalOnBean(ZerowebS3Config.class)
 public class S3Service implements IStorageService {
 
-  static final String ETAG_CALLBACK_URL = "/s3/{id}/etag";
   private final ZerowebS3Config zerowebS3Config;
   private final S3Presigner s3Presigner;
   private final S3Client s3Client;
   private final S3UploadIdRepository s3UploadIdRepository;
-  private final S3EtagRepository s3EtagRepository;
 
   public S3Service(
       final ZerowebS3Config zerowebS3Config,
       final S3Presigner s3Presigner,
       final S3Client s3Client,
-      final S3UploadIdRepository s3UploadIdRepository,
-      final S3EtagRepository s3EtagRepository
+      final S3UploadIdRepository s3UploadIdRepository
   ) {
     this.zerowebS3Config = zerowebS3Config;
     this.s3Presigner = s3Presigner;
     this.s3Client = s3Client;
     this.s3UploadIdRepository = s3UploadIdRepository;
-    this.s3EtagRepository = s3EtagRepository;
   }
 
   @Override
@@ -71,6 +68,26 @@ public class S3Service implements IStorageService {
     int partCount = Math.toIntExact(
         (attachment.getSize() - 1) / partSize + 1
     );
+
+    if (partCount > 1) {
+      s3UploadIdRepository.findById(attachment.getId()).ifPresentOrElse(
+          s3UploadId -> {
+            try {
+              this.listParts(attachment, s3UploadId.getUploadId());
+            } catch (NoSuchUploadException _) {
+              // 上传ID已过期，重新创建
+              log.warn(
+                  "Refresh S3 UploadId {} for attachment {}",
+                  s3UploadId.getUploadId(), attachment.getId()
+              );
+              this.createMultipartUpload(attachment);
+            }
+          },
+          // 如果之前创建上传ID失败，则重新创建
+          () -> this.createMultipartUpload(attachment)
+      );
+    }
+
     return new UploadInfo(
         attachment.getId(),
         attachment.getProvider(),
@@ -104,16 +121,18 @@ public class S3Service implements IStorageService {
     return this.getUploadAddress(attachment, partNumber, StorageContext.CRC.get());
   }
 
-  public UploadEndpoint getUploadAddress(Attachment attachment, int partNumber, String crc) {
+  public UploadEndpoint getUploadAddress(Attachment attachment, Integer partNumber, String crc) {
+    S3UploadId s3UploadId = s3UploadIdRepository.findById(attachment.getId())
+        .orElseGet(() -> this.createMultipartUpload(attachment));
     // 如果分段已上传，则跳过
-    Optional<S3Etag> etag = s3EtagRepository
-        .findByAttachmentIdAndPartNumber(attachment.getId(), partNumber);
-    if (etag.isPresent()) {
+    List<Part> parts = this.listParts(attachment, s3UploadId.getUploadId());
+    if (parts.stream()
+        .map(Part::partNumber)
+        .anyMatch(partNumber::equals)
+    ) {
       return new UploadEndpoint(partNumber);
     }
 
-    S3UploadId s3UploadId = s3UploadIdRepository.findById(attachment.getId())
-        .orElseGet(() -> this.createMultipartUpload(attachment));
     PresignedUploadPartRequest presignedUploadPartRequest = s3Presigner
         .presignUploadPart(presignRequest -> presignRequest
             .signatureDuration(Duration.ofMinutes(10))
@@ -130,14 +149,9 @@ public class S3Service implements IStorageService {
               }
             })
         );
-    String callbackUrl = UriComponentsBuilder
-        .fromPath(ETAG_CALLBACK_URL)
-        .buildAndExpand(attachment.getId())
-        .toUriString();
     return new UploadEndpoint(
         partNumber,
-        presignedUploadPartRequest.url().toString(),
-        callbackUrl
+        presignedUploadPartRequest.url().toString()
     );
   }
 
@@ -157,34 +171,43 @@ public class S3Service implements IStorageService {
     );
   }
 
-  void upsertEtag(S3Etag etag) {
-    s3EtagRepository.findByAttachmentIdAndPartNumber(etag.getAttachmentId(), etag.getPartNumber())
-        .ifPresentOrElse(
-            entity -> {
-              entity.setEtag(etag.getEtag());
-              entity.setChecksum(etag.getChecksum());
-              s3EtagRepository.save(entity);
-            },
-            () -> s3EtagRepository.save(etag)
-        );
-  }
-
   /// 开启一次分段上传
   /// @param attachment 附件
-  /// @return 上传ID
   private S3UploadId createMultipartUpload(Attachment attachment) {
-    CreateMultipartUploadResponse response = s3Client.createMultipartUpload(builder -> builder
-        .bucket(zerowebS3Config.getBucket())
-        .key(attachment.objectKey())
-        .contentType(attachment.getType())
-        .metadata(Collections.singletonMap("filename", attachment.getName()))
-        .checksumType(ChecksumType.FULL_OBJECT)
-        .checksumAlgorithm(ChecksumAlgorithm.CRC32)
+    CreateMultipartUploadResponse createMultipartUploadResponse = s3Client.createMultipartUpload(
+        builder -> builder
+            .bucket(zerowebS3Config.getBucket())
+            .key(attachment.objectKey())
+            .contentType(attachment.getType())
+            .metadata(Collections.singletonMap("filename", attachment.getName()))
+            .checksumType(ChecksumType.FULL_OBJECT)
+            .checksumAlgorithm(ChecksumAlgorithm.CRC32)
     );
-    String crc = StorageContext.CRC.get();
-    S3UploadId s3UploadId = new S3UploadId(attachment.getId(), response.uploadId(), crc);
+    S3UploadId s3UploadId = s3UploadIdRepository.findById(attachment.getId())
+        .orElseGet(() -> new S3UploadId(
+            attachment.getId(),
+            createMultipartUploadResponse.uploadId(),
+            StorageContext.CRC.get()
+        ));
+    s3UploadId.setUploadId(createMultipartUploadResponse.uploadId());
     s3UploadIdRepository.save(s3UploadId);
     return s3UploadId;
+  }
+
+  /**
+   * 获取已上传分段情况
+   * @param attachment 附件
+   * @param uploadId 上传ID
+   * @return 已上传分段列表
+   * @throws NoSuchUploadException 上传ID已过期或不存在
+   */
+  private List<Part> listParts(Attachment attachment, String uploadId) throws NoSuchUploadException {
+    ListPartsResponse listPartsResponse = s3Client.listParts(builder -> builder
+        .bucket(zerowebS3Config.getBucket())
+        .key(attachment.objectKey())
+        .uploadId(uploadId)
+    );
+    return listPartsResponse.parts();
   }
 
   /// 文件上传前，先调用 S3 开启一次分段上传
@@ -209,12 +232,11 @@ public class S3Service implements IStorageService {
     }
     s3UploadIdRepository.findById(attachment.getId())
         .ifPresent(s3UploadId -> {
-          List<S3Etag> s3EtagList = s3EtagRepository
-              .findByAttachmentIdOrderByPartNumberAsc(attachment.getId());
+          List<Part> s3EtagList = this.listParts(attachment, s3UploadId.getUploadId());
           List<CompletedPart> uploadedParts = s3EtagList.stream()
               .map(s3Etag -> CompletedPart.builder()
-                  .partNumber(s3Etag.getPartNumber())
-                  .eTag(s3Etag.getEtag())
+                  .partNumber(s3Etag.partNumber())
+                  .eTag(s3Etag.eTag())
                   .build()
               )
               .toList();

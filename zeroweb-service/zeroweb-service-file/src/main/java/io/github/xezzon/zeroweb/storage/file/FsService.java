@@ -10,6 +10,7 @@ import io.github.xezzon.zeroweb.attachment.event.AttachmentDeletedEvent;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
+import io.github.xezzon.zeroweb.common.constant.BannerConstant;
 import io.github.xezzon.zeroweb.common.exception.IncorrectFileException;
 import io.github.xezzon.zeroweb.common.exception.ReadFileException;
 import io.github.xezzon.zeroweb.common.exception.WriteFileException;
@@ -44,7 +45,8 @@ public class FsService implements IStorageService {
   static final String UPLOAD_ENDPOINT = "/fs/{id}/upload";
   static final String MULTIPART_UPLOAD_ENDPOINT = "/fs/{id}/upload/{partNumber}";
   static final String DOWNLOAD_ENDPOINT = "/fs/{id}/download";
-  private static final Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir"));
+  private static final Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir"))
+      .resolve(BannerConstant.NAME);
   private final ZerowebFsConfig zerowebFsConfig;
   private final IAttachmentService attachmentService;
 
@@ -65,6 +67,15 @@ public class FsService implements IStorageService {
     long partSize = zerowebFsConfig.getPartSize();
     int partCount = Math.toIntExact(
         (attachment.getSize() - 1) / partSize + 1);
+
+    if (partCount > 1) {
+      try {
+        Files.createDirectories(TEMP_DIR.resolve(attachment.getId()));
+      } catch (IOException e) {
+        throw new WriteFileException(e);
+      }
+    }
+
     return new UploadInfo(
         attachment.getId(),
         attachment.getProvider(),

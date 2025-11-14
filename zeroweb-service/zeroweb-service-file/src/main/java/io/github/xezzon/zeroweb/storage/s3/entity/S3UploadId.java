@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /// S3 的上传 ID
+/// 
 /// @author xezzon
 @Getter
 @Setter
@@ -28,7 +29,7 @@ public class S3UploadId {
   )
   private String attachmentId;
   /// S3上传ID
-  @Column(name = "upload_id", nullable = false, updatable = false, length = 512)
+  @Column(name = "upload_id", nullable = false, length = 512)
   private String uploadId;
   /// 循环冗余校验和。用于 S3 的完整对象校验
   @Column(name = "crc", nullable = false, updatable = false)

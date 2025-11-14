@@ -9,9 +9,6 @@ import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
 import io.github.xezzon.zeroweb.storage.StorageContext;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
-import io.github.xezzon.zeroweb.storage.s3.entity.S3Etag;
-import io.github.xezzon.zeroweb.storage.s3.entity.S3UploadId;
-import io.github.xezzon.zeroweb.storage.s3.repository.S3UploadIdRepository;
 import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.zip.CRC32;
 import org.junit.jupiter.api.Assertions;
@@ -46,6 +42,7 @@ import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.ChecksumAlgorithm;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListMultipartUploadsResponse;
 import software.amazon.awssdk.services.s3.model.ListPartsResponse;
 
 /// @author xezzon
@@ -66,8 +63,6 @@ class S3ServiceTest {
   private S3Service s3Service;
   @Resource
   private AttachmentRepository attachmentRepository;
-  @Resource
-  private S3UploadIdRepository s3UploadIdRepository;
   @Resource
   private ZerowebS3Config zerowebS3Config;
 
@@ -202,24 +197,23 @@ class S3ServiceTest {
                   response.statusCode(),
                   () -> new String(response.body())
               );
-              s3Service.upsertEtag(new S3Etag(
-                  largeFileAttachment.getId(),
-                  partNumber,
-                  String.join(",", response.headers().allValues("etag")),
-                  partChecksum
-              ));
             }
           } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
           }
         });
 
-    Optional<S3UploadId> s3UploadId = s3UploadIdRepository.findById(largeFileAttachment.getId());
-    Assertions.assertTrue(s3UploadId.isPresent());
+    ListMultipartUploadsResponse listMultipartUploadsResponse = s3Client.listMultipartUploads(
+        builder -> builder
+            .bucket(zerowebS3Config.getBucket())
+            .keyMarker(attachment.objectKey())
+    );
+    Assertions.assertEquals(1, listMultipartUploadsResponse.uploads().size());
+    final String uploadId = listMultipartUploadsResponse.uploads().getFirst().uploadId();
     ListPartsResponse listPartsResponse = s3Client.listParts(builder -> builder
         .bucket(BUCKET)
         .key(largeFileAttachment.objectKey())
-        .uploadId(s3UploadId.get().getUploadId())
+        .uploadId(uploadId)
     );
     Assertions.assertEquals(partCount, listPartsResponse.parts().size());
   }

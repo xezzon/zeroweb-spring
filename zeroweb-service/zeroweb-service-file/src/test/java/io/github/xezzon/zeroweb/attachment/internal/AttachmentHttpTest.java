@@ -15,12 +15,13 @@ import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
+import io.github.xezzon.zeroweb.common.constant.BannerConstant;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
 import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
 import io.github.xezzon.zeroweb.storage.s3.ZerowebS3Config;
-import io.github.xezzon.zeroweb.storage.s3.entity.S3Etag;
+import io.github.xezzon.zeroweb.storage.s3.repository.S3UploadIdRepository;
 import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
@@ -30,9 +31,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import java.util.zip.CRC32;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -47,7 +50,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.utility.DockerImageName;
@@ -94,6 +96,8 @@ abstract class AttachmentHttpTest {
   abstract boolean fileExist(Attachment attachment);
 
   abstract void assertIncorrectFileStatus(int status);
+
+  abstract void expire(Attachment attachment);
 
   abstract void saveFile(Attachment attachment) throws IOException;
 
@@ -304,24 +308,13 @@ abstract class AttachmentHttpTest {
           .expectBody(UploadEndpoint.class).returnResult().getResponseBody();
       Assertions.assertNotNull(address);
       URI uri = localhost(address.getEndpoint());
-      ResponseSpec response = webTestClient.put()
+      webTestClient.put()
           .uri(uri)
           .bodyValue(partContent)
           .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
           .header("x-amz-checksum-crc32", partChecksum)
           .exchange()
           .expectStatus().isOk();
-      if (address.getCallback() != null) {
-        response.expectHeader().value("etag", etag -> webTestClient.put()
-            .uri(builder -> builder
-                .path(address.getCallback())
-                .build(attachmentId)
-            )
-            .bodyValue(new S3Etag(attachmentId, 2, etag, partChecksum))
-            .exchange()
-            .expectStatus().isOk()
-        );
-      }
       // 重复上传，测试幂等性
       webTestClient.put()
           .uri(uri)
@@ -330,17 +323,6 @@ abstract class AttachmentHttpTest {
           .header("x-amz-checksum-crc32", partChecksum)
           .exchange()
           .expectStatus().isOk();
-      if (address.getCallback() != null) {
-        response.expectHeader().value("etag", etag -> webTestClient.put()
-            .uri(builder -> builder
-                .path(address.getCallback())
-                .build(attachmentId)
-            )
-            .bodyValue(new S3Etag(attachmentId, 2, etag, partChecksum))
-            .exchange()
-            .expectStatus().isOk()
-        );
-      }
     }
 
     // 测试断点续传
@@ -383,24 +365,13 @@ abstract class AttachmentHttpTest {
             }
 
             final URI uri = localhost(address.getEndpoint());
-            ResponseSpec response = webTestClient.put()
+            webTestClient.put()
                 .uri(uri)
                 .bodyValue(partContent)
                 .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
                 .header("x-amz-checksum-crc32", partChecksum)
                 .exchange()
                 .expectStatus().isOk();
-            if (address.getCallback() != null) {
-              response.expectHeader().value("etag", etag -> webTestClient.put()
-                  .uri(builder -> builder
-                      .path(address.getCallback())
-                      .build(attachmentId)
-                  )
-                  .bodyValue(new S3Etag(attachmentId, address.getPartNumber(), etag, partChecksum))
-                  .exchange()
-                  .expectStatus().isOk()
-              );
-            }
           });
     }
 
@@ -543,24 +514,13 @@ abstract class AttachmentHttpTest {
           Assertions.assertNotNull(address);
           final URI uri = localhost(address.getEndpoint());
 
-          ResponseSpec response = webTestClient.put()
+          webTestClient.put()
               .uri(uri)
               .bodyValue(partContent)
               .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
               .header("x-amz-checksum-crc32", partChecksum)
               .exchange()
               .expectStatus().isOk();
-          if (address.getCallback() != null) {
-            response.expectHeader().value("etag", etag -> webTestClient.put()
-                .uri(builder -> builder
-                    .path(address.getCallback())
-                    .build(attachmentId)
-                )
-                .bodyValue(new S3Etag(attachmentId, address.getPartNumber(), etag, partChecksum))
-                .exchange()
-                .expectStatus().isOk()
-            );
-          }
         });
 
     webTestClient.put()
@@ -630,25 +590,132 @@ abstract class AttachmentHttpTest {
               .expectBody(UploadEndpoint.class).returnResult().getResponseBody();
           Assertions.assertNotNull(address);
           final URI uri = localhost(address.getEndpoint());
-          ResponseSpec response = webTestClient.put()
+          webTestClient.put()
               .uri(uri)
               .bodyValue(partContent)
               .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
               .header("x-amz-checksum-crc32", partChecksum)
               .exchange()
               .expectStatus().isOk();
-          if (address.getCallback() != null) {
-            response.expectHeader().value("etag", etag -> webTestClient.put()
-                .uri(builder -> builder
-                    .path(address.getCallback())
-                    .build(attachmentId)
-                )
-                .bodyValue(new S3Etag(attachmentId, address.getPartNumber(), etag, partChecksum))
-                .exchange()
-                .expectStatus().isOk()
-            );
-          }
         });
+
+    webTestClient.put()
+        .uri(FINISH_UPLOAD, attachmentId)
+        .exchange()
+        .expectStatus().isOk();
+    Assertions.assertTrue(fileExist(largeFileAttachment));
+  }
+
+  @Test
+  void upload_uploadIdExpiration() throws IOException {
+    // 新增附件
+    AddAttachmentReq req = new AddAttachmentReq(
+        largeFileAttachment.getName(),
+        largeFileAttachment.getChecksum(),
+        largeFileAttachment.getSize(),
+        largeFileAttachment.getType(),
+        largeFileAttachment.getBizType(),
+        largeFileAttachment.getBizId()
+    );
+    CRC32 crc32 = new CRC32();
+    crc32.update(Files.readAllBytes(largeFileResource));
+    String crc = Base64.getEncoder().encodeToString(
+        HexUtil.decodeHex(Long.toHexString(crc32.getValue()))
+    );
+    UploadInfo uploadInfo = webTestClient.post()
+        .uri(builder -> builder
+            .path(ADD_ATTACHMENT)
+            .queryParam("crc", crc)
+            .build()
+        )
+        .bodyValue(req)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(UploadInfo.class)
+        .returnResult().getResponseBody();
+    Assertions.assertNotNull(uploadInfo);
+    Assertions.assertTrue(uploadInfo.partCount() > 1);
+    final String attachmentId = uploadInfo.id();
+    largeFileAttachment = repository.findById(attachmentId).orElseThrow();
+
+    // 上传其中一个分片
+    {
+      final byte[] partContent = largeFileParts.get(1);
+      final CRC32 partCrc32 = new CRC32();
+      partCrc32.update(partContent);
+      final String partChecksum = Base64.getEncoder().encodeToString(
+          HexUtil.decodeHex(Long.toHexString(partCrc32.getValue()))
+      );
+      UploadEndpoint address = webTestClient.get()
+          .uri(builder -> builder
+              .path(GET_UPLOAD_ADDRESS)
+              .queryParam("partNumber", 2)
+              .queryParam("crc", partChecksum)
+              .build(largeFileAttachment.getId())
+          )
+          .exchange()
+          .expectStatus().isOk()
+          .expectBody(UploadEndpoint.class).returnResult().getResponseBody();
+      Assertions.assertNotNull(address);
+      URI uri = localhost(address.getEndpoint());
+      webTestClient.put()
+          .uri(uri)
+          .bodyValue(partContent)
+          .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
+          .header("x-amz-checksum-crc32", partChecksum)
+          .exchange()
+          .expectStatus().isOk();
+    }
+
+    // 模拟分段过期
+    this.expire(largeFileAttachment);
+
+    // 测试断点续传
+    {
+      uploadInfo = webTestClient.get()
+          .uri(builder -> builder
+              .path(GET_UPLOAD_INFO)
+              .queryParam("checksum", largeFileAttachment.getChecksum())
+              .queryParam("fileSize", largeFileAttachment.getSize())
+              .build(attachmentId)
+          )
+          .exchange()
+          .expectStatus().isOk()
+          .expectBody(UploadInfo.class)
+          .returnResult().getResponseBody();
+      Assertions.assertNotNull(uploadInfo);
+
+      for (int i = 1; i <= uploadInfo.partCount(); i++) {
+        int partNumber = i;
+        final byte[] partContent = largeFileParts.get(partNumber - 1);
+        final CRC32 partCrc32 = new CRC32();
+        partCrc32.update(partContent);
+        final String partChecksum = Base64.getEncoder().encodeToString(
+            HexUtil.decodeHex(Long.toHexString(partCrc32.getValue()))
+        );
+        UploadEndpoint address = webTestClient.get()
+            .uri(builder -> builder
+                .path(GET_UPLOAD_ADDRESS)
+                .queryParam("partNumber", partNumber)
+                .queryParam("crc", partChecksum)
+                .build(attachmentId)
+            )
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(UploadEndpoint.class).returnResult().getResponseBody();
+        Assertions.assertNotNull(address);
+        Assertions.assertNotNull(address.getEndpoint());
+
+        final URI uri = localhost(address.getEndpoint());
+        webTestClient.put()
+            .uri(uri)
+            .bodyValue(partContent)
+            .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
+            .header("x-amz-checksum-crc32", partChecksum)
+            .exchange()
+            .expectStatus().isOk();
+      }
+    }
 
     webTestClient.put()
         .uri(FINISH_UPLOAD, attachmentId)
@@ -771,6 +838,8 @@ class S3HttpTest extends AttachmentHttpTest {
   private static S3Client s3Client = null;
   @Resource
   private ZerowebS3Config zerowebS3Config;
+  @Resource
+  private S3UploadIdRepository s3UploadIdRepository;
 
   @BeforeAll
   static void beforeAll() {
@@ -821,6 +890,16 @@ class S3HttpTest extends AttachmentHttpTest {
   }
 
   @Override
+  void expire(final Attachment attachment) {
+    s3UploadIdRepository.findById(attachment.getId())
+        .ifPresent(s3UploadId -> s3Client.abortMultipartUpload(builder -> builder
+            .bucket(zerowebS3Config.getBucket())
+            .key(attachment.objectKey())
+            .uploadId(s3UploadId.getUploadId())
+        ));
+  }
+
+  @Override
   void saveFile(Attachment attachment) {
     s3Client.putObject(
         builder -> builder
@@ -837,6 +916,8 @@ class S3HttpTest extends AttachmentHttpTest {
 @ActiveProfiles("fs")
 class FsHttpTest extends AttachmentHttpTest {
 
+  private static final Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir"))
+      .resolve(BannerConstant.NAME);
   @Resource
   private ZerowebFsConfig zerowebFsConfig;
 
@@ -854,6 +935,17 @@ class FsHttpTest extends AttachmentHttpTest {
   @Override
   void assertIncorrectFileStatus(int status) {
     Assertions.assertEquals(ErrorCodeConstant.CLIENT_ERROR_STATUS, status);
+  }
+
+  @Override
+  void expire(final Attachment attachment) {
+    try (Stream<Path> stream = Files.walk(TEMP_DIR.resolve(attachment.getId()))) {
+      stream.sorted(Comparator.reverseOrder())
+          .map(Path::toFile)
+          .forEach(File::delete);
+    } catch (IOException _) {
+      // 无需处理
+    }
   }
 
   @Override
