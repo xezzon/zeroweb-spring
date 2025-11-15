@@ -20,11 +20,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ChecksumAlgorithm;
 import software.amazon.awssdk.services.s3.model.ChecksumType;
 import software.amazon.awssdk.services.s3.model.CompletedPart;
 import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListPartsResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchUploadException;
 import software.amazon.awssdk.services.s3.model.Part;
@@ -40,6 +43,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 @ConditionalOnBean(ZerowebS3Config.class)
 public class S3Service implements IStorageService {
 
+  public static final String FILENAME_METADATA_KEY = "filename";
   private final ZerowebS3Config zerowebS3Config;
   private final S3Presigner s3Presigner;
   private final S3Client s3Client;
@@ -65,9 +69,7 @@ public class S3Service implements IStorageService {
   @Override
   public UploadInfo getUploadInfo(Attachment attachment) {
     long partSize = zerowebS3Config.getPartSize();
-    int partCount = Math.toIntExact(
-        (attachment.getSize() - 1) / partSize + 1
-    );
+    int partCount = Math.toIntExact((attachment.getSize() - 1) / partSize + 1);
 
     if (partCount > 1) {
       s3UploadIdRepository.findById(attachment.getId()).ifPresentOrElse(
@@ -107,7 +109,7 @@ public class S3Service implements IStorageService {
             .contentLength(attachment.getSize())
             .checksumAlgorithm(ChecksumAlgorithm.SHA256)
             .checksumSHA256(attachment.getChecksum())
-            .metadata(Collections.singletonMap("filename", attachment.getName()))
+            .metadata(Collections.singletonMap(FILENAME_METADATA_KEY, attachment.getName()))
         )
         .build();
     PresignedPutObjectRequest presignedPutObjectRequest = s3Presigner
@@ -171,6 +173,29 @@ public class S3Service implements IStorageService {
     );
   }
 
+  @Override
+  public void upload(Attachment attachment, byte[] fileContent) {
+    s3Client.putObject(
+        builder -> builder
+            .bucket(zerowebS3Config.getBucket())
+            .key(attachment.objectKey())
+            .contentLength(attachment.getSize())
+            .contentType(attachment.getType())
+            .metadata(Collections.singletonMap(FILENAME_METADATA_KEY, attachment.getName())),
+        RequestBody.fromBytes(fileContent)
+    );
+  }
+
+  @Override
+  public byte[] download(final Attachment attachment) {
+    ResponseBytes<GetObjectResponse> response = s3Client.getObjectAsBytes(builder -> builder
+        .bucket(zerowebS3Config.getBucket())
+        .key(attachment.objectKey())
+        .responseContentType(attachment.getType())
+    );
+    return response.asByteArray();
+  }
+
   /// 开启一次分段上传
   /// @param attachment 附件
   private S3UploadId createMultipartUpload(Attachment attachment) {
@@ -179,7 +204,7 @@ public class S3Service implements IStorageService {
             .bucket(zerowebS3Config.getBucket())
             .key(attachment.objectKey())
             .contentType(attachment.getType())
-            .metadata(Collections.singletonMap("filename", attachment.getName()))
+            .metadata(Collections.singletonMap(FILENAME_METADATA_KEY, attachment.getName()))
             .checksumType(ChecksumType.FULL_OBJECT)
             .checksumAlgorithm(ChecksumAlgorithm.CRC32)
     );
@@ -218,6 +243,10 @@ public class S3Service implements IStorageService {
       return;
     }
     if (attachment.getSize() <= zerowebS3Config.getPartSize()) {
+      return;
+    }
+    if (!StorageContext.CRC.isBound()) {
+      // gRPC 调用，无需开启分段上传
       return;
     }
     this.createMultipartUpload(attachment);
@@ -262,4 +291,3 @@ public class S3Service implements IStorageService {
     );
   }
 }
-

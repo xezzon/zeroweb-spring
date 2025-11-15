@@ -38,6 +38,17 @@ public interface IStorageService {
   /// @return 下载地址
   DownloadEndpoint getDownloadEndpoint(Attachment attachment);
 
+  /// 上传文件
+  /// 
+  /// @param attachment 附件
+  /// @param fileContent 文件内容
+  void upload(Attachment attachment, byte[] fileContent);
+
+  /// 下载文件
+  /// @param attachment 附件
+  /// @return 文件内容
+  byte[] download(Attachment attachment);
+
   @Component
   class Factory {
 

@@ -11,10 +11,10 @@ import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
+import io.github.xezzon.zeroweb.common.exception.IncorrectFileException;
 import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.IStorageService;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
-import io.github.xezzon.zeroweb.common.exception.IncorrectFileException;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +46,7 @@ public class AttachmentService implements IAttachmentService {
     return attachmentRepository.findById(id).orElseThrow();
   }
 
-  UploadInfo addAttachment(Attachment attachment) {
+  void addAttachment(Attachment attachment) {
     attachment.setProvider(zerowebFileConfig.getProvider());
     attachment.setOwnerId(JwtAuth.get()
         .map(JwtClaim::getSub)
@@ -54,11 +54,6 @@ public class AttachmentService implements IAttachmentService {
     );
     attachmentRepository.save(attachment);
     eventPublisher.publishEvent(new AttachmentCreatedEvent(attachment));
-    return this.getUploadInfo(
-        attachment.getId(),
-        attachment.getChecksum(),
-        attachment.getSize()
-    );
   }
 
   UploadInfo getUploadInfo(String id, String checksum, long fileSize) {
@@ -84,6 +79,11 @@ public class AttachmentService implements IAttachmentService {
     }
   }
 
+  void upload(Attachment attachment, byte[] content) {
+    IStorageService storageService = storageServiceFactory.get(attachment.getProvider());
+    storageService.upload(attachment, content);
+  }
+
   void updateStatus(String id) {
     attachmentRepository.findById(id)
         .ifPresent(attachment -> {
@@ -101,6 +101,11 @@ public class AttachmentService implements IAttachmentService {
     Attachment attachment = attachmentRepository.findById(id).orElseThrow();
     IStorageService storageService = storageServiceFactory.get(attachment.getProvider());
     return storageService.getDownloadEndpoint(attachment);
+  }
+
+  byte[] download(final Attachment attachment) {
+    IStorageService storageService = storageServiceFactory.get(attachment.getProvider());
+    return storageService.download(attachment);
   }
 
   void deleteAttachment(String id) {

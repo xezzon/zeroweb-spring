@@ -41,7 +41,14 @@ public class AttachmentHttpEndpoint {
   ) {
     Attachment attachment = req.into();
     return ScopedValue.where(StorageContext.CRC, crc)
-        .call(() -> attachmentService.addAttachment(attachment));
+        .call(() -> {
+          attachmentService.addAttachment(attachment);
+          return attachmentService.getUploadInfo(
+              attachment.getId(),
+              attachment.getChecksum(),
+              attachment.getSize()
+          );
+        });
   }
 
   /// 获取附件上传元信息

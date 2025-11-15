@@ -1,2 +1,8 @@
 SPRING_ENVIRONMENT: test
 JDBC_TYPE: @db.type@
+
+spring:
+  grpc:
+    server:
+      inprocess:
+        name: file

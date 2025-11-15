@@ -26,6 +26,8 @@ spring:
       channels:
         admin:
           address: zeroweb-service-admin:9002
+        file:
+          address: zeroweb-service-file:9022
   threads:
     virtual:
       enabled: true
