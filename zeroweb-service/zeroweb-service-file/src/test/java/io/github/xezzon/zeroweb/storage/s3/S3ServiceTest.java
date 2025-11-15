@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 import java.util.zip.CRC32;
 import org.junit.jupiter.api.Assertions;
@@ -44,6 +45,7 @@ import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListMultipartUploadsResponse;
 import software.amazon.awssdk.services.s3.model.ListPartsResponse;
+import software.amazon.awssdk.services.s3.model.MultipartUpload;
 
 /// @author xezzon
 @SpringBootTest
@@ -206,10 +208,11 @@ class S3ServiceTest {
     ListMultipartUploadsResponse listMultipartUploadsResponse = s3Client.listMultipartUploads(
         builder -> builder
             .bucket(zerowebS3Config.getBucket())
-            .keyMarker(attachment.objectKey())
+            .prefix(largeFileAttachment.objectKey())
     );
-    Assertions.assertEquals(1, listMultipartUploadsResponse.uploads().size());
-    final String uploadId = listMultipartUploadsResponse.uploads().getFirst().uploadId();
+    List<MultipartUpload> uploads = listMultipartUploadsResponse.uploads();
+    Assertions.assertEquals(1, uploads.size());
+    final String uploadId = uploads.getFirst().uploadId();
     ListPartsResponse listPartsResponse = s3Client.listParts(builder -> builder
         .bucket(BUCKET)
         .key(largeFileAttachment.objectKey())
