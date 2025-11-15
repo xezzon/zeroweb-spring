@@ -10,8 +10,6 @@ public class UploadEndpoint {
   private int partNumber;
   /// 上传地址
   private String endpoint;
-  /// 回调地址
-  private String callback;
 
   @SuppressWarnings("unused")
   public UploadEndpoint() {
@@ -37,15 +35,5 @@ public class UploadEndpoint {
   public UploadEndpoint(int partNumber, String endpoint) {
     this.partNumber = partNumber;
     this.endpoint = endpoint;
-  }
-
-  /// 需要回调的文件上传地址
-  /// @param partNumber 分段序号
-  /// @param endpoint 上传地址
-  /// @param callback 回调地址
-  public UploadEndpoint(int partNumber, String endpoint, String callback) {
-    this.partNumber = partNumber;
-    this.endpoint = endpoint;
-    this.callback = callback;
   }
 }
