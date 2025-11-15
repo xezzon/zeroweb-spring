@@ -41,8 +41,23 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Test and analyze
+      - name: Install dependents
+        run: mvn -B clean install -D skipTests=true
+      - name: Unit Test
+        run: |
+          mvn -B test -pl io.github.xezzon:zeroweb-open-sdk &
+          mvn -B test -pl io.github.xezzon:zeroweb-spring-boot-starter &
+          mvn -B test -pl io.github.xezzon:zeroweb-service-admin -D db.type=${{ matrix.db_type }} &
+          mvn -B test -pl io.github.xezzon:zeroweb-service-open -D db.type=${{ matrix.db_type }} &
+          mvn -B test -pl io.github.xezzon:zeroweb-service-file -D db.type=${{ matrix.db_type }} &
+          mvn -B test -pl io.github.xezzon:zeroweb-service-dev -D db.type=${{ matrix.db_type }} &
+          wait
+      - name: Upload reports
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -D sonar.projectKey=xezzon_zeroweb-spring -D db.type=${{ matrix.db_type }}
+        run: >
+          mvn -B 
+          verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar 
+          -D sonar.projectKey=xezzon_zeroweb-spring 
+          -D skipTests=true
