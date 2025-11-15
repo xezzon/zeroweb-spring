@@ -122,7 +122,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
     final byte[] salt = Longs.toByteArray(iat.toEpochMilli());
     this.validateSignature(appId, body, signature, salt);
     /* 构造JWT */
-    ThirdPartyApp thirdPartyApp = thirdPartyAppDAO.get().getReferenceById(appId);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppDAO.get().findById(appId).orElseThrow();
     JwtClaim claim = JwtClaim.newBuilder()
         .setSub(appId)
         .setPreferredUsername(thirdPartyApp.getId())

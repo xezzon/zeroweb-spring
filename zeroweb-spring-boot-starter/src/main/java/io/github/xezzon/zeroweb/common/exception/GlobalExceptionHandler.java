@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
 import org.springframework.http.HttpStatus;
@@ -88,8 +89,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResult> handleException(
       NoResourceFoundException e,
       HttpServletRequest request
-  )
-      throws NoResourceFoundException {
+  ) throws NoResourceFoundException {
     log(e, request);
     throw e;
   }
@@ -127,7 +127,7 @@ public class GlobalExceptionHandler {
   /**
    * 数据已删除
    */
-  @ExceptionHandler({EntityNotFoundException.class})
+  @ExceptionHandler({EntityNotFoundException.class, NoSuchElementException.class})
   public ResponseEntity<ErrorResult> handleDataNotExistException(
       RuntimeException e,
       HttpServletRequest request

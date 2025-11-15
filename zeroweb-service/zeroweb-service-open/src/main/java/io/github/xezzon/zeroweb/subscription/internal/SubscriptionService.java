@@ -65,7 +65,7 @@ public class SubscriptionService implements
   ///
   /// @param id 订阅的ID
   protected void auditSubscription(String id) {
-    Subscription entity = subscriptionRepository.getReferenceById(id);
+    Subscription entity = subscriptionRepository.findById(id).orElseThrow();
     if (!Objects.equals(entity.getSubscriptionStatus(), SubscriptionStatus.AUDITING)) {
       // 不是审核中，不变更状态
       return;
@@ -102,7 +102,7 @@ public class SubscriptionService implements
     if (subscriptions.isEmpty()) {
       throw new UnsubscribeOpenapiException();
     }
-    Subscription subscription = subscriptions.get(0);
+    Subscription subscription = subscriptions.getFirst();
     if (subscription.getSubscriptionStatus() != SubscriptionStatus.SUBSCRIBED) {
       throw new UnsubscribeOpenapiException();
     }

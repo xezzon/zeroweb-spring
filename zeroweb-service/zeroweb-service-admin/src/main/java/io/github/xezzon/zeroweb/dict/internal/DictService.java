@@ -48,12 +48,12 @@ public class DictService {
   /// @param dict 字典项
   /// @throws RepeatDataException 字典键冲突
   protected void modifyDict(Dict dict) {
-    Dict entity = dictDAO.get().getReferenceById(dict.getId());
-    final Dict oldValue = new Dict();
-    dictDAO.getCopier().copy(entity, oldValue);
-    dictDAO.getCopier().copy(dict, entity);
+    Dict entity = dictDAO.get().findById(dict.getId()).orElseThrow();
     /* 前置校验 */
-    this.checkRepeat(entity);
+    dict.setTag(entity.getTag());
+    this.checkRepeat(dict);
+    /* 属性复制（忽略空属性） */
+    dictDAO.getCopier().copy(dict, entity);
     /* 持久化 */
     dictDAO.get().save(entity);
   }

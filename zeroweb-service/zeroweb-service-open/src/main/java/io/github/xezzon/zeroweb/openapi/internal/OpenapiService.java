@@ -45,7 +45,7 @@ public class OpenapiService implements IOpenapiService4Subscription {
   /// @throws PublishedOpenapiCannotBeModifyException 如果要修改的Openapi已经发布且编码（即对外的路径）被修改，则抛出异常
   protected void modifyOpenapi(Openapi openapi) {
     this.checkRepeat(openapi);
-    Openapi entity = openapiDAO.get().getReferenceById(openapi.getId());
+    Openapi entity = openapiDAO.get().findById(openapi.getId()).orElseThrow();
     if (entity.isPublished()
         && openapi.getCode() != null
         && !Objects.equals(entity.getCode(), openapi.getCode())
@@ -62,7 +62,7 @@ public class OpenapiService implements IOpenapiService4Subscription {
   ///
   /// @param id 要发布的对外接口的ID
   protected void publishOpenapi(String id) {
-    Openapi entity = openapiDAO.get().getReferenceById(id);
+    Openapi entity = openapiDAO.get().findById(id).orElseThrow();
     entity.setStatus(OpenapiStatus.PUBLISHED);
     openapiDAO.get().save(entity);
   }

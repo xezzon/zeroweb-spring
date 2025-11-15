@@ -64,11 +64,12 @@ public class LocalizedService {
   ///
   /// @param language 语言
   void updateLanguage(final Language language) {
-    final Language entity = languageDAO.get().getReferenceById(language.getId());
-    final String oldTag = entity.getLanguageTag();
-    languageDAO.getCopier().copy(language, entity);
+    final Language entity = languageDAO.get().findById(language.getId()).orElseThrow();
     /* 前置校验 */
     this.checkRepeat(language);
+    /* 属性赋值 */
+    final String oldTag = entity.getLanguageTag();
+    languageDAO.getCopier().copy(language, entity);
     /* 持久化 */
     languageDAO.get().save(entity);
     /* 后置处理 */
@@ -126,13 +127,13 @@ public class LocalizedService {
   /// @throws RepeatDataException 重复数据异常
   /// @throws jakarta.persistence.EntityNotFoundException 数据不存在或已删除
   void updateI18nMessage(final I18nMessage i18nMessage) {
-    final I18nMessage entity = i18nMessageDAO.get().getReferenceById(i18nMessage.getId());
+    final I18nMessage entity = i18nMessageDAO.get().findById(i18nMessage.getId()).orElseThrow();
     final I18nMessage oldValue = new I18nMessage();
     i18nMessageDAO.getCopier().copy(entity, oldValue);
-    i18nMessageDAO.getCopier().copy(i18nMessage, entity);
     /* 前置校验 */
     this.checkRepeat(i18nMessage);
     /* 持久化 */
+    i18nMessageDAO.getCopier().copy(i18nMessage, entity);
     i18nMessageDAO.get().save(entity);
     /* 后置处理 */
     eventPublisher.publishEvent(new I18nMessageChangedEvent(oldValue, i18nMessage));
