@@ -29,7 +29,7 @@
     <grpc.port>9090</grpc.port>
     <!-- Testcontainers -->
     <testcontainers.postgresql.url>
-      jdbc:tc:postgresql:17-alpine:///postgres
+      jdbc:tc:postgresql:18-alpine:///postgres
     </testcontainers.postgresql.url>
   </properties>
 
