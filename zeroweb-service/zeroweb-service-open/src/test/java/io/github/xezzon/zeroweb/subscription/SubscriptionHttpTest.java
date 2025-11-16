@@ -115,7 +115,7 @@ class SubscriptionHttpTest {
         .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
             .queryParam("top", top)
             .queryParam("skip", skip)
-            .build(dataset.get(0).getAppId())
+            .build(dataset.getFirst().getAppId())
         )
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator
@@ -146,7 +146,7 @@ class SubscriptionHttpTest {
       Assertions.assertTrue(actual.getOpenapi().isPublished());
       Assertions.assertNull(actual.getOpenapi().getDestination());
       Optional<Subscription> except = dataset.parallelStream()
-          .filter(o -> Objects.equals(o.getAppId(), dataset.get(0).getAppId()))
+          .filter(o -> Objects.equals(o.getAppId(), dataset.getFirst().getAppId()))
           .filter(o -> Objects.equals(o.getOpenapiCode(), openapi.getCode()))
           .findAny();
       if (except.isPresent()) {
@@ -176,7 +176,7 @@ class SubscriptionHttpTest {
         .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
             .queryParam("top", top)
             .queryParam("skip", skip)
-            .build(dataset.get(0).getAppId())
+            .build(dataset.getFirst().getAppId())
         )
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator
@@ -195,7 +195,7 @@ class SubscriptionHttpTest {
     Openapi openapi = openapiRepository.findAll().stream()
         .filter(Openapi::isPublished)
         .findAny().orElseThrow();
-    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     AddSubscriptionReq req = new AddSubscriptionReq(thirdPartyApp.getId(), openapi.getCode());
     Id responseBody = webTestClient.post()
@@ -217,7 +217,7 @@ class SubscriptionHttpTest {
     Openapi openapi = openapiRepository.findAll().stream()
         .filter(Predicate.not(Openapi::isPublished))
         .findAny().orElseThrow();
-    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     AddSubscriptionReq req = new AddSubscriptionReq(thirdPartyApp.getId(), openapi.getCode());
     webTestClient.post()
@@ -235,8 +235,8 @@ class SubscriptionHttpTest {
 
   @Test
   void subscribe_dataPermissionForbidden() {
-    Openapi openapi = openapiRepository.findAll().get(0);
-    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().get(0);
+    Openapi openapi = openapiRepository.findAll().getFirst();
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     AddSubscriptionReq req = new AddSubscriptionReq(thirdPartyApp.getId(), openapi.getCode());
     webTestClient.post()
@@ -252,7 +252,7 @@ class SubscriptionHttpTest {
 
   @Test
   void auditSubscription() {
-    Subscription target = repository.findAll().get(0);
+    Subscription target = repository.findAll().getFirst();
 
     webTestClient.put()
         .uri(builder -> builder

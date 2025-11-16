@@ -15,7 +15,7 @@ public class ZerowebAdminApplication {
 
   /// 系统管理服务入口
   /// @param args 应用启动参数
-  public static void main(String[] args) {
+  static void main(String[] args) {
     SpringApplication.run(ZerowebAdminApplication.class, args);
   }
 }

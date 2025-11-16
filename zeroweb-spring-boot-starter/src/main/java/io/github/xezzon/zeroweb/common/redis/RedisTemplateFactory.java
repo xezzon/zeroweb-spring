@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.common.redis;
 
 import com.google.common.reflect.TypeToken;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -34,7 +35,7 @@ public class RedisTemplateFactory {
    * }
    * </pre>
    */
-  public <T> RedisTemplate<String, T> of(final TypeToken<T> typeToken) {
+  public <T> RedisTemplate<String, T> of(final TypeToken<@NotNull T> typeToken) {
     RedisTemplate<String, T> redisTemplate = new RedisTemplate<>();
     redisTemplate.setConnectionFactory(connectionFactory);
     redisTemplate.setKeySerializer(keySerializer);

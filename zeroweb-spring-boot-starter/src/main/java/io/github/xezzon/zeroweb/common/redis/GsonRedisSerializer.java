@@ -4,6 +4,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 
@@ -15,7 +16,7 @@ public class GsonRedisSerializer<T> implements RedisSerializer<T> {
   private static final Gson GSON = new Gson();
   private final Type type;
 
-  public GsonRedisSerializer(final TypeToken<T> typeToken) {
+  public GsonRedisSerializer(final TypeToken<@NotNull T> typeToken) {
     this.type = typeToken.getType();
   }
 

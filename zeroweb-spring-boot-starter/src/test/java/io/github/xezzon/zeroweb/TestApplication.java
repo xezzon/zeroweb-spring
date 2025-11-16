@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Import;
 @Import(ExcludeDbTrait.class)
 public class TestApplication {
 
-  public static void main(String[] args) {
+  static void main(String[] args) {
     SpringApplication.run(TestApplication.class, args);
   }
 }

@@ -42,7 +42,8 @@ public class DictScanner implements ImportBeanDefinitionRegistrar, CommandLineRu
     AnnotationDictConfiguration configuration = new AnnotationDictConfiguration(metadata);
     String classpath = configuration.getValue();
     try {
-      ImmutableSet<ClassInfo> classInfos = ClassPath.from(ClassLoader.getSystemClassLoader())
+      ImmutableSet<@NotNull ClassInfo> classInfos = ClassPath
+          .from(ClassLoader.getSystemClassLoader())
           .getTopLevelClassesRecursive(classpath);
       for (ClassInfo classInfo : classInfos) {
         Class<?> clazz = classInfo.load();

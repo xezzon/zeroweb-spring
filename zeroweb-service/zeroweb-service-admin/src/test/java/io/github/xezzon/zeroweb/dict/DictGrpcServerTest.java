@@ -56,7 +56,7 @@ class DictGrpcServerTest {
         children.add(child);
       }
       parent.setChildren(children);
-      Dict child = children.get(0);
+      Dict child = children.getFirst();
       Dict grandchild = new Dict();
       grandchild.setTag(child.getTag());
       grandchild.setCode(RandomUtil.randomString(8));
@@ -78,12 +78,12 @@ class DictGrpcServerTest {
   @Test
   void getDictListByTag() {
     DictListResp resp = dictBlockingStub.getDictListByTag(DictReq.newBuilder()
-        .setTag(dataset.get(0).getCode())
+        .setTag(dataset.getFirst().getCode())
         .build()
     );
 
-    List<Dict> children = dataset.get(0).getChildren();
-    children.add(children.get(0).getChildren().get(0));
+    List<Dict> children = dataset.getFirst().getChildren();
+    children.add(children.getFirst().getChildren().getFirst());
     children.sort(Comparator.comparing(Dict::getOrdinal));
     for (int i = 0, cnt = children.size(); i < cnt; i++) {
       assertEquals(children.get(i).getId(), resp.getData(i).getId());
@@ -119,7 +119,7 @@ class DictGrpcServerTest {
         .filter(o -> Objects.equals(o.getTag(), Dict.DICT_TAG))
         .toList()
     );
-    tagList.add(0, DictImportReq.newBuilder()
+    tagList.addFirst(DictImportReq.newBuilder()
         .setCode(existTag.getCode())
         .setOrdinal(RandomUtil.randomInt())
         .build()
@@ -156,7 +156,7 @@ class DictGrpcServerTest {
     assertEquals(count, repository.count());
     Dict result = repository.findByTagAndCode(
         Dict.DICT_TAG,
-        tagList.get(0).getCode()
+        tagList.getFirst().getCode()
     ).orElseThrow();
     assertEquals(existTag.getId(), result.getId());
     for (Dict item : existItems) {

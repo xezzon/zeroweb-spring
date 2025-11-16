@@ -3,6 +3,6 @@ JDBC_TYPE: @db.type@
 
 spring:
   grpc:
-    server:
+    test:
       inprocess:
-        name: file
+        enabled: true

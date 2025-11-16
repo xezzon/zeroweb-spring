@@ -89,7 +89,7 @@ class OpenapiHttpTest {
 
   @Test
   void addOpenapi_repeat() {
-    Openapi exist = repository.findAll().get(0);
+    Openapi exist = repository.findAll().getFirst();
 
     AddOpenapiReq req = new AddOpenapiReq(
         exist.getCode(),
@@ -252,7 +252,7 @@ class OpenapiHttpTest {
 
   @Test
   void publishOpenapi() {
-    Openapi target = repository.findAll().get(0);
+    Openapi target = repository.findAll().getFirst();
 
     webTestClient.put()
         .uri(builder -> builder.path(PUBLISH_OPENAPI_URI)

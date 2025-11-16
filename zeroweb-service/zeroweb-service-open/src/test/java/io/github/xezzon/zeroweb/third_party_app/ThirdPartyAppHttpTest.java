@@ -113,7 +113,7 @@ class ThirdPartyAppHttpTest {
     final int top = 5;
     final int skip = top * 2;
     List<ThirdPartyApp> dataset = repository.findAll();
-    String me = dataset.get(0).getOwnerId();
+    String me = dataset.getFirst().getOwnerId();
 
     PagedModel<ThirdPartyApp> responseBody = webTestClient.get()
         .uri(builder -> builder
@@ -180,7 +180,7 @@ class ThirdPartyAppHttpTest {
 
   @Test
   void rollAccessSecret() {
-    ThirdPartyApp target = repository.findAll().get(0);
+    ThirdPartyApp target = repository.findAll().getFirst();
     AccessSecret responseBody = webTestClient.patch()
         .uri(builder -> builder
             .path(ROLL_ACCESS_SECRET_URI)

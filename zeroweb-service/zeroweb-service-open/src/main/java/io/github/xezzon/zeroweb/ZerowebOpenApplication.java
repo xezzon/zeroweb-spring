@@ -13,9 +13,12 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerial
 @EnableDictScan
 public class ZerowebOpenApplication {
 
+  private ZerowebOpenApplication() {
+  }
+
   /// 开放平台服务入口
   /// @param args 应用启动参数
-  public static void main(String[] args) {
+  static void main(String[] args) {
     SpringApplication.run(ZerowebOpenApplication.class, args);
   }
 }

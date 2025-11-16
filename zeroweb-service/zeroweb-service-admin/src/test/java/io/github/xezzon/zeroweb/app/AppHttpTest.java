@@ -123,7 +123,7 @@ class AppHttpTest {
   void updateApp() {
     // Arrange
     List<App> dataset = repository.findAll();
-    App app = dataset.get(0);
+    App app = dataset.getFirst();
     UpdateAppReq req = new UpdateAppReq(
         app.getId(),
         RandomUtil.randomString(8),
@@ -145,7 +145,7 @@ class AppHttpTest {
   void updateApp_invalidBaseUrl() {
     // Arrange
     List<App> dataset = repository.findAll();
-    App app = dataset.get(0);
+    App app = dataset.getFirst();
     UpdateAppReq invalidUrlReq = new UpdateAppReq(
         app.getId(),
         RandomUtil.randomString(8),
@@ -189,7 +189,7 @@ class AppHttpTest {
   void updateApp_nullOptionalFields() {
     // Arrange
     List<App> dataset = repository.findAll();
-    App app = dataset.get(0);
+    App app = dataset.getFirst();
     // Assuming that the app name is optional and can be null
     UpdateAppReq nullOptionalReq = new UpdateAppReq(
         app.getId(),
@@ -213,10 +213,10 @@ class AppHttpTest {
   void updateApp_concurrentUpdates() {
     // Arrange
     List<App> dataset = repository.findAll();
-    App app = dataset.get(0);
+    App app = dataset.getFirst();
     int concurrentRequests = 16;
     IntStream.range(0, concurrentRequests).parallel()
-        .mapToObj(i -> new UpdateAppReq(
+        .mapToObj(_ -> new UpdateAppReq(
             app.getId(),
             RandomUtil.randomString(8),
             "http://example.com",
@@ -237,7 +237,7 @@ class AppHttpTest {
   void deleteApp() {
     // Arrange
     List<App> dataset = repository.findAll();
-    String id = dataset.get(0).getId();
+    String id = dataset.getFirst().getId();
 
     // Act & Assert
     webTestClient.delete()

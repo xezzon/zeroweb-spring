@@ -108,7 +108,7 @@ class RoleServiceTest {
 
   @Test
   void addRole_repeat() {
-    Role role = dataset.get(0);
+    Role role = dataset.getFirst();
     Role req = new AddRoleReq(
         role.getCode(),
         RandomUtil.randomString(8),
@@ -124,7 +124,7 @@ class RoleServiceTest {
   @Test
   @Transactional
   void deleteRole_success() {
-    Role role = dataset.get(0);
+    Role role = dataset.getFirst();
 
     roleService.deleteRole(role.getId());
     Assertions.assertFalse(repository.existsById(role.getId()));
@@ -134,6 +134,6 @@ class RoleServiceTest {
         .filter(Role::getInheritable)
         .findAny().orElseThrow();
     Assertions.assertFalse(repository.existsById(child.getId()));
-    Assertions.assertFalse(repository.existsById(child.getChildren().get(0).getId()));
+    Assertions.assertFalse(repository.existsById(child.getChildren().getFirst().getId()));
   }
 }

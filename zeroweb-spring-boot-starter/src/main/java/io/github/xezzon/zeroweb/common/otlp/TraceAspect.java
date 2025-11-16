@@ -3,7 +3,6 @@ package io.github.xezzon.zeroweb.common.otlp;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
-import io.opentelemetry.context.Scope;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -34,7 +33,7 @@ public class TraceAspect {
         .setAttribute(CODE_NAMESPACE_KEY, namespace)
         .setAttribute(CODE_FUNCTION_KEY, methodName)
         .startSpan();
-    try (Scope ignore = span.makeCurrent()) {
+    try (var _ = span.makeCurrent()) {
       Object result = pjp.proceed();
       span.setStatus(StatusCode.OK);
       return result;

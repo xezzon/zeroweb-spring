@@ -23,7 +23,4 @@ class PermissionConstantUtilTest {
 class PermissionConstant {
 
   public static final String PERMISSION1 = RandomUtil.randomString(8);
-  public static final String PERMISSION2 = RandomUtil.randomString(8);
-  public static final String PERMISSION3 = RandomUtil.randomString(8);
-  public static final String PERMISSION4 = RandomUtil.randomString(8);
 }

@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableDictScan
 public class DictDbTestApplication {
 
-  public static void main(String[] args) {
+  static void main(String[] args) {
     SpringApplication.run(DictDbTestApplication.class, args);
   }
 }

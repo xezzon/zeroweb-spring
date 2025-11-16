@@ -82,7 +82,7 @@ class DictHttpTest {
         children.add(child);
       }
       parent.setChildren(children);
-      Dict child = children.get(0);
+      Dict child = children.getFirst();
       Dict grandchild = new Dict();
       grandchild.setTag(child.getTag());
       grandchild.setCode(RandomUtil.randomString(8));
@@ -124,7 +124,7 @@ class DictHttpTest {
 
   @Test
   void addDictTag_repeat() {
-    Dict exist = dataset.get(0);
+    Dict exist = dataset.getFirst();
 
     AddDictReq req = new AddDictReq();
     req.setCode(exist.getCode());
@@ -142,7 +142,7 @@ class DictHttpTest {
 
   @Test
   void addDict() {
-    Dict parent = dataset.get(0);
+    Dict parent = dataset.getFirst();
     AddDictReq req = new AddDictReq();
     req.setTag(parent.getCode());
     req.setCode(RandomUtil.randomString(8));
@@ -165,8 +165,8 @@ class DictHttpTest {
 
   @Test
   void addDict_repeat() {
-    Dict parent = dataset.get(0);
-    Dict exist = parent.getChildren().get(0);
+    Dict parent = dataset.getFirst();
+    Dict exist = parent.getChildren().getFirst();
 
     AddDictReq req = new AddDictReq();
     req.setTag(exist.getTag());
@@ -186,7 +186,7 @@ class DictHttpTest {
 
   @Test
   void modifyDict() {
-    Dict target = dataset.get(0);
+    Dict target = dataset.getFirst();
 
     ModifyDictReq req = new ModifyDictReq(
         target.getId(),
@@ -327,11 +327,11 @@ class DictHttpTest {
         .exchange()
         .expectStatus().isOk();
     assertFalse(repository.existsById(dict20.getId()));
-    assertFalse(repository.existsById(dict20.getChildren().get(0).getId())); // 子级被删除
+    assertFalse(repository.existsById(dict20.getChildren().getFirst().getId())); // 子级被删除
     assertFalse(repository.existsById(dict22.getId()));
     assertFalse(repository.existsById(dict31.getId()));
     assertTrue(repository.existsById(dataset.get(2).getId()));
-    assertTrue(repository.existsById(dataset.get(3).getChildren().get(0).getId()));
+    assertTrue(repository.existsById(dataset.get(3).getChildren().getFirst().getId()));
   }
 
   @Test
@@ -339,7 +339,7 @@ class DictHttpTest {
     List<Dict> responseBody = webTestClient.get()
         .uri(uriBuilder -> uriBuilder
             .path(GET_DICT_TREE_BY_TAG_URI)
-            .build(dataset.get(0).getCode())
+            .build(dataset.getFirst().getCode())
         )
         .exchange()
         .expectStatus().isOk()
@@ -347,7 +347,7 @@ class DictHttpTest {
         .returnResult().getResponseBody();
 
     assertNotNull(responseBody);
-    List<Dict> children = dataset.get(0).getChildren();
+    List<Dict> children = dataset.getFirst().getChildren();
     children.sort(Comparator.comparing(Dict::getOrdinal));
     for (int i = 0, cnt = responseBody.size(); i < cnt; i++) {
       assertEquals(children.get(i).getId(), responseBody.get(i).getId());

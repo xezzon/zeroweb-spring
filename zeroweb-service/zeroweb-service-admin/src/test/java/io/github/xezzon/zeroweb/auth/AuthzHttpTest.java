@@ -441,7 +441,7 @@ class AuthzHttpTest {
   void roleUser_normal_failed() {
     // 获取目标角色和当前用户
     Role targetRole = RandomUtil.randomEle(roles);
-    User currentUser = users.get(0);
+    User currentUser = users.getFirst();
 
     // 测试角色-用户绑定（当前用户不属于目标角色的上级角色）
     List<RoleUser> userBindToRole = new ArrayList<>();

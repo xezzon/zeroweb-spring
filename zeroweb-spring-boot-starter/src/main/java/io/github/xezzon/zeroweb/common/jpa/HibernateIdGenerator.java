@@ -24,9 +24,7 @@ public class HibernateIdGenerator implements IdentifierGenerator {
     if (originId != null) {
       return originId;
     }
-    IdGenerator idGenerator = ApplicationContextProvider
-        .getApplicationContext()
-        .getBean(IdGenerator.class);
+    IdGenerator idGenerator = ApplicationContextProvider.get().getBean(IdGenerator.class);
     return idGenerator.nextId();
   }
 }

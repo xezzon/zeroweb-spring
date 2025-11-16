@@ -55,10 +55,13 @@ class TreeTest {
     Assertions.assertEquals("2", menus.get(1).getId());
     Assertions.assertEquals("3", menus.get(2).getId());
     Assertions.assertEquals("11", menus.get(0).getChildren().get(0).getId());
-    Assertions.assertEquals("121", menus.get(0).getChildren().get(1).getChildren().get(0).getId());
+    Assertions.assertEquals(
+        "121",
+        menus.get(0).getChildren().get(1).getChildren().getFirst().getId()
+    );
     Assertions.assertEquals(
         "1222",
-        menus.get(0).getChildren()
+        menus.getFirst().getChildren()
             .get(1).getChildren()
             .get(1).getChildren()
             .get(1).getId()
@@ -157,8 +160,8 @@ class MenuService implements ITreeService<Menu, String> {
 
   @Override
   public List<Menu> listByParentId(Collection<String> parentIds) {
-    return TreeTest.DATA_SET.parallelStream()
+    return TreeTest.DATA_SET.stream()
         .filter(menu -> parentIds.contains(menu.getParentId()))
-        .collect(Collectors.toList());
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 }
