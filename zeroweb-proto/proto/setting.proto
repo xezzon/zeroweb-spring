@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package io.github.xezzon.zeroweb.setting;
+
+import "google/protobuf/struct.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "SettingProto";
+option java_package = "io.github.xezzon.zeroweb.setting";
+
+// 业务参数
+message SettingItem {
+  // 业务参数标识
+  string key = 2;
+  // 参数值
+  google.protobuf.Struct value = 4;
+}
+
+// 获取业务参数请求
+message GetSettingRequest {
+  // 业务参数标识
+  string key = 1;
+}
+
+// 业务参数服务
+service Setting {
+  // 获取参数值
+  rpc GetSetting(GetSettingRequest) returns (SettingItem);
+}
