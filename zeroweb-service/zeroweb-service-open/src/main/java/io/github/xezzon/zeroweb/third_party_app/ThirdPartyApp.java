@@ -5,13 +5,15 @@ import io.github.xezzon.zeroweb.common.jpa.IEntity;
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /// 第三方应用
 ///
@@ -21,6 +23,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @ToString
 @Entity
 @Table(name = ThirdPartyApp.TABLE_NAME)
+@EntityListeners({AuditingEntityListener.class})
 public class ThirdPartyApp implements IEntity<String> {
 
   public static final String TABLE_NAME = "zeroweb_third_party_app";
@@ -44,6 +47,6 @@ public class ThirdPartyApp implements IEntity<String> {
   String ownerId;
   /// 创建时间
   @Column(name = "create_time", nullable = false, updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   Instant createTime;
 }

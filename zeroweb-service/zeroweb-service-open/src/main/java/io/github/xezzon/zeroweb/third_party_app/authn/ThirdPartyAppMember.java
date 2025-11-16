@@ -5,6 +5,7 @@ import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.ID_LENGT
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
@@ -12,7 +13,8 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /// @author xezzon
 @Getter
@@ -20,6 +22,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @ToString
 @Entity
 @Table(name = "zeroweb_third_party_app_member")
+@EntityListeners({AuditingEntityListener.class})
 public class ThirdPartyAppMember {
 
   public static final String DEFAULT_ROLE_ID = "0";
@@ -36,7 +39,7 @@ public class ThirdPartyAppMember {
   @Column(name = "role_id", nullable = false, length = ID_LENGTH)
   private String roleId;
   @Column(name = "create_time", nullable = false, updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   private Instant createTime;
 
   public boolean isOwner() {
