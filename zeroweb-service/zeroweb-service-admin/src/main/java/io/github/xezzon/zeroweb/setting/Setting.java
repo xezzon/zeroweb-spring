@@ -12,7 +12,8 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /// 业务参数
@@ -33,13 +34,14 @@ public class Setting {
   @Column(name = "key", nullable = false, updatable = false)
   private String key;
   /// 约束
-  @Column(name = "schema", nullable = false)
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "schema", columnDefinition = "json", nullable = false)
   private String schema;
   /// 参数值
-  @Column(name = "value", nullable = false)
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "value", columnDefinition = "json", nullable = false)
   private Map<String, Object> value;
   /// 更新时间
   @Column(name = "update_time", updatable = false)
-  @LastModifiedDate
   private Instant updateTime;
 }
