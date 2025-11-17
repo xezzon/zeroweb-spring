@@ -1,5 +1,7 @@
-package io.github.xezzon.zeroweb.common.config;
+package io.github.xezzon.zeroweb.storage.fs;
 
+import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
+import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.common.exception.UnsupportedFileProviderException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;

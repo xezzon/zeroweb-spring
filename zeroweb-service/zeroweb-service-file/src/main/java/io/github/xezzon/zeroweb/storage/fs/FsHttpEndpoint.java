@@ -1,9 +1,8 @@
-package io.github.xezzon.zeroweb.storage.file;
+package io.github.xezzon.zeroweb.storage.fs;
 
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.IAttachmentService;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
-import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.exception.UnsupportedFileProviderException;
 import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;

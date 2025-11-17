@@ -1,4 +1,4 @@
-package io.github.xezzon.zeroweb.storage.file;
+package io.github.xezzon.zeroweb.storage.fs;
 
 import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingOutputStream;
@@ -9,7 +9,6 @@ import io.github.xezzon.zeroweb.attachment.event.AttachmentCreatedEvent;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentDeletedEvent;
 import io.github.xezzon.zeroweb.attachment.event.AttachmentUploadedEvent;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
-import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.constant.BannerConstant;
 import io.github.xezzon.zeroweb.common.exception.IncorrectFileException;
 import io.github.xezzon.zeroweb.common.exception.ReadFileException;

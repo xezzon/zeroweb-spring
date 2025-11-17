@@ -16,7 +16,7 @@ import io.github.xezzon.zeroweb.attachment.QueryAttachmentListRequest;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
-import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
+import io.github.xezzon.zeroweb.storage.fs.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.exception.WriteFileException;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
 import io.grpc.stub.StreamObserver;
