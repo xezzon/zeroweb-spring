@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.auth.repository;
 import io.github.xezzon.zeroweb.auth.RoleUser;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -19,4 +20,6 @@ public interface RoleUserRepository extends
   void deleteByRoleIdAndUserId(String roleId, String userId);
 
   List<RoleUser> findByUserId(String userId);
+
+  Optional<RoleUser> findByRoleIdAndUserId(String roleId, String userId);
 }

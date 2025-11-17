@@ -24,6 +24,7 @@ sa-token:
   timeout: ${SA_TOKEN_TIMEOUT:2592000}
 
 zeroweb:
+  root-password: ${ZEROWEB_ROOT_PASSWORD:}
   jwt:
     issuer: ${ZEROWEB_JWT_ISSUER:xezzon.github.io}
     timeout: ${ZEROWEB_JWT_TIMEOUT:120}
