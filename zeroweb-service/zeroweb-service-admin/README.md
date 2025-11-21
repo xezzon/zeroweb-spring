@@ -30,7 +30,7 @@ service:
 | SA_TOKEN_TIMEOUT      | Session 有效时长。单位 秒。 | 2592000（30天）     |
 | ZEROWEB_JWT_ISSUER    | JWT签发机构。建议设置为域名。   | xezzon.github.io |
 | ZEROWEB_JWT_TIMEOUT   | JWT 有效时长。单位 秒。     | 120              |
-| ZEROWEB_ROOT_PASSWORD | root 账号口令          |                  |
+| ZEROWEB_ROOT_PASSWORD | root 账号口令。必填。      |                  |
 
 其他配置请查看[公共配置清单](../../zeroweb-spring-boot-starter/README.md)。
 
