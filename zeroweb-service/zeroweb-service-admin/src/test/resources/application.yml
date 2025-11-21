@@ -1,5 +1,6 @@
 SPRING_ENVIRONMENT: test
 JDBC_TYPE: @db.type@
+ZEROWEB_ROOT_PASSWORD: zeroweb
 
 spring:
   grpc:
