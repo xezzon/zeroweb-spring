@@ -22,8 +22,8 @@
 
   <dependencies>
     <dependency>
-      <artifactId>zeroweb-open-sdk</artifactId>
       <groupId>io.github.xezzon</groupId>
+      <artifactId>zeroweb-open-sdk</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>

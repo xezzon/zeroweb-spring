@@ -11,8 +11,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.servlet.autoconfigure.MultipartProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 

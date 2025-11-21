@@ -3,11 +3,9 @@ package io.github.xezzon.zeroweb;
 import static io.github.xezzon.zeroweb.TestApplication.SECRET_KEY;
 import static io.github.xezzon.zeroweb.ZerowebOpenConstant.DIGEST_ALGORITHM;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import jakarta.annotation.Resource;
-import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author xezzon
@@ -37,7 +36,7 @@ public class TestController {
       @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) String accessKey,
       @RequestHeader(ZerowebOpenConstant.TIMESTAMP_HEADER) Instant timestamp,
       @RequestHeader(ZerowebOpenConstant.SIGNATURE_HEADER) String signature
-  ) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+  ) throws NoSuchAlgorithmException, InvalidKeyException {
     Assertions.assertEquals("hello", accessKey);
     Assertions.assertTrue(timestamp.isBefore(Instant.now()));
     Assertions.assertTrue(Duration.between(timestamp, Instant.now()).toMinutes() < 2);

@@ -8,8 +8,8 @@ import io.github.xezzon.zeroweb.dict.DictReq;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.grpc.test.autoconfigure.AutoConfigureInProcessTransport;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.grpc.test.AutoConfigureInProcessTransport;
 import org.springframework.test.annotation.DirtiesContext;
 
 /**
