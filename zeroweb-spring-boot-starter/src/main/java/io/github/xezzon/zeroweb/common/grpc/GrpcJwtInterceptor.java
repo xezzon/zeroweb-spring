@@ -9,8 +9,9 @@ import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
 import io.grpc.ClientInterceptor;
+import io.grpc.Context;
+import io.grpc.Contexts;
 import io.grpc.ForwardingClientCall.SimpleForwardingClientCall;
-import io.grpc.ForwardingServerCall.SimpleForwardingServerCall;
 import io.grpc.Metadata;
 import io.grpc.Metadata.Key;
 import io.grpc.MethodDescriptor;
@@ -18,7 +19,6 @@ import io.grpc.ServerCall;
 import io.grpc.ServerCall.Listener;
 import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
-import io.grpc.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.client.GlobalClientInterceptor;
 import org.springframework.grpc.server.GlobalServerInterceptor;
@@ -43,41 +43,36 @@ public class GrpcJwtInterceptor implements ServerInterceptor, ClientInterceptor 
    * 服务端拦截器
    */
   @Override
-  public <ReqT, RespT> Listener<ReqT> interceptCall(
-      final ServerCall<ReqT, RespT> call,
-      final Metadata requestHeaders,
-      final ServerCallHandler<ReqT, RespT> next
+  public <T, R> Listener<T> interceptCall(
+      final ServerCall<T, R> call,
+      final Metadata headers,
+      final ServerCallHandler<T, R> next
   ) {
+    JwtClaim claim = null;
     try {
-      final byte[] jwtClaimBytes = requestHeaders.get(BEARER);
+      final byte[] jwtClaimBytes = headers.get(BEARER);
       if (jwtClaimBytes != null) {
-        final JwtClaim claim = JwtClaim.parseFrom(jwtClaimBytes);
-        JwtAuth.save(claim);
+        claim = JwtClaim.parseFrom(jwtClaimBytes);
       }
     } catch (RuntimeException | InvalidProtocolBufferException e) {
       log.error("Parse JWT failed.", e);
     }
-    return next.startCall(new SimpleForwardingServerCall<>(call) {
-      @Override
-      public void close(Status status, Metadata trailers) {
-        super.close(status, trailers);
-        JwtAuth.clear();
-      }
-    }, requestHeaders);
+    Context context = Context.current().withValue(JwtAuth.CONTEXT, claim);
+    return Contexts.interceptCall(context, call, headers, next);
   }
 
   /**
    * 客户端拦截器
    */
   @Override
-  public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(
-      final MethodDescriptor<ReqT, RespT> method,
+  public <T, R> ClientCall<T, R> interceptCall(
+      final MethodDescriptor<T, R> method,
       final CallOptions callOptions,
       final Channel next
   ) {
     return new SimpleForwardingClientCall<>(next.newCall(method, callOptions)) {
       @Override
-      public void start(Listener<RespT> responseListener, Metadata headers) {
+      public void start(Listener<R> responseListener, Metadata headers) {
         JwtAuth.get().ifPresent(claim ->
             headers.put(BEARER, claim.toByteArray())
         );

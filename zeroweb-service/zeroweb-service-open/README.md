@@ -9,7 +9,8 @@
 version: 3
 service:
   pgsql:
-    image: postgres:16  # 关系数据库，强依赖
+    image: postgres:18
+    # 关系数据库，强依赖
     name: pgsql
     environment:
       POSTGRES_PASSWORD: postgres@123

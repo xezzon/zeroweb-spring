@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.subscription.enumeration;
 
-import io.github.xezzon.tao.dict.IDict;
+import io.github.xezzon.zeroweb.core.trait.IDict;
 
 /// @author xezzon
 public enum SubscriptionStatus implements IDict {

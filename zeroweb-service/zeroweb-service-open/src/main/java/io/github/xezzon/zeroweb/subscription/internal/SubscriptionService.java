@@ -78,14 +78,12 @@ public class SubscriptionService implements
   public Page<Subscription> listSubscription(ODataQueryOption odata, String appId) {
     Page<Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
     List<Subscription> subscriptions = subscriptionRepository.findByAppId(appId);
-    Map<String, Subscription> subscriptionMap = subscriptions.parallelStream()
+    Map<String, Subscription> subscriptionMap = subscriptions.stream()
         .collect(Collectors.toMap(Subscription::getOpenapiCode, s -> s));
-    subscriptions = openapiPage.getContent().parallelStream()
+    subscriptions = openapiPage.getContent().stream()
         .map(openapi -> {
-          Subscription subscription = subscriptionMap.get(openapi.getCode());
-          if (subscription == null) {
-            subscription = new Subscription();
-          }
+          Subscription subscription = subscriptionMap
+              .computeIfAbsent(openapi.getCode(), _ -> new Subscription());
           subscription.setOpenapi(openapi);
           openapi.setDestination(null);  // 内部路径不允许暴露给订阅者
           return subscription;

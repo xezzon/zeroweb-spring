@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.common.jpa;
 
-import io.github.xezzon.tao.trait.NewType;
+import io.github.xezzon.zeroweb.core.trait.NewType;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;

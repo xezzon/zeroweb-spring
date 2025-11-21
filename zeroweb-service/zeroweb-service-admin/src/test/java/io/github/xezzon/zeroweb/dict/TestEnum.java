@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.dict;
 
-import io.github.xezzon.tao.dict.IDict;
+import io.github.xezzon.zeroweb.core.trait.IDict;
 
 /// @author xezzon
 public enum TestEnum implements IDict {

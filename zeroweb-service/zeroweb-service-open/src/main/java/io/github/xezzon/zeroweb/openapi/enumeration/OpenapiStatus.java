@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.openapi.enumeration;
 
-import io.github.xezzon.tao.dict.IDict;
+import io.github.xezzon.zeroweb.core.trait.IDict;
 
 /// 接口状态
 ///

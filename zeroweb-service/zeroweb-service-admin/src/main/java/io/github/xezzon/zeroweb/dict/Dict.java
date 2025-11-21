@@ -1,10 +1,10 @@
 package io.github.xezzon.zeroweb.dict;
 
-import io.github.xezzon.tao.dict.IDict;
-import io.github.xezzon.tao.tree.TreeNode;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.jpa.IEntity;
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
+import io.github.xezzon.zeroweb.core.trait.IDict;
+import io.github.xezzon.zeroweb.core.tree.ITreeNode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -25,7 +25,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "zeroweb_dict")
-public class Dict implements IEntity<String>, IDict, TreeNode<Dict, String> {
+public class Dict implements IEntity<String>, IDict, ITreeNode<Dict, String> {
 
   public static final String DICT_TAG = "DICT";
 

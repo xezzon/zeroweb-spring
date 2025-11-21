@@ -55,10 +55,13 @@ class TreeTest {
     Assertions.assertEquals("2", menus.get(1).getId());
     Assertions.assertEquals("3", menus.get(2).getId());
     Assertions.assertEquals("11", menus.get(0).getChildren().get(0).getId());
-    Assertions.assertEquals("121", menus.get(0).getChildren().get(1).getChildren().get(0).getId());
+    Assertions.assertEquals(
+        "121",
+        menus.get(0).getChildren().get(1).getChildren().getFirst().getId()
+    );
     Assertions.assertEquals(
         "1222",
-        menus.get(0).getChildren()
+        menus.getFirst().getChildren()
             .get(1).getChildren()
             .get(1).getChildren()
             .get(1).getId()
@@ -101,6 +104,26 @@ class TreeTest {
     });
   }
 
+  @Test
+  void fold_flatten() {
+    TreeList<Menu> menuTree = TreeList.from(DATA_SET);
+    int i = 0;
+    List<Menu> nodes = menuTree;
+    while (!nodes.isEmpty()) {
+      List<Menu> children = new ArrayList<>();
+      for (Menu menu : nodes) {
+        Assertions.assertEquals(DATA_SET.get(i), menu);
+        if (menu.getChildren() != null) {
+          children.addAll(menu.getChildren());
+        }
+        i++;
+      }
+      nodes = children;
+    }
+
+    List<Menu> menuList = menuTree.into();
+    Assertions.assertIterableEquals(DATA_SET, menuList);
+  }
 }
 
 class Menu implements ITreeNode<Menu, String> {
@@ -157,8 +180,8 @@ class MenuService implements ITreeService<Menu, String> {
 
   @Override
   public List<Menu> listByParentId(Collection<String> parentIds) {
-    return TreeTest.DATA_SET.parallelStream()
+    return TreeTest.DATA_SET.stream()
         .filter(menu -> parentIds.contains(menu.getParentId()))
-        .collect(Collectors.toList());
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 }

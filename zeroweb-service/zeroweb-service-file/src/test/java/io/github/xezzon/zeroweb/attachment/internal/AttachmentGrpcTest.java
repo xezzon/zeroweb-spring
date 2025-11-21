@@ -16,7 +16,7 @@ import io.github.xezzon.zeroweb.attachment.QueryAttachmentListRequest;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
-import io.github.xezzon.zeroweb.common.config.ZerowebFsConfig;
+import io.github.xezzon.zeroweb.storage.fs.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.exception.WriteFileException;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
 import io.grpc.stub.StreamObserver;
@@ -40,7 +40,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.grpc.test.AutoConfigureInProcessTransport;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -58,7 +57,6 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 @SpringBootTest
 @DirtiesContext
-@AutoConfigureInProcessTransport
 @Slf4j
 abstract class AttachmentGrpcTest {
 

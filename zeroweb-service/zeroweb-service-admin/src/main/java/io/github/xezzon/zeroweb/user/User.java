@@ -5,14 +5,16 @@ import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /// 用户
 ///
@@ -22,6 +24,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @ToString
 @Entity
 @Table(name = "zeroweb_user")
+@EntityListeners({AuditingEntityListener.class})
 public class User {
 
   @Id
@@ -46,10 +49,10 @@ public class User {
   String cipher;
   /// 记录创建时间
   @Column(name = "create_time", nullable = false, updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   Instant createTime;
   /// 最后更新时间
   @Column(name = "update_time", nullable = false)
-  @UpdateTimestamp
+  @LastModifiedDate
   Instant updateTime;
 }

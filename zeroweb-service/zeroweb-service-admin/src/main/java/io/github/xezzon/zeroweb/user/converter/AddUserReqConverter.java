@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.user.converter;
 
-import io.github.xezzon.tao.trait.From;
+import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.user.AddUserReq;
 import io.github.xezzon.zeroweb.user.User;
 import org.mapstruct.Mapper;

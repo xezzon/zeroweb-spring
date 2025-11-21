@@ -103,7 +103,7 @@ class RoleHttpTest {
   @Test
   void deleteRole() {
     long excepted = roleRepository.count();
-    Role role = roles.get(0);
+    Role role = roles.getFirst();
     webTestClient.delete()
         .uri(builder -> builder
             .path("/role/{id}")
@@ -138,7 +138,7 @@ class RoleHttpTest {
         .flatMap(List::stream)
         .anyMatch(o -> Objects.equals(
             o.getId(),
-            roles.get(0).getId()
+            roles.getFirst().getId()
         ))
     );
   }

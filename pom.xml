@@ -60,11 +60,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>io.github.xezzon</groupId>
-        <artifactId>tao-core</artifactId>
-        <version>0.15.0</version>
-      </dependency>
-      <dependency>
         <groupId>cn.hutool</groupId>
         <artifactId>hutool-core</artifactId>
         <version>${hutool.version}</version>

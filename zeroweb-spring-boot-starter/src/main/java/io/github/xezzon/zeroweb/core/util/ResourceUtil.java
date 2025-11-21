@@ -48,6 +48,6 @@ public class ResourceUtil {
    */
   public static Path getResourceFromClasspath(String resourceName) {
     List<Path> paths = getResourcesFromClasspath(resourceName);
-    return paths.get(0);
+    return paths.getFirst();
   }
 }

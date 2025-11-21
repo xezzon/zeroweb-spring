@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.dict.converter;
 
-import io.github.xezzon.tao.trait.From;
+import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.dict.Dict;
 import io.github.xezzon.zeroweb.dict.DictImportReq;
 import org.mapstruct.Mapper;

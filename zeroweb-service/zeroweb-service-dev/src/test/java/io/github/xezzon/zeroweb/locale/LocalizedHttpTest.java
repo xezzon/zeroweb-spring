@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
@@ -149,7 +151,7 @@ class LocalizedHttpTest {
         .expectBodyList(Language.class)
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
-    assertEquals(Locale.CHINA.toLanguageTag(), responseBody.get(0).getLanguageTag());
+    assertEquals(Locale.CHINA.toLanguageTag(), responseBody.getFirst().getLanguageTag());
   }
 
   @Test
@@ -307,7 +309,7 @@ class LocalizedHttpTest {
   void queryI18nMessageList() {
     List<I18nMessage> dataset = i18nMessageRepository.findAll();
     List<I18nMessage> except = dataset.stream()
-        .filter(it -> Objects.equals(it.getNamespace(), dataset.get(0).getNamespace()))
+        .filter(it -> Objects.equals(it.getNamespace(), dataset.getFirst().getNamespace()))
         .sorted(Comparator.comparing(I18nMessage::getMessageKey))
         .toList();
 
@@ -315,7 +317,7 @@ class LocalizedHttpTest {
         .uri(builder -> builder.path(LIST_I18N_MESSAGE_URL)
             .queryParam("top", except.size())
             .queryParam("skip", 0)
-            .build(dataset.get(0).getNamespace())
+            .build(dataset.getFirst().getNamespace())
         )
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
@@ -334,7 +336,7 @@ class LocalizedHttpTest {
 
   @Test
   void addI18nMessage_repeat() {
-    I18nMessage except = i18nMessageRepository.findAll().get(0);
+    I18nMessage except = i18nMessageRepository.findAll().getFirst();
     AddI18nMessageReq req = new AddI18nMessageReq(
         except.getNamespace(),
         except.getMessageKey()
@@ -350,8 +352,8 @@ class LocalizedHttpTest {
   }
 
   @Test
-  void updateI18nMessage() throws InterruptedException {
-    I18nMessage target = i18nMessageRepository.findAll().get(0);
+  void updateI18nMessage() {
+    I18nMessage target = i18nMessageRepository.findAll().getFirst();
 
     I18nMessage except = new I18nMessage();
     except.setId(target.getId());
@@ -368,17 +370,18 @@ class LocalizedHttpTest {
     assertEquals(except.getNamespace(), actual.getNamespace());
     assertEquals(except.getMessageKey(), actual.getMessageKey());
 
-    Thread.sleep(3000);
-    assertFalse(translationRepository.findAll()
-        .stream()
-        .filter(o -> Objects.equals(o.getNamespace(), target.getNamespace()))
-        .anyMatch(o -> Objects.equals(o.getMessageKey(), target.getMessageKey()))
-    );
-    assertTrue(translationRepository.findAll()
-        .stream()
-        .filter(o -> Objects.equals(o.getNamespace(), except.getNamespace()))
-        .anyMatch(o -> Objects.equals(o.getMessageKey(), except.getMessageKey()))
-    );
+    await().atMost(3, SECONDS).untilAsserted(() -> {
+      assertFalse(translationRepository.findAll()
+          .stream()
+          .filter(o -> Objects.equals(o.getNamespace(), target.getNamespace()))
+          .anyMatch(o -> Objects.equals(o.getMessageKey(), target.getMessageKey()))
+      );
+      assertTrue(translationRepository.findAll()
+          .stream()
+          .filter(o -> Objects.equals(o.getNamespace(), except.getNamespace()))
+          .anyMatch(o -> Objects.equals(o.getMessageKey(), except.getMessageKey()))
+      );
+    });
   }
 
   @Test
@@ -401,8 +404,8 @@ class LocalizedHttpTest {
   }
 
   @Test
-  void deleteI18nMessage() throws InterruptedException {
-    I18nMessage target = i18nMessageRepository.findAll().get(0);
+  void deleteI18nMessage() {
+    I18nMessage target = i18nMessageRepository.findAll().getFirst();
 
     webTestClient.delete()
         .uri(builder -> builder.path(DELETE_I18N_MESSAGE_URL)
@@ -414,17 +417,18 @@ class LocalizedHttpTest {
         .expectStatus().isOk();
     assertFalse(i18nMessageRepository.existsById(target.getId()));
 
-    Thread.sleep(3000);
-    assertFalse(translationRepository.findAll()
-        .stream()
-        .filter(o -> Objects.equals(o.getNamespace(), target.getNamespace()))
-        .anyMatch(o -> Objects.equals(o.getMessageKey(), target.getMessageKey()))
+    await().atMost(3, SECONDS).untilAsserted(() ->
+        assertFalse(translationRepository.findAll()
+            .stream()
+            .filter(o -> Objects.equals(o.getNamespace(), target.getNamespace()))
+            .anyMatch(o -> Objects.equals(o.getMessageKey(), target.getMessageKey()))
+        )
     );
   }
 
   @Test
   void queryTranslation() {
-    I18nMessage i18nMessage = i18nMessageRepository.findAll().get(0);
+    I18nMessage i18nMessage = i18nMessageRepository.findAll().getFirst();
 
     Map<String, String> responseBody = webTestClient.get()
         .uri(builder -> builder.path(QUERY_TRANSLATION_URL)
@@ -448,7 +452,7 @@ class LocalizedHttpTest {
 
   @Test
   void insertTranslation() {
-    I18nMessage targetMessage = i18nMessageRepository.findAll().get(0);
+    I18nMessage targetMessage = i18nMessageRepository.findAll().getFirst();
     Language targetLanguage = new Language();
     targetLanguage.setLanguageTag(Locale.TAIWAN.toLanguageTag());
     targetLanguage.setDescription(Locale.TAIWAN.getDisplayName());
@@ -478,7 +482,7 @@ class LocalizedHttpTest {
 
   @Test
   void updateTranslation() {
-    Translation target = translationRepository.findAll().get(0);
+    Translation target = translationRepository.findAll().getFirst();
 
     UpsertTranslationReq req = new UpsertTranslationReq(
         target.getNamespace(),
@@ -503,7 +507,7 @@ class LocalizedHttpTest {
 
   @Test
   void updateTranslation_noSuchData_language() {
-    Translation target = translationRepository.findAll().get(0);
+    Translation target = translationRepository.findAll().getFirst();
 
     UpsertTranslationReq req = new UpsertTranslationReq(
         target.getNamespace(),
@@ -523,7 +527,7 @@ class LocalizedHttpTest {
 
   @Test
   void updateTranslation_noSuchData_namespace() {
-    Translation target = translationRepository.findAll().get(0);
+    Translation target = translationRepository.findAll().getFirst();
 
     UpsertTranslationReq req = new UpsertTranslationReq(
         RandomUtil.randomString(8),
@@ -543,7 +547,7 @@ class LocalizedHttpTest {
 
   @Test
   void updateTranslation_noSuchData_messageKey() {
-    Translation target = translationRepository.findAll().get(0);
+    Translation target = translationRepository.findAll().getFirst();
 
     UpsertTranslationReq req = new UpsertTranslationReq(
         target.getNamespace(),
@@ -564,8 +568,8 @@ class LocalizedHttpTest {
   @Test
   void loadTranslation() {
     List<Translation> dataset = translationRepository.findAll();
-    String targetLanguage = dataset.get(0).getLanguage();
-    String targetNamespace = dataset.get(0).getNamespace();
+    String targetLanguage = dataset.getFirst().getLanguage();
+    String targetNamespace = dataset.getFirst().getNamespace();
 
     Map<String, String> responseBody = webTestClient.get()
         .uri(builder -> builder.path(LOAD_TRANSLATION_URL)

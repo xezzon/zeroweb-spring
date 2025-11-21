@@ -1,11 +1,11 @@
 package io.github.xezzon.zeroweb.dict.internal;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import io.github.xezzon.tao.tree.Tree;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
+import io.github.xezzon.zeroweb.core.tree.TreeList;
 import io.github.xezzon.zeroweb.dict.Dict;
 import io.github.xezzon.zeroweb.dict.entity.AddDictReq;
 import io.github.xezzon.zeroweb.dict.entity.ModifyDictReq;
@@ -68,7 +68,7 @@ public class DictHttpEndpoint {
   @GetMapping("/tag/{tag}")
   public List<Dict> getDictTreeByTag(@PathVariable String tag) {
     List<Dict> dictItemList = dictService.getDictItemList(tag);
-    return Tree.fold(dictItemList);
+    return TreeList.from(dictItemList);
   }
 
   /// 更新字典目/字典项

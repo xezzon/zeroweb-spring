@@ -14,7 +14,7 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 @EnableDictScan
 public class DictRpcTestApplication implements ImportBeanDefinitionRegistrar {
 
-  public static void main(String[] args) {
+  static void main(String[] args) {
     SpringApplication.run(DictDbTestApplication.class, args);
   }
 }

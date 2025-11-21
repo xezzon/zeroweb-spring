@@ -26,9 +26,9 @@ class GrpcConfigurationTest {
   @Test
   void jwtInterceptor() {
     final TestJwtGenerator.Builder jwtBuilder = TestJwtGenerator.userBuilder().username("test");
-    JwtAuth.save(jwtBuilder.jwtClaim());
     Assertions.assertDoesNotThrow(() ->
-        dictBlockingStub.getDictListByTag(DictReq.newBuilder().build())
+        ScopedValue.where(JwtAuth.CLAIM, jwtBuilder.jwtClaim())
+            .call(() -> dictBlockingStub.getDictListByTag(DictReq.newBuilder().build()))
     );
   }
 

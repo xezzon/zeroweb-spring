@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.attachment.entity;
 
-import io.github.xezzon.tao.trait.From;
-import io.github.xezzon.tao.trait.Into;
+import io.github.xezzon.zeroweb.core.trait.From;
+import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

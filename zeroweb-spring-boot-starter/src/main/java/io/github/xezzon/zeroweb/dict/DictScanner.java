@@ -3,7 +3,7 @@ package io.github.xezzon.zeroweb.dict;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
-import io.github.xezzon.tao.dict.IDict;
+import io.github.xezzon.zeroweb.core.trait.IDict;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import io.github.xezzon.zeroweb.dict.DictImportReqList.Builder;
 import jakarta.annotation.Resource;
@@ -12,7 +12,8 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class DictScanner implements ImportBeanDefinitionRegistrar, CommandLineRunner {
+public class DictScanner implements ImportBeanDefinitionRegistrar, ApplicationRunner {
 
   @Resource
   private DictImporter dictImporter;
@@ -42,7 +43,8 @@ public class DictScanner implements ImportBeanDefinitionRegistrar, CommandLineRu
     AnnotationDictConfiguration configuration = new AnnotationDictConfiguration(metadata);
     String classpath = configuration.getValue();
     try {
-      ImmutableSet<ClassInfo> classInfos = ClassPath.from(ClassLoader.getSystemClassLoader())
+      ImmutableSet<@NotNull ClassInfo> classInfos = ClassPath
+          .from(ClassLoader.getSystemClassLoader())
           .getTopLevelClassesRecursive(classpath);
       for (ClassInfo classInfo : classInfos) {
         Class<?> clazz = classInfo.load();
@@ -77,7 +79,7 @@ public class DictScanner implements ImportBeanDefinitionRegistrar, CommandLineRu
    * 不影响应用正常启动。
    */
   @Override
-  public void run(String... args) {
+  public void run(final ApplicationArguments args) throws Exception {
     try {
       dictImporter.importDict(dictList.build());
     } catch (Exception e) {
