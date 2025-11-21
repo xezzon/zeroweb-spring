@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.common.jpa;
 
-import io.github.xezzon.tao.data.IdGenerator;
+import io.github.xezzon.zeroweb.core.trait.IdGenerator;
 import io.github.xezzon.zeroweb.common.context.ApplicationContextProvider;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;

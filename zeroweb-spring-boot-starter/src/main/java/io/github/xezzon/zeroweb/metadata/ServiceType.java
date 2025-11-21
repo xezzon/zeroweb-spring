@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.metadata;
 
-import io.github.xezzon.tao.dict.IDict;
+import io.github.xezzon.zeroweb.core.trait.IDict;
 
 /**
  * 服务类型

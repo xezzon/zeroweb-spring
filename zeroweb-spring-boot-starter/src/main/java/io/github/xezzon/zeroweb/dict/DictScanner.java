@@ -3,7 +3,7 @@ package io.github.xezzon.zeroweb.dict;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
-import io.github.xezzon.tao.dict.IDict;
+import io.github.xezzon.zeroweb.core.trait.IDict;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import io.github.xezzon.zeroweb.dict.DictImportReqList.Builder;
 import jakarta.annotation.Resource;

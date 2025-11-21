@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.app.entity;
 
-import io.github.xezzon.tao.trait.From;
-import io.github.xezzon.tao.trait.Into;
+import io.github.xezzon.zeroweb.core.trait.From;
+import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.app.App;
 import org.hibernate.validator.constraints.URL;
 import org.mapstruct.Mapper;

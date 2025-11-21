@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.openapi.enumeration;
 
-import io.github.xezzon.tao.dict.IDict;
+import io.github.xezzon.zeroweb.core.trait.IDict;
 
 /// 开放平台允许使用的HTTP方法
 public enum HttpMethod implements IDict {

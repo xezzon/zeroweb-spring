@@ -173,7 +173,7 @@ JDBC_TYPE=postgresql
 - 一般情况下，应该对每个复杂请求封装一个请求对象，将其转换为对应的充血模型传给 Service 层。
 - 一般情况下，可以直接以充血模型作为响应对象。必要时也可以封装一个响应对象。
 - 分页查询支持 odata 语法。参数为 `io.github.xezzon.zeroweb.core.odata.ODataRequestParam`，通过
-  `io.github.xezzon.tao.trait.Into#into()` 方法转换为
+  `io.github.xezzon.zeroweb.core.trait.Into#into()` 方法转换为
   `io.github.xezzon.zeroweb.core.odata.ODataQueryOption` 传给 Service。返回值为
   `org.springframework.data.domain.Page`。
 
@@ -181,12 +181,12 @@ JDBC_TYPE=postgresql
 
 贫血模型的种类有很多。比如对请求的封装、对响应的封装、事件对象。
 
-- 请求对象，一个 record 类。作为 HTTP 端点的参数。实现 `io.github.xezzon.tao.trait.Into`
+- 请求对象，一个 record 类。作为 HTTP 端点的参数。实现 `io.github.xezzon.zeroweb.core.trait.Into`
   接口，可以以自身为参数返回充血模型。可以实现一个范围级别为 `package-private` 的类内 interface，继承
-  `io.github.xezzon.tao.trait.From` 接口，使用 `org.mapstruct.Mapper`
+  `io.github.xezzon.zeroweb.core.trait.From` 接口，使用 `org.mapstruct.Mapper`
   注解。请求对象中的各字段应该使用合适的 [Hibernate Validator](https://hibernate.org/validator/) 注解。
 - 响应对象，一个 record 类。作为 HTTP 端点的返回。实现一个名为 `from` 的静态方法，将充血模型转换为自身。可以实现一个范围级别为
-  `package-private` 的类内 interface，继承 `io.github.xezzon.tao.trait.From` 接口，使用
+  `package-private` 的类内 interface，继承 `io.github.xezzon.zeroweb.core.trait.From` 接口，使用
   `org.mapstruct.Mapper` 注解。
 - 事件对象，使用 `lombok.Builder` 注解。
 

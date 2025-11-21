@@ -1,6 +1,6 @@
 package io.github.xezzon.zeroweb.core.odata;
 
-import io.github.xezzon.tao.trait.Into;
+import io.github.xezzon.zeroweb.core.trait.Into;
 
 /**
  * @param top 最大返回条数

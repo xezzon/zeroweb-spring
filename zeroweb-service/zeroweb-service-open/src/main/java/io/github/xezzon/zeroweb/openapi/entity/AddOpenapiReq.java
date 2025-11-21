@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.openapi.entity;
 
-import io.github.xezzon.tao.trait.From;
-import io.github.xezzon.tao.trait.Into;
+import io.github.xezzon.zeroweb.core.trait.From;
+import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.enumeration.HttpMethod;

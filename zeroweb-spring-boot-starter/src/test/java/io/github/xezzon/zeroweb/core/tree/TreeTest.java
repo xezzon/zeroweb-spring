@@ -104,6 +104,26 @@ class TreeTest {
     });
   }
 
+  @Test
+  void fold_flatten() {
+    TreeList<Menu> menuTree = TreeList.from(DATA_SET);
+    int i = 0;
+    List<Menu> nodes = menuTree;
+    while (!nodes.isEmpty()) {
+      List<Menu> children = new ArrayList<>();
+      for (Menu menu : nodes) {
+        Assertions.assertEquals(DATA_SET.get(i), menu);
+        if (menu.getChildren() != null) {
+          children.addAll(menu.getChildren());
+        }
+        i++;
+      }
+      nodes = children;
+    }
+
+    List<Menu> menuList = menuTree.into();
+    Assertions.assertIterableEquals(DATA_SET, menuList);
+  }
 }
 
 class Menu implements ITreeNode<Menu, String> {

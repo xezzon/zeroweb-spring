@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.common.jpa;
 
 import com.fasterxml.uuid.Generators;
-import io.github.xezzon.tao.data.IdGenerator;
+import io.github.xezzon.zeroweb.core.trait.IdGenerator;
 import io.github.xezzon.zeroweb.common.config.ZerowebConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
