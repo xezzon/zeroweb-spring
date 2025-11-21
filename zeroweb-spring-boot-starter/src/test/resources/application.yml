@@ -5,3 +5,7 @@ spring:
     group: zeroweb
     name: zeroweb-spring-boot-starter
     version: 1.0.0
+  grpc:
+    server:
+      servlet:
+        enabled: false
