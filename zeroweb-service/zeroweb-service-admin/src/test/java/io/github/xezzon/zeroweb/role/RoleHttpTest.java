@@ -14,13 +14,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -29,7 +31,7 @@ class RoleHttpTest {
 
   private final List<Role> roles = new ArrayList<>();
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
   @Resource
   private RoleRepository roleRepository;
 
@@ -87,9 +89,9 @@ class RoleHttpTest {
         true,
         "1"
     );
-    Id responseBody1 = webTestClient.post()
+    Id responseBody1 = testClient.post()
         .uri("/role")
-        .bodyValue(req1)
+        .body(req1)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -104,7 +106,7 @@ class RoleHttpTest {
   void deleteRole() {
     long excepted = roleRepository.count();
     Role role = roles.getFirst();
-    webTestClient.delete()
+    testClient.delete()
         .uri(builder -> builder
             .path("/role/{id}")
             .build(role.getId())
@@ -122,13 +124,14 @@ class RoleHttpTest {
 
   @Test
   void listAllRole() {
-    List<Role> responseBody = webTestClient.get()
+    List<Role> responseBody = testClient.get()
         .uri("/role")
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(Role.class)
+        .expectBody(new ParameterizedTypeReference<@NotNull List<Role>>() {
+        })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
     Assertions.assertEquals(3, responseBody.size());
@@ -149,7 +152,7 @@ class RoleHttpTest {
     List<String> roleValues = randomRoles.stream()
         .map(Role::getValue)
         .toList();
-    List<Role> responseBody = webTestClient.get()
+    List<Role> responseBody = testClient.get()
         .uri("/role/mine")
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator
@@ -159,7 +162,8 @@ class RoleHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(Role.class)
+        .expectBody(new ParameterizedTypeReference<@NotNull List<Role>>() {
+        })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
     List<String> excepted = randomRoles.stream()

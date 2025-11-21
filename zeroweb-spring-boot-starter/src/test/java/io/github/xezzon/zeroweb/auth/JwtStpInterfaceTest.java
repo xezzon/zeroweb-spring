@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /**
  * @author xezzon
@@ -19,17 +19,17 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class JwtStpInterfaceTest {
 
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
 
   @Test
   void checkRole() {
-    webTestClient.get()
+    testClient.get()
         .uri("/check/role")
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
-    webTestClient.get()
+    testClient.get()
         .uri("/check/role")
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator
@@ -43,13 +43,13 @@ class JwtStpInterfaceTest {
 
   @Test
   void checkPermission() {
-    webTestClient.get()
+    testClient.get()
         .uri("/check/permission")
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk();
-    webTestClient.get()
+    testClient.get()
         .uri("/check/permission")
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator

@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -34,7 +34,7 @@ class UserHttpTest {
   @Resource
   private UserRepository repository;
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
 
   @BeforeEach
   void setUp() {
@@ -59,9 +59,9 @@ class UserHttpTest {
             + RandomUtil.randomString(String.valueOf(CharacterConstant.getUppercase()), 4)
             + RandomUtil.randomString(String.valueOf(CharacterConstant.getDigit()), 4)
     );
-    Id responseBody = webTestClient.post()
+    Id responseBody = testClient.post()
         .uri(USER_REGISTER_URI)
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isOk()
         .expectBody(io.github.xezzon.zeroweb.common.domain.Id.class)
@@ -82,9 +82,9 @@ class UserHttpTest {
             + RandomUtil.randomString(String.valueOf(CharacterConstant.getUppercase()), 4)
             + RandomUtil.randomString(String.valueOf(CharacterConstant.getDigit()), 4)
     );
-    webTestClient.post()
+    testClient.post()
         .uri(USER_REGISTER_URI)
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(ERROR_CODE_HEADER, RepeatDataException.ERROR_CODE);

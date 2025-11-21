@@ -5,12 +5,14 @@ import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import jakarta.annotation.Resource;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /**
  * @author xezzon
@@ -20,11 +22,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class MetadataHttpTest {
 
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
 
   @Test
   void serviceInfo() {
-    ServiceInfo responseBody = webTestClient.get()
+    ServiceInfo responseBody = testClient.get()
         .uri("/metadata/info.json")
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -39,10 +41,11 @@ class MetadataHttpTest {
 
   @Test
   void resourceInfo() {
-    List<MenuInfo> responseBody = webTestClient.get()
+    List<MenuInfo> responseBody = testClient.get()
         .uri("/metadata/menu.json")
         .exchange()
-        .expectBodyList(MenuInfo.class)
+        .expectBody(new ParameterizedTypeReference<@NotNull List<MenuInfo>>() {
+        })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
     Assertions.assertEquals(MenuService.MENU_INFOS.size(), responseBody.size());

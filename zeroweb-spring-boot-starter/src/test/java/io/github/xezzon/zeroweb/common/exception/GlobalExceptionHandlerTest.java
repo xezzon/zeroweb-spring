@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /**
  * @author xezzon
@@ -25,11 +25,11 @@ class GlobalExceptionHandlerTest {
   }
 
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
 
   @Test
   void repeatDataException() {
-    ErrorResult responseBody = webTestClient.get()
+    ErrorResult responseBody = testClient.get()
         .uri("/RepeatDataException")
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
@@ -42,7 +42,7 @@ class GlobalExceptionHandlerTest {
 
   @Test
   void noValidClasspathException() {
-    ErrorResult responseBody = webTestClient.get()
+    ErrorResult responseBody = testClient.get()
         .uri("/NoValidClasspathException")
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.SERVER_ERROR_STATUS)
@@ -55,7 +55,7 @@ class GlobalExceptionHandlerTest {
 
   @Test
   void entityNotFoundException() {
-    ErrorResult responseBody = webTestClient.get()
+    ErrorResult responseBody = testClient.get()
         .uri("/EntityNotFoundException")
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
@@ -68,7 +68,7 @@ class GlobalExceptionHandlerTest {
 
   @Test
   void unsupportedOperationException() {
-    ErrorResult responseBody = webTestClient.get()
+    ErrorResult responseBody = testClient.get()
         .uri("/UnsupportedOperationException")
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.SERVER_ERROR_STATUS)
@@ -84,9 +84,9 @@ class GlobalExceptionHandlerTest {
     ValidEntity entity = new ValidEntity();
     entity.setName(RandomUtil.randomString(8));
     entity.setEmail(RandomUtil.randomString(8));
-    ErrorResult responseBody = webTestClient.post()
+    ErrorResult responseBody = testClient.post()
         .uri("/MethodArgumentNotValidException")
-        .bodyValue(entity)
+        .body(entity)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.ARGUMENT_INVALID)
@@ -105,7 +105,7 @@ class GlobalExceptionHandlerTest {
   @Test
   void noResourceFoundException() {
     final String uri = RandomUtil.randomString(8);
-    webTestClient.get()
+    testClient.get()
         .uri(uri)
         .exchange()
         .expectStatus().isNotFound();
@@ -113,7 +113,7 @@ class GlobalExceptionHandlerTest {
 
   @Test
   void dataPermissionForbiddenException() {
-    ErrorResult responseBody = webTestClient.get()
+    ErrorResult responseBody = testClient.get()
         .uri("/DataPermissionForbiddenException")
         .exchange()
         .expectStatus().isForbidden()

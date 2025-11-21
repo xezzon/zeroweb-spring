@@ -1,24 +1,16 @@
-package io.github.xezzon.zeroweb.attachment.internal;
+package io.github.xezzon.zeroweb.attachment;
 
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.hash.Hashing;
 import com.google.protobuf.ByteString;
-import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentBlockingStub;
 import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentStub;
-import io.github.xezzon.zeroweb.attachment.AttachmentList;
-import io.github.xezzon.zeroweb.attachment.FileDownloadRequest;
-import io.github.xezzon.zeroweb.attachment.FileDownloadResponse;
-import io.github.xezzon.zeroweb.attachment.FileMetadata;
-import io.github.xezzon.zeroweb.attachment.FileUploadRequest;
-import io.github.xezzon.zeroweb.attachment.FileUploadResponse;
-import io.github.xezzon.zeroweb.attachment.QueryAttachmentListRequest;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
-import io.github.xezzon.zeroweb.storage.fs.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.exception.WriteFileException;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
+import io.github.xezzon.zeroweb.storage.fs.ZerowebFsConfig;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
 import java.io.File;

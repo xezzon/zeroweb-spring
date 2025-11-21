@@ -35,7 +35,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -49,7 +49,7 @@ class SubscriptionCallHttpTest {
   private final Subscription subscription = new Subscription();
   private final AccessSecret accessSecret = new AccessSecret();
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
   @Resource
   private OpenapiRepository openapiRepository;
   @Resource
@@ -97,7 +97,7 @@ class SubscriptionCallHttpTest {
     mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
-    String responseBody = webTestClient.post()
+    String responseBody = testClient.post()
         .uri(builder -> builder
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
@@ -107,7 +107,7 @@ class SubscriptionCallHttpTest {
         .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessSecret.getAccessKey())
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
-        .bodyValue(rawBody)
+        .body(rawBody)
         .exchange()
         .expectStatus().isOk()
         .expectBody(String.class)
@@ -127,7 +127,7 @@ class SubscriptionCallHttpTest {
     mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
-    webTestClient.post()
+    testClient.post()
         .uri(builder -> builder
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
@@ -137,7 +137,7 @@ class SubscriptionCallHttpTest {
         .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessSecret.getAccessKey())
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
-        .bodyValue(rawBody)
+        .body(rawBody)
         .exchange()
         .expectStatus().isForbidden()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, UnsubscribeOpenapiException.ERROR_CODE);
@@ -155,7 +155,7 @@ class SubscriptionCallHttpTest {
     mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
-    webTestClient.post()
+    testClient.post()
         .uri(builder -> builder
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
@@ -167,7 +167,7 @@ class SubscriptionCallHttpTest {
         )
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
-        .bodyValue(rawBody)
+        .body(rawBody)
         .exchange()
         .expectStatus().isForbidden()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidAccessKeyException.ERROR_CODE);
@@ -185,7 +185,7 @@ class SubscriptionCallHttpTest {
     mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
-    webTestClient.post()
+    testClient.post()
         .uri(builder -> builder
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
@@ -195,7 +195,7 @@ class SubscriptionCallHttpTest {
         .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessSecret.getAccessKey())
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
-        .bodyValue(rawBody)
+        .body(rawBody)
         .exchange()
         .expectStatus().isForbidden()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidAccessKeyException.ERROR_CODE);
@@ -213,7 +213,7 @@ class SubscriptionCallHttpTest {
     mac.update(Bytes.concat("tampered message".getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
-    webTestClient.post()
+    testClient.post()
         .uri(builder -> builder
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
@@ -223,7 +223,7 @@ class SubscriptionCallHttpTest {
         .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessSecret.getAccessKey())
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
-        .bodyValue(rawBody)
+        .body(rawBody)
         .exchange()
         .expectStatus().isForbidden()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidAccessKeyException.ERROR_CODE);
@@ -241,7 +241,7 @@ class SubscriptionCallHttpTest {
     mac.update(Bytes.concat(rawBody.getBytes(), Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
-    webTestClient.post()
+    testClient.post()
         .uri(builder -> builder
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)
@@ -251,7 +251,7 @@ class SubscriptionCallHttpTest {
         .header(ZerowebOpenConstant.ACCESS_KEY_HEADER, accessSecret.getAccessKey())
         .header(ZerowebOpenConstant.TIMESTAMP_HEADER, String.valueOf(timestamp))
         .header(ZerowebOpenConstant.SIGNATURE_HEADER, signature)
-        .bodyValue(rawBody)
+        .body(rawBody)
         .exchange()
         .expectStatus().isUnauthorized()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.UNAUTHENTICATED);
@@ -268,7 +268,7 @@ class SubscriptionCallHttpTest {
     mac.update(Bytes.concat(Longs.toByteArray(timestamp)));
     String signature = Base64.getEncoder().encodeToString(mac.doFinal());
 
-    String responseBody = webTestClient.get()
+    String responseBody = testClient.get()
         .uri(builder -> builder
             .path(SUBSCRIPTION_CALL)
             .queryParam("anything", anything)

@@ -19,6 +19,7 @@ import jakarta.annotation.Resource;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -48,7 +49,7 @@ class ThirdPartyAppMemberHttpTest {
   @Resource
   private ThirdPartyAppMemberRepository thirdPartyAppMemberRepository;
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
 
   @BeforeEach
   void setUp() {
@@ -81,7 +82,7 @@ class ThirdPartyAppMemberHttpTest {
   void addMember_general() {
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
-    String token = webTestClient.post()
+    String token = testClient.post()
         .uri(builder -> builder
             .path(INVITE_MEMBER)
             .build(thirdPartyApp.getId())
@@ -92,8 +93,9 @@ class ThirdPartyAppMemberHttpTest {
         .expectStatus().isOk()
         .expectBody(String.class)
         .returnResult().getResponseBody();
+    Assertions.assertNotNull(token);
 
-    Id memberId = webTestClient.put()
+    Id memberId = testClient.put()
         .uri(builder -> builder
             .path(ACCEPT_INVITATION)
             .queryParam("token", token)
@@ -118,7 +120,7 @@ class ThirdPartyAppMemberHttpTest {
     String invitedUser = UUID.randomUUID().toString();
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
-    String token = webTestClient.post()
+    String token = testClient.post()
         .uri(builder -> builder
             .path(INVITE_MEMBER)
             .queryParam("userId", invitedUser)
@@ -130,8 +132,9 @@ class ThirdPartyAppMemberHttpTest {
         .expectStatus().isOk()
         .expectBody(String.class)
         .returnResult().getResponseBody();
+    Assertions.assertNotNull(token);
 
-    Id memberId = webTestClient.put()
+    Id memberId = testClient.put()
         .uri(builder -> builder
             .path(ACCEPT_INVITATION)
             .queryParam("token", token)
@@ -146,7 +149,7 @@ class ThirdPartyAppMemberHttpTest {
     Assertions.assertNotNull(memberId);
     Assertions.assertTrue(thirdPartyAppMemberRepository.existsById(memberId.id()));
 
-    webTestClient.put()
+    testClient.put()
         .uri(builder -> builder
             .path(ACCEPT_INVITATION)
             .queryParam("token", token)
@@ -162,7 +165,7 @@ class ThirdPartyAppMemberHttpTest {
         .expectStatus().isForbidden()
         .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidInvitationCodeException.ERROR_CODE);
 
-    List<ThirdPartyAppMember> responseBody = webTestClient.get()
+    List<ThirdPartyAppMember> responseBody = testClient.get()
         .uri(builder -> builder
             .path(LIST_MEMBER)
             .build(thirdPartyApp.getId())
@@ -171,7 +174,7 @@ class ThirdPartyAppMemberHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(invitedUser).bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<List<ThirdPartyAppMember>>() {
+        .expectBody(new ParameterizedTypeReference<@NotNull List<ThirdPartyAppMember>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
@@ -182,7 +185,7 @@ class ThirdPartyAppMemberHttpTest {
   void addMember_timeout() {
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
-    String token = webTestClient.post()
+    String token = testClient.post()
         .uri(builder -> builder
             .path(INVITE_MEMBER)
             .queryParam("timeout", 0)
@@ -194,8 +197,9 @@ class ThirdPartyAppMemberHttpTest {
         .expectStatus().isOk()
         .expectBody(String.class)
         .returnResult().getResponseBody();
+    Assertions.assertNotNull(token);
 
-    webTestClient.put()
+    testClient.put()
         .uri(builder -> builder
             .path(ACCEPT_INVITATION)
             .queryParam("token", token)
@@ -216,7 +220,7 @@ class ThirdPartyAppMemberHttpTest {
   void moveOwnership() {
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
-    webTestClient.patch()
+    testClient.patch()
         .uri(builder -> builder
             .path(MOVE_OWNERSHIP)
             .queryParam("userId", MEMBER_ID)
@@ -241,7 +245,7 @@ class ThirdPartyAppMemberHttpTest {
   void moveOwnership_notOwner() {
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
-    webTestClient.patch()
+    testClient.patch()
         .uri(builder -> builder
             .path(MOVE_OWNERSHIP)
             .queryParam("userId", OWNER_ID)
@@ -258,7 +262,7 @@ class ThirdPartyAppMemberHttpTest {
   void moveOwnership_notMember() {
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
-    webTestClient.patch()
+    testClient.patch()
         .uri(builder -> builder
             .path(MOVE_OWNERSHIP)
             .queryParam("userId", UUID.randomUUID().toString())
@@ -275,7 +279,7 @@ class ThirdPartyAppMemberHttpTest {
   void moveOwnership_self() {
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
-    webTestClient.patch()
+    testClient.patch()
         .uri(builder -> builder
             .path(MOVE_OWNERSHIP)
             .queryParam("userId", OWNER_ID)

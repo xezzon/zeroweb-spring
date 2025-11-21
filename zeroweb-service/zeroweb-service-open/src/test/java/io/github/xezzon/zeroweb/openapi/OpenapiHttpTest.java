@@ -21,6 +21,7 @@ import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
 import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -43,7 +44,7 @@ class OpenapiHttpTest {
   @Resource
   private OpenapiRepository repository;
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
 
   @BeforeEach
   void setUp() {
@@ -69,11 +70,11 @@ class OpenapiHttpTest {
         RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
-    Id responseBody = webTestClient.post()
+    Id responseBody = testClient.post()
         .uri(OPENAPI_ADD_URI)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isOk()
         .expectBody(Id.class)
@@ -96,11 +97,11 @@ class OpenapiHttpTest {
         RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
-    webTestClient.post()
+    testClient.post()
         .uri(OPENAPI_ADD_URI)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(ERROR_CODE_HEADER, RepeatDataException.ERROR_CODE);
@@ -112,7 +113,7 @@ class OpenapiHttpTest {
     final int skip = top * 2;
     List<Openapi> dataset = repository.findAll();
 
-    PagedModel<Openapi> responseBody = webTestClient.get()
+    PagedModel<Openapi> responseBody = testClient.get()
         .uri(builder -> builder
             .path(GET_OPENAPI_URI)
             .queryParam("top", top)
@@ -121,7 +122,7 @@ class OpenapiHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<PagedModel<Openapi>>() {
+        .expectBody(new ParameterizedTypeReference<@NotNull PagedModel<Openapi>>() {
         })
         .returnResult().getResponseBody();
 
@@ -149,11 +150,11 @@ class OpenapiHttpTest {
         RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
-    webTestClient.put()
+    testClient.put()
         .uri(MODIFY_OPENAPI_URI)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isOk();
     Openapi openapi = repository.findById(draftOne.getId()).orElseThrow();
@@ -175,11 +176,11 @@ class OpenapiHttpTest {
         RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
-    webTestClient.put()
+    testClient.put()
         .uri(MODIFY_OPENAPI_URI)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(ERROR_CODE_HEADER, RepeatDataException.ERROR_CODE);
@@ -198,11 +199,11 @@ class OpenapiHttpTest {
         RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
-    webTestClient.put()
+    testClient.put()
         .uri(MODIFY_OPENAPI_URI)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);
@@ -220,11 +221,11 @@ class OpenapiHttpTest {
         RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
-    webTestClient.put()
+    testClient.put()
         .uri(MODIFY_OPENAPI_URI)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader()
@@ -236,11 +237,11 @@ class OpenapiHttpTest {
         RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
-    webTestClient.put()
+    testClient.put()
         .uri(MODIFY_OPENAPI_URI)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isOk();
     Openapi openapi = repository.findById(publishedOpenapi.getId()).orElseThrow();
@@ -254,7 +255,7 @@ class OpenapiHttpTest {
   void publishOpenapi() {
     Openapi target = repository.findAll().getFirst();
 
-    webTestClient.put()
+    testClient.put()
         .uri(builder -> builder.path(PUBLISH_OPENAPI_URI)
             .build(target.getId())
         )
@@ -268,7 +269,7 @@ class OpenapiHttpTest {
 
   @Test
   void publishOpenapi_noSuchData() {
-    webTestClient.put()
+    testClient.put()
         .uri(builder -> builder.path(PUBLISH_OPENAPI_URI)
             .build(RandomUtil.randomString(8))
         )

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /**
  * @author xezzon
@@ -27,7 +27,7 @@ class AlphanumericValidatorTest {
   }
 
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
 
   @Test
   void validate() {
@@ -36,9 +36,9 @@ class AlphanumericValidatorTest {
     ChildEntity childEntity = new ChildEntity();
     childEntity.setAlphabet("no_rst-uvw");
     entity.setChildEntity(childEntity);
-    ErrorResult responseBody = webTestClient.post()
+    ErrorResult responseBody = testClient.post()
         .uri("/alphanumeric/validate")
-        .bodyValue(entity)
+        .body(entity)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.ARGUMENT_INVALID)
