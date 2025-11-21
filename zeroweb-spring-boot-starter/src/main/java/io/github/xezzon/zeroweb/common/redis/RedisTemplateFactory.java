@@ -35,7 +35,7 @@ public class RedisTemplateFactory {
    * }
    * </pre>
    */
-  public <T> RedisTemplate<String, T> of(final TypeToken<@NotNull T> typeToken) {
+  public <T> RedisTemplate<String, T> of(final @NotNull TypeToken<@NotNull T> typeToken) {
     RedisTemplate<String, T> redisTemplate = new RedisTemplate<>();
     redisTemplate.setConnectionFactory(connectionFactory);
     redisTemplate.setKeySerializer(keySerializer);

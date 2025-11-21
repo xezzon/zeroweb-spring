@@ -3,8 +3,9 @@ package io.github.xezzon.zeroweb.core.tree;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,11 +25,11 @@ public class TreeList<T extends ITreeNode<T, ?>> extends AbstractList<T> impleme
     List<T> root = top(list);
     TreeList<T> tree = new TreeList<>(root);
     List<T> parents = root;
+    Map<?, List<T>> childrenMap = list.stream()
+        .collect(Collectors.groupingBy(ITreeNode::getParentId));
     while (!parents.isEmpty()) {
       for (T parent : parents) {
-        List<T> children = list.stream()
-            .filter(node -> Objects.equals(node.getParentId(), parent.getId()))
-            .toList();
+        List<T> children = childrenMap.getOrDefault(parent.getId(), Collections.emptyList());
         parent.setChildren(children);
       }
       parents = parents.stream()

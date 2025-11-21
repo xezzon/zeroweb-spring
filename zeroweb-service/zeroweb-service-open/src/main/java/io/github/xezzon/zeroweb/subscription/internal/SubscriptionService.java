@@ -78,7 +78,7 @@ public class SubscriptionService implements
   public Page<Subscription> listSubscription(ODataQueryOption odata, String appId) {
     Page<Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
     List<Subscription> subscriptions = subscriptionRepository.findByAppId(appId);
-    Map<String, Subscription> subscriptionMap = subscriptions.parallelStream()
+    Map<String, Subscription> subscriptionMap = subscriptions.stream()
         .collect(Collectors.toMap(Subscription::getOpenapiCode, s -> s));
     subscriptions = openapiPage.getContent().stream()
         .map(openapi -> {
