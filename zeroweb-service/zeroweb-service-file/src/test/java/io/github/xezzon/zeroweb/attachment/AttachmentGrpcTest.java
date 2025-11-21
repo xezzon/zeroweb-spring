@@ -36,8 +36,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.localstack.LocalStackContainer;
-import org.testcontainers.containers.localstack.LocalStackContainer.Service;
+import org.testcontainers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -249,7 +248,8 @@ abstract class AttachmentGrpcTest {
     final CountDownLatch latch = new CountDownLatch(1);
     final FileDownloadResponse[] response = new FileDownloadResponse[1];
 
-    attachmentStub.downloadFile(FileDownloadRequest.newBuilder()
+    attachmentStub.downloadFile(
+        FileDownloadRequest.newBuilder()
             .setId(largeFileAttachment.getId())
             .build(),
         new StreamObserver<>() {
@@ -286,7 +286,7 @@ class S3GrpcTest extends AttachmentGrpcTest {
 
   private static final LocalStackContainer CONTAINER = new LocalStackContainer(
       DockerImageName.parse("localstack/localstack:s3-latest")
-  ).withServices(Service.S3);
+  ).withServices("s3");
   private static final String BUCKET = "test";
   private static S3Client s3Client = null;
 
@@ -294,7 +294,7 @@ class S3GrpcTest extends AttachmentGrpcTest {
   static void beforeAll() {
     CONTAINER.start();
     s3Client = S3Client.builder()
-        .endpointOverride(CONTAINER.getEndpointOverride(Service.S3))
+        .endpointOverride(CONTAINER.getEndpoint())
         .credentialsProvider(StaticCredentialsProvider.create(
             AwsBasicCredentials.create(CONTAINER.getAccessKey(), CONTAINER.getSecretKey())
         ))
@@ -309,7 +309,7 @@ class S3GrpcTest extends AttachmentGrpcTest {
 
   @DynamicPropertySource
   static void properties(DynamicPropertyRegistry registry) {
-    registry.add("S3_ENDPOINT", () -> CONTAINER.getEndpointOverride(Service.S3));
+    registry.add("S3_ENDPOINT", CONTAINER::getEndpoint);
     registry.add("S3_ACCESS_KEY", CONTAINER::getAccessKey);
     registry.add("S3_SECRET_KEY", CONTAINER::getSecretKey);
     registry.add("S3_BUCKET", () -> BUCKET);

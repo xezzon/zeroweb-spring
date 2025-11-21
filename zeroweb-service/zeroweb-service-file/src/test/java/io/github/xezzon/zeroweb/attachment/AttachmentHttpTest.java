@@ -13,13 +13,13 @@ import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
-import io.github.xezzon.zeroweb.storage.fs.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.constant.BannerConstant;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.common.exception.ReadFileException;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
 import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
+import io.github.xezzon.zeroweb.storage.fs.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.storage.s3.ZerowebS3Config;
 import io.github.xezzon.zeroweb.storage.s3.repository.S3UploadIdRepository;
 import jakarta.annotation.Resource;
@@ -51,8 +51,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.client.RestTestClient;
-import org.testcontainers.containers.localstack.LocalStackContainer;
-import org.testcontainers.containers.localstack.LocalStackContainer.Service;
+import org.testcontainers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -849,7 +848,7 @@ class S3HttpTest extends AttachmentHttpTest {
 
   private static final LocalStackContainer CONTAINER = new LocalStackContainer(
       DockerImageName.parse("localstack/localstack:s3-latest")
-  ).withServices(Service.S3);
+  ).withServices("s3");
   private static final String BUCKET = "test";
   private static S3Client s3Client = null;
   @Resource
@@ -861,7 +860,7 @@ class S3HttpTest extends AttachmentHttpTest {
   static void beforeAll() {
     CONTAINER.start();
     s3Client = S3Client.builder()
-        .endpointOverride(CONTAINER.getEndpointOverride(Service.S3))
+        .endpointOverride(CONTAINER.getEndpoint())
         .credentialsProvider(StaticCredentialsProvider.create(
             AwsBasicCredentials.create(CONTAINER.getAccessKey(), CONTAINER.getSecretKey())
         ))
@@ -876,7 +875,7 @@ class S3HttpTest extends AttachmentHttpTest {
 
   @DynamicPropertySource
   static void properties(DynamicPropertyRegistry registry) {
-    registry.add("S3_ENDPOINT", () -> CONTAINER.getEndpointOverride(Service.S3));
+    registry.add("S3_ENDPOINT", CONTAINER::getEndpoint);
     registry.add("S3_ACCESS_KEY", CONTAINER::getAccessKey);
     registry.add("S3_SECRET_KEY", CONTAINER::getSecretKey);
     registry.add("S3_BUCKET", () -> BUCKET);
