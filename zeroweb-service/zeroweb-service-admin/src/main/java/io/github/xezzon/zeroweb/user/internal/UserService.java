@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 /// @author xezzon
@@ -38,12 +39,12 @@ public class UserService implements IUserService4Auth {
   ///
   /// @param username 用户名
   /// @return 返回与用户名对应的用户信息，若不存在则返回null
-  protected User getByUsername(@NonNull final String username) {
+  protected @Nullable User getByUsername(@NonNull final String username) {
     return userRepository.findByUsername(username).orElse(null);
   }
 
   @Override
-  public User getUserByUsername(final String username) {
+  public @Nullable User getUserByUsername(final String username) {
     return this.getByUsername(username);
   }
 

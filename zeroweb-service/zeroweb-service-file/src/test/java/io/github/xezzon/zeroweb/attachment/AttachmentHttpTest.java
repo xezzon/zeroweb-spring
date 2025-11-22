@@ -760,7 +760,7 @@ abstract class AttachmentHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NonNull List<Attachment>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<@NonNull Attachment>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
@@ -779,7 +779,7 @@ abstract class AttachmentHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NonNull List<Attachment>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<@NonNull Attachment>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);

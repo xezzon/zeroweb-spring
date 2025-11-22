@@ -6,6 +6,7 @@ import static cn.dev33.satoken.exception.NotLoginException.NOT_TOKEN;
 import cn.dev33.satoken.exception.NotLoginException;
 import io.grpc.Context;
 import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 
 /**
  * JWT认证相关
@@ -24,7 +25,7 @@ public class JwtAuth {
    * 如果没获取到则返回 {@link Optional#empty()}
    * @return 当前认证信息
    */
-  public static Optional<JwtClaim> get() {
+  public static @NonNull Optional<JwtClaim> get() {
     JwtClaim grpcContext = CONTEXT.get();
     if (grpcContext != null) {
       return Optional.of(grpcContext);
@@ -40,7 +41,7 @@ public class JwtAuth {
    * @return 认证信息
    * @throws NotLoginException 没有认证
    */
-  public static JwtClaim getOrThrow() {
+  public static @NonNull JwtClaim getOrThrow() {
     return get()
         .orElseThrow(() ->
             new NotLoginException(DEFAULT_MESSAGE, null, NOT_TOKEN)

@@ -1,10 +1,12 @@
 package io.github.xezzon.zeroweb.auth.exception;
 
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
+import org.jspecify.annotations.NullMarked;
 
 /// 不正确的口令
 ///
 /// @author xezzon
+@NullMarked
 public class InvalidPasswordException extends ZerowebBusinessException {
 
   public static final String ERROR_CODE = "CFF01";

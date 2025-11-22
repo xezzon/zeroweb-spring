@@ -2,6 +2,7 @@ package io.github.xezzon.zeroweb.third_party_app.exception;
 
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import org.jspecify.annotations.NullMarked;
 
 /// 无效的访问密钥
 ///
@@ -11,6 +12,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 /// 3. AccessKey或签名使用的SecretKey不匹配
 ///
 /// @author xezzon
+@NullMarked
 public class InvalidAccessKeyException extends ZerowebBusinessException {
 
   public static final String ERROR_CODE = "CFE03";

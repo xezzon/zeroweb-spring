@@ -11,9 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NullMarked;
 import org.slf4j.event.Level;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,6 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
  */
 @RestControllerAdvice
 @Slf4j
-@NullMarked
 public class GlobalExceptionHandler {
 
   /**
@@ -72,8 +70,8 @@ public class GlobalExceptionHandler {
     log(e, request, Level.INFO);
     List<ErrorResult.Detail> errorDetails = e.getFieldErrors().stream()
         .map(error -> new ErrorResult.Detail(
-            Optional.ofNullable(error.getCode()).orElse("Invalid field."),
-            Optional.ofNullable(error.getDefaultMessage()).orElse("Unknown reason."),
+            Objects.requireNonNullElse(error.getCode(), "Invalid field."),
+            Objects.requireNonNullElse(error.getDefaultMessage(), "Unknown reason."),
             Map.ofEntries(
                 Map.entry("field", error.getField())
             )

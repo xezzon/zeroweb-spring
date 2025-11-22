@@ -1,10 +1,12 @@
 package io.github.xezzon.zeroweb.role.exception;
 
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
+import org.jspecify.annotations.NullMarked;
 
 /// 角色不能被继承
 ///
 /// @author xezzon
+@NullMarked
 public class RoleNotInheritableException extends ZerowebBusinessException {
 
   public static final String ERROR_CODE = "CFF02";
