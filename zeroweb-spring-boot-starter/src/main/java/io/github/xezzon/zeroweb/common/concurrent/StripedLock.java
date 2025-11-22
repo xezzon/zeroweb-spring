@@ -6,7 +6,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Supplier;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Fallback;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Fallback
+@NullMarked
 public class StripedLock implements LockProvider {
 
   @Override
@@ -24,7 +26,7 @@ public class StripedLock implements LockProvider {
 
   public static class InnerLock implements LockAdaptor {
 
-    private final Striped<@NotNull Lock> stripedLocks = Striped.lazyWeakLock(100);
+    private final Striped<Lock> stripedLocks = Striped.lazyWeakLock(100);
     private final int timeout;
 
     public InnerLock(int timeout) {
@@ -32,7 +34,7 @@ public class StripedLock implements LockProvider {
     }
 
     @Override
-    public <R> Optional<R> tryLock(String id, Supplier<R> supplier) {
+    public <R> Optional<R> tryLock(String id, Supplier<@Nullable R> supplier) {
       Lock specificLock = stripedLocks.get(id);
       try {
         if (!specificLock.tryLock(timeout, TimeUnit.SECONDS)) {

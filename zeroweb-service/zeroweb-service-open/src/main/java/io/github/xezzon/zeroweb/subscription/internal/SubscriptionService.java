@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -75,8 +76,8 @@ public class SubscriptionService implements
   }
 
   @Override
-  public Page<Subscription> listSubscription(ODataQueryOption odata, String appId) {
-    Page<Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
+  public Page<@NonNull Subscription> listSubscription(ODataQueryOption odata, String appId) {
+    Page<@NonNull Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
     List<Subscription> subscriptions = subscriptionRepository.findByAppId(appId);
     Map<String, Subscription> subscriptionMap = subscriptions.stream()
         .collect(Collectors.toMap(Subscription::getOpenapiCode, s -> s));

@@ -16,7 +16,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -71,7 +71,7 @@ public class JwtKeyManager implements JwtCryptoService {
   }
 
   @Override
-  public String signJwt(final @NotNull JwtClaim claim) {
+  public String signJwt(final @NonNull JwtClaim claim) {
     Instant iat = Instant.now();
     return JsonWebToken.signer(this.getPrivateKey())
         .issuer(zerowebJwtConfig.getIssuer())

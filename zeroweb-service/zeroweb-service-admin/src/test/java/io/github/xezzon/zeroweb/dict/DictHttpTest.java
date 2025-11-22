@@ -27,7 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -344,7 +344,7 @@ class DictHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<Dict>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Dict>>() {
         })
         .returnResult().getResponseBody();
 
@@ -385,7 +385,7 @@ class DictHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull PagedModel<Dict>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<Dict>>() {
         })
         .returnResult().getResponseBody();
 

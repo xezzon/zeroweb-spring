@@ -18,7 +18,7 @@ import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -111,7 +111,7 @@ class AppHttpTest {
         .uri(LIST_APP_URI)
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<App>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<App>>() {
         })
         .returnResult().getResponseBody();
     assertNotNull(responseBody);

@@ -6,6 +6,7 @@ import io.github.xezzon.zeroweb.role.constant.RoleConstant;
 import io.github.xezzon.zeroweb.user.constant.UserConstant;
 import jakarta.annotation.Resource;
 import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
@@ -23,7 +24,7 @@ public class RootUserRoleRunner implements ApplicationRunner {
   private RoleUserRepository roleUserRepository;
 
   @Override
-  public void run(final ApplicationArguments args) {
+  public void run(@NonNull final ApplicationArguments args) {
     Optional<RoleUser> root = roleUserRepository.findByRoleIdAndUserId(
         RoleConstant.ROOT.getId(),
         UserConstant.ROOT.getId()

@@ -5,6 +5,7 @@ import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
 import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppSpec;
+import org.jspecify.annotations.NullMarked;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 /// @author xezzon
 @Repository
+@NullMarked
 public class ThirdPartyAppDAO extends BaseDAO<ThirdPartyApp, String, ThirdPartyAppRepository> {
 
   protected ThirdPartyAppDAO(ThirdPartyAppRepository repository) {
@@ -25,7 +27,7 @@ public class ThirdPartyAppDAO extends BaseDAO<ThirdPartyApp, String, ThirdPartyA
   }
 
   @Override
-  public Page<ThirdPartyApp> findAll(ODataQueryOption odata) {
+  public Page<ThirdPartyApp> findAll(final ODataQueryOption odata) {
     Sort sort = ThirdPartyAppSpec.defaultSort();
     return this.findAll(odata, null, sort);
   }

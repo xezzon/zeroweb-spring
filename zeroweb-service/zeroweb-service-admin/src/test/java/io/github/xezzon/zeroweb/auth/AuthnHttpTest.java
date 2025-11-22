@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
@@ -176,7 +176,7 @@ class AuthnHttpTest {
         .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull Map<String, Object>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull Map<String, Object>>() {
         })
         .returnResult()
         .getResponseBody();

@@ -6,6 +6,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Root;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -24,9 +26,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * @param <M> 实体操作类类型
  * @author xezzon
  */
-public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<T, I> & JpaSpecificationExecutor<T>>
-    implements
-    NewType<M> {
+public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<@NonNull T, @NonNull I> & JpaSpecificationExecutor<@NonNull T>>
+    implements NewType<M> {
 
   private final M repository;
   private final Class<T> typeToken;
@@ -39,6 +40,7 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<T
 
   public abstract ICopier<T> getCopier();
 
+  @SuppressWarnings("unused")
   @Autowired
   private void setEntityManager(EntityManager em) {
     this.em = em;
@@ -67,7 +69,7 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<T
    * @param odata OData查询条件
    * @return 分页数据
    */
-  public Page<T> findAll(ODataQueryOption odata) {
+  public Page<@NonNull T> findAll(@NonNull final ODataQueryOption odata) {
     return this.findAll(odata, null, null);
   }
 
@@ -78,15 +80,15 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<T
    * @param innerSort 服务端组装排序条件
    * @return 分页数据
    */
-  protected Page<T> findAll(
-      ODataQueryOption odata,
-      Specification<T> innerSpecification,
-      Sort innerSort
+  protected Page<@NonNull T> findAll(
+      @NonNull final ODataQueryOption odata,
+      @Nullable Specification<@NonNull T> innerSpecification,
+      @Nullable Sort innerSort
   ) {
     if (innerSpecification == null) {
       innerSpecification = BaseSpecs.identicallyEqual();
     }
-    Specification<T> specification = Specification.allOf(innerSpecification);
+    Specification<@NonNull T> specification = Specification.allOf(innerSpecification);
     if (innerSort == null) {
       innerSort = Sort.unsorted();
     }

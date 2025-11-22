@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import jakarta.annotation.Resource;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,7 +53,7 @@ class BaseDAOTest {
     final int pageSize = 2;
     ODataRequestParam param = new ODataRequestParam(pageSize, pageSize * pageNum);
     ODataQueryOption odata = param.into();
-    Page<TestEntity> page = testEntityDAO.findAll(odata);
+    Page<@NonNull TestEntity> page = testEntityDAO.findAll(odata);
     Assertions.assertEquals(loopTime, page.getTotalElements());
     Assertions.assertEquals(pageSize, page.getContent().size());
     Assertions.assertEquals(pageSize, page.getSize());
@@ -62,7 +63,7 @@ class BaseDAOTest {
         .top(pageSize)
         .skip(pageNum * pageSize)
         .build();
-    Page<TestEntity> page1 = testEntityDAO.findAll(odata1, BaseSpecs.identicallyNotEqual(), null);
+    Page<@NonNull TestEntity> page1 = testEntityDAO.findAll(odata1, BaseSpecs.identicallyNotEqual(), null);
     Assertions.assertEquals(0, page1.getTotalElements());
     Assertions.assertEquals(0, page1.getContent().size());
     Assertions.assertEquals(pageSize, page1.getSize());

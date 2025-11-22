@@ -9,6 +9,7 @@ import io.github.xezzon.zeroweb.dict.repository.DictSpecs;
 import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.Optional;
+import org.jspecify.annotations.NullMarked;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Repository;
 
 /// @author xezzon
 @Repository
+@NullMarked
 public class DictDAO extends BaseDAO<Dict, String, DictRepository> {
 
   DictDAO(DictRepository repository) {
@@ -35,7 +37,7 @@ public class DictDAO extends BaseDAO<Dict, String, DictRepository> {
   /// @param odata 前端查询参数
   /// @return 字典列表
   @Override
-  public Page<Dict> findAll(ODataQueryOption odata) {
+  public Page<Dict> findAll(final ODataQueryOption odata) {
     Specification<Dict> specification = DictSpecs.isDictTag();
     Sort sort = Sort.by(Order.asc(Dict_.CODE));
     return this.findAll(odata, specification, sort);
@@ -44,7 +46,7 @@ public class DictDAO extends BaseDAO<Dict, String, DictRepository> {
   /// 根据 tag、code 判断，如果字典存在，则跳过；否则保存
   ///
   /// @param dict 字典信息
-  public void upsert(Dict dict) {
+  public void upsert(final Dict dict) {
     Optional<Dict> exist = this.get().findByTagAndCode(dict.getTag(), dict.getCode());
     if (exist.isPresent()) {
       return;

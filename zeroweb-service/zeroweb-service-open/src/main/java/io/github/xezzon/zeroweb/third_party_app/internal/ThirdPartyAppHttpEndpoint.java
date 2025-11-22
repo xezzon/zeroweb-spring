@@ -10,6 +10,7 @@ import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
 import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionManager;
 import io.github.xezzon.zeroweb.third_party_app.entity.AddThirdPartyAppReq;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -53,7 +54,7 @@ public class ThirdPartyAppHttpEndpoint {
   ///
   /// @return 当前用户的所有第三方应用列表
   @GetMapping("/mine")
-  public Page<ThirdPartyApp> listMyThirdPartyApp() {
+  public Page<@NonNull ThirdPartyApp> listMyThirdPartyApp() {
     String userId = JwtAuth.getOrThrow().getSub();
     return thirdPartyAppService.listThirdPartyAppByUser(userId);
   }
@@ -64,7 +65,7 @@ public class ThirdPartyAppHttpEndpoint {
   /// @return 所有第三方应用列表
   @GetMapping()
   @SaCheckPermission({PermissionConstant.THIRD_PARTY_APP_READ})
-  public Page<ThirdPartyApp> listThirdPartyApp(ODataRequestParam odata) {
+  public Page<@NonNull ThirdPartyApp> listThirdPartyApp(ODataRequestParam odata) {
     return thirdPartyAppService.listThirdPartyApp(odata.into());
   }
 

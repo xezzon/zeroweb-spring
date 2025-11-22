@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.auth.config;
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.dao.SaTokenDaoDefaultImpl;
 import io.github.xezzon.zeroweb.common.redis.RedisTemplateFactory;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -19,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
 public class SaTokenRedisConfiguration implements ApplicationRunner {
 
   @Override
-  public void run(final ApplicationArguments args) {
+  public void run(@NonNull final ApplicationArguments args) {
     SaManager.setSaTokenDao(new SaTokenDaoDefaultImpl());
   }
 }

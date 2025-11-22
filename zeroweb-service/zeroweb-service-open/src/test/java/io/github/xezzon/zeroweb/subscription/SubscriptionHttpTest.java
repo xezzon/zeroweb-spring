@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -125,7 +125,7 @@ class SubscriptionHttpTest {
             .bearer()
         )
         .exchange()
-        .expectBody(new ParameterizedTypeReference<@NotNull PagedModel<Subscription>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<Subscription>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);

@@ -21,7 +21,7 @@ import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
 import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -122,7 +122,7 @@ class OpenapiHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull PagedModel<Openapi>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<Openapi>>() {
         })
         .returnResult().getResponseBody();
 

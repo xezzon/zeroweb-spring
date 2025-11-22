@@ -6,6 +6,7 @@ import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.Openapi_;
 import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
+import org.jspecify.annotations.NullMarked;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Repository;
 
 /// @author xezzon
 @Repository
+@NullMarked
 public class OpenapiDAO extends BaseDAO<Openapi, String, OpenapiRepository> {
 
   protected OpenapiDAO(OpenapiRepository repository) {

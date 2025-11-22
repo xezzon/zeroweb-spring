@@ -32,6 +32,7 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -79,7 +80,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
   ///
   /// @param userId 用户ID
   /// @return 分页查询结果，包含符合条件的第三方应用列表
-  protected Page<ThirdPartyApp> listThirdPartyAppByUser(String userId) {
+  protected Page<@NonNull ThirdPartyApp> listThirdPartyAppByUser(String userId) {
     List<ThirdPartyAppMember> members = thirdPartyAppMemberRepository.findByUserId(userId);
     Set<String> appIds = members.stream()
         .map(ThirdPartyAppMember::getGroupId)
@@ -92,7 +93,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
   ///
   /// @param odata OData查询选项，用于指定分页和排序等条件
   /// @return 分页查询结果，包含符合条件的第三方应用列表
-  protected Page<ThirdPartyApp> listThirdPartyApp(ODataQueryOption odata) {
+  protected Page<@NonNull ThirdPartyApp> listThirdPartyApp(ODataQueryOption odata) {
     return thirdPartyAppDAO.findAll(odata);
   }
 

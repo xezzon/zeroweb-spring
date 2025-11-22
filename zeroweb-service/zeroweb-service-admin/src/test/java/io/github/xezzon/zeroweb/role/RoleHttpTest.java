@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -130,7 +130,7 @@ class RoleHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<Role>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Role>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
@@ -162,7 +162,7 @@ class RoleHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<Role>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Role>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);

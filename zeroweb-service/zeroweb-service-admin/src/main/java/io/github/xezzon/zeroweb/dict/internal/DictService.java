@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class DictService {
   ///
   /// @param odata OData查询选项
   /// @return 字典分页列表
-  protected Page<Dict> pagedList(ODataQueryOption odata) {
+  protected Page<@NonNull Dict> pagedList(ODataQueryOption odata) {
     return dictDAO.findAll(odata);
   }
 

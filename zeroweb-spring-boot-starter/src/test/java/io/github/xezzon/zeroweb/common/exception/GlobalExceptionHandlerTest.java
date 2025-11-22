@@ -94,6 +94,7 @@ class GlobalExceptionHandlerTest {
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
     Assertions.assertEquals("MethodArgumentNotValid", responseBody.getCode());
+    Assertions.assertNotNull(responseBody.getDetails());
     Assertions.assertTrue(responseBody.getDetails().stream().anyMatch(detail ->
         Objects.equals("email", detail.getParameters().get("field"))
     ));

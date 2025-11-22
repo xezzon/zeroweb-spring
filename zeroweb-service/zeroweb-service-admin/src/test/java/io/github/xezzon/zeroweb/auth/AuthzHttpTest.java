@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -155,7 +155,7 @@ class AuthzHttpTest {
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
           .expectStatus().isOk()
-          .expectBody(new ParameterizedTypeReference<@NotNull List<User>>() {
+          .expectBody(new ParameterizedTypeReference<@NonNull List<User>>() {
           })
           .returnResult().getResponseBody();
       Assertions.assertNotNull(responseBody);
@@ -179,7 +179,7 @@ class AuthzHttpTest {
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
           .expectStatus().isOk()
-          .expectBody(new ParameterizedTypeReference<@NotNull List<Role>>() {
+          .expectBody(new ParameterizedTypeReference<@NonNull List<Role>>() {
           })
           .returnResult().getResponseBody();
       Assertions.assertNotNull(responseBody);
@@ -286,7 +286,7 @@ class AuthzHttpTest {
           .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
-          .expectBody(new ParameterizedTypeReference<@NotNull List<Object>>() {
+          .expectBody(new ParameterizedTypeReference<@NonNull List<Object>>() {
           })
           .returnResult().getResponseBody();
       Assertions.assertNotNull(responseBody);
@@ -313,7 +313,7 @@ class AuthzHttpTest {
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
           .expectStatus().isOk()
-          .expectBody(new ParameterizedTypeReference<@NotNull List<Role>>() {
+          .expectBody(new ParameterizedTypeReference<@NonNull List<Role>>() {
           })
           .returnResult().getResponseBody();
       Assertions.assertNotNull(responseBody);
@@ -394,7 +394,7 @@ class AuthzHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<User>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<User>>() {
         })
         .returnResult().getResponseBody();
 
@@ -587,7 +587,7 @@ class AuthzHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<Object>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Object>>() {
         })
         .returnResult().getResponseBody();
 
@@ -608,7 +608,7 @@ class AuthzHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<Object>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Object>>() {
         })
         .returnResult().getResponseBody();
 

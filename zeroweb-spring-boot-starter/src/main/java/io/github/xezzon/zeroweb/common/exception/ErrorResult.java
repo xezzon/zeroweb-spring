@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * API异常响应对象，与 Error-Code 响应头对应
@@ -31,7 +33,7 @@ public class ErrorResult {
    * 有关导致该报告错误的具体错误的详细信息数组
    */
   @JsonInclude(Include.NON_NULL)
-  private List<Detail> details;
+  private @Nullable List<Detail> details;
 
   public ErrorResult(Throwable e) {
     this.code = getCode(e);
@@ -41,7 +43,10 @@ public class ErrorResult {
     }
   }
 
-  public ErrorResult(Throwable e, List<Detail> details) {
+  public ErrorResult(
+      @NonNull final Throwable e,
+      @NonNull final List<Detail> details
+  ) {
     this(e);
     this.details = details;
   }

@@ -5,7 +5,7 @@ import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import jakarta.annotation.Resource;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,7 +44,7 @@ class MetadataHttpTest {
     List<MenuInfo> responseBody = testClient.get()
         .uri("/metadata/menu.json")
         .exchange()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<MenuInfo>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<MenuInfo>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);

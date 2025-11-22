@@ -18,6 +18,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,7 +61,7 @@ public class AuthnHttpEndpoint {
 
   /// @return 当前用户的认证信息
   @GetMapping("/self")
-  public ResponseEntity<byte[]> self() throws InvalidProtocolBufferException {
+  public ResponseEntity<byte @NonNull []> self() throws InvalidProtocolBufferException {
     if (!StpUtil.isLogin()) {
       return ResponseEntity.status(HttpStatus.NO_CONTENT)
           .body(new byte[0]);

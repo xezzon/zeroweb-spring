@@ -4,13 +4,16 @@ import io.github.xezzon.zeroweb.auth.RolePermission;
 import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@NullMarked
 public interface RolePermissionRepository extends
-    JpaRepository<RolePermission, String>, JpaSpecificationExecutor<RolePermission> {
+    JpaRepository<RolePermission, String>,
+    JpaSpecificationExecutor<RolePermission> {
 
   List<RolePermission> findByRoleIdIn(Collection<String> roleIds);
 

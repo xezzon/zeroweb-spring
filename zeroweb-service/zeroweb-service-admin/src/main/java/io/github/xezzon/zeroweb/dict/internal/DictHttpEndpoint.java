@@ -11,6 +11,7 @@ import io.github.xezzon.zeroweb.dict.entity.AddDictReq;
 import io.github.xezzon.zeroweb.dict.entity.ModifyDictReq;
 import java.util.Collection;
 import java.util.List;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,7 +58,7 @@ public class DictHttpEndpoint {
   /// @return 字典目列表
   @SaCheckPermission({PermissionConstant.DICT_READ})
   @GetMapping()
-  public Page<Dict> getDictTagList(ODataRequestParam odata) {
+  public Page<@NonNull Dict> getDictTagList(ODataRequestParam odata) {
     return dictService.pagedList(odata.into());
   }
 

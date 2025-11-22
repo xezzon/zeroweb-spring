@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
@@ -117,7 +118,7 @@ public class LocalizedService {
   /// @param namespace 命名空间
   /// @param odata 分页查询参数
   /// @return 国际化内容列表
-  Page<I18nMessage> queryI18nMessageList(final String namespace, final ODataQueryOption odata) {
+  Page<@NonNull I18nMessage> queryI18nMessageList(final String namespace, final ODataQueryOption odata) {
     return i18nMessageDAO.findAllWithNamespace(namespace, odata);
   }
 

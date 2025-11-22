@@ -37,7 +37,7 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.zip.CRC32;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -760,7 +760,7 @@ abstract class AttachmentHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<Attachment>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Attachment>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
@@ -779,7 +779,7 @@ abstract class AttachmentHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<Attachment>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Attachment>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
@@ -793,7 +793,7 @@ abstract class AttachmentHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<Attachment>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Attachment>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody2);
@@ -817,7 +817,7 @@ abstract class AttachmentHttpTest {
         .exchange()
         .expectStatus().isOk()
         .expectHeader().valueEquals("Content-Type", attachment.getType())
-        .expectBody(new ParameterizedTypeReference<byte @NotNull []>() {
+        .expectBody(new ParameterizedTypeReference<byte @NonNull []>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(fileContent);

@@ -13,6 +13,7 @@ import io.github.xezzon.zeroweb.subscription.Subscription;
 import io.github.xezzon.zeroweb.subscription.authz.SubscriptionPermissionManager;
 import io.github.xezzon.zeroweb.subscription.entity.AddSubscriptionReq;
 import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,7 +45,7 @@ public class SubscriptionHttpEndpoint {
   /// @param appId 第三方应用ID
   /// @return 所有已发布的对外接口以及指定第三方应用的订阅情况
   @GetMapping("/third-party-app/{appId}/subscription")
-  public Page<Subscription> listSubscription(ODataRequestParam odata, @PathVariable String appId) {
+  public Page<@NonNull Subscription> listSubscription(ODataRequestParam odata, @PathVariable String appId) {
     if (!StpUtil.hasPermission(PermissionConstant.SUBSCRIPTION_AUDIT)) {
       // 应用管理员可以查看所有应用的订阅，非管理员则需要对应的权限
       subscriptionPermissionManager.check(appId, JwtAuth.getOrThrow().getSub(), LIST_SUBSCRIPTION);

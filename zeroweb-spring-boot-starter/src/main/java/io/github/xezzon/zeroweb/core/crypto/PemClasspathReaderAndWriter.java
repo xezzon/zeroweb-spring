@@ -15,6 +15,7 @@ import org.bouncycastle.util.io.pem.PemWriter;
  * 从classpath中读写PEM格式的公钥和私钥文件
  * @author xezzon
  */
+@SuppressWarnings("ClassCanBeRecord")
 public class PemClasspathReaderAndWriter implements
     ASN1PublicKeyReader, ASN1PrivateKeyReader,
     ASN1PublicKeyWriter, ASN1PrivateKeyWriter {

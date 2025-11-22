@@ -5,7 +5,7 @@ import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.dict.Dict;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

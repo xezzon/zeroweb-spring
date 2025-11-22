@@ -7,7 +7,9 @@ import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.exception.PublishedOpenapiCannotBeModifyException;
 import java.util.Objects;
-import org.jetbrains.annotations.Nullable;
+import java.util.Optional;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +36,7 @@ public class OpenapiService implements IOpenapiService4Subscription {
   ///
   /// @param odata OData查询选项
   /// @return 分页查询结果，包含符合条件的对外接口列表
-  protected Page<Openapi> pageList(ODataQueryOption odata) {
+  protected Page<@NonNull Openapi> pageList(ODataQueryOption odata) {
     return openapiDAO.findAll(odata);
   }
 
@@ -68,19 +70,19 @@ public class OpenapiService implements IOpenapiService4Subscription {
   }
 
   private void checkRepeat(Openapi openapi) {
-    Openapi exist = openapiDAO.get().findByCode(openapi.getCode());
-    if (exist != null && !Objects.equals(exist.getId(), openapi.getId())) {
+    Optional<Openapi> exist = openapiDAO.get().findByCode(openapi.getCode());
+    if (exist.isPresent() && !Objects.equals(exist.get().getId(), openapi.getId())) {
       throw new RepeatDataException("`" + openapi.getCode() + "`");
     }
   }
 
   @Override
-  public Page<Openapi> listPublishedOpenapi(ODataQueryOption odata) {
+  public Page<@NonNull Openapi> listPublishedOpenapi(ODataQueryOption odata) {
     return openapiDAO.listPublishedOpenapi(odata);
   }
 
   @Override
   public @Nullable Openapi getByCode(String openapiCode) {
-    return openapiDAO.get().findByCode(openapiCode);
+    return openapiDAO.get().findByCode(openapiCode).orElse(null);
   }
 }

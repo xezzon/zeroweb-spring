@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -127,7 +127,7 @@ class ThirdPartyAppHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(me).bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull PagedModel<ThirdPartyApp>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<ThirdPartyApp>>() {
         })
         .returnResult().getResponseBody();
 
@@ -162,7 +162,7 @@ class ThirdPartyAppHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull PagedModel<ThirdPartyApp>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<ThirdPartyApp>>() {
         })
         .returnResult().getResponseBody();
 

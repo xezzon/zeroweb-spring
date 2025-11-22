@@ -2,11 +2,13 @@ package io.github.xezzon.zeroweb.user.repository;
 
 import io.github.xezzon.zeroweb.user.User;
 import java.util.Optional;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /// @author xezzon
 @Repository
+@NullMarked
 public interface UserRepository extends JpaRepository<User, String> {
 
   /// 根据用户名获取记录

@@ -3,13 +3,13 @@ package io.github.xezzon.zeroweb.locale;
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
@@ -34,7 +34,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -149,7 +149,7 @@ class LocalizedHttpTest {
     List<Language> responseBody = testClient.get()
         .uri(LIST_LANGUAGE_URL)
         .exchange()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<Language>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Language>>() {
         })
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
@@ -297,7 +297,7 @@ class LocalizedHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<String>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<String>>() {
         })
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
@@ -325,7 +325,7 @@ class LocalizedHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull PagedModel<I18nMessage>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<I18nMessage>>() {
         })
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
@@ -438,7 +438,7 @@ class LocalizedHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull Map<String, String>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull Map<String, String>>() {
         })
         .returnResult().getResponseBody();
     Map<String, String> except = translationRepository.findAll()
@@ -579,7 +579,7 @@ class LocalizedHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull Map<String, String>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull Map<String, String>>() {
         })
         .returnResult().getResponseBody();
     assertNotNull(responseBody);

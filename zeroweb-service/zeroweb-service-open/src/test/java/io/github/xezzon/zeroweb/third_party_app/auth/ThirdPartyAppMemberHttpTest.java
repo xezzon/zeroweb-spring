@@ -19,7 +19,7 @@ import jakarta.annotation.Resource;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -174,7 +174,7 @@ class ThirdPartyAppMemberHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(invitedUser).bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<@NotNull List<ThirdPartyAppMember>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<ThirdPartyAppMember>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);

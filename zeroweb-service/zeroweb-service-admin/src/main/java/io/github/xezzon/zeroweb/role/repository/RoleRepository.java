@@ -4,12 +4,14 @@ import io.github.xezzon.zeroweb.role.Role;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 /// @author xezzon
 @Repository
+@NullMarked
 public interface RoleRepository extends
     JpaRepository<Role, String>,
     JpaSpecificationExecutor<Role> {
