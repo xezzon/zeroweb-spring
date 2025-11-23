@@ -17,7 +17,7 @@
   <properties>
     <http.port>9021</http.port>
     <grpc.port>9022</grpc.port>
-    <management.port>9023</management.port>
+    <management.port>9029</management.port>
     <mainClass>io.github.xezzon.zeroweb.ZerowebFileApplication</mainClass>
   </properties>
 

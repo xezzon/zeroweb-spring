@@ -17,7 +17,7 @@
   <properties>
     <http.port>9001</http.port>
     <grpc.port>9002</grpc.port>
-    <management.port>9003</management.port>
+    <management.port>9009</management.port>
     <mainClass>io.github.xezzon.zeroweb.ZerowebAdminApplication</mainClass>
   </properties>
 

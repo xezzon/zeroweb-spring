@@ -25,8 +25,9 @@
     <maven.compiler.release>25</maven.compiler.release>
     <mainClass/>
     <!-- 应用端口号 -->
-    <app.port>8080</app.port>
+    <http.port>8080</http.port>
     <grpc.port>9090</grpc.port>
+    <management.port>8081</management.port>
     <!-- Testcontainers -->
     <testcontainers.postgresql.url>
       jdbc:tc:postgresql:18-alpine:///postgres
@@ -236,7 +237,7 @@
                   </OTEL_JAVA_EXTENSIONS>
                 </environment>
                 <ports>
-                  <port>${app.port}</port>
+                  <port>${http.port}</port>
                   <port>${grpc.port}</port>
                 </ports>
                 <volumes>
