@@ -16,7 +16,11 @@ spring:
       port: @grpc.port@
 
 server:
-  port: @app.port@
+  port: @http.port@
+
+management:
+  server:
+    port: @management.port@
 
 sa-token:
   token-name: X-SESSION-ID

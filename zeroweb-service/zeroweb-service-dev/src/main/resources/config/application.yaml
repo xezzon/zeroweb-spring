@@ -13,4 +13,8 @@ spring:
     tag: @project.version@
 
 server:
-  port: @app.port@
+  port: @http.port@
+
+management:
+  server:
+    port: @management.port@

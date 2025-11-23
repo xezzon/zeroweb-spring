@@ -14,9 +14,16 @@ spring:
   servlet:
     multipart:
       max-file-size: 5MB
+  grpc:
+    server:
+      port: @grpc.port@
 
 server:
-  port: @app.port@
+  port: @http.port@
+
+management:
+  server:
+    port: @management.port@
 
 zeroweb:
   file:
