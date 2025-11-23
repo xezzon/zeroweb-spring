@@ -22,14 +22,16 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -40,7 +42,7 @@ class AuthzHttpTest {
   private final List<Role> roles = new ArrayList<>();
   private final List<String> permissions = new ArrayList<>();
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
   @Resource
   private RoleUserRepository roleUserRepository;
   @Resource
@@ -112,9 +114,9 @@ class AuthzHttpTest {
         userBindToRole.add(roleUser);
       }
     }
-    webTestClient.put()
+    testClient.put()
         .uri("/auth/role/-/user")
-        .bodyValue(userBindToRole)
+        .body(userBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -133,9 +135,9 @@ class AuthzHttpTest {
         roleBindToUser.add(roleUser);
       }
     }
-    webTestClient.put()
+    testClient.put()
         .uri("/auth/role/-/user")
-        .bodyValue(roleBindToUser)
+        .body(roleBindToUser)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -147,13 +149,14 @@ class AuthzHttpTest {
     ).toList();
     // 读取角色绑定的人员
     {
-      List<User> responseBody = webTestClient.get()
+      List<User> responseBody = testClient.get()
           .uri("/auth/role/{roleId}/user", roleId)
           .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
           .expectStatus().isOk()
-          .expectBodyList(User.class)
+          .expectBody(new ParameterizedTypeReference<@NonNull List<User>>() {
+          })
           .returnResult().getResponseBody();
       Assertions.assertNotNull(responseBody);
       Collection<String> exceptUserIds = roleUsers.stream()
@@ -170,13 +173,14 @@ class AuthzHttpTest {
     }
     // 读取人员绑定角色
     {
-      List<Role> responseBody = webTestClient.get()
+      List<Role> responseBody = testClient.get()
           .uri("/auth/user/{userId}/role", userId)
           .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
           .expectStatus().isOk()
-          .expectBodyList(Role.class)
+          .expectBody(new ParameterizedTypeReference<@NonNull List<Role>>() {
+          })
           .returnResult().getResponseBody();
       Assertions.assertNotNull(responseBody);
       Collection<String> exceptUserIds = roleUsers.stream()
@@ -193,9 +197,9 @@ class AuthzHttpTest {
     }
     // 解绑角色-人员
     {
-      webTestClient.method(HttpMethod.DELETE)
+      testClient.method(HttpMethod.DELETE)
           .uri("/auth/role/-/user")
-          .bodyValue(roleUsers)
+          .body(roleUsers)
           .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
@@ -230,9 +234,9 @@ class AuthzHttpTest {
         rolePermissionRepository.save(rolePermission);
         temp.add(rolePermission);
       }
-      webTestClient.put()
+      testClient.put()
           .uri("/auth/role/-/permission")
-          .bodyValue(permissionBindToRole)
+          .body(permissionBindToRole)
           .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
@@ -262,9 +266,9 @@ class AuthzHttpTest {
         rolePermissionRepository.save(rolePermission);
         temp.add(rolePermission);
       }
-      webTestClient.put()
+      testClient.put()
           .uri("/auth/role/-/permission")
-          .bodyValue(roleBindToPermission)
+          .body(roleBindToPermission)
           .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
@@ -277,12 +281,13 @@ class AuthzHttpTest {
     ).toList();
     // 读取角色绑定的权限
     {
-      List<Object> responseBody = webTestClient.get()
+      List<Object> responseBody = testClient.get()
           .uri("/auth/role/{roleId}/permission", roleId)
           .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
-          .expectBodyList(Object.class)
+          .expectBody(new ParameterizedTypeReference<@NonNull List<Object>>() {
+          })
           .returnResult().getResponseBody();
       Assertions.assertNotNull(responseBody);
       List<String> except = rolePermissions.stream()
@@ -298,7 +303,7 @@ class AuthzHttpTest {
     }
     // 读取权限绑定的角色
     {
-      List<Role> responseBody = webTestClient.get()
+      List<Role> responseBody = testClient.get()
           .uri(uriBuilder -> uriBuilder
               .path("/auth/permission/-/role")
               .queryParam("permission", permission)
@@ -308,7 +313,8 @@ class AuthzHttpTest {
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
           .expectStatus().isOk()
-          .expectBodyList(Role.class)
+          .expectBody(new ParameterizedTypeReference<@NonNull List<Role>>() {
+          })
           .returnResult().getResponseBody();
       Assertions.assertNotNull(responseBody);
       List<String> except = rolePermissions.stream()
@@ -325,9 +331,9 @@ class AuthzHttpTest {
     }
     // 解绑角色-权限
     {
-      webTestClient.method(HttpMethod.DELETE)
+      testClient.method(HttpMethod.DELETE)
           .uri("/auth/role/-/permission")
-          .bodyValue(rolePermissions)
+          .body(rolePermissions)
           .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
           .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
           .exchange()
@@ -363,9 +369,9 @@ class AuthzHttpTest {
     roleUser.setUserId(targetUser.getId());
     userBindToRole.add(roleUser);
 
-    webTestClient.put()
+    testClient.put()
         .uri("/auth/role/-/user")
-        .bodyValue(userBindToRole)
+        .body(userBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
             .id(currentUser.getId())
@@ -377,7 +383,7 @@ class AuthzHttpTest {
         .expectStatus().isOk();
 
     // 测试查询角色绑定的用户
-    List<User> responseBody = webTestClient.get()
+    List<User> responseBody = testClient.get()
         .uri("/auth/role/{roleId}/user", targetRole.getId())
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
@@ -388,7 +394,8 @@ class AuthzHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(User.class)
+        .expectBody(new ParameterizedTypeReference<@NonNull List<User>>() {
+        })
         .returnResult().getResponseBody();
 
     Assertions.assertNotNull(responseBody);
@@ -396,9 +403,9 @@ class AuthzHttpTest {
         responseBody.stream().anyMatch(user -> user.getId().equals(targetUser.getId())));
 
     // 测试解绑角色-用户（当前用户属于目标角色的上级角色）
-    webTestClient.method(HttpMethod.DELETE)
+    testClient.method(HttpMethod.DELETE)
         .uri("/auth/role/-/user")
-        .bodyValue(userBindToRole)
+        .body(userBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
             .id(currentUser.getId())
@@ -419,9 +426,9 @@ class AuthzHttpTest {
     List<RoleUser> selfUnbind = new ArrayList<>();
     selfUnbind.add(selfRoleUser);
 
-    webTestClient.method(HttpMethod.DELETE)
+    testClient.method(HttpMethod.DELETE)
         .uri("/auth/role/-/user")
-        .bodyValue(selfUnbind)
+        .body(selfUnbind)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
             .id(currentUser.getId())
@@ -450,9 +457,9 @@ class AuthzHttpTest {
     roleUser.setUserId(users.get(1).getId());
     userBindToRole.add(roleUser);
 
-    webTestClient.put()
+    testClient.put()
         .uri("/auth/role/-/user")
-        .bodyValue(userBindToRole)
+        .body(userBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
             .id(currentUser.getId())
@@ -464,7 +471,7 @@ class AuthzHttpTest {
         .expectStatus().isForbidden();
 
     // 测试查询角色绑定的用户（当前用户不属于目标角色的上级角色）
-    webTestClient.get()
+    testClient.get()
         .uri("/auth/role/{roleId}/user", targetRole.getId())
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
@@ -477,9 +484,9 @@ class AuthzHttpTest {
         .expectStatus().isForbidden();
 
     // 测试解绑角色-用户（目标用户不是当前用户，且当前用户不属于目标角色的上级角色）
-    webTestClient.method(HttpMethod.DELETE)
+    testClient.method(HttpMethod.DELETE)
         .uri("/auth/role/-/user")
-        .bodyValue(userBindToRole)
+        .body(userBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
             .id(currentUser.getId())
@@ -517,9 +524,9 @@ class AuthzHttpTest {
     permissionBindToRole.add(rolePermission);
 
     // 下级角色的权限不能超过上级角色
-    webTestClient.put()
+    testClient.put()
         .uri("/auth/role/-/permission")
-        .bodyValue(permissionBindToRole)
+        .body(permissionBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
             .id(currentUser.getId())
@@ -536,9 +543,9 @@ class AuthzHttpTest {
     parentRolePermission.setPermission(permission);
     rolePermissionRepository.save(parentRolePermission);
 
-    webTestClient.put()
+    testClient.put()
         .uri("/auth/role/-/permission")
-        .bodyValue(permissionBindToRole)
+        .body(permissionBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
             .id(currentUser.getId())
@@ -556,7 +563,7 @@ class AuthzHttpTest {
     roleUserRepository.save(memberRoleUser);
 
     // 测试查询角色绑定的权限（当前用户属于目标角色）
-    webTestClient.get()
+    testClient.get()
         .uri("/auth/role/{roleId}/permission", targetRole.getId())
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
@@ -569,7 +576,7 @@ class AuthzHttpTest {
         .expectStatus().isOk();
 
     // 测试查询角色绑定的权限（当前用户属于目标角色的上级角色）
-    List<Object> responseBody1 = webTestClient.get()
+    List<Object> responseBody1 = testClient.get()
         .uri("/auth/role/{roleId}/permission", targetRole.getId())
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
@@ -580,7 +587,8 @@ class AuthzHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(Object.class)
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Object>>() {
+        })
         .returnResult().getResponseBody();
 
     Assertions.assertNotNull(responseBody1);
@@ -589,7 +597,7 @@ class AuthzHttpTest {
     roleUserRepository.delete(memberRoleUser);
 
     // 测试查询角色绑定的权限（当前用户属于目标角色的上级角色）
-    List<Object> responseBody2 = webTestClient.get()
+    List<Object> responseBody2 = testClient.get()
         .uri("/auth/role/{roleId}/permission", targetRole.getId())
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
@@ -600,16 +608,17 @@ class AuthzHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(Object.class)
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Object>>() {
+        })
         .returnResult().getResponseBody();
 
     Assertions.assertNotNull(responseBody2);
     Assertions.assertTrue(responseBody2.contains(permission));
 
     // 测试解绑角色-权限（当前用户属于目标角色的上级角色）
-    webTestClient.method(HttpMethod.DELETE)
+    testClient.method(HttpMethod.DELETE)
         .uri("/auth/role/-/permission")
-        .bodyValue(permissionBindToRole)
+        .body(permissionBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
             .id(currentUser.getId())
@@ -639,9 +648,9 @@ class AuthzHttpTest {
     rolePermission.setPermission(RandomUtil.randomEle(permissions));
     permissionBindToRole.add(rolePermission);
 
-    webTestClient.put()
+    testClient.put()
         .uri("/auth/role/-/permission")
-        .bodyValue(permissionBindToRole)
+        .body(permissionBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
             .id(currentUser.getId())
@@ -653,7 +662,7 @@ class AuthzHttpTest {
         .expectStatus().isForbidden();
 
     // 测试查询角色绑定的权限（当前用户既不属于目标角色，也不属于其上级角色）
-    webTestClient.get()
+    testClient.get()
         .uri("/auth/role/{roleId}/permission", targetRole.getId())
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
@@ -666,9 +675,9 @@ class AuthzHttpTest {
         .expectStatus().isForbidden();
 
     // 测试解绑角色-权限（当前用户不属于目标角色的上级角色）
-    webTestClient.method(HttpMethod.DELETE)
+    testClient.method(HttpMethod.DELETE)
         .uri("/auth/role/-/permission")
-        .bodyValue(permissionBindToRole)
+        .body(permissionBindToRole)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder()
             .id(currentUser.getId())

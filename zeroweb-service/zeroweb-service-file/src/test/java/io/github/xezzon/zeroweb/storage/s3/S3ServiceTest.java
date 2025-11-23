@@ -31,8 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.localstack.LocalStackContainer;
-import org.testcontainers.containers.localstack.LocalStackContainer.Service;
+import org.testcontainers.localstack.LocalStackContainer;
 import org.testcontainers.shaded.com.google.common.hash.Hashing;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -72,7 +71,7 @@ class S3ServiceTest {
   static void beforeAll() {
     CONTAINER.start();
     s3Client = S3Client.builder()
-        .endpointOverride(CONTAINER.getEndpointOverride(Service.S3))
+        .endpointOverride(CONTAINER.getEndpoint())
         .credentialsProvider(StaticCredentialsProvider.create(
             AwsBasicCredentials.create(CONTAINER.getAccessKey(), CONTAINER.getSecretKey())
         ))
@@ -88,7 +87,7 @@ class S3ServiceTest {
   @DynamicPropertySource
   static void properties(DynamicPropertyRegistry registry) {
     registry.add("ZEROWEB_FILE_PROVIDER", () -> "s3");
-    registry.add("S3_ENDPOINT", () -> CONTAINER.getEndpointOverride(Service.S3));
+    registry.add("S3_ENDPOINT", CONTAINER::getEndpoint);
     registry.add("S3_ACCESS_KEY", CONTAINER::getAccessKey);
     registry.add("S3_SECRET_KEY", CONTAINER::getSecretKey);
     registry.add("S3_BUCKET", () -> BUCKET);

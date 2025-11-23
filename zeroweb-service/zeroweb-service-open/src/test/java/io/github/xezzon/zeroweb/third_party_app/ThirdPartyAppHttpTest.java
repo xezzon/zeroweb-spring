@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -47,7 +48,7 @@ class ThirdPartyAppHttpTest {
   @Resource
   private ThirdPartyAppMemberRepository thirdPartyAppMemberRepository;
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
 
   @BeforeEach
   void setUp() {
@@ -81,11 +82,11 @@ class ThirdPartyAppHttpTest {
     AddThirdPartyAppReq req = new AddThirdPartyAppReq(
         RandomUtil.randomString(8)
     );
-    AccessSecret responseBody = webTestClient.post()
+    AccessSecret responseBody = testClient.post()
         .uri(THIRD_PARTY_APP_ADD_URI)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(ownerId).bearer())
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().is2xxSuccessful()
         .expectBody(AccessSecret.class)
@@ -115,7 +116,7 @@ class ThirdPartyAppHttpTest {
     List<ThirdPartyApp> dataset = repository.findAll();
     String me = dataset.getFirst().getOwnerId();
 
-    PagedModel<ThirdPartyApp> responseBody = webTestClient.get()
+    PagedModel<ThirdPartyApp> responseBody = testClient.get()
         .uri(builder -> builder
             .path(THIRD_PARTY_LIST_MINE_API)
             .queryParam("top", top)
@@ -126,7 +127,7 @@ class ThirdPartyAppHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(me).bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<PagedModel<ThirdPartyApp>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<ThirdPartyApp>>() {
         })
         .returnResult().getResponseBody();
 
@@ -150,7 +151,7 @@ class ThirdPartyAppHttpTest {
     final int skip = top * 2;
     List<ThirdPartyApp> dataset = repository.findAll();
 
-    PagedModel<ThirdPartyApp> responseBody = webTestClient.get()
+    PagedModel<ThirdPartyApp> responseBody = testClient.get()
         .uri(builder -> builder
             .path(THIRD_PARTY_LIST_API)
             .queryParam("top", top)
@@ -161,7 +162,7 @@ class ThirdPartyAppHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<PagedModel<ThirdPartyApp>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<ThirdPartyApp>>() {
         })
         .returnResult().getResponseBody();
 
@@ -181,7 +182,7 @@ class ThirdPartyAppHttpTest {
   @Test
   void rollAccessSecret() {
     ThirdPartyApp target = repository.findAll().getFirst();
-    AccessSecret responseBody = webTestClient.patch()
+    AccessSecret responseBody = testClient.patch()
         .uri(builder -> builder
             .path(ROLL_ACCESS_SECRET_URI)
             .build(target.getId())

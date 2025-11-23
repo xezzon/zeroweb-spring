@@ -5,6 +5,7 @@ import io.github.xezzon.zeroweb.user.User;
 import io.github.xezzon.zeroweb.user.constant.UserConstant;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -29,7 +30,7 @@ public class RootUserRunner implements ApplicationRunner {
   private String rootPassword;
 
   @Override
-  public void run(final ApplicationArguments args) {
+  public void run(@NonNull final ApplicationArguments args) {
     final User root = UserConstant.ROOT;
     final String rootUsername = UserConstant.ROOT.getUsername();
     final String cipher = BCrypt.hashpw(rootPassword);

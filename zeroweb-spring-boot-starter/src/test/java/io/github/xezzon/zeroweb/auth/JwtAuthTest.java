@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /**
  * @author xezzon
@@ -24,7 +24,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class JwtAuthTest {
 
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
 
   @Test
   void login() {
@@ -34,7 +34,7 @@ class JwtAuthTest {
         .id(userId)
         .username(username)
         .bearer();
-    String responseBody = webTestClient.get()
+    String responseBody = testClient.get()
         .uri("/jwt")
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, bearer)
@@ -47,7 +47,7 @@ class JwtAuthTest {
 
   @Test
   void notLogin() {
-    webTestClient.get()
+    testClient.get()
         .uri("/jwt")
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -61,7 +61,7 @@ class JwtAuthTest {
     String bearer = TestJwtGenerator.appBuilder()
         .username(username)
         .bearer();
-    String responseBody = webTestClient.get()
+    String responseBody = testClient.get()
         .uri("/jwt")
         .header(ACCESS_KEY_HEADER, TestJwtGenerator.getSecretKey())
         .header(AUTHORIZATION, bearer)

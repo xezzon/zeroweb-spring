@@ -15,8 +15,9 @@
   <description>附件管理服务</description>
 
   <properties>
-    <app.port>9021</app.port>
+    <http.port>9021</http.port>
     <grpc.port>9022</grpc.port>
+    <management.port>9023</management.port>
     <mainClass>io.github.xezzon.zeroweb.ZerowebFileApplication</mainClass>
   </properties>
 
@@ -36,7 +37,7 @@
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
-      <artifactId>localstack</artifactId>
+      <artifactId>testcontainers-localstack</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

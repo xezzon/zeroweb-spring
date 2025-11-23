@@ -5,6 +5,7 @@ import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.locale.I18nMessage;
 import io.github.xezzon.zeroweb.locale.I18nMessage_;
 import io.github.xezzon.zeroweb.locale.repository.I18nMessageRepository;
+import org.jspecify.annotations.NullMarked;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 /// @author xezzon
 @Repository
+@NullMarked
 public class I18nMessageDAO extends BaseDAO<I18nMessage, String, I18nMessageRepository> {
 
   protected I18nMessageDAO(final I18nMessageRepository repository) {

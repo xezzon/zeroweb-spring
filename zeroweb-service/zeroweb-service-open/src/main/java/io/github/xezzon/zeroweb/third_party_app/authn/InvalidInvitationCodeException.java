@@ -3,10 +3,12 @@ package io.github.xezzon.zeroweb.third_party_app.authn;
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
 import io.jsonwebtoken.JwtException;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import org.jspecify.annotations.NullMarked;
 
 /// 邀请码已过期，或者不允许被当前用户使用
 ///
 /// @author xezzon
+@NullMarked
 public class InvalidInvitationCodeException extends ZerowebBusinessException {
 
   public static final String ERROR_CODE = "CFE05";

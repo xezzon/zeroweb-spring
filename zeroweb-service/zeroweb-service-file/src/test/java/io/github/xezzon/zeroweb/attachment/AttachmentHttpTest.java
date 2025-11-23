@@ -1,4 +1,4 @@
-package io.github.xezzon.zeroweb.attachment.internal;
+package io.github.xezzon.zeroweb.attachment;
 
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
@@ -7,20 +7,19 @@ import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
-import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentReq;
 import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
-import io.github.xezzon.zeroweb.storage.fs.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.common.constant.BannerConstant;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.common.exception.ReadFileException;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
 import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
+import io.github.xezzon.zeroweb.storage.fs.ZerowebFsConfig;
 import io.github.xezzon.zeroweb.storage.s3.ZerowebS3Config;
 import io.github.xezzon.zeroweb.storage.s3.repository.S3UploadIdRepository;
 import jakarta.annotation.Resource;
@@ -38,6 +37,7 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.zip.CRC32;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,9 +50,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.localstack.LocalStackContainer;
-import org.testcontainers.containers.localstack.LocalStackContainer.Service;
+import org.springframework.test.web.servlet.client.RestTestClient;
+import org.testcontainers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -86,7 +85,7 @@ abstract class AttachmentHttpTest {
   private final List<byte[]> largeFileParts = new ArrayList<>();
 
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
   @Resource
   AttachmentRepository repository;
   @Resource
@@ -178,11 +177,11 @@ abstract class AttachmentHttpTest {
         RandomUtil.randomString(8),
         UUID.randomUUID().toString()
     );
-    UploadInfo responseBody = webTestClient.post()
+    UploadInfo responseBody = testClient.post()
         .uri(ADD_ATTACHMENT)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(userId).bearer())
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isOk()
         .expectBody(UploadInfo.class)
@@ -208,10 +207,10 @@ abstract class AttachmentHttpTest {
         RandomUtil.randomString(8),
         UUID.randomUUID().toString()
     );
-    UploadInfo responseBody = webTestClient.post()
+    UploadInfo responseBody = testClient.post()
         .uri(ADD_ATTACHMENT)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isOk()
         .expectBody(UploadInfo.class)
@@ -223,7 +222,7 @@ abstract class AttachmentHttpTest {
 
   @Test
   void upload() throws IOException {
-    UploadInfo uploadInfo = webTestClient.get()
+    UploadInfo uploadInfo = testClient.get()
         .uri(builder -> builder
             .path(GET_UPLOAD_INFO)
             .queryParam("checksum", attachment.getChecksum())
@@ -237,7 +236,7 @@ abstract class AttachmentHttpTest {
     Assertions.assertNotNull(uploadInfo);
     Assertions.assertEquals(1, uploadInfo.partCount());
 
-    UploadEndpoint uploadEndpoint = webTestClient.get()
+    UploadEndpoint uploadEndpoint = testClient.get()
         .uri(builder -> builder
             .path(GET_UPLOAD_ADDRESS)
             .build(attachment.getId())
@@ -248,9 +247,9 @@ abstract class AttachmentHttpTest {
     Assertions.assertNotNull(uploadEndpoint);
 
     byte[] fileContent = Files.readAllBytes(resource);
-    webTestClient.put()
+    testClient.put()
         .uri(localhost(uploadEndpoint.getEndpoint()))
-        .bodyValue(fileContent)
+        .body(fileContent)
         .header("Content-Type", Files.probeContentType(resource))
         .header("x-amz-meta-filename", attachment.getName())
         .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.SHA256.toString())
@@ -276,13 +275,13 @@ abstract class AttachmentHttpTest {
     String crc = Base64.getEncoder().encodeToString(
         HexUtil.decodeHex(Long.toHexString(crc32.getValue()))
     );
-    UploadInfo uploadInfo = webTestClient.post()
+    UploadInfo uploadInfo = testClient.post()
         .uri(builder -> builder
             .path(ADD_ATTACHMENT)
             .queryParam("crc", crc)
             .build()
         )
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isOk()
         .expectBody(UploadInfo.class)
@@ -300,7 +299,7 @@ abstract class AttachmentHttpTest {
       final String partChecksum = Base64.getEncoder().encodeToString(
           HexUtil.decodeHex(Long.toHexString(partCrc32.getValue()))
       );
-      UploadEndpoint address = webTestClient.get()
+      UploadEndpoint address = testClient.get()
           .uri(builder -> builder
               .path(GET_UPLOAD_ADDRESS)
               .queryParam("partNumber", 2)
@@ -312,17 +311,17 @@ abstract class AttachmentHttpTest {
           .expectBody(UploadEndpoint.class).returnResult().getResponseBody();
       Assertions.assertNotNull(address);
       URI uri = localhost(address.getEndpoint());
-      webTestClient.put()
+      testClient.put()
           .uri(uri)
-          .bodyValue(partContent)
+          .body(partContent)
           .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
           .header("x-amz-checksum-crc32", partChecksum)
           .exchange()
           .expectStatus().isOk();
       // 重复上传，测试幂等性
-      webTestClient.put()
+      testClient.put()
           .uri(uri)
-          .bodyValue(partContent)
+          .body(partContent)
           .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
           .header("x-amz-checksum-crc32", partChecksum)
           .exchange()
@@ -331,7 +330,7 @@ abstract class AttachmentHttpTest {
 
     // 测试断点续传
     {
-      uploadInfo = webTestClient.get()
+      uploadInfo = testClient.get()
           .uri(builder -> builder
               .path(GET_UPLOAD_INFO)
               .queryParam("checksum", largeFileAttachment.getChecksum())
@@ -352,7 +351,7 @@ abstract class AttachmentHttpTest {
             final String partChecksum = Base64.getEncoder().encodeToString(
                 HexUtil.decodeHex(Long.toHexString(partCrc32.getValue()))
             );
-            UploadEndpoint address = webTestClient.get()
+            UploadEndpoint address = testClient.get()
                 .uri(builder -> builder
                     .path(GET_UPLOAD_ADDRESS)
                     .queryParam("partNumber", partNumber)
@@ -369,9 +368,9 @@ abstract class AttachmentHttpTest {
             }
 
             final URI uri = localhost(address.getEndpoint());
-            webTestClient.put()
+            testClient.put()
                 .uri(uri)
-                .bodyValue(partContent)
+                .body(partContent)
                 .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
                 .header("x-amz-checksum-crc32", partChecksum)
                 .exchange()
@@ -379,7 +378,7 @@ abstract class AttachmentHttpTest {
           });
     }
 
-    webTestClient.put()
+    testClient.put()
         .uri(FINISH_UPLOAD, attachmentId)
         .exchange()
         .expectStatus().isOk();
@@ -391,7 +390,7 @@ abstract class AttachmentHttpTest {
 
   @Test
   void upload_incorrectChecksum() {
-    webTestClient.get()
+    testClient.get()
         .uri(builder -> builder
             .path(GET_UPLOAD_INFO)
             .queryParam("checksum", largeFileAttachment.getChecksum())
@@ -401,7 +400,7 @@ abstract class AttachmentHttpTest {
         .exchange()
         .expectStatus().is4xxClientError();
 
-    webTestClient.get()
+    testClient.get()
         .uri(builder -> builder
             .path(GET_UPLOAD_INFO)
             .queryParam("checksum", attachment.getChecksum())
@@ -411,7 +410,7 @@ abstract class AttachmentHttpTest {
         .exchange()
         .expectStatus().is4xxClientError();
 
-    webTestClient.get()
+    testClient.get()
         .uri(builder -> builder
             .path(GET_UPLOAD_INFO)
             .queryParam("checksum", largeFileAttachment.getChecksum())
@@ -424,7 +423,7 @@ abstract class AttachmentHttpTest {
 
   @Test
   void upload_incorrectFile() throws IOException {
-    UploadInfo responseBody = webTestClient.get()
+    UploadInfo responseBody = testClient.get()
         .uri(builder -> builder
             .path(GET_UPLOAD_INFO)
             .queryParam("checksum", attachment.getChecksum())
@@ -439,7 +438,7 @@ abstract class AttachmentHttpTest {
 
     Path path = ResourceUtil.getResourceFromClasspath("incorrect_file.txt");
 
-    UploadEndpoint address = webTestClient.get()
+    UploadEndpoint address = testClient.get()
         .uri(builder -> builder
             .path(GET_UPLOAD_ADDRESS)
             .build(responseBody.id())
@@ -448,9 +447,9 @@ abstract class AttachmentHttpTest {
         .expectStatus().isOk()
         .expectBody(UploadEndpoint.class).returnResult().getResponseBody();
     Assertions.assertNotNull(address);
-    webTestClient.put()
+    testClient.put()
         .uri(localhost(address.getEndpoint()))
-        .bodyValue(Files.readAllBytes(path))
+        .body(Files.readAllBytes(path))
         .header("Content-Type", Files.probeContentType(path))
         .header("x-amz-meta-filename", attachment.getName())
         .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.SHA256.toString())
@@ -484,13 +483,13 @@ abstract class AttachmentHttpTest {
     final String checksum = Base64.getEncoder().encodeToString(
         HexUtil.decodeHex(Long.toHexString(crc32.getValue()))
     );
-    UploadInfo responseBody = webTestClient.post()
+    UploadInfo responseBody = testClient.post()
         .uri(builder -> builder
             .path(ADD_ATTACHMENT)
             .queryParam("crc", checksum)
             .build()
         )
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isOk()
         .expectBody(UploadInfo.class)
@@ -508,7 +507,7 @@ abstract class AttachmentHttpTest {
           final String partChecksum = Base64.getEncoder().encodeToString(
               HexUtil.decodeHex(Long.toHexString(partCrc32.getValue()))
           );
-          UploadEndpoint address = webTestClient.get()
+          UploadEndpoint address = testClient.get()
               .uri(builder -> builder
                   .path(GET_UPLOAD_ADDRESS)
                   .queryParam("partNumber", partNumber)
@@ -521,16 +520,16 @@ abstract class AttachmentHttpTest {
           Assertions.assertNotNull(address);
           final URI uri = localhost(address.getEndpoint());
 
-          webTestClient.put()
+          testClient.put()
               .uri(uri)
-              .bodyValue(partContent)
+              .body(partContent)
               .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
               .header("x-amz-checksum-crc32", partChecksum)
               .exchange()
               .expectStatus().isOk();
         });
 
-    webTestClient.put()
+    testClient.put()
         .uri(FINISH_UPLOAD, attachmentId)
         .exchange()
         .expectStatus().value(this::assertIncorrectFileStatus);
@@ -561,13 +560,13 @@ abstract class AttachmentHttpTest {
         largeFileAttachment.getBizType(),
         largeFileAttachment.getBizId()
     );
-    UploadInfo responseBody = webTestClient.post()
+    UploadInfo responseBody = testClient.post()
         .uri(builder -> builder
             .path(ADD_ATTACHMENT)
             .queryParam("crc", checksum)
             .build()
         )
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isOk()
         .expectBody(UploadInfo.class)
@@ -585,7 +584,7 @@ abstract class AttachmentHttpTest {
           final String partChecksum = Base64.getEncoder().encodeToString(
               HexUtil.decodeHex(Long.toHexString(partCrc32.getValue()))
           );
-          UploadEndpoint address = webTestClient.get()
+          UploadEndpoint address = testClient.get()
               .uri(builder -> builder
                   .path(GET_UPLOAD_ADDRESS)
                   .queryParam("partNumber", partNumber)
@@ -597,16 +596,16 @@ abstract class AttachmentHttpTest {
               .expectBody(UploadEndpoint.class).returnResult().getResponseBody();
           Assertions.assertNotNull(address);
           final URI uri = localhost(address.getEndpoint());
-          webTestClient.put()
+          testClient.put()
               .uri(uri)
-              .bodyValue(partContent)
+              .body(partContent)
               .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
               .header("x-amz-checksum-crc32", partChecksum)
               .exchange()
               .expectStatus().isOk();
         });
 
-    webTestClient.put()
+    testClient.put()
         .uri(FINISH_UPLOAD, attachmentId)
         .exchange()
         .expectStatus().isOk();
@@ -632,13 +631,13 @@ abstract class AttachmentHttpTest {
     String crc = Base64.getEncoder().encodeToString(
         HexUtil.decodeHex(Long.toHexString(crc32.getValue()))
     );
-    UploadInfo uploadInfo = webTestClient.post()
+    UploadInfo uploadInfo = testClient.post()
         .uri(builder -> builder
             .path(ADD_ATTACHMENT)
             .queryParam("crc", crc)
             .build()
         )
-        .bodyValue(req)
+        .body(req)
         .exchange()
         .expectStatus().isOk()
         .expectBody(UploadInfo.class)
@@ -656,7 +655,7 @@ abstract class AttachmentHttpTest {
       final String partChecksum = Base64.getEncoder().encodeToString(
           HexUtil.decodeHex(Long.toHexString(partCrc32.getValue()))
       );
-      UploadEndpoint address = webTestClient.get()
+      UploadEndpoint address = testClient.get()
           .uri(builder -> builder
               .path(GET_UPLOAD_ADDRESS)
               .queryParam("partNumber", 2)
@@ -668,9 +667,9 @@ abstract class AttachmentHttpTest {
           .expectBody(UploadEndpoint.class).returnResult().getResponseBody();
       Assertions.assertNotNull(address);
       URI uri = localhost(address.getEndpoint());
-      webTestClient.put()
+      testClient.put()
           .uri(uri)
-          .bodyValue(partContent)
+          .body(partContent)
           .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
           .header("x-amz-checksum-crc32", partChecksum)
           .exchange()
@@ -682,7 +681,7 @@ abstract class AttachmentHttpTest {
 
     // 测试断点续传
     {
-      uploadInfo = webTestClient.get()
+      uploadInfo = testClient.get()
           .uri(builder -> builder
               .path(GET_UPLOAD_INFO)
               .queryParam("checksum", largeFileAttachment.getChecksum())
@@ -703,7 +702,7 @@ abstract class AttachmentHttpTest {
         final String partChecksum = Base64.getEncoder().encodeToString(
             HexUtil.decodeHex(Long.toHexString(partCrc32.getValue()))
         );
-        UploadEndpoint address = webTestClient.get()
+        UploadEndpoint address = testClient.get()
             .uri(builder -> builder
                 .path(GET_UPLOAD_ADDRESS)
                 .queryParam("partNumber", partNumber)
@@ -717,9 +716,9 @@ abstract class AttachmentHttpTest {
         Assertions.assertNotNull(address.getEndpoint());
 
         final URI uri = localhost(address.getEndpoint());
-        webTestClient.put()
+        testClient.put()
             .uri(uri)
-            .bodyValue(partContent)
+            .body(partContent)
             .header("x-amz-sdk-checksum-algorithm", ChecksumAlgorithm.CRC32.toString())
             .header("x-amz-checksum-crc32", partChecksum)
             .exchange()
@@ -727,7 +726,7 @@ abstract class AttachmentHttpTest {
       }
     }
 
-    webTestClient.put()
+    testClient.put()
         .uri(FINISH_UPLOAD, attachmentId)
         .exchange()
         .expectStatus().isOk();
@@ -742,7 +741,7 @@ abstract class AttachmentHttpTest {
     Attachment before = repository.findById(attachment.getId()).orElseThrow();
     Assertions.assertEquals(AttachmentStatusEnum.UPLOADING, before.getStatus());
 
-    webTestClient.put()
+    testClient.put()
         .uri(FINISH_UPLOAD, attachment.getId())
         .exchange()
         .expectStatus().isOk();
@@ -753,7 +752,7 @@ abstract class AttachmentHttpTest {
 
   @Test
   void queryByBiz() {
-    List<Attachment> responseBody = webTestClient.get()
+    List<Attachment> responseBody = testClient.get()
         .uri(uri -> uri.path(QUERY_BY_BIZ)
             .queryParam("bizType", attachment.getBizType())
             .queryParam("bizId", attachment.getBizId())
@@ -761,7 +760,8 @@ abstract class AttachmentHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(Attachment.class)
+        .expectBody(new ParameterizedTypeReference<@NonNull List<@NonNull Attachment>>() {
+        })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
 
@@ -771,7 +771,7 @@ abstract class AttachmentHttpTest {
 
   @Test
   void queryByBiz_empty() {
-    List<Attachment> responseBody = webTestClient.get()
+    List<Attachment> responseBody = testClient.get()
         .uri(uri -> uri.path(QUERY_BY_BIZ)
             .queryParam("bizType", RandomUtil.randomString(6))
             .queryParam("bizId", attachment.getBizId())
@@ -779,12 +779,13 @@ abstract class AttachmentHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(Attachment.class)
+        .expectBody(new ParameterizedTypeReference<@NonNull List<@NonNull Attachment>>() {
+        })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
     Assertions.assertTrue(responseBody.isEmpty());
 
-    List<Attachment> responseBody2 = webTestClient.get()
+    List<Attachment> responseBody2 = testClient.get()
         .uri(uri -> uri.path(QUERY_BY_BIZ)
             .queryParam("bizType", attachment.getBizType())
             .queryParam("bizId", UUID.randomUUID().toString())
@@ -792,7 +793,8 @@ abstract class AttachmentHttpTest {
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(Attachment.class)
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Attachment>>() {
+        })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody2);
     Assertions.assertTrue(responseBody2.isEmpty());
@@ -800,7 +802,7 @@ abstract class AttachmentHttpTest {
 
   @Test
   void download() throws IOException {
-    DownloadEndpoint downloadEndpoint = webTestClient.get()
+    DownloadEndpoint downloadEndpoint = testClient.get()
         .uri(uri -> uri
             .path(GET_DOWNLOAD_ADDRESS)
             .build(attachmentForDownloading.getId())
@@ -810,12 +812,12 @@ abstract class AttachmentHttpTest {
         .expectBody(DownloadEndpoint.class).returnResult().getResponseBody();
     Assertions.assertNotNull(downloadEndpoint);
 
-    byte[] fileContent = webTestClient.get()
+    byte[] fileContent = testClient.get()
         .uri(localhost(downloadEndpoint.getEndpoint()))
         .exchange()
         .expectStatus().isOk()
         .expectHeader().valueEquals("Content-Type", attachment.getType())
-        .expectBody(new ParameterizedTypeReference<byte[]>() {
+        .expectBody(new ParameterizedTypeReference<byte @NonNull []>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(fileContent);
@@ -825,7 +827,7 @@ abstract class AttachmentHttpTest {
 
   @Test
   void deleteAttachment() {
-    webTestClient.delete()
+    testClient.delete()
         .uri(builder -> builder
             .path(DELETE_ATTACHMENT)
             .build(attachment.getId())
@@ -846,7 +848,7 @@ class S3HttpTest extends AttachmentHttpTest {
 
   private static final LocalStackContainer CONTAINER = new LocalStackContainer(
       DockerImageName.parse("localstack/localstack:s3-latest")
-  ).withServices(Service.S3);
+  ).withServices("s3");
   private static final String BUCKET = "test";
   private static S3Client s3Client = null;
   @Resource
@@ -858,7 +860,7 @@ class S3HttpTest extends AttachmentHttpTest {
   static void beforeAll() {
     CONTAINER.start();
     s3Client = S3Client.builder()
-        .endpointOverride(CONTAINER.getEndpointOverride(Service.S3))
+        .endpointOverride(CONTAINER.getEndpoint())
         .credentialsProvider(StaticCredentialsProvider.create(
             AwsBasicCredentials.create(CONTAINER.getAccessKey(), CONTAINER.getSecretKey())
         ))
@@ -873,7 +875,7 @@ class S3HttpTest extends AttachmentHttpTest {
 
   @DynamicPropertySource
   static void properties(DynamicPropertyRegistry registry) {
-    registry.add("S3_ENDPOINT", () -> CONTAINER.getEndpointOverride(Service.S3));
+    registry.add("S3_ENDPOINT", CONTAINER::getEndpoint);
     registry.add("S3_ACCESS_KEY", CONTAINER::getAccessKey);
     registry.add("S3_SECRET_KEY", CONTAINER::getSecretKey);
     registry.add("S3_BUCKET", () -> BUCKET);

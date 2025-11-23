@@ -5,6 +5,7 @@ import io.github.xezzon.zeroweb.attachment.IAttachmentService;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.exception.UnsupportedFileProviderException;
 import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -61,7 +62,7 @@ public class FsHttpEndpoint {
   /// 
   /// @param id 附件ID
   @GetMapping(FsService.DOWNLOAD_ENDPOINT)
-  public ResponseEntity<byte[]> download(@PathVariable String id) {
+  public ResponseEntity<byte @NonNull []> download(@PathVariable String id) {
     Attachment attachment = attachmentService.queryById(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.valueOf(attachment.getType()));

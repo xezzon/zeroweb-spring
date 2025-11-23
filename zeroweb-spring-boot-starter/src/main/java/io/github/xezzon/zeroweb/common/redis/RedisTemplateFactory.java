@@ -1,7 +1,7 @@
 package io.github.xezzon.zeroweb.common.redis;
 
 import com.google.common.reflect.TypeToken;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -17,7 +17,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisTemplateFactory {
 
   private final RedisConnectionFactory connectionFactory;
-  private final RedisSerializer<String> keySerializer;
+  private final RedisSerializer<@NonNull String> keySerializer;
 
   public RedisTemplateFactory(final RedisConnectionFactory connectionFactory) {
     this.connectionFactory = connectionFactory;
@@ -35,12 +35,12 @@ public class RedisTemplateFactory {
    * }
    * </pre>
    */
-  public <T> RedisTemplate<String, T> of(final @NotNull TypeToken<@NotNull T> typeToken) {
+  public <T> RedisTemplate<String, T> of(final @NonNull TypeToken<@NonNull T> typeToken) {
     RedisTemplate<String, T> redisTemplate = new RedisTemplate<>();
     redisTemplate.setConnectionFactory(connectionFactory);
     redisTemplate.setKeySerializer(keySerializer);
     redisTemplate.setHashKeySerializer(keySerializer);
-    final RedisSerializer<T> valueSerializer = new GsonRedisSerializer<>(typeToken);
+    final RedisSerializer<@NonNull T> valueSerializer = new GsonRedisSerializer<>(typeToken);
     redisTemplate.setValueSerializer(valueSerializer);
     redisTemplate.setHashValueSerializer(valueSerializer);
     redisTemplate.afterPropertiesSet();

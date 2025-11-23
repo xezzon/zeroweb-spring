@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import javax.crypto.SecretKey;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * 签发/解码JWT
@@ -131,7 +131,7 @@ public final class JsonWebToken {
     /**
      * @param issuedAt JWT签发时间
      */
-    public Signer issuedAt(@NotNull final Instant issuedAt) {
+    public Signer issuedAt(@NonNull final Instant issuedAt) {
       this.issuedAt = issuedAt;
       return this;
     }
@@ -139,7 +139,7 @@ public final class JsonWebToken {
     /**
      * @param timeout JWT有效期，单位（秒）
      */
-    public Signer timeout(@NotNull final Long timeout) {
+    public Signer timeout(@NonNull final Long timeout) {
       this.timeout = timeout;
       return this;
     }

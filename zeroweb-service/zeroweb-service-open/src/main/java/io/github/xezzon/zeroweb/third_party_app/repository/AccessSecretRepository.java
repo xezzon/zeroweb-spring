@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.third_party_app.repository;
 
 import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /// @author xezzon
 @Repository
+@NullMarked
 public interface AccessSecretRepository extends JpaRepository<AccessSecret, String> {
 
   @Transactional

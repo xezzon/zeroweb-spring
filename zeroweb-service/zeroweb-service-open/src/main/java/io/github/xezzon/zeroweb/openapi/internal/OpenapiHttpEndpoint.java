@@ -8,6 +8,7 @@ import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.entity.AddOpenapiReq;
 import io.github.xezzon.zeroweb.openapi.entity.ModifyOpenapiReq;
 import jakarta.validation.Valid;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,7 +48,7 @@ public class OpenapiHttpEndpoint {
   /// @param odata OData查询参数，用于分页和排序
   /// @return 包含`对外接口`列表的分页对象
   @GetMapping()
-  public Page<Openapi> getOpenapiList(ODataRequestParam odata) {
+  public Page<@NonNull Openapi> getOpenapiList(ODataRequestParam odata) {
     return openapiService.pageList(odata.into());
   }
 

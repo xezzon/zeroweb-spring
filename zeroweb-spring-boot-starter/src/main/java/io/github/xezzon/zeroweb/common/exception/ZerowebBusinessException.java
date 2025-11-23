@@ -3,7 +3,6 @@ package io.github.xezzon.zeroweb.common.exception;
 import java.util.Collections;
 import java.util.Map;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * ZeroWeb 业务异常
@@ -20,8 +19,8 @@ public abstract class ZerowebBusinessException extends RuntimeException {
   }
 
   protected ZerowebBusinessException(
-      @NotNull Map<String, Object> parameters,
-      String message
+      final Map<String, Object> parameters,
+      final String message
   ) {
     super(message);
     this.parameters = parameters;

@@ -9,6 +9,7 @@ import lombok.Getter;
  * href="https://docs.oasis-open.org/odata/odata/v4.01/cs01/abnf/odata-abnf-construction-rules.txt">OData
  * ABNF Construction Rules Version 4.01</a>
  */
+@SuppressWarnings("ClassCanBeRecord")
 @Builder()
 public class ODataQueryOption {
 

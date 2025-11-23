@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
 import org.springframework.http.HttpStatus;
@@ -69,8 +70,8 @@ public class GlobalExceptionHandler {
     log(e, request, Level.INFO);
     List<ErrorResult.Detail> errorDetails = e.getFieldErrors().stream()
         .map(error -> new ErrorResult.Detail(
-            error.getCode(),
-            error.getDefaultMessage(),
+            Objects.requireNonNullElse(error.getCode(), "Invalid field."),
+            Objects.requireNonNullElse(error.getDefaultMessage(), "Unknown reason."),
             Map.ofEntries(
                 Map.entry("field", error.getField())
             )

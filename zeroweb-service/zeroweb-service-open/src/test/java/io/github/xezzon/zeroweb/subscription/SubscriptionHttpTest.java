@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +40,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -52,7 +53,7 @@ class SubscriptionHttpTest {
   private static final String THIRD_PARTY_APP_MEMBER = UUID.randomUUID().toString();
 
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
   @Resource
   private SubscriptionRepository repository;
   @Resource
@@ -111,7 +112,7 @@ class SubscriptionHttpTest {
     final int skip = 0;
     List<Subscription> dataset = repository.findAll();
 
-    PagedModel<Subscription> responseBody = webTestClient.get()
+    PagedModel<Subscription> responseBody = testClient.get()
         .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
             .queryParam("top", top)
             .queryParam("skip", skip)
@@ -124,7 +125,7 @@ class SubscriptionHttpTest {
             .bearer()
         )
         .exchange()
-        .expectBody(new ParameterizedTypeReference<PagedModel<Subscription>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<Subscription>>() {
         })
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
@@ -172,7 +173,7 @@ class SubscriptionHttpTest {
     final int skip = 0;
     List<Subscription> dataset = repository.findAll();
 
-    webTestClient.get()
+    testClient.get()
         .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
             .queryParam("top", top)
             .queryParam("skip", skip)
@@ -198,9 +199,9 @@ class SubscriptionHttpTest {
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     AddSubscriptionReq req = new AddSubscriptionReq(thirdPartyApp.getId(), openapi.getCode());
-    Id responseBody = webTestClient.post()
+    Id responseBody = testClient.post()
         .uri(SUBSCRIBE_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(THIRD_PARTY_APP_MEMBER).bearer())
         .exchange()
@@ -220,9 +221,9 @@ class SubscriptionHttpTest {
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     AddSubscriptionReq req = new AddSubscriptionReq(thirdPartyApp.getId(), openapi.getCode());
-    webTestClient.post()
+    testClient.post()
         .uri(SUBSCRIBE_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(THIRD_PARTY_APP_MEMBER).bearer())
         .exchange()
@@ -239,9 +240,9 @@ class SubscriptionHttpTest {
     ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findAll().getFirst();
 
     AddSubscriptionReq req = new AddSubscriptionReq(thirdPartyApp.getId(), openapi.getCode());
-    webTestClient.post()
+    testClient.post()
         .uri(SUBSCRIBE_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -254,7 +255,7 @@ class SubscriptionHttpTest {
   void auditSubscription() {
     Subscription target = repository.findAll().getFirst();
 
-    webTestClient.put()
+    testClient.put()
         .uri(builder -> builder
             .path(AUDIT_SUBSCRIPTION_URI)
             .build(target.getId())

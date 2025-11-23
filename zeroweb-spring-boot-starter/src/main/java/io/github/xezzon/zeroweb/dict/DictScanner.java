@@ -10,7 +10,7 @@ import jakarta.annotation.Resource;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -37,13 +37,13 @@ public class DictScanner implements ImportBeanDefinitionRegistrar, ApplicationRu
    */
   @Override
   public void registerBeanDefinitions(
-      @NotNull AnnotationMetadata metadata,
-      @NotNull BeanDefinitionRegistry registry
+      @NonNull final AnnotationMetadata metadata,
+      @NonNull final BeanDefinitionRegistry registry
   ) {
     AnnotationDictConfiguration configuration = new AnnotationDictConfiguration(metadata);
     String classpath = configuration.getValue();
     try {
-      ImmutableSet<@NotNull ClassInfo> classInfos = ClassPath
+      final ImmutableSet<@NonNull ClassInfo> classInfos = ClassPath
           .from(ClassLoader.getSystemClassLoader())
           .getTopLevelClassesRecursive(classpath);
       for (ClassInfo classInfo : classInfos) {
@@ -79,7 +79,7 @@ public class DictScanner implements ImportBeanDefinitionRegistrar, ApplicationRu
    * 不影响应用正常启动。
    */
   @Override
-  public void run(final ApplicationArguments args) throws Exception {
+  public void run(@NonNull final ApplicationArguments args) {
     try {
       dictImporter.importDict(dictList.build());
     } catch (Exception e) {
@@ -102,7 +102,7 @@ class AnnotationDictConfiguration {
    */
   private final AnnotationAttributes attributes;
 
-  AnnotationDictConfiguration(@NotNull AnnotationMetadata metadata) {
+  AnnotationDictConfiguration(@NonNull final AnnotationMetadata metadata) {
     Class<? extends Annotation> annotation = EnableDictScan.class;
     Map<String, Object> attributesSource = metadata.getAnnotationAttributes(annotation.getName());
     if (attributesSource == null) {

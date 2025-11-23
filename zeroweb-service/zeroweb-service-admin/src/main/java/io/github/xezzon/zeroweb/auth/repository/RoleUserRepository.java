@@ -4,13 +4,16 @@ import io.github.xezzon.zeroweb.auth.RoleUser;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@NullMarked
 public interface RoleUserRepository extends
-    JpaRepository<RoleUser, String>, JpaSpecificationExecutor<RoleUser> {
+    JpaRepository<RoleUser, String>,
+    JpaSpecificationExecutor<RoleUser> {
 
   List<RoleUser> findByRoleId(String roleId);
 

@@ -8,6 +8,7 @@ import io.github.xezzon.zeroweb.locale.I18nMessage;
 import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,7 +59,7 @@ public class I18nMessageHttpEndpoint {
   /// @return 国际化内容列表
   @SaCheckPermission({PermissionConstant.LOCALE_READ})
   @GetMapping("/{namespace}")
-  public Page<I18nMessage> queryI18nMessageList(
+  public Page<@NonNull I18nMessage> queryI18nMessageList(
       @PathVariable final String namespace,
       final ODataRequestParam odata
   ) {

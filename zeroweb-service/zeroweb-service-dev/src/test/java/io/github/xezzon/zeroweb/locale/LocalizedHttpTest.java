@@ -3,13 +3,13 @@ package io.github.xezzon.zeroweb.locale;
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -62,7 +63,7 @@ class LocalizedHttpTest {
   private static final String LOAD_TRANSLATION_URL = "/locale/{language}/{namespace}";
 
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
   @Resource
   private LanguageRepository languageRepository;
   @Resource
@@ -109,9 +110,9 @@ class LocalizedHttpTest {
         RandomUtil.randomInt(),
         null
     );
-    Id responseBody = webTestClient.post()
+    Id responseBody = testClient.post()
         .uri(ADD_LANGUAGE_URL)
-        .bodyValue(addLanguageReq)
+        .body(addLanguageReq)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -132,9 +133,9 @@ class LocalizedHttpTest {
         RandomUtil.randomInt(10),
         true
     );
-    webTestClient.post()
+    testClient.post()
         .uri(ADD_LANGUAGE_URL)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -145,10 +146,11 @@ class LocalizedHttpTest {
 
   @Test
   void queryLanguageList() {
-    List<Language> responseBody = webTestClient.get()
+    List<Language> responseBody = testClient.get()
         .uri(LIST_LANGUAGE_URL)
         .exchange()
-        .expectBodyList(Language.class)
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Language>>() {
+        })
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
     assertEquals(Locale.CHINA.toLanguageTag(), responseBody.getFirst().getLanguageTag());
@@ -169,9 +171,9 @@ class LocalizedHttpTest {
         3,
         false
     );
-    webTestClient.put()
+    testClient.put()
         .uri(UPDATE_LANGUAGE_URL)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -205,9 +207,9 @@ class LocalizedHttpTest {
         3,
         false
     );
-    webTestClient.put()
+    testClient.put()
         .uri(UPDATE_LANGUAGE_URL)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -224,9 +226,9 @@ class LocalizedHttpTest {
         3,
         false
     );
-    webTestClient.put()
+    testClient.put()
         .uri(UPDATE_LANGUAGE_URL)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -243,7 +245,7 @@ class LocalizedHttpTest {
     except.setEnabled(true);
     languageRepository.save(except);
 
-    webTestClient.delete()
+    testClient.delete()
         .uri(builder -> builder.path(DELETE_LANGUAGE_URL)
             .build(except.getId())
         )
@@ -267,9 +269,9 @@ class LocalizedHttpTest {
         RandomUtil.randomString(8),
         RandomUtil.randomString(8)
     );
-    Id responseBody = webTestClient.post()
+    Id responseBody = testClient.post()
         .uri(ADD_I18N_MESSAGE_URL)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -289,13 +291,13 @@ class LocalizedHttpTest {
         .sorted()
         .toList();
 
-    List<String> responseBody = webTestClient.get()
+    List<String> responseBody = testClient.get()
         .uri(LIST_I18N_NAMESPACE_URL)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<List<String>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull List<String>>() {
         })
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
@@ -313,7 +315,7 @@ class LocalizedHttpTest {
         .sorted(Comparator.comparing(I18nMessage::getMessageKey))
         .toList();
 
-    PagedModel<I18nMessage> responseBody = webTestClient.get()
+    PagedModel<I18nMessage> responseBody = testClient.get()
         .uri(builder -> builder.path(LIST_I18N_MESSAGE_URL)
             .queryParam("top", except.size())
             .queryParam("skip", 0)
@@ -323,7 +325,7 @@ class LocalizedHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<PagedModel<I18nMessage>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<I18nMessage>>() {
         })
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
@@ -341,9 +343,9 @@ class LocalizedHttpTest {
         except.getNamespace(),
         except.getMessageKey()
     );
-    webTestClient.post()
+    testClient.post()
         .uri(ADD_I18N_MESSAGE_URL)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -359,9 +361,9 @@ class LocalizedHttpTest {
     except.setId(target.getId());
     except.setNamespace(RandomUtil.randomString(6));
     except.setMessageKey(RandomUtil.randomString(6));
-    webTestClient.put()
+    testClient.put()
         .uri(UPDATE_I18N_MESSAGE_URL)
-        .bodyValue(except)
+        .body(except)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -393,9 +395,9 @@ class LocalizedHttpTest {
     except.setId(target.getId());
     except.setNamespace(repeat.getNamespace());
     except.setMessageKey(repeat.getMessageKey());
-    webTestClient.put()
+    testClient.put()
         .uri(UPDATE_I18N_MESSAGE_URL)
-        .bodyValue(except)
+        .body(except)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -407,7 +409,7 @@ class LocalizedHttpTest {
   void deleteI18nMessage() {
     I18nMessage target = i18nMessageRepository.findAll().getFirst();
 
-    webTestClient.delete()
+    testClient.delete()
         .uri(builder -> builder.path(DELETE_I18N_MESSAGE_URL)
             .build(target.getId())
         )
@@ -430,13 +432,13 @@ class LocalizedHttpTest {
   void queryTranslation() {
     I18nMessage i18nMessage = i18nMessageRepository.findAll().getFirst();
 
-    Map<String, String> responseBody = webTestClient.get()
+    Map<String, String> responseBody = testClient.get()
         .uri(builder -> builder.path(QUERY_TRANSLATION_URL)
             .build(i18nMessage.getNamespace(), i18nMessage.getMessageKey())
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<Map<String, String>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull Map<String, String>>() {
         })
         .returnResult().getResponseBody();
     Map<String, String> except = translationRepository.findAll()
@@ -466,9 +468,9 @@ class LocalizedHttpTest {
         targetLanguage.getLanguageTag(),
         RandomUtil.randomString(8)
     );
-    Id responseBody = webTestClient.put()
+    Id responseBody = testClient.put()
         .uri(UPSERT_TRANSLATION_URL)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -490,9 +492,9 @@ class LocalizedHttpTest {
         target.getLanguage(),
         RandomUtil.randomString(8)
     );
-    Id responseBody = webTestClient.put()
+    Id responseBody = testClient.put()
         .uri(UPSERT_TRANSLATION_URL)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -515,9 +517,9 @@ class LocalizedHttpTest {
         RandomUtil.randomString(8),
         RandomUtil.randomString(8)
     );
-    webTestClient.put()
+    testClient.put()
         .uri(UPSERT_TRANSLATION_URL)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -535,9 +537,9 @@ class LocalizedHttpTest {
         target.getLanguage(),
         RandomUtil.randomString(8)
     );
-    webTestClient.put()
+    testClient.put()
         .uri(UPSERT_TRANSLATION_URL)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -555,9 +557,9 @@ class LocalizedHttpTest {
         target.getLanguage(),
         RandomUtil.randomString(8)
     );
-    webTestClient.put()
+    testClient.put()
         .uri(UPSERT_TRANSLATION_URL)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -571,13 +573,13 @@ class LocalizedHttpTest {
     String targetLanguage = dataset.getFirst().getLanguage();
     String targetNamespace = dataset.getFirst().getNamespace();
 
-    Map<String, String> responseBody = webTestClient.get()
+    Map<String, String> responseBody = testClient.get()
         .uri(builder -> builder.path(LOAD_TRANSLATION_URL)
             .build(targetLanguage, targetNamespace)
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<Map<String, String>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull Map<String, String>>() {
         })
         .returnResult().getResponseBody();
     assertNotNull(responseBody);

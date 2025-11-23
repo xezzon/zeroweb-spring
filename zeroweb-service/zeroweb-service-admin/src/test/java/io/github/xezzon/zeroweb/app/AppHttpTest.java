@@ -18,6 +18,7 @@ import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,8 +26,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext
@@ -38,7 +40,7 @@ class AppHttpTest {
   private static final String DELETE_APP_URI = "/app/{id}";
 
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
   @Resource
   private AppRepository repository;
 
@@ -64,9 +66,9 @@ class AppHttpTest {
     AddAppReq req = new AddAppReq("testApp", "http://example.com", 1);
 
     // Act
-    Id responseBody = webTestClient.post()
+    Id responseBody = testClient.post()
         .uri(ADD_APP_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -92,9 +94,9 @@ class AppHttpTest {
     AddAppReq req = new AddAppReq("testApp", invalidUrl, 1);
 
     // Act & Assert
-    webTestClient.post()
+    testClient.post()
         .uri(ADD_APP_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -105,11 +107,12 @@ class AppHttpTest {
   void listApp_shouldReturnOk() {
     List<App> apps = repository.findAll();
     // Act & Assert
-    List<App> responseBody = webTestClient.get()
+    List<App> responseBody = testClient.get()
         .uri(LIST_APP_URI)
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(App.class)
+        .expectBody(new ParameterizedTypeReference<@NonNull List<App>>() {
+        })
         .returnResult().getResponseBody();
     assertNotNull(responseBody);
     assertEquals(apps.size(), responseBody.size());
@@ -132,9 +135,9 @@ class AppHttpTest {
     );
 
     // Act & Assert for a valid update
-    webTestClient.put()
+    testClient.put()
         .uri(UPDATE_APP_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -154,9 +157,9 @@ class AppHttpTest {
     );
 
     // Act & Assert for invalid baseUrl
-    webTestClient.put()
+    testClient.put()
         .uri(UPDATE_APP_URI)
-        .bodyValue(invalidUrlReq)
+        .body(invalidUrlReq)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -175,9 +178,9 @@ class AppHttpTest {
     );
 
     // Act & Assert for non-existent app update
-    webTestClient.put()
+    testClient.put()
         .uri(UPDATE_APP_URI)
-        .bodyValue(nonExistentReq)
+        .body(nonExistentReq)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -199,9 +202,9 @@ class AppHttpTest {
     );
 
     // Act & Assert for updating with null optional fields
-    webTestClient.put()
+    testClient.put()
         .uri(UPDATE_APP_URI)
-        .bodyValue(nullOptionalReq)
+        .body(nullOptionalReq)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -222,9 +225,9 @@ class AppHttpTest {
             "http://example.com",
             RandomUtil.randomInt()
         ))
-        .forEach(o -> webTestClient.put()
+        .forEach(o -> testClient.put()
             .uri(UPDATE_APP_URI)
-            .bodyValue(o)
+            .body(o)
             .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
             .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
             .exchange()
@@ -240,7 +243,7 @@ class AppHttpTest {
     String id = dataset.getFirst().getId();
 
     // Act & Assert
-    webTestClient.delete()
+    testClient.delete()
         .uri(uri -> uri.path(DELETE_APP_URI).build(id))
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())

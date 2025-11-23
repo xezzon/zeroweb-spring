@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -51,7 +52,7 @@ class DictHttpTest {
 
   private final List<Dict> dataset = new ArrayList<>();
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
   @Resource
   private DictRepository repository;
 
@@ -107,9 +108,9 @@ class DictHttpTest {
     req.setCode(RandomUtil.randomString(8));
     req.setLabel(RandomUtil.randomString(8));
     req.setOrdinal(RandomUtil.randomInt());
-    Id responseBody = webTestClient.post()
+    Id responseBody = testClient.post()
         .uri(ADD_DICT_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -130,9 +131,9 @@ class DictHttpTest {
     req.setCode(exist.getCode());
     req.setLabel(RandomUtil.randomString(8));
     req.setOrdinal(RandomUtil.randomInt());
-    webTestClient.post()
+    testClient.post()
         .uri(ADD_DICT_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -149,9 +150,9 @@ class DictHttpTest {
     req.setLabel(RandomUtil.randomString(8));
     req.setParentId(parent.getId());
     req.setOrdinal(RandomUtil.randomInt());
-    Id responseBody = webTestClient.post()
+    Id responseBody = testClient.post()
         .uri(ADD_DICT_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -174,9 +175,9 @@ class DictHttpTest {
     req.setLabel(RandomUtil.randomString(8));
     req.setParentId(exist.getParentId());
     req.setOrdinal(RandomUtil.randomInt());
-    webTestClient.post()
+    testClient.post()
         .uri(ADD_DICT_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -196,9 +197,9 @@ class DictHttpTest {
         target.getParentId(),
         RandomUtil.randomBoolean()
     );
-    webTestClient.put()
+    testClient.put()
         .uri(MODIFY_DICT_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -229,9 +230,9 @@ class DictHttpTest {
         target.getParentId(),
         RandomUtil.randomBoolean()
     );
-    webTestClient.put()
+    testClient.put()
         .uri(MODIFY_DICT_URI)
-        .bodyValue(req)
+        .body(req)
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -255,13 +256,13 @@ class DictHttpTest {
     );
     Collections.shuffle(dataset);
 
-    webTestClient.put()
+    testClient.put()
         .uri(builder -> builder
             .path(UPDATE_DICT_STATUS_URI)
             .queryParam("enabled", false)
             .build()
         )
-        .bodyValue(List.of(dataset.get(0).getId(), dataset.get(1).getId()))
+        .body(List.of(dataset.get(0).getId(), dataset.get(1).getId()))
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -271,13 +272,13 @@ class DictHttpTest {
     Dict dict2 = repository.findById(dataset.get(1).getId()).orElseThrow();
     assertEquals(false, dict2.getEnabled());
 
-    webTestClient.put()
+    testClient.put()
         .uri(builder -> builder
             .path(UPDATE_DICT_STATUS_URI)
             .queryParam("enabled", true)
             .build()
         )
-        .bodyValue(List.of(dataset.get(1).getId(), dataset.get(2).getId()))
+        .body(List.of(dataset.get(1).getId(), dataset.get(2).getId()))
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -294,9 +295,9 @@ class DictHttpTest {
 
     Dict dict0 = dataset.get(0);
     Dict dict1 = dataset.get(1);
-    webTestClient.method(HttpMethod.DELETE)
+    testClient.method(HttpMethod.DELETE)
         .uri(DELETE_DICT_URI)
-        .bodyValue(List.of(dict0.getId(), dict1.getId()))
+        .body(List.of(dict0.getId(), dict1.getId()))
         .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
@@ -315,9 +316,9 @@ class DictHttpTest {
     Dict dict20 = dataset.get(2).getChildren().get(0);
     Dict dict22 = dataset.get(2).getChildren().get(2);
     Dict dict31 = dataset.get(3).getChildren().get(1);
-    webTestClient.method(HttpMethod.DELETE)
+    testClient.method(HttpMethod.DELETE)
         .uri(DELETE_DICT_URI)
-        .bodyValue(List.of(
+        .body(List.of(
             dict20.getId(),
             dict22.getId(),
             dict31.getId()
@@ -336,14 +337,15 @@ class DictHttpTest {
 
   @Test
   void getDictTreeByTag() {
-    List<Dict> responseBody = webTestClient.get()
+    List<Dict> responseBody = testClient.get()
         .uri(uriBuilder -> uriBuilder
             .path(GET_DICT_TREE_BY_TAG_URI)
             .build(dataset.getFirst().getCode())
         )
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(Dict.class)
+        .expectBody(new ParameterizedTypeReference<@NonNull List<Dict>>() {
+        })
         .returnResult().getResponseBody();
 
     assertNotNull(responseBody);
@@ -372,7 +374,7 @@ class DictHttpTest {
     final int top = 5;
     final int skip = top * 2;
 
-    PagedModel<Dict> responseBody = webTestClient.get()
+    PagedModel<Dict> responseBody = testClient.get()
         .uri(builder -> builder
             .path(GET_DICT_URI)
             .queryParam("top", top)
@@ -383,7 +385,7 @@ class DictHttpTest {
         .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<PagedModel<Dict>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<Dict>>() {
         })
         .returnResult().getResponseBody();
 

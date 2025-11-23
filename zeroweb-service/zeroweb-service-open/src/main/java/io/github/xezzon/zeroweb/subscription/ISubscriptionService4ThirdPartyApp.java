@@ -2,6 +2,7 @@ package io.github.xezzon.zeroweb.subscription;
 
 import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 
 /// @author xezzon
@@ -12,6 +13,6 @@ public interface ISubscriptionService4ThirdPartyApp {
   /// @param appId 应用程序ID。
   /// @return 包含订阅信息的分页对象。
   /// @throws DataPermissionForbiddenException 只有应用所有者有权限访问
-  Page<Subscription> listSubscription(ODataQueryOption odata, String appId)
+  Page<@NonNull Subscription> listSubscription(ODataQueryOption odata, String appId)
       throws DataPermissionForbiddenException;
 }

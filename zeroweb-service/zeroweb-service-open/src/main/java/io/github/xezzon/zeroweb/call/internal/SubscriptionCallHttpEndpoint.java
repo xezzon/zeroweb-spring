@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
@@ -49,7 +50,7 @@ public class SubscriptionCallHttpEndpoint {
 
   /// 转发 GET 请求
   @GetMapping(value = "/{openapiCode}")
-  public ResponseEntity<byte[]> forwardForSafe(
+  public ResponseEntity<byte @NonNull []> forwardForSafe(
       @PathVariable String openapiCode,
       @RequestBody(required = false) byte[] body,
       @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) String accessKey,
@@ -67,7 +68,7 @@ public class SubscriptionCallHttpEndpoint {
 
   /// 转发非 GET 请求
   @RequestMapping(value = "/{openapiCode}", method = {POST, PUT, DELETE, PATCH})
-  public ResponseEntity<byte[]> forwardForUnsafe(
+  public ResponseEntity<byte @NonNull []> forwardForUnsafe(
       @PathVariable String openapiCode,
       @RequestBody(required = false) byte[] body,
       @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) String accessKey,
@@ -93,7 +94,7 @@ public class SubscriptionCallHttpEndpoint {
   /// @param signature 签名（请求头）
   /// @param parameterMap 原始请求参数
   /// @return 响应体
-  private ResponseEntity<byte[]> forward(
+  private ResponseEntity<byte @NonNull []> forward(
       String openapiCode, byte[] body, String accessKey, Instant timestamp, String signature,
       HttpHeaders originalHeaders, Map<String, String[]> parameterMap
   ) {

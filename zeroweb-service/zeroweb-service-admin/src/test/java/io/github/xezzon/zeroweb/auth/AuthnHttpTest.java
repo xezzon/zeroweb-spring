@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
@@ -40,7 +41,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.containers.GenericContainer;
 
 /// @author xezzon
@@ -55,7 +56,7 @@ class AuthnHttpTest {
   private final String password = RandomUtil.randomString(8);
   private final List<User> users = new ArrayList<>();
   @Resource
-  private WebTestClient webTestClient;
+  private RestTestClient testClient;
   @Resource
   private UserRepository userRepository;
   @Resource
@@ -98,9 +99,9 @@ class AuthnHttpTest {
     User user = users.getFirst();
 
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
-    OidcToken responseBody = webTestClient.post()
+    OidcToken responseBody = testClient.post()
         .uri(uri)
-        .bodyValue(basicAuth)
+        .body(basicAuth)
         .exchange()
         .expectBody(OidcToken.class)
         .returnResult()
@@ -108,9 +109,9 @@ class AuthnHttpTest {
     assertNotNull(responseBody);
     String tokenValue0 = responseBody.getAccessToken();
     // 再次以相同用户登录，返回相同的令牌
-    OidcToken responseBody1 = webTestClient.post()
+    OidcToken responseBody1 = testClient.post()
         .uri(uri)
-        .bodyValue(basicAuth)
+        .body(basicAuth)
         .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
         .exchange()
         .expectBody(OidcToken.class)
@@ -121,9 +122,9 @@ class AuthnHttpTest {
     // 以不同的用户登录，返回不同的令牌
     User user2 = users.get(1);
     BasicAuth basicAuth2 = new BasicAuth(user2.getUsername(), password);
-    OidcToken responseBody2 = webTestClient.post()
+    OidcToken responseBody2 = testClient.post()
         .uri(uri)
-        .bodyValue(basicAuth2)
+        .body(basicAuth2)
         .header(saTokenConfig.getTokenName(), tokenValue0)
         .exchange()
         .expectBody(OidcToken.class)
@@ -140,17 +141,17 @@ class AuthnHttpTest {
     User user = users.getFirst();
     // 用户名不正确
     BasicAuth basicAuth1 = new BasicAuth(RandomUtil.randomString(9), password);
-    webTestClient.post()
+    testClient.post()
         .uri(uri)
-        .bodyValue(basicAuth1)
+        .body(basicAuth1)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidPasswordException.ERROR_CODE);
     // 密码不正确
     BasicAuth basicAuth2 = new BasicAuth(user.getUsername(), RandomUtil.randomString(9));
-    webTestClient.post()
+    testClient.post()
         .uri(uri)
-        .bodyValue(basicAuth2)
+        .body(basicAuth2)
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(ERROR_CODE_HEADER, InvalidPasswordException.ERROR_CODE);
@@ -161,21 +162,21 @@ class AuthnHttpTest {
     final String uri = "/auth/self";
     User user = users.getFirst();
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
-    OidcToken responseBody = webTestClient.post()
+    OidcToken responseBody = testClient.post()
         .uri(BASIC_LOGIN_URI)
-        .bodyValue(basicAuth)
+        .body(basicAuth)
         .exchange()
         .expectBody(OidcToken.class)
         .returnResult()
         .getResponseBody();
     assertNotNull(responseBody);
 
-    Map<String, Object> responseBody1 = webTestClient.get()
+    Map<String, Object> responseBody1 = testClient.get()
         .uri(uri)
         .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
         .exchange()
         .expectStatus().isOk()
-        .expectBody(new ParameterizedTypeReference<Map<String, Object>>() {
+        .expectBody(new ParameterizedTypeReference<@NonNull Map<String, Object>>() {
         })
         .returnResult()
         .getResponseBody();
@@ -189,16 +190,16 @@ class AuthnHttpTest {
     final String uri = "/auth/token";
     User user = users.getFirst();
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
-    OidcToken responseBody = webTestClient.post()
+    OidcToken responseBody = testClient.post()
         .uri(BASIC_LOGIN_URI)
-        .bodyValue(basicAuth)
+        .body(basicAuth)
         .exchange()
         .expectBody(OidcToken.class)
         .returnResult()
         .getResponseBody();
     assertNotNull(responseBody);
 
-    OidcToken responseBody1 = webTestClient.get()
+    OidcToken responseBody1 = testClient.get()
         .uri(uri)
         .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
         .exchange()
@@ -213,6 +214,7 @@ class AuthnHttpTest {
         .parseSignedClaims(responseBody1.getIdToken())
         .getPayload()
     );
+    assertNotNull(payload);
     assertEquals(user.getId(), payload.getSubject());
   }
 
@@ -221,16 +223,16 @@ class AuthnHttpTest {
     final ECPublicKey publicKey = keyManager.getPublicKey();
     User user = users.getFirst();
     BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
-    OidcToken responseBody = webTestClient.post()
+    OidcToken responseBody = testClient.post()
         .uri(BASIC_LOGIN_URI)
-        .bodyValue(basicAuth)
+        .body(basicAuth)
         .exchange()
         .expectBody(OidcToken.class)
         .returnResult()
         .getResponseBody();
     assertNotNull(responseBody);
 
-    webTestClient.get()
+    testClient.get()
         .uri("/auth/self")
         .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
         .exchange()
@@ -245,7 +247,7 @@ class AuthnHttpTest {
           assertEquals(excepted.getSubject(), actual.getSubject());
         });
 
-    webTestClient.get()
+    testClient.get()
         .uri("/auth/token")
         .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
         .exchange()
@@ -263,7 +265,7 @@ class AuthnHttpTest {
 
   @Test
   void forwardAuth_notLogin() {
-    webTestClient.get()
+    testClient.get()
         .uri("/auth/self")
         .exchange()
         .expectStatus().isEqualTo(HttpStatus.NO_CONTENT);

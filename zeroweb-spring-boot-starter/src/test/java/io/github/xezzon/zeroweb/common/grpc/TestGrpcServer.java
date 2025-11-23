@@ -20,8 +20,8 @@ class TestDictGrpcServer extends DictGrpc.DictImplBase {
 
   @Override
   public void getDictListByTag(DictReq request, StreamObserver<DictListResp> responseObserver) {
-    JwtClaim claimWrapper = Assertions.assertDoesNotThrow(() -> JwtAuth.get().orElseThrow());
-    Assertions.assertEquals("test", claimWrapper.getPreferredUsername());
+    JwtClaim claim = Assertions.assertDoesNotThrow(JwtAuth::getOrThrow);
+    Assertions.assertEquals("test", claim.getPreferredUsername());
     responseObserver.onNext(DictListResp.newBuilder()
         .addAllData(Collections.emptyList())
         .build()

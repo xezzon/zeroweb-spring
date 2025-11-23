@@ -1,7 +1,6 @@
 package io.github.xezzon.zeroweb.common.context;
 
-import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.BeansException;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
@@ -26,8 +25,7 @@ public class ApplicationContextProvider implements ApplicationContextAware {
   }
 
   @Override
-  public void setApplicationContext(@NotNull ApplicationContext applicationContext)
-      throws BeansException {
+  public void setApplicationContext(@NonNull final ApplicationContext applicationContext) {
     setContext(applicationContext);
   }
 }

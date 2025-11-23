@@ -1,8 +1,10 @@
 package io.github.xezzon.zeroweb.subscription.exception;
 
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
+import org.jspecify.annotations.NullMarked;
 
 /// @author xezzon
+@NullMarked
 public class UnpublishedOpenapiCannotBeSubscribeException extends ZerowebBusinessException {
 
   public static final String ERROR_CODE = "CFE02";
