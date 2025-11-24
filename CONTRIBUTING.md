@@ -241,7 +241,7 @@ JDBC_TYPE=postgresql
 - 测试类的方法命名为`${被测试的方法名}_${预期的情况}`。测试类与测试方法的访问级别
 - 所有对中间件与外部系统的依赖都通过 [Testcontainers for Java](https://java.testcontainers.org/) 解决。严禁使用任何 Mock 方法或框架进行单元测试。
 - 所有依赖于 Spring Boot 的测试类，都需要用 `@SpringBootTest`（如果是针对 HTTP 端点的测试，则是
-  `@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)`） 和 `@DirtiesContext` 注解。
+  `@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)`）
 - 如果需要，所有方法测试（@BeforeEach）前向相关的数据表中写入随机的测试数据，测试方法结束后（@AfterEach）将数据表中的数据全部删除。
 
 ### CI/CD

@@ -10,13 +10,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.grpc.test.autoconfigure.AutoConfigureInProcessTransport;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 
 /**
  * @author xezzon
  */
 @SpringBootTest
-@DirtiesContext
 @AutoConfigureInProcessTransport
 class GrpcConfigurationTest {
 
