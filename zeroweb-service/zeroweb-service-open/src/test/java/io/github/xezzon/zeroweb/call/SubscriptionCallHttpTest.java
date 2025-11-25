@@ -28,18 +28,17 @@ import java.time.Instant;
 import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext
 class SubscriptionCallHttpTest {
 
   private static final String SUBSCRIPTION_CALL = "/call/{openapiCode}";
@@ -83,6 +82,13 @@ class SubscriptionCallHttpTest {
         .encodeToString(SIG.HS256.key().build().getEncoded())
     );
     accessSecretRepository.save(accessSecret);
+  }
+
+  @AfterEach
+  void tearDown() {
+    subscriptionRepository.deleteAll();
+    thirdPartyAppRepository.deleteAll();
+    openapiRepository.deleteAll();
   }
 
   @Test

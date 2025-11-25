@@ -28,12 +28,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext
 class ThirdPartyAppHttpTest {
 
   private static final String THIRD_PARTY_APP_ADD_URI = "/third-party-app";
@@ -73,6 +71,7 @@ class ThirdPartyAppHttpTest {
   @AfterEach
   void tearDown() {
     repository.deleteAll();
+    thirdPartyAppMemberRepository.deleteAll();
   }
 
   @Test

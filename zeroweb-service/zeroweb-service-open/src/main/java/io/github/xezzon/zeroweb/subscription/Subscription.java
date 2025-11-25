@@ -25,24 +25,32 @@ import lombok.ToString;
 @Setter
 @ToString
 @Entity
-@Table(name = "zeroweb_openapi_subscription")
+@Table(name = Subscription.TABLE_NAME)
 public class Subscription implements IEntity<String> {
 
+  public static final String TABLE_NAME = "zeroweb_openapi_subscription";
   public static final String OPENAPI_CODE_COLUMN = "openapi_code";
+  public static final String APP_ID_COLUMN = "app_id";
+  public static final String STATUS_COLUMN = "status";
 
   /// 订阅标识
   @Id
-  @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   @IdGenerator
+  @Column(
+      name = DatabaseConstant.ID_COLUMN,
+      nullable = false,
+      updatable = false,
+      length = DatabaseConstant.ID_LENGTH
+  )
   String id;
   /// 第三方应用标识
-  @Column(name = "app_id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
+  @Column(name = APP_ID_COLUMN, nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   String appId;
   /// 对外接口编码
   @Column(name = OPENAPI_CODE_COLUMN, nullable = false, updatable = false)
   String openapiCode;
   /// 订阅状态
-  @Column(name = "status", nullable = false)
+  @Column(name = STATUS_COLUMN, nullable = false)
   @Enumerated(EnumType.STRING)
   SubscriptionStatus status;
   /// 对外接口详情

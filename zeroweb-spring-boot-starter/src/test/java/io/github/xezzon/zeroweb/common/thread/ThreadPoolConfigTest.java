@@ -9,10 +9,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 
 @SpringBootTest
-@DirtiesContext
 class ThreadPoolConfigTest {
 
   @Resource

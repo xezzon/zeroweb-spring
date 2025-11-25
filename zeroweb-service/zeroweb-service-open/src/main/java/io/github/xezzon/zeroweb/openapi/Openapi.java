@@ -23,16 +23,24 @@ import lombok.ToString;
 @Setter
 @ToString
 @Entity
-@Table(name = "zeroweb_openapi")
+@Table(name = Openapi.TABLE_NAME)
 public class Openapi implements IEntity<String> {
 
-  public static final String ID_COLUMN = "id";
+  public static final String TABLE_NAME = "zeroweb_openapi";
   public static final String CODE_COLUMN = "code";
+  public static final String DESTINATION_COLUMN = "destination";
+  public static final String HTTP_METHOD_COLUMN = "http_method";
+  public static final String STATUS_COLUMN = "status";
 
   /// 对外接口标识
   @Id
-  @Column(name = ID_COLUMN, nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   @IdGenerator
+  @Column(
+      name = DatabaseConstant.ID_COLUMN,
+      nullable = false,
+      updatable = false,
+      length = DatabaseConstant.ID_LENGTH
+  )
   String id;
   /// 接口编码
   ///
@@ -42,15 +50,15 @@ public class Openapi implements IEntity<String> {
   /// 后端地址
   ///
   /// 即该接口应该转发到的后端地址
-  @Column(name = "destination", nullable = false, length = 2083)
+  @Column(name = DESTINATION_COLUMN, nullable = false, length = 2083)
   @JsonInclude(Include.NON_NULL)
   String destination;
   /// 请求接口的HTTP方法
-  @Column(name = "http_method", nullable = false, length = 16)
+  @Column(name = HTTP_METHOD_COLUMN, nullable = false, length = 16)
   @Enumerated(EnumType.STRING)
   HttpMethod httpMethod;
   /// 接口状态
-  @Column(name = "status", nullable = false)
+  @Column(name = STATUS_COLUMN, nullable = false)
   @Enumerated(EnumType.STRING)
   OpenapiStatus status;
 

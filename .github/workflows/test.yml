@@ -41,13 +41,26 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Test and analyze
+      - name: Unit test and installation for SDK
+        run: >
+          mvn -B clean install
+          -pl zeroweb-spring-boot-starter,zeroweb-open-sdk -am
+          -T 1C
+      - name: Unit test for services
+        working-directory: zeroweb-service
+        run: >
+          mvn -B test
+          -D db.type=${{ matrix.db_type }}
+          -T 1C
+      - name: Integration test
+        run: >
+          mvn -B verify
+          -D skipTests=true -D skipITs=false
+          -T 1C
+      - name: Analyze code
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: >
-          mvn -B 
-          verify 
-          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar 
+          mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar 
           -D sonar.projectKey=xezzon_zeroweb-spring 
-          -D db.type=${{ matrix.db_type }} 
