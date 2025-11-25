@@ -15,6 +15,8 @@ public class DatabaseConstant {
    * 用于表示不存在的根节点
    */
   public static final String ROOT_ID = "0";
+  /// ID 列名
+  public static final String ID_COLUMN = "id";
 
   private DatabaseConstant() {
   }
