@@ -38,6 +38,10 @@ public class SettingService {
         );
   }
 
+  void updateSetting(final Setting setting) {
+    settingDAO.partialUpdate(setting);
+  }
+
   private void checkRepeat(final Setting setting) {
     Optional<Setting> exist = settingDAO.get().findByKey(setting.getKey());
     if (exist.isPresent() && !Objects.equals(exist.get().getId(), setting.getId())) {

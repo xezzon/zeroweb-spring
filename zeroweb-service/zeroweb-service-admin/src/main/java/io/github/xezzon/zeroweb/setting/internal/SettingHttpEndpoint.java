@@ -62,8 +62,11 @@ public class SettingHttpEndpoint {
    * 更新业务参数
    * @param request 业务参数
    */
+  @SaCheckPermission({PermissionConstant.SETTING_WRITE})
   @PutMapping("/schema")
-  void updateSettingSchema(final UpdateSchemaRequest request) {
+  void updateSettingSchema(@RequestBody final UpdateSchemaRequest request) {
+    Setting setting = request.into();
+    settingService.updateSetting(setting);
   }
 
   /**

@@ -43,6 +43,6 @@ public class Setting implements IEntity<String> {
   @Column(name = "value", columnDefinition = "json", nullable = false)
   private Map<String, Object> value;
   /// 更新时间
-  @Column(name = "update_time", updatable = false)
+  @Column(name = "update_time", nullable = false)
   private Instant updateTime;
 }
