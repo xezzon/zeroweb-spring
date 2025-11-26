@@ -49,6 +49,7 @@ class SettingHttpTest {
   private static final String GET_SETTING_PAGE_URI = "/setting";
   private static final String GET_SETTING_BY_KEY_URI = "/setting/{key}";
   private static final String UPDATE_SETTING_SCHEMA_URI = "/setting/schema";
+  private static final String UPDATE_SETTING_VALUE_URI = "/setting/value";
   private static String testSchema;
 
   @Resource
@@ -221,6 +222,29 @@ class SettingHttpTest {
     Setting actual = repository.findById(setting.getId()).orElseThrow();
     Assertions.assertEquals(setting.getKey(), actual.getKey());
     Assertions.assertEquals("{}", actual.getSchema());
+    Assertions.assertTrue(actual.getValue().isEmpty());
+  }
+
+  @Test
+  void updateValue() {
+    Setting setting = repository.findAll().getFirst();
+    Setting request = new Setting();
+    request.setId(setting.getId());
+    request.setKey(RandomUtil.randomString(9));
+    request.setSchema("{}");
+    request.setValue(Collections.emptyMap());
+
+    testClient.put()
+        .uri(UPDATE_SETTING_VALUE_URI)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .body(request)
+        .exchange()
+        .expectStatus().isOk();
+
+    Setting actual = repository.findById(setting.getId()).orElseThrow();
+    Assertions.assertEquals(setting.getKey(), actual.getKey());
+    Assertions.assertEquals(setting.getSchema(), actual.getSchema());
     Assertions.assertTrue(actual.getValue().isEmpty());
   }
 }
