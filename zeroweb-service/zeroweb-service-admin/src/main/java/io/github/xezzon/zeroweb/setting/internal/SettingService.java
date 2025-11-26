@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.setting.internal;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.setting.Setting;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
@@ -28,6 +29,13 @@ public class SettingService {
 
   Page<@NonNull Setting> querySettingPage(final ODataQueryOption odata) {
     return settingDAO.findAll(odata);
+  }
+
+  Setting queryByKey(final @NonNull String key) {
+    return settingDAO.get().findByKey(key)
+        .orElseThrow(() ->
+            new NoSuchElementException("Setting `" + key + "` does not exist.")
+        );
   }
 
   private void checkRepeat(final Setting setting) {

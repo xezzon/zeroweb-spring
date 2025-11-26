@@ -53,6 +53,11 @@ public class SettingHttpEndpoint {
     return settingService.querySettingPage(odata.into());
   }
 
+  @GetMapping("/{key}")
+  Setting queryByKey(@PathVariable @NonNull final String key) {
+    return settingService.queryByKey(key);
+  }
+
   /**
    * 更新业务参数
    * @param request 业务参数

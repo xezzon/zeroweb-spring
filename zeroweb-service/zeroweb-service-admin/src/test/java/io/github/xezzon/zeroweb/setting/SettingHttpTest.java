@@ -2,19 +2,26 @@ package io.github.xezzon.zeroweb.setting;
 
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
+import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.CLIENT_ERROR_STATUS;
 import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
+import io.github.xezzon.zeroweb.core.util.ResourceUtil;
+import io.github.xezzon.zeroweb.setting.TestEntity.Child;
 import io.github.xezzon.zeroweb.setting.entity.AddSettingRequest;
 import io.github.xezzon.zeroweb.setting.repository.SettingRepository;
 import jakarta.annotation.Resource;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,12 +30,14 @@ import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.web.servlet.client.RestTestClient;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author xezzon
@@ -38,19 +47,33 @@ class SettingHttpTest {
 
   private static final String ADD_SETTING_URI = "/setting";
   private static final String GET_SETTING_PAGE_URI = "/setting";
+  private static final String GET_SETTING_BY_KEY_URI = "/setting/{key}";
+  private static String testSchema;
 
   @Resource
   private RestTestClient testClient;
   @Resource
   private SettingRepository repository;
+  @Resource
+  private ObjectMapper objectMapper;
+
+  @BeforeAll
+  static void beforeAll() throws IOException {
+    Path path = ResourceUtil.getResourceFromClasspath("setting-schema.json");
+    testSchema = Files.readString(path);
+  }
 
   @BeforeEach
   void setUp() {
     for (int i = 0, cnt = Byte.MAX_VALUE; i < cnt; i++) {
       Setting setting = new Setting();
       setting.setKey(RandomUtil.randomString(8));
-      setting.setSchema("{}");
-      setting.setValue(Collections.emptyMap());
+      setting.setSchema(testSchema);
+      TestEntity value = new TestEntity(
+          RandomUtil.randomString(8),
+          Collections.singletonList(new Child(RandomUtil.randomBigDecimal()))
+      );
+      setting.setValue(BeanUtil.beanToMap(value));
       setting.setUpdateTime(Instant.now());
       repository.save(setting);
     }
@@ -134,5 +157,46 @@ class SettingHttpTest {
     for (int i = 0, cnt = responseBody.getContent().size(); i < cnt; i++) {
       assertEquals(except.get(i).getId(), responseBody.getContent().get(i).getId());
     }
+  }
+
+  @Test
+  void queryByKey() {
+    Setting expect = repository.findAll().getFirst();
+    TestEntity expectValue = new TestEntity();
+    BeanUtil.fillBeanWithMap(expect.getValue(), expectValue, true);
+
+    Setting actual = testClient.get()
+        .uri(builder -> builder
+            .path(GET_SETTING_BY_KEY_URI)
+            .build(expect.getKey())
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(Setting.class)
+        .returnResult().getResponseBody();
+    Assertions.assertNotNull(actual);
+
+    Assertions.assertEquals(expect.getId(), actual.getId());
+    Assertions.assertEquals(expect.getUpdateTime(), actual.getUpdateTime());
+    Assertions.assertEquals(expect.getSchema(), actual.getSchema());
+    TestEntity actualValue = objectMapper.convertValue(actual.getValue(), TestEntity.class);
+    Assertions.assertEquals(expectValue.getValue(), actualValue.getValue());
+    Assertions.assertEquals(expectValue.getChildren().size(), actualValue.getChildren().size());
+    Assertions.assertEquals(
+        expectValue.getChildren().getFirst().getChild(),
+        actualValue.getChildren().getFirst().getChild()
+    );
+  }
+
+  @Test
+  void queryByKey_notExist() {
+    testClient.get()
+        .uri(builder -> builder
+            .path(GET_SETTING_BY_KEY_URI)
+            .build(RandomUtil.randomString(9))
+        )
+        .exchange()
+        .expectStatus().isEqualTo(CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);
   }
 }
