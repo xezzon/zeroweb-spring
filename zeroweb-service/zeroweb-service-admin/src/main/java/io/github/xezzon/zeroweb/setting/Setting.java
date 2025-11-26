@@ -1,6 +1,7 @@
 package io.github.xezzon.zeroweb.setting;
 
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
+import io.github.xezzon.zeroweb.common.jpa.IEntity;
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +25,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "zeroweb_setting")
 @EntityListeners({AuditingEntityListener.class})
-public class Setting {
+public class Setting implements IEntity<String> {
 
   @Id
   @IdGenerator

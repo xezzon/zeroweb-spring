@@ -15,6 +15,7 @@ public final class PermissionConstant {
   public static final String DICT_WRITE = "dict:write";
   public static final String ROLE_READ = "role:read";
   public static final String ROLE_WRITE = "role:write";
+  public static final String SETTING_READ = "setting:read";
   public static final String SETTING_WRITE = "setting:write";
 
   private static final List<MenuInfo> PERMISSIONS;

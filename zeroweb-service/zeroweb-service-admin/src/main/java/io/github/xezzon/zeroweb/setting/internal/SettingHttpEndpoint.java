@@ -47,9 +47,10 @@ public class SettingHttpEndpoint {
   /// 查询业务参数列表（分页）
   /// @param odata 查询参数
   /// @return 业务参数列表
+  @SaCheckPermission({PermissionConstant.SETTING_READ})
   @GetMapping()
   Page<@NonNull Setting> querySettingPage(final ODataRequestParam odata) {
-    return null;
+    return settingService.querySettingPage(odata.into());
   }
 
   /**

@@ -1,10 +1,12 @@
 package io.github.xezzon.zeroweb.setting.internal;
 
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
+import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.setting.Setting;
-import io.github.xezzon.zeroweb.setting.repository.SettingRepository;
 import java.util.Objects;
 import java.util.Optional;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,19 +15,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class SettingService {
 
-  private final SettingRepository settingRepository;
+  private final SettingDAO settingDAO;
 
-  public SettingService(final SettingRepository settingRepository) {
-    this.settingRepository = settingRepository;
+  public SettingService(final SettingDAO settingDAO) {
+    this.settingDAO = settingDAO;
   }
 
   void addSetting(final Setting setting) {
     this.checkRepeat(setting);
-    settingRepository.save(setting);
+    settingDAO.get().save(setting);
+  }
+
+  Page<@NonNull Setting> querySettingPage(final ODataQueryOption odata) {
+    return settingDAO.findAll(odata);
   }
 
   private void checkRepeat(final Setting setting) {
-    Optional<Setting> exist = settingRepository.findByKey(setting.getKey());
+    Optional<Setting> exist = settingDAO.get().findByKey(setting.getKey());
     if (exist.isPresent() && !Objects.equals(exist.get().getId(), setting.getId())) {
       throw new RepeatDataException(setting.getKey());
     }
