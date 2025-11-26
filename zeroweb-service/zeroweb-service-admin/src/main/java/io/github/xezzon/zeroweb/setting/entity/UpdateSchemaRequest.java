@@ -1,0 +1,37 @@
+package io.github.xezzon.zeroweb.setting.entity;
+
+import io.github.xezzon.zeroweb.core.trait.From;
+import io.github.xezzon.zeroweb.core.trait.Into;
+import io.github.xezzon.zeroweb.setting.Setting;
+import java.util.Map;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
+
+/// 更新业务参数请求
+/// @param id 需要更新的业务参数的ID
+/// @param schema 约束
+/// @param value 业务参数的值
+/// @author xezzon
+public record UpdateSchemaRequest(
+    String id,
+    String schema,
+    Map<String, Object> value
+) implements Into<Setting> {
+
+  @Override
+  public Setting into() {
+    return Converter.INSTANCE.from(this);
+  }
+
+  @Mapper
+  interface Converter extends From<UpdateSchemaRequest, Setting> {
+
+    Converter INSTANCE = Mappers.getMapper(Converter.class);
+
+    @Mapping(target = "updateTime", expression = "java(java.time.Instant.now())")
+    @Mapping(target = "code", ignore = true)
+    @Override
+    Setting from(UpdateSchemaRequest source);
+  }
+}

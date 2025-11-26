@@ -4,6 +4,7 @@ import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentBlockingStub
 import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentStub;
 import io.github.xezzon.zeroweb.dict.DictGrpc.DictBlockingStub;
 import io.github.xezzon.zeroweb.dict.DictGrpc.DictStub;
+import io.github.xezzon.zeroweb.setting.SettingGrpc.SettingBlockingStub;
 import io.github.xezzon.zeroweb.user.UserGrpc.UserBlockingStub;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +23,8 @@ import org.springframework.stereotype.Component;
     types = {
         DictBlockingStub.class,
         DictStub.class,
-        UserBlockingStub.class
+        UserBlockingStub.class,
+        SettingBlockingStub.class
     }
 )
 @ImportGrpcClients(
