@@ -84,7 +84,9 @@ public class SettingHttpEndpoint {
    * 删除业务参数
    * @param id 业务参数ID
    */
+  @SaCheckPermission({PermissionConstant.SETTING_WRITE})
   @DeleteMapping("/{id}")
   void deleteSetting(@PathVariable final String id) {
+    settingService.deleteSetting(id);
   }
 }

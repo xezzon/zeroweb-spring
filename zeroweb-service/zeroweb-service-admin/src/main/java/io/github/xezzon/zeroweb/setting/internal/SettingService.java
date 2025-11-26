@@ -42,6 +42,13 @@ public class SettingService {
     settingDAO.partialUpdate(setting);
   }
 
+  void deleteSetting(final String id) {
+    settingDAO.get().findById(id)
+        .ifPresent(_ ->
+            settingDAO.get().deleteById(id)
+        );
+  }
+
   private void checkRepeat(final Setting setting) {
     Optional<Setting> exist = settingDAO.get().findByKey(setting.getKey());
     if (exist.isPresent() && !Objects.equals(exist.get().getId(), setting.getId())) {

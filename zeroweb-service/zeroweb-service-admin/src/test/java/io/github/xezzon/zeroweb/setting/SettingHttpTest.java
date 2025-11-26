@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -50,6 +51,7 @@ class SettingHttpTest {
   private static final String GET_SETTING_BY_KEY_URI = "/setting/{key}";
   private static final String UPDATE_SETTING_SCHEMA_URI = "/setting/schema";
   private static final String UPDATE_SETTING_VALUE_URI = "/setting/value";
+  private static final String DELETE_SETTING_URI = "/setting/{id}";
   private static String testSchema;
 
   @Resource
@@ -246,5 +248,29 @@ class SettingHttpTest {
     Assertions.assertEquals(setting.getKey(), actual.getKey());
     Assertions.assertEquals(setting.getSchema(), actual.getSchema());
     Assertions.assertTrue(actual.getValue().isEmpty());
+  }
+
+  @Test
+  void deleteSetting() {
+    Setting target = repository.findAll().getFirst();
+
+    testClient.delete()
+        .uri(DELETE_SETTING_URI, target.getId())
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .exchange()
+        .expectStatus().isOk();
+
+    Assertions.assertFalse(repository.existsById(target.getId()));
+  }
+
+  @Test
+  void deleteSetting_notExist() {
+    testClient.delete()
+        .uri(DELETE_SETTING_URI, UUID.randomUUID().toString())
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .exchange()
+        .expectStatus().isOk();
   }
 }
