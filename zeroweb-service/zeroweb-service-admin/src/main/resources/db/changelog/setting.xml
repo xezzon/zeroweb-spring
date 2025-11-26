@@ -10,18 +10,21 @@
       <column name="id" type="VARCHAR(64)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="key" type="VARCHAR(255)" remarks="业务参数标识">
+      <column name="code" type="VARCHAR(255)" remarks="业务参数标识">
         <constraints nullable="false" unique="true"/>
       </column>
       <column name="schema" type="JSON" remarks="约束">
         <constraints nullable="false"/>
       </column>
-      <column name="value" type="JSON" remarks="参数值" defaultValue="{}">
+      <column name="value" type="JSON" remarks="参数值">
         <constraints nullable="false"/>
       </column>
       <column name="update_time" type="TIMESTAMP(3)" remarks="更新时间">
         <constraints nullable="false"/>
       </column>
     </createTable>
+    <createIndex tableName="zeroweb_setting" indexName="idx_setting_ut">
+      <column name="update_time"/>
+    </createIndex>
   </changeSet>
 </databaseChangeLog>

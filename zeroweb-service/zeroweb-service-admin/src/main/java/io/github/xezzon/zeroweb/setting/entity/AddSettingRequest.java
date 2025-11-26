@@ -9,12 +9,12 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 /// 新增业务参数
-/// @param key 业务参数标识
+/// @param code 业务参数标识
 /// @param schema 约束
 /// @param value 业务参数的值
 /// @author xezzon
 public record AddSettingRequest(
-    String key,
+    String code,
     String schema,
     Map<String, Object> value
 ) implements Into<Setting> {
@@ -23,8 +23,6 @@ public record AddSettingRequest(
   public Setting into() {
     return Converter.INSTANCE.from(this);
   }
-
-  public
 
   @Mapper
   interface Converter extends From<AddSettingRequest, Setting> {

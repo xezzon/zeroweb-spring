@@ -71,7 +71,7 @@ class SettingHttpTest {
   void setUp() {
     for (int i = 0, cnt = Byte.MAX_VALUE; i < cnt; i++) {
       Setting setting = new Setting();
-      setting.setKey(RandomUtil.randomString(8));
+      setting.setCode(RandomUtil.randomString(8));
       setting.setSchema(testSchema);
       TestEntity value = new TestEntity(
           RandomUtil.randomString(8),
@@ -108,14 +108,14 @@ class SettingHttpTest {
     Assertions.assertNotNull(responseBody);
     Optional<Setting> actual = repository.findById(responseBody.id());
     Assertions.assertTrue(actual.isPresent());
-    Assertions.assertEquals(request.key(), actual.get().getKey());
+    Assertions.assertEquals(request.code(), actual.get().getCode());
   }
 
   @Test
   void addSetting_repeat() {
     Setting exist = repository.findAll().getFirst();
     AddSettingRequest request = new AddSettingRequest(
-        exist.getKey(),
+        exist.getCode(),
         "{}",
         Collections.emptyMap()
     );
@@ -153,7 +153,7 @@ class SettingHttpTest {
 
     assertNotNull(responseBody);
     assertEquals(dataset.size(), responseBody.getPage().getTotalElements());
-    List<Setting> except = dataset.parallelStream()
+    List<Setting> except = dataset.stream()
         .sorted(Comparator.comparing(Setting::getUpdateTime).reversed())
         .skip(skip)
         .limit(top)
@@ -172,7 +172,7 @@ class SettingHttpTest {
     Setting actual = testClient.get()
         .uri(builder -> builder
             .path(GET_SETTING_BY_KEY_URI)
-            .build(expect.getKey())
+            .build(expect.getCode())
         )
         .exchange()
         .expectStatus().isOk()
@@ -209,7 +209,7 @@ class SettingHttpTest {
     Setting setting = repository.findAll().getFirst();
     Setting request = new Setting();
     request.setId(setting.getId());
-    request.setKey(RandomUtil.randomString(9));
+    request.setCode(RandomUtil.randomString(9));
     request.setSchema("{}");
     request.setValue(Collections.emptyMap());
 
@@ -222,7 +222,7 @@ class SettingHttpTest {
         .expectStatus().isOk();
 
     Setting actual = repository.findById(setting.getId()).orElseThrow();
-    Assertions.assertEquals(setting.getKey(), actual.getKey());
+    Assertions.assertEquals(setting.getCode(), actual.getCode());
     Assertions.assertEquals("{}", actual.getSchema());
     Assertions.assertTrue(actual.getValue().isEmpty());
   }
@@ -232,7 +232,7 @@ class SettingHttpTest {
     Setting setting = repository.findAll().getFirst();
     Setting request = new Setting();
     request.setId(setting.getId());
-    request.setKey(RandomUtil.randomString(9));
+    request.setCode(RandomUtil.randomString(9));
     request.setSchema("{}");
     request.setValue(Collections.emptyMap());
 
@@ -245,7 +245,7 @@ class SettingHttpTest {
         .expectStatus().isOk();
 
     Setting actual = repository.findById(setting.getId()).orElseThrow();
-    Assertions.assertEquals(setting.getKey(), actual.getKey());
+    Assertions.assertEquals(setting.getCode(), actual.getCode());
     Assertions.assertEquals(setting.getSchema(), actual.getSchema());
     Assertions.assertTrue(actual.getValue().isEmpty());
   }

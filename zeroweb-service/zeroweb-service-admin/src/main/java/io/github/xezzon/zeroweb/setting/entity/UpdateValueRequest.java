@@ -29,7 +29,7 @@ public record UpdateValueRequest(
 
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "schema", ignore = true)
-    @Mapping(target = "key", ignore = true)
+    @Mapping(target = "code", ignore = true)
     @Override
     Setting from(UpdateValueRequest source);
   }

@@ -49,7 +49,7 @@ class SettingGrpcTest {
 
   @BeforeEach
   void setUp() {
-    expect.setKey(RandomUtil.randomString(8));
+    expect.setCode(RandomUtil.randomString(8));
     expect.setSchema(testSchema);
     expectValue.setValue(RandomUtil.randomString(8));
     expectValue.setChildren(Collections.singletonList(
@@ -68,7 +68,7 @@ class SettingGrpcTest {
   @Test
   void queryByKey() throws InvalidProtocolBufferException {
     SettingItem actual = settingBlockingStub.getSetting(GetSettingRequest.newBuilder()
-        .setKey(expect.getKey())
+        .setCode(expect.getCode())
         .build()
     );
     String actualValueJson = JsonFormat.printer().print(actual.getValue());
@@ -84,7 +84,7 @@ class SettingGrpcTest {
   @Test
   void queryByKey_notExist() {
     GetSettingRequest request = GetSettingRequest.newBuilder()
-        .setKey(RandomUtil.randomString(9))
+        .setCode(RandomUtil.randomString(9))
         .build();
     Assertions.assertThrows(StatusRuntimeException.class, () ->
         settingBlockingStub.getSetting(request)

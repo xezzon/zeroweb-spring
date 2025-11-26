@@ -32,11 +32,11 @@ public class Setting implements IEntity<String> {
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   private String id;
   /// 业务参数标识
-  @Column(name = "key", nullable = false, updatable = false)
-  private String key;
+  @Column(name = "code", nullable = false, updatable = false)
+  private String code;
   /// 约束
   @JdbcTypeCode(SqlTypes.JSON)
-  @Column(name = "schema", columnDefinition = "json", nullable = false)
+  @Column(name = "`schema`", columnDefinition = "json", nullable = false)
   private String schema;
   /// 参数值
   @JdbcTypeCode(SqlTypes.JSON)

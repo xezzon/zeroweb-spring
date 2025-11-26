@@ -4,13 +4,13 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Struct;
 import com.google.protobuf.Struct.Builder;
 import com.google.protobuf.util.JsonFormat;
+import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import io.github.xezzon.zeroweb.setting.GetSettingRequest;
 import io.github.xezzon.zeroweb.setting.Setting;
 import io.github.xezzon.zeroweb.setting.SettingGrpc.SettingImplBase;
 import io.github.xezzon.zeroweb.setting.SettingItem;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
-import java.util.NoSuchElementException;
 import org.springframework.grpc.server.service.GrpcService;
 import tools.jackson.databind.ObjectMapper;
 
@@ -33,17 +33,17 @@ public class SettingGrpcEndpoint extends SettingImplBase {
       final StreamObserver<SettingItem> responseObserver
   ) {
     try {
-      Setting setting = settingService.queryByKey(request.getKey());
+      Setting setting = settingService.queryByCode(request.getCode());
       String valueJson = objectMapper.writeValueAsString(setting.getValue());
       Builder valueBuilder = Struct.newBuilder();
       JsonFormat.parser().merge(valueJson, valueBuilder);
       responseObserver.onNext(SettingItem.newBuilder()
-          .setKey(setting.getKey())
+          .setCode(setting.getCode())
           .setValue(valueBuilder.build())
           .build()
       );
-    } catch (InvalidProtocolBufferException | NoSuchElementException e) {
-      responseObserver.onError(e);
+    } catch (InvalidProtocolBufferException e) {
+      throw new ZerowebRuntimeException(e);
     } finally {
       responseObserver.onCompleted();
     }

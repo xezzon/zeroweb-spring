@@ -30,7 +30,7 @@ public record UpdateSchemaRequest(
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
     @Mapping(target = "updateTime", expression = "java(java.time.Instant.now())")
-    @Mapping(target = "key", ignore = true)
+    @Mapping(target = "code", ignore = true)
     @Override
     Setting from(UpdateSchemaRequest source);
   }

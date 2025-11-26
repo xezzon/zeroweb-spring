@@ -31,10 +31,10 @@ public class SettingService {
     return settingDAO.findAll(odata);
   }
 
-  Setting queryByKey(final @NonNull String key) {
-    return settingDAO.get().findByKey(key)
+  Setting queryByCode(@NonNull final String code) {
+    return settingDAO.get().findByCode(code)
         .orElseThrow(() ->
-            new NoSuchElementException("Setting `" + key + "` does not exist.")
+            new NoSuchElementException("Setting `" + code + "` does not exist.")
         );
   }
 
@@ -43,16 +43,13 @@ public class SettingService {
   }
 
   void deleteSetting(final String id) {
-    settingDAO.get().findById(id)
-        .ifPresent(_ ->
-            settingDAO.get().deleteById(id)
-        );
+    settingDAO.get().deleteById(id);
   }
 
   private void checkRepeat(final Setting setting) {
-    Optional<Setting> exist = settingDAO.get().findByKey(setting.getKey());
+    Optional<Setting> exist = settingDAO.get().findByCode(setting.getCode());
     if (exist.isPresent() && !Objects.equals(exist.get().getId(), setting.getId())) {
-      throw new RepeatDataException(setting.getKey());
+      throw new RepeatDataException(setting.getCode());
     }
   }
 }

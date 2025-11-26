@@ -53,9 +53,9 @@ public class SettingHttpEndpoint {
     return settingService.querySettingPage(odata.into());
   }
 
-  @GetMapping("/{key}")
-  Setting queryByKey(@PathVariable @NonNull final String key) {
-    return settingService.queryByKey(key);
+  @GetMapping("/{code}")
+  Setting queryByCode(@PathVariable @NonNull final String code) {
+    return settingService.queryByCode(code);
   }
 
   /**

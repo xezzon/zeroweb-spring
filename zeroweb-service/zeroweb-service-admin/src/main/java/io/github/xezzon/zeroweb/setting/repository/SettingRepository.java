@@ -16,5 +16,5 @@ public interface SettingRepository extends
     JpaRepository<Setting, String>,
     JpaSpecificationExecutor<Setting> {
 
-  Optional<Setting> findByKey(String key);
+  Optional<Setting> findByCode(String code);
 }
