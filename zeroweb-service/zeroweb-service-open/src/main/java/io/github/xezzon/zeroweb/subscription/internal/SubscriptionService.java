@@ -55,6 +55,7 @@ public class SubscriptionService implements
     );
     if (!exist.isEmpty()) {
       // 如果接口已订阅则跳过
+      subscription.setId(exist.getFirst().getId());
       return;
     }
     subscriptionRepository.save(subscription);
