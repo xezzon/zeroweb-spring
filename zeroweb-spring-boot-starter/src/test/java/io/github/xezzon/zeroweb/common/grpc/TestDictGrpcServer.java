@@ -3,7 +3,7 @@ package io.github.xezzon.zeroweb.common.grpc;
 import com.google.protobuf.Empty;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
-import io.github.xezzon.zeroweb.dict.DictGrpc;
+import io.github.xezzon.zeroweb.dict.DictGrpc.DictImplBase;
 import io.github.xezzon.zeroweb.dict.DictImportReqList;
 import io.github.xezzon.zeroweb.dict.DictListResp;
 import io.github.xezzon.zeroweb.dict.DictReq;
@@ -16,7 +16,7 @@ import org.springframework.grpc.server.service.GrpcService;
  * @author xezzon
  */
 @GrpcService
-class TestDictGrpcServer extends DictGrpc.DictImplBase {
+public class TestDictGrpcServer extends DictImplBase {
 
   @Override
   public void getDictListByTag(DictReq request, StreamObserver<DictListResp> responseObserver) {
@@ -36,4 +36,3 @@ class TestDictGrpcServer extends DictGrpc.DictImplBase {
     responseObserver.onCompleted();
   }
 }
-
