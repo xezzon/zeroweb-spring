@@ -1,5 +1,7 @@
 package io.github.xezzon.zeroweb.common.domain;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * 将ID封装成对象
  * @author xezzon
@@ -11,7 +13,7 @@ public record Id(String id) {
    * @param id ID
    * @return ID对象
    */
-  public static Id of(String id) {
+  public static Id of(@NonNull String id) {
     return new Id(id);
   }
 }
