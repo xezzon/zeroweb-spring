@@ -43,7 +43,7 @@ jobs:
       - name: Set SDK Version
         run: mvn -B versions:set -D newVersion=${{ needs.set-version.outputs.project_version }}
       - name: Publish Java package
-        run: mvn -B deploy -P release -D skipTests=true
+        run: mvn -B deploy -P release -D skipTests=true -T 1C
         env:
           MAVEN_USERNAME: ${{ vars.MAVEN_USERNAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
@@ -69,7 +69,12 @@ jobs:
           server-username: DOCKER_USERNAME
           server-password: DOCKER_TOKEN
       - name: Publish Docker image
-        run: mvn -B deploy -P docker -D skipTests=true -D image.version=${{ needs.set-version.outputs.image_version }}
+        run: >
+          mvn -B deploy 
+          -P docker 
+          -D skipTests=true 
+          -D image.version=${{ needs.set-version.outputs.image_version }}
+          -T 1C
         env:
           DOCKER_REGISTRY: ${{ env.DOCKER_HOST }}/${{ github.repository_owner }}
           DOCKER_USERNAME: ${{ github.repository_owner }}
@@ -95,7 +100,7 @@ jobs:
       - name: Set Version
         run: mvn -B versions:set -D newVersion=${{ needs.set-version.outputs.project_version }}
       - name: Generate the report
-        run: mvn -B site site:stage -P report
+        run: mvn -B site site:stage -P report -T 1C
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
