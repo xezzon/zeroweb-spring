@@ -126,4 +126,9 @@ fabric.properties
 application-local.*
 .env
 
+# AI Editor
 .roomodes
+.kilocode/
+.roo/
+.specify/
+specs/
