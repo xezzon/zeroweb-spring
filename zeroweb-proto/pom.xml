@@ -48,7 +48,7 @@
         <artifactId>protobuf-maven-plugin</artifactId>
         <configuration>
           <sourceDirectories>
-            <sourceDirectory>proto</sourceDirectory>
+            <sourceDirectory>src/main/protobuf</sourceDirectory>
           </sourceDirectories>
           <cleanOutputDirectories>true</cleanOutputDirectories>
         </configuration>
