@@ -172,12 +172,20 @@
         <configuration>
           <licenseName>lgpl_v3</licenseName>
           <organizationName>ZeroWeb</organizationName>
+          <copyrightOwners>xezzon</copyrightOwners>
           <inceptionYear>2024</inceptionYear>
+          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+          <ignoreLastDate>true</ignoreLastDate>
+          <emptyLineAfterHeader>true</emptyLineAfterHeader>
           <extraExtensions>
             <proto>java</proto>
           </extraExtensions>
         </configuration>
         <executions>
+          <execution>
+            <id>check-license-and-copyright</id>
+            <phase>validate</phase>
+          </execution>
           <execution>
             <id>add-third-party-license</id>
             <phase>generate-resources</phase>
