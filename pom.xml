@@ -180,10 +180,39 @@
         <executions>
           <execution>
             <id>add-third-party-license</id>
-            <phase>install</phase>
+            <phase>generate-resources</phase>
             <goals>
               <goal>add-third-party</goal>
             </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+              <thirdPartyFilename>NOTICE</thirdPartyFilename>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-license</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${maven.multiModuleProjectDirectory}</directory>
+                  <includes>
+                    <include>COPYING</include>
+                    <include>COPYING.LESSER</include>
+                  </includes>
+                </resource>
+              </resources>
+              <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+            </configuration>
           </execution>
         </executions>
       </plugin>
