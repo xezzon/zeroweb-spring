@@ -252,6 +252,9 @@
                 <workingDirectory>${workdir}</workingDirectory>
                 <format>Docker</format>
                 <mainClass>${mainClass}</mainClass>
+                <labels>
+                  <maven.artifact>${project.groupId}:${project.artifactId}:${project.version}</maven.artifact>
+                </labels>
               </container>
               <extraDirectories>
                 <paths>
