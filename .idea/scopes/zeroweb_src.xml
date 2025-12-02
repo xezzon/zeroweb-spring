@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="zeroweb-src" pattern="(src:io.github.xezzon.zeroweb..*||src:db.changelog..*)&amp;&amp;!file:target/generated-sources//*" />
+</component>
