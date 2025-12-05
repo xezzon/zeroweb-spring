@@ -21,6 +21,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+/// 用于语言的数据库操作。
+///
 /// @author xezzon
 @Repository
 @NullMarked
@@ -28,7 +30,16 @@ public interface LanguageRepository extends
     JpaRepository<Language, String>,
     JpaSpecificationExecutor<Language> {
 
+  /// 根据字典标签和语言标签查找语言。
+  ///
+  /// @param dictTag 字典标签。
+  /// @param languageTag 语言标签。
+  /// @return 包含语言的 Optional 对象。
   Optional<Language> findByDictTagAndLanguageTag(String dictTag, String languageTag);
 
+  /// 根据字典标签查询语言列表，并按排序字段升序排列。
+  ///
+  /// @param dictTag 字典标签。
+  /// @return 语言列表。
   List<Language> findByDictTagOrderByOrdinalAsc(String dictTag);
 }

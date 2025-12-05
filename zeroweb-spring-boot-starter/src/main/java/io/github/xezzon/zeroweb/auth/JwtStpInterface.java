@@ -18,13 +18,22 @@ import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
-/**
- * @author xezzon
- */
+/// ZeroWeb 的 StpInterface 实现类，用于 Sa-Token 框架。
+///
+/// 该类通过从 JWT claims 中提取权限和角色信息，为 Sa-Token 提供认证授权服务。
+///
+/// @author xezzon
 @Component
 @SuppressWarnings("unused")
 public class JwtStpInterface implements StpInterface {
 
+  /// 获取指定账号的权限列表。
+  ///
+  /// 该方法从当前请求的 JWT claims 中提取权限列表。
+  ///
+  /// @param loginId 账号 id
+  /// @param loginType 账号类型
+  /// @return 权限列表，如果未找到则返回空列表
   @Override
   public List<String> getPermissionList(Object loginId, String loginType) {
     return JwtAuth.get()
@@ -33,6 +42,13 @@ public class JwtStpInterface implements StpInterface {
         .orElse(Collections.emptyList());
   }
 
+  /// 获取指定账号的角色列表。
+  ///
+  /// 该方法从当前请求的 JWT claims 中提取角色列表。
+  ///
+  /// @param loginId 账号 id
+  /// @param loginType 账号类型
+  /// @return 角色列表，如果未找到则返回空列表
   @Override
   public List<String> getRoleList(Object loginId, String loginType) {
     return JwtAuth.get()

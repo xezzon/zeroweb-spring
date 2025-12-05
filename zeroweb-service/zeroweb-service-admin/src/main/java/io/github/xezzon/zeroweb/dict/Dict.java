@@ -40,6 +40,7 @@ import lombok.ToString;
 @Table(name = "zeroweb_dict")
 public class Dict implements IEntity<String>, IDict, ITreeNode<Dict, String> {
 
+  /// 字典目的 `tag` 字段的值
   public static final String DICT_TAG = "DICT";
 
   @Id

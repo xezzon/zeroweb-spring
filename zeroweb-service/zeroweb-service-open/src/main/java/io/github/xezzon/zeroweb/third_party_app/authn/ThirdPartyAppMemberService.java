@@ -42,15 +42,24 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/// 第三方应用成员服务
+///
+/// 提供第三方应用成员管理功能，包括邀请成员、接受邀请、查询成员列表和所有权转移等
+///
 /// @author xezzon
 @Service
 public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
 
+  /// JWT载荷中用户组ID的声明名称
   private static final String GROUP_ID_CLAIM = "groupId";
+  /// JWT载荷中用户ID的声明名称
   private static final String USER_ID_CLAIM = "userId";
   private final ThirdPartyAppMemberRepository thirdPartyAppMemberRepository;
   private final AccessSecretRepository accessSecretRepository;
 
+  /// 依赖注入
+  /// @param thirdPartyAppMemberRepository 第三方应用成员 JPA 接口
+  /// @param accessSecretRepository 访问凭据 JPA 接口
   public ThirdPartyAppMemberService(
       ThirdPartyAppMemberRepository thirdPartyAppMemberRepository,
       AccessSecretRepository accessSecretRepository
@@ -92,7 +101,6 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
         .orElseThrow();
     // 验证邀请码的有效性
     try {
-
       Jwts.parser()
           .verifyWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(accessSecret.getSecretKey())))
           .build()
@@ -120,6 +128,10 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
     return thirdPartyAppMember.getId();
   }
 
+  /// 查询第三方应用的成员列表
+  ///
+  /// @param appId 第三方应用ID
+  /// @return 成员列表，按创建时间降序排序
   List<ThirdPartyAppMember> listMember(String appId) {
     return thirdPartyAppMemberRepository.findByGroupIdOrderByCreateTimeDesc(appId);
   }

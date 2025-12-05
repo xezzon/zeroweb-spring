@@ -13,14 +13,22 @@
 
 package io.github.xezzon.zeroweb.common.exception;
 
-/// 文件上传错误
+/// 文件写入错误。
+///
+/// 文件服务在上传文件时发生的任何错误，都应该抛出此异常。
+///
 /// @author xezzon
 public class WriteFileException extends ZerowebRuntimeException {
 
+  /// 根据一个已有的异常构造一个新的文件写入异常。
+  /// @param cause 原始异常
   public WriteFileException(Throwable cause) {
     super(cause);
   }
 
+  /// 根据一个已有的异常和指定的错误信息构造一个新的文件写入异常。
+  /// @param message 错误信息
+  /// @param cause 原始异常
   public WriteFileException(String message, Throwable cause) {
     super(message, cause);
   }

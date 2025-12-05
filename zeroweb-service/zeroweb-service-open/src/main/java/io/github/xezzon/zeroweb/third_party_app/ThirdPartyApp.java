@@ -39,9 +39,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners({AuditingEntityListener.class})
 public class ThirdPartyApp implements IEntity<String> {
 
+  /// 表名
   public static final String TABLE_NAME = "zeroweb_third_party_app";
+  /// 第三方应用名称列名
   public static final String NAME_COLUMN = "name";
+  /// 第三方应用所有者列名
   public static final String OWNER_ID_COLUMN = "owner_id";
+  /// 应用创建时间列名
   public static final String CREATE_TIME_COLUMN = "create_time";
 
   /// 第三方应用标识

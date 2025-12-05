@@ -17,12 +17,22 @@ import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp_;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 
+/// 第三方应用查询规范
+///
+/// 定义第三方应用的查询条件和排序规则
+///
 /// @author xezzon
 public class ThirdPartyAppSpec {
 
+  /// 私有构造函数，防止实例化
   private ThirdPartyAppSpec() {
   }
 
+  /// 获取默认排序规则
+  ///
+  /// 按创建时间降序排序
+  ///
+  /// @return 排序对象
   public static Sort defaultSort() {
     return Sort.by(Order.desc(ThirdPartyApp_.CREATE_TIME));
   }

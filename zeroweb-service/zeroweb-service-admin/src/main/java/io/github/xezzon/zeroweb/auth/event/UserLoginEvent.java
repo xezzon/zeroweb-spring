@@ -17,14 +17,13 @@ import io.github.xezzon.zeroweb.user.User;
 import lombok.Builder;
 import lombok.Getter;
 
-/// 用户登录事件
-///
-/// 登录后，将用户信息、授权信息加载到会话中
+/// `UserLoginEvent` 表示用户成功登录后触发的事件。
 ///
 /// @author xezzon
 @Getter
 @Builder
 public class UserLoginEvent {
 
+  /// 登录成功的用户实体。
   private User user;
 }

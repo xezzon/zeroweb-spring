@@ -25,10 +25,11 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-/**
- * 应用启动时为超级管理员添加权限
- * @author xezzon
- */
+/// `RootUserRoleRunner` 是一个应用程序启动器，用于在应用启动时为预定义的超级管理员用户分配根角色。
+///
+/// 这个组件确保在系统首次启动或特定条件下，超级管理员拥有必要的最高权限。
+///
+/// @author xezzon
 @Component
 @Order(Short.MAX_VALUE)
 public class RootUserRoleRunner implements ApplicationRunner {
@@ -36,6 +37,11 @@ public class RootUserRoleRunner implements ApplicationRunner {
   @Resource
   private RoleUserRepository roleUserRepository;
 
+  /// 应用程序启动时执行的逻辑。
+  ///
+  /// 它会检查超级管理员是否已经关联了根角色。如果未关联，则创建该关联。
+  ///
+  /// @param args 应用程序启动参数。
   @Override
   public void run(@NonNull final ApplicationArguments args) {
     Optional<RoleUser> root = roleUserRepository.findByRoleIdAndUserId(

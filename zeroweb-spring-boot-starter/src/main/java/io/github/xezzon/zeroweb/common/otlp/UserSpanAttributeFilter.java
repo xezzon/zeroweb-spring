@@ -28,21 +28,36 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-/**
- * @see <a href="https://opentelemetry.io/docs/specs/semconv/attributes-registry/user/">User | OpenTelemetry</a>
- */
+/// OTLP 用户 Span 属性过滤器。
+/// 该过滤器将登录用户的相关信息（如用户 ID、用户名、角色、全名）添加到当前的 OpenTelemetry Span 中，
+/// 以便在分布式追踪中识别和关联用户操作。
+///
+/// @see <a href="https://opentelemetry.io/docs/specs/semconv/attributes-registry/user/">User | OpenTelemetry</a>
 @Slf4j
 @Component
 @WebFilter(urlPatterns = "/*")
 @Order(16)
 public class UserSpanAttributeFilter implements Filter {
 
+  /// OpenTelemetry Span 属性键：用户 ID
   public static final String USER_ID = "user.id";
+  /// OpenTelemetry Span 属性键：用户名
   public static final String USER_NAME = "user.name";
+  /// OpenTelemetry Span 属性键：用户角色
   public static final String USER_ROLES = "user.roles";
+  /// OpenTelemetry Span 属性键：用户全名
   public static final String USER_FULL_NAME = "user.full_name";
 
 
+  /// 过滤请求，将登录用户的属性添加到当前的 Span 中。
+  /// 如果用户已登录，则从 [JwtAuth] 中获取用户声明，并将其转换为 OpenTelemetry Span 属性。
+  /// 任何在处理过程中发生的运行时异常都将被忽略，以确保请求链的正常执行。
+  ///
+  /// @param request  ServletRequest 对象
+  /// @param response ServletResponse 对象
+  /// @param chain    FilterChain 对象
+  /// @throws IOException      如果发生 I/O 错误
+  /// @throws ServletException 如果发生 Servlet 错误
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {

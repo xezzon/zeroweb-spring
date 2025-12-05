@@ -49,20 +49,29 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+/// 文件系统存储服务实现。
+/// 如果没有配置文件系统，则不会注册 Bean。
 /// @author xezzon
 @Service
 @ConditionalOnBean(ZerowebFsConfig.class)
 @Slf4j
 public class FsService implements IStorageService {
 
+  /// 文件上传访问点模板
   static final String UPLOAD_ENDPOINT = "/fs/{id}/upload";
+  /// 文件分段上传访问点模板
   static final String MULTIPART_UPLOAD_ENDPOINT = "/fs/{id}/upload/{partNumber}";
+  /// 文件下载访问点模板
   static final String DOWNLOAD_ENDPOINT = "/fs/{id}/download";
+  /// 系统临时文件目录
   private static final Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir"))
       .resolve(BannerConstant.NAME);
   private final ZerowebFsConfig zerowebFsConfig;
   private final IAttachmentService attachmentService;
 
+  /// 注入依赖
+  /// @param zerowebFsConfig 文件系统配置
+  /// @param attachmentService 附件管理服务
   public FsService(
       final ZerowebFsConfig zerowebFsConfig,
       @Lazy final IAttachmentService attachmentService
@@ -171,11 +180,18 @@ public class FsService implements IStorageService {
     }
   }
 
+  /// 上传文件。
+  /// @param id 附件ID
+  /// @param fileContent 文件内容
   void upload(String id, byte[] fileContent) {
     Attachment attachment = attachmentService.queryById(id);
     this.upload(attachment, fileContent);
   }
 
+  /// 分段上传文件。
+  /// @param id 附件ID
+  /// @param partNumber 分段序号
+  /// @param fileContent 文件内容
   void upload(String id, int partNumber, byte[] fileContent) {
     Attachment attachment = attachmentService.queryById(id);
     if (attachment == null) {
@@ -191,6 +207,9 @@ public class FsService implements IStorageService {
     }
   }
 
+  /// 文件下载
+  /// @param id 附件ID
+  /// @return 文件内容
   byte[] download(String id) {
     Attachment attachment = attachmentService.queryById(id);
     return this.download(attachment);

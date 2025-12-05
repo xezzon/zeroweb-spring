@@ -22,32 +22,44 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-/**
- * @author xezzon
- */
+/// [RedisTemplate] 的工厂类，用于创建具有特定值类型的 [RedisTemplate] 实例。
+///
+/// 该类通过注入 [RedisConnectionFactory] 和使用 [StringRedisSerializer] 作为键序列化器，
+/// 并结合 [GsonRedisSerializer] 作为值序列化器来构建 [RedisTemplate]。
+///
+/// @author xezzon
 @Configuration
 @Profile("redis")
 public class RedisTemplateFactory {
 
+  /// Redis 连接工厂，用于创建 Redis 连接。
   private final RedisConnectionFactory connectionFactory;
+  /// Redis 键的序列化器，默认为 [StringRedisSerializer]。
   private final RedisSerializer<@NonNull String> keySerializer;
 
+  /// 构造函数，通过注入 [RedisConnectionFactory] 初始化工厂。
+  ///
+  /// @param connectionFactory Redis 连接工厂
   public RedisTemplateFactory(final RedisConnectionFactory connectionFactory) {
     this.connectionFactory = connectionFactory;
     this.keySerializer = new StringRedisSerializer();
   }
 
-  /**
-   * 指定值类型的 Redis 处理器 使用方法如下：
-   * <pre>
-   * public class AnyService {
-   *   private final RedisTemplate&lt;String, Any&gt; anyRedisTemplate;
-   *   public AnyService(RedisTemplateFactory factory) {
-   *     this.anyRedisTemplate = factory.of(new TypeToken&lt;&gt;() {});
-   *   }
-   * }
-   * </pre>
-   */
+  /// 创建一个指定值类型的 [RedisTemplate] 实例。
+  ///
+  /// 使用方法如下：
+  /// ```java
+  /// public class AnyService {
+  ///   private final RedisTemplate<String, Any> anyRedisTemplate;
+  ///   public AnyService(RedisTemplateFactory factory) {
+  ///     this.anyRedisTemplate = factory.of(new TypeToken<>() {});
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// @param typeToken 用于指定 [RedisTemplate] 值类型的 [TypeToken]
+  /// @param <T> 值类型
+  /// @return 具有指定值类型的 [RedisTemplate] 实例
   public <T> RedisTemplate<String, T> of(final @NonNull TypeToken<@NonNull T> typeToken) {
     RedisTemplate<String, T> redisTemplate = new RedisTemplate<>();
     redisTemplate.setConnectionFactory(connectionFactory);

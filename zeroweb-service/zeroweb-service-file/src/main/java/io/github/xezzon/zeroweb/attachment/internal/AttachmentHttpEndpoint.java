@@ -38,6 +38,8 @@ public class AttachmentHttpEndpoint {
 
   private final AttachmentService attachmentService;
 
+  /// 依赖注入
+  /// @param attachmentService 附件服务
   public AttachmentHttpEndpoint(
       final AttachmentService attachmentService
   ) {
@@ -46,6 +48,7 @@ public class AttachmentHttpEndpoint {
 
   /// 新增附件
   /// @param req 文件信息
+  /// @param crc 文件的 CRC 值。虽然只有 S3 服务需要，但是建议调用接口时必传。
   /// @return 文件上传元数据
   @PostMapping()
   public UploadInfo addAttachment(
@@ -66,6 +69,9 @@ public class AttachmentHttpEndpoint {
 
   /// 获取附件上传元信息
   /// @param id 附件ID
+  /// @param checksum 附件的内容摘要。与 `fileSize` 联合校验续传内容与之前的内容一致。
+  /// @param fileSize 附件的大小。
+  /// @param crc 文件的 CRC 值。虽然只有 S3 服务需要，但是建议调用接口时必传。
   /// @return 上传元信息
   @GetMapping("/{id}/resume")
   public UploadInfo getUploadInfo(
@@ -81,6 +87,7 @@ public class AttachmentHttpEndpoint {
   /// 获取附件上传地址
   /// @param id 附件ID
   /// @param partNumber 分段序号
+  /// @param crc 文件的 CRC 值。虽然只有 S3 服务需要，但是建议调用接口时必传。
   /// @return 附件上传地址
   @GetMapping("/{id}/endpoint/upload")
   public UploadEndpoint getUploadEndpoint(

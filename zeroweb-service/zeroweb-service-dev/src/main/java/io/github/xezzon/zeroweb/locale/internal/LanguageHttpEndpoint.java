@@ -42,9 +42,10 @@ public class LanguageHttpEndpoint {
     this.localizedService = localizedService;
   }
 
-  /// 新增语言
+  /// 新增语言。
   ///
-  /// @param req 语言
+  /// @param req 语言请求体。
+  /// @return 新增语言的 ID。
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PostMapping()
   public Id addLanguage(@RequestBody final AddLanguageReq req) {
@@ -53,17 +54,17 @@ public class LanguageHttpEndpoint {
     return Id.of(language.getId());
   }
 
-  /// 查询语言列表
+  /// 查询语言列表。
   ///
-  /// @return 语言列表
+  /// @return 语言列表。
   @GetMapping()
   public List<Language> queryLanguageList() {
     return localizedService.queryLanguageList();
   }
 
-  /// 更新语言
+  /// 更新语言。
   ///
-  /// @param req 语言
+  /// @param req 语言请求体。
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
   public void updateLanguage(@RequestBody final ModifyLanguageReq req) {
@@ -71,9 +72,9 @@ public class LanguageHttpEndpoint {
     localizedService.updateLanguage(language);
   }
 
-  /// 删除语言
+  /// 删除语言。
   ///
-  /// @param id 语言ID
+  /// @param id 语言 ID。
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @DeleteMapping("/{id}")
   public void deleteLanguage(@PathVariable final String id) {

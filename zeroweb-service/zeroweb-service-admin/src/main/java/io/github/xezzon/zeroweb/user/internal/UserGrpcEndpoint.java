@@ -28,13 +28,20 @@ import org.springframework.grpc.server.service.GrpcService;
 @GrpcService
 public class UserGrpcEndpoint extends UserImplBase {
 
+  /// 用户服务接口
   private final UserService userService;
 
+  /// 依赖注入
+  ///
+  /// @param userService 用户服务接口
   UserGrpcEndpoint(final UserService userService) {
     this.userService = userService;
   }
 
   /// 新增用户（服务间接口）
+  ///
+  /// @param request 新增用户请求
+  /// @param responseObserver 响应观察者
   @Override
   public void addUser(AddUserReq request, StreamObserver<AddUserResp> responseObserver) {
     User user = AddUserReqConverter.INSTANCE.from(request);

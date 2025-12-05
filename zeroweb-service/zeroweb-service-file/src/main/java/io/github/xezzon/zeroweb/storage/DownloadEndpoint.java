@@ -15,6 +15,7 @@ package io.github.xezzon.zeroweb.storage;
 
 import lombok.Getter;
 
+/// 附件下载地址
 /// @author xezzon
 @Getter
 public class DownloadEndpoint {
@@ -22,11 +23,18 @@ public class DownloadEndpoint {
   /// 下载地址
   private String endpoint;
 
+  /**
+   * 默认构造函数
+   */
   @SuppressWarnings("unused")
   DownloadEndpoint() {
     super();
   }
 
+  /**
+   * 构造附件下载地址
+   * @param endpoint 下载地址URL
+   */
   public DownloadEndpoint(String endpoint) {
     this.endpoint = endpoint;
   }

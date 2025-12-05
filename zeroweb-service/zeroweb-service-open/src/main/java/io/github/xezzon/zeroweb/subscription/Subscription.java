@@ -41,9 +41,13 @@ import lombok.ToString;
 @Table(name = Subscription.TABLE_NAME)
 public class Subscription implements IEntity<String> {
 
+  /// 表名
   public static final String TABLE_NAME = "zeroweb_openapi_subscription";
+  /// 对外接口编码列名
   public static final String OPENAPI_CODE_COLUMN = "openapi_code";
+  /// 第三方应用标识列名
   public static final String APP_ID_COLUMN = "app_id";
+  /// 订阅状态列名
   public static final String STATUS_COLUMN = "status";
 
   /// 订阅标识
@@ -77,6 +81,8 @@ public class Subscription implements IEntity<String> {
   )
   Openapi openapi;
 
+  /// 获取订阅状态，如果状态为 null 则返回 NONE
+  /// @return 订阅状态
   public SubscriptionStatus getSubscriptionStatus() {
     if (this.status == null) {
       return SubscriptionStatus.NONE;

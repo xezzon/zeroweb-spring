@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/// 第三方应用成员管理
 /// @author xezzon
 @RestController
 public class ThirdPartAppMemberHttpEndpoint {
@@ -33,6 +34,9 @@ public class ThirdPartAppMemberHttpEndpoint {
   private final ThirdPartyAppMemberService thirdPartyAppMemberService;
   private final ThirdPartyAppPermissionManager thirdPartyAppPermissionManager;
 
+  /// 依赖注入
+  /// @param thirdPartyAppMemberService 第三方应用成员管理服务
+  /// @param thirdPartyAppPermissionManager 第三方应用权限管理服务
   public ThirdPartAppMemberHttpEndpoint(
       ThirdPartyAppMemberService thirdPartyAppMemberService,
       ThirdPartyAppPermissionManager thirdPartyAppPermissionManager
@@ -71,6 +75,7 @@ public class ThirdPartAppMemberHttpEndpoint {
   /// 查询第三方应用的成员
   ///
   /// @param appId 第三方应用ID
+  /// @return 第三方应用成员列表
   @GetMapping("/third-party-app/{appId}/member")
   public List<ThirdPartyAppMember> listMember(@PathVariable String appId) {
     thirdPartyAppPermissionManager
@@ -80,6 +85,7 @@ public class ThirdPartAppMemberHttpEndpoint {
 
   /// 第三方应用所有权转移
   ///
+  /// @param appId 第三方应用 ID
   /// @param userId 转移的目标用户
   @PatchMapping("/third-party-app/{appId}/owner")
   public void moveOwnership(@PathVariable String appId, @RequestParam String userId) {

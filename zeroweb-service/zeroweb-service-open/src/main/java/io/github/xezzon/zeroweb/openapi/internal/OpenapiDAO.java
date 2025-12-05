@@ -28,6 +28,12 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
+/// 对外接口数据访问对象
+///
+/// 封装了对 [Openapi] 实体对象的数据库操作，
+/// 继承自 [BaseDAO]，提供基础的增删改查功能。
+/// 同时提供了查询已发布接口的专用方法。
+///
 /// @author xezzon
 @Repository
 @NullMarked
@@ -48,6 +54,10 @@ public class OpenapiDAO extends BaseDAO<Openapi, String, OpenapiRepository> {
     return super.findAll(odata, null, sort);
   }
 
+  /// 查询已发布的对外接口列表。按编码升序排序。
+  ///
+  /// @param odata OData查询参数，用于指定查询条件、排序方式、分页信息等
+  /// @return 符合查询条件的已发布对外接口分页结果
   public Page<Openapi> listPublishedOpenapi(ODataQueryOption odata) {
     Specification<Openapi> spec = (root, _, cb) ->
         cb.equal(root.get(Openapi_.status), OpenapiStatus.PUBLISHED);

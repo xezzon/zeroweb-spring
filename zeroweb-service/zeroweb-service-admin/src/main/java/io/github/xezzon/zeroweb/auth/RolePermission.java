@@ -24,7 +24,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/// 角色-接口权限
+/// `RolePermission` 实体表示角色与接口权限之间的关联。
+///
+/// 它定义了哪些角色拥有哪些特定的 API 权限。
 ///
 /// @author xezzon
 @Getter
@@ -34,14 +36,15 @@ import lombok.ToString;
 @Table(name = "zeroweb_role_permission")
 public class RolePermission {
 
+  /// 唯一标识符。
   @Id
   @IdGenerator
   @Column(name = "id", nullable = false, updatable = false, length = ID_LENGTH)
   private String id;
-  /// 角色ID
+  /// 关联的角色ID。
   @Column(name = "role_id", nullable = false, updatable = false, length = ID_LENGTH)
   private String roleId;
-  /// 接口权限编码
+  /// 接口权限编码，例如 "user:read", "app:write"。
   @Column(name = "permission", nullable = false, updatable = false)
   private String permission;
 }

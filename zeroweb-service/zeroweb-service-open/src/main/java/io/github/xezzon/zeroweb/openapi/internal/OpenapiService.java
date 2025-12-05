@@ -26,12 +26,20 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+/// 对外接口服务类
+///
+/// 实现了对外接口的完整生命周期管理，包括新增、修改、发布和查询等功能。
+/// 该服务类实现了 [IOpenapiService4Subscription] 接口，
+/// 为订阅服务提供了获取已发布接口列表和按编码查询接口的方法。
+///
 /// @author xezzon
 @Service
 public class OpenapiService implements IOpenapiService4Subscription {
 
   private final OpenapiDAO openapiDAO;
 
+  /// 依赖注入
+  /// @param openapiDAO 对外接口数据库管理
   public OpenapiService(final OpenapiDAO openapiDAO) {
     this.openapiDAO = openapiDAO;
   }
@@ -82,6 +90,10 @@ public class OpenapiService implements IOpenapiService4Subscription {
     openapiDAO.get().save(entity);
   }
 
+  /// 检查接口编码是否重复
+  ///
+  /// @param openapi 要检查的对外接口对象
+  /// @throws RepeatDataException 如果接口编码已存在且不是当前接口本身，则抛出异常
   private void checkRepeat(Openapi openapi) {
     Optional<Openapi> exist = openapiDAO.get().findByCode(openapi.getCode());
     if (exist.isPresent() && !Objects.equals(exist.get().getId(), openapi.getId())) {

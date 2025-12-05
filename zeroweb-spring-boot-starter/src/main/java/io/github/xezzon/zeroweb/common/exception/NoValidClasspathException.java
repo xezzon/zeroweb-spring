@@ -16,12 +16,21 @@ package io.github.xezzon.zeroweb.common.exception;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 找不到有效的类路径
+ * `NoValidClasspathException` 表示在应用程序启动或运行时未能找到任何有效的类路径。
+ * 当应用程序依赖于类路径中的特定资源或配置，但这些资源无法被正确加载时，会抛出此异常。
+ * 例如，当密钥文件未在预期位置找到时，可能会抛出此异常。
+ *
  * @author xezzon
+ * @see ZerowebRuntimeException
  */
 @Slf4j
 public class NoValidClasspathException extends ZerowebRuntimeException {
 
+  /**
+   * 使用指定的根本原因构造一个新的 `NoValidClasspathException`。
+   *
+   * @param cause 根本原因（通常是另一个异常，它导致此异常被抛出）。
+   */
   public NoValidClasspathException(Throwable cause) {
     super("No valid classpath found", cause);
   }

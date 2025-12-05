@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/// 服务管理
+/// 应用管理
 ///
 /// @author xezzon
 @RestController
@@ -39,13 +39,19 @@ public class AppHttpEndpoint {
 
   private final AppService appService;
 
+  /// 构造函数，注入 [AppService]。
+  ///
+  /// @param appService [AppService] 实例。
   public AppHttpEndpoint(final AppService appService) {
     this.appService = appService;
   }
 
-  /// 新增服务
+  /// 新增一个服务。
   ///
-  /// @param req 服务基础信息
+  /// 需要 `app:write` 权限。
+  ///
+  /// @param req 包含服务基础信息的新增服务请求体。
+  /// @return 新增服务的 ID。
   @SaCheckPermission({PermissionConstant.APP_WRITE})
   @PostMapping()
   public Id addApp(@RequestBody @Validated final AddAppReq req) {
@@ -54,17 +60,19 @@ public class AppHttpEndpoint {
     return Id.of(app.getId());
   }
 
-  /// 查询服务列表
+  /// 查询所有服务列表。
   ///
-  /// @return 服务列表
+  /// @return 包含所有服务实体的列表。
   @GetMapping()
   public List<App> listApp() {
     return appService.listApp();
   }
 
-  /// 更新服务
+  /// 更新一个现有服务的信息。
   ///
-  /// @param req 服务基础信息
+  /// 需要 `app:write` 权限。
+  ///
+  /// @param req 包含要更新的服务信息和其 ID 的请求体。
   @SaCheckPermission({PermissionConstant.APP_WRITE})
   @PutMapping
   public void updateApp(@RequestBody @Validated final UpdateAppReq req) {
@@ -72,9 +80,11 @@ public class AppHttpEndpoint {
     appService.updateApp(app);
   }
 
-  /// 删除服务
+  /// 根据服务ID删除一个服务。
   ///
-  /// @param id 服务ID
+  /// 需要 `app:write` 权限。
+  ///
+  /// @param id 要删除服务的 ID。
   @SaCheckPermission({PermissionConstant.APP_WRITE})
   @DeleteMapping("/{id}")
   public void deleteApp(@PathVariable final String id) {

@@ -18,17 +18,22 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-/**
- * @author xezzon
- */
+/// 从测试数据生成 INSERT DML 语句的规范
+/// @param <T> 测试数据类型
+/// @author xezzon
+@SuppressWarnings("unused")
 public interface ToSQL<T> {
 
+  /// 申明表名
   /// @return 表名
   String tableName();
 
-  /// @return 列名
+  /// 申明列名
+  /// @return 列名列表
   String[] columnNames();
 
+  /// 获取列数据的方法
+  /// @return 获取数据的函数的集合。与 [列名](#columnNames()) 一一对应。
   List<Function<T, Object>> columnValue();
 
   /// 列数据模板
@@ -42,6 +47,11 @@ public interface ToSQL<T> {
         .collect(Collectors.joining(",", "(", "),"));
   }
 
+  /**
+   * 将数据转换为 INSERT DML 语句
+   * @param dataset 数据集合
+   * @return INSERT DML 语句
+   */
   default String toSql(List<T> dataset) {
     StringBuilder sqlBuilder = new StringBuilder();
     // 表头

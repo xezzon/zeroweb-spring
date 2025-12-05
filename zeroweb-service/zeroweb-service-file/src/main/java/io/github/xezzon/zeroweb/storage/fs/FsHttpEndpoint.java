@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/// 上传/下载附件到文件系统
 /// @author xezzon
 @RestController
 @ConditionalOnBean(ZerowebFsConfig.class)
@@ -38,6 +39,11 @@ public class FsHttpEndpoint {
   private final FsService fsService;
   private final IAttachmentService attachmentService;
 
+  /**
+   * 注入依赖
+   * @param fsService 文件系统存储服务
+   * @param attachmentService 附件服务
+   */
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   public FsHttpEndpoint(
       final Optional<FsService> fsService,
@@ -74,6 +80,7 @@ public class FsHttpEndpoint {
   /// 下载文件
   /// 
   /// @param id 附件ID
+  /// @return 文件内容
   @GetMapping(FsService.DOWNLOAD_ENDPOINT)
   public ResponseEntity<byte @NonNull []> download(@PathVariable String id) {
     Attachment attachment = attachmentService.queryById(id);
@@ -83,6 +90,8 @@ public class FsHttpEndpoint {
     return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
   }
 
+  /// 获取文件系统存储服务。
+  /// 在未正确配置文件存储时，调用相关的 HTTP 接口会报错。
   private FsService fsService() {
     if (fsService == null) {
       throw new UnsupportedFileProviderException(FileProviderEnum.FS);

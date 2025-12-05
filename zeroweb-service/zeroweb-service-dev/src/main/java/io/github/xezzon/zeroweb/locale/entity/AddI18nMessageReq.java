@@ -20,14 +20,19 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/// 新增国际化内容的请求参数
+/// 新增国际化内容的请求参数。
 ///
+/// @param namespace 国际化内容命名空间。
+/// @param messageKey 国际化内容的键。
 /// @author xezzon
 public record AddI18nMessageReq(
     String namespace,
     String messageKey
 ) implements Into<I18nMessage> {
 
+  /// 将当前请求对象转换为 [I18nMessage] 实体。
+  ///
+  /// @return 转换后的 [I18nMessage] 实体。
   @Override
   public I18nMessage into() {
     return Converter.INSTANCE.from(this);

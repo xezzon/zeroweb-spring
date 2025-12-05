@@ -20,6 +20,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+/// 修改字典请求对象
+///
+/// 用于封装修改字典项的请求参数。
+/// 该对象实现了 [Into] 接口，可以转换为 [Dict] 实体对象。
+///
+/// @param id 字典ID
 /// @param code 字典键
 /// @param label 字典值
 /// @param ordinal 排序号
@@ -34,16 +40,27 @@ public record ModifyDictReq(
     Boolean enabled
 ) implements Into<Dict> {
 
+  /// 转换为字典实体对象
+  ///
+  /// @return 字典实体对象
   @Override
   public Dict into() {
     return Converter.INSTANCE.from(this);
   }
 
+  /// 请求对象到实体对象的转换器
   @Mapper
   interface Converter extends From<ModifyDictReq, Dict> {
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
+    /// 转换规则：
+    /// - 忽略 `editable`，不允许修改
+    /// - 忽略 `tag`，不允许修改
+    /// - 忽略 `children`，该字段为瞬态字段
+    ///
+    /// @param source 修改字典请求对象
+    /// @return 字典实体对象
     @Mapping(target = "editable", ignore = true)
     @Mapping(target = "tag", ignore = true)
     @Mapping(target = "children", ignore = true)

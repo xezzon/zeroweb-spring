@@ -41,9 +41,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SubscriptionHttpEndpoint {
 
+  /// 订阅服务，用于处理订阅业务逻辑
   private final SubscriptionService subscriptionService;
+  /// 订阅权限管理器，用于校验用户权限
   private final SubscriptionPermissionManager subscriptionPermissionManager;
 
+  /// 构造器，注入订阅服务和权限管理器
+  /// @param subscriptionService 订阅服务
+  /// @param subscriptionPermissionManager 订阅权限管理器
   public SubscriptionHttpEndpoint(
       final SubscriptionService subscriptionService,
       final SubscriptionPermissionManager subscriptionPermissionManager

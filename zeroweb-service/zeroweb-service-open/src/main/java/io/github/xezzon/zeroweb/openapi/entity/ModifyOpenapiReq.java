@@ -22,10 +22,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/// @param id 对外接口标识
-/// @param code 接口编码
-/// @param destination 后端地址
-/// @param httpMethod 请求接口的HTTP方法
+/// 修改对外接口请求对象
+///
+/// 用于修改现有的对外接口，包含接口标识、编码、后端地址和HTTP方法等信息。
+/// 该请求对象实现了 [Into] 接口，
+/// 可以转换为 [Openapi] 实体对象。
+///
+/// @param id 对外接口标识，唯一标识要修改的接口
+/// @param code 接口编码，唯一标识一个对外接口
+/// @param destination 后端地址，即该接口应该转发到的后端服务地址
+/// @param httpMethod 请求接口的HTTP方法，如 GET、POST 等
 /// @author xezzon
 public record ModifyOpenapiReq(
     String id,

@@ -29,7 +29,6 @@ import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMemberReposit
 import io.github.xezzon.zeroweb.third_party_app.event.ThirdPartyAppCreatedEvent;
 import io.github.xezzon.zeroweb.third_party_app.exception.InvalidAccessKeyException;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
-import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
 import io.jsonwebtoken.Jwts.SIG;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -51,12 +50,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
+/// 第三方应用服务
+///
+/// 提供第三方应用的业务逻辑处理，包括应用管理、密钥管理、JWT签名等功能
+///
 /// @author xezzon
 @Service
 @Slf4j
 public class ThirdPartyAppService implements IThirdPartyAppService4Call {
-
-  private final ThirdPartyAppRepository thirdPartyAppRepository;
 
   private final ThirdPartyAppDAO thirdPartyAppDAO;
   private final AccessSecretRepository accessSecretRepository;
@@ -65,17 +66,21 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
   @Resource
   private ApplicationEventPublisher eventPublisher;
 
+  /// 依赖注入
+  /// @param thirdPartyAppDAO 第三方应用的数据库操作
+  /// @param accessSecretRepository 访问凭据的 JPA 接口
+  /// @param thirdPartyAppMemberRepository 第三方应用成员的 JPA 接口
+  /// @param zerowebConfig JWT 相关设置
   public ThirdPartyAppService(
       final ThirdPartyAppDAO thirdPartyAppDAO,
       final AccessSecretRepository accessSecretRepository,
       ThirdPartyAppMemberRepository thirdPartyAppMemberRepository,
-      final ZerowebConfig zerowebConfig,
-      ThirdPartyAppRepository thirdPartyAppRepository) {
+      final ZerowebConfig zerowebConfig
+  ) {
     this.thirdPartyAppDAO = thirdPartyAppDAO;
     this.accessSecretRepository = accessSecretRepository;
     this.thirdPartyAppMemberRepository = thirdPartyAppMemberRepository;
     this.zerowebJwtConfig = zerowebConfig.getJwt();
-    this.thirdPartyAppRepository = thirdPartyAppRepository;
   }
 
   /// 添加第三方应用并生成访问密钥
@@ -98,7 +103,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
     Set<String> appIds = members.stream()
         .map(ThirdPartyAppMember::getGroupId)
         .collect(Collectors.toSet());
-    List<ThirdPartyApp> list = thirdPartyAppRepository.findByIdInOrderByCreateTimeDesc(appIds);
+    List<ThirdPartyApp> list = thirdPartyAppDAO.get().findByIdInOrderByCreateTimeDesc(appIds);
     return new PageImpl<>(list);
   }
 
@@ -125,16 +130,24 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
     return accessSecret;
   }
 
+  /// 校验摘要并签发JWT
+  ///
+  /// 首先验证消息摘要的有效性，然后为第三方应用签发包含认证信息的JWT
+  ///
+  /// @param accessKey 访问密钥
+  /// @param body 消息内容
+  /// @param signature 消息摘要
+  /// @param iat 消息签发时间
+  /// @return 签发的JWT字符串
+  /// @throws InvalidAccessKeyException 签名验证未通过时抛出
   @Override
-  public String signJwt(String accessKey, byte[] body, String signature, Instant iat)
-      throws InvalidAccessKeyException {
+  public String signJwt(String accessKey, byte[] body, String signature, Instant iat) {
     /* 校验摘要 */
     String appId = new String(
         Base64.getDecoder().decode(accessKey),
         StandardCharsets.UTF_8
     );
-    final byte[] salt = Longs.toByteArray(iat.toEpochMilli());
-    this.validateSignature(appId, body, signature, salt);
+    this.validateSignature(appId, body, signature, iat);
     /* 构造JWT */
     ThirdPartyApp thirdPartyApp = thirdPartyAppDAO.get().findById(appId).orElseThrow();
     JwtClaim claim = JwtClaim.newBuilder()
@@ -156,14 +169,15 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
   /// @param appId 应用标识
   /// @param body 消息体
   /// @param signature 摘要
-  /// @param salt 盐值
+  /// @param iat 生成摘要的时间
   /// @throws InvalidAccessKeyException 签名校验失败
   private void validateSignature(
       final String appId,
       final byte[] body,
       final String signature,
-      final byte[] salt
+      final Instant iat
   ) {
+    final byte[] salt = Longs.toByteArray(iat.toEpochMilli());
     AccessSecret accessSecret = accessSecretRepository.findById(appId)
         .orElseThrow(InvalidAccessKeyException::new);
     try {

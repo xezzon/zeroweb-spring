@@ -18,25 +18,19 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * 资源信息
- */
+/// 菜单或资源的信息封装类。
+/// 用于描述前端菜单、外部链接、嵌入页面以及后端接口权限和资源权限等。
 @Getter
 @Setter
 @ToString
 public class MenuInfo {
 
-  /**
-   * 资源类型
-   */
+  /// 菜单或资源的具体类型，例如路由、外部链接、接口权限等。
   private MenuType type;
-  /**
-   * 资源路径 不同类型的资源有不同的路径格式
-   * @see MenuType
-   */
+  /// 菜单或资源的路径。
+  /// 不同类型的资源有不同的路径格式，详见 [MenuType]。
   private String path;
-  /**
-   * 访问资源所需要的权限 取并集，即资源必须满足所列出的所有权限
-   */
+  /// 访问此菜单或资源所需要的权限集合。
+  /// 取并集，即访问者必须满足列表中所有权限才能访问。
   private Collection<String> permissions;
 }

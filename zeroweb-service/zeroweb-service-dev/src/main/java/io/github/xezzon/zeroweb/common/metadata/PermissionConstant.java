@@ -17,10 +17,12 @@ import io.github.xezzon.zeroweb.metadata.MenuInfo;
 import io.github.xezzon.zeroweb.metadata.PermissionConstantUtil;
 import java.util.List;
 
-/// 接口权限
+/// 接口权限常量类
 public final class PermissionConstant {
 
+  /// 读取语言环境的权限标识
   public static final String LOCALE_READ = "locale:read";
+  /// 写入语言环境的权限标识
   public static final String LOCALE_WRITE = "locale:write";
 
   private static final List<MenuInfo> PERMISSIONS;
@@ -29,9 +31,13 @@ public final class PermissionConstant {
     PERMISSIONS = PermissionConstantUtil.read(PermissionConstant.class);
   }
 
+  /// 私有构造函数，防止实例化
   private PermissionConstant() {
   }
 
+  /// 获取所有权限信息
+  ///
+  /// @return 权限信息列表
   public static List<MenuInfo> getPermissions() {
     return PERMISSIONS;
   }

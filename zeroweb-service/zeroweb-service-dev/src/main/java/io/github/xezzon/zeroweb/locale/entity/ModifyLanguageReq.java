@@ -21,6 +21,7 @@ import org.mapstruct.factory.Mappers;
 
 /// 修改语言的请求参数
 ///
+/// @param id 需要被修改的语言的ID
 /// @param languageTag 语言标签
 /// @param description 语言描述
 /// @param ordinal 排序序号

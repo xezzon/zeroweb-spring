@@ -16,18 +16,21 @@ package io.github.xezzon.zeroweb.subscription.exception;
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
 import org.jspecify.annotations.NullMarked;
 
+/// 未发布接口不能订阅异常，当尝试订阅未发布的对外接口时抛出
 /// @author xezzon
 @NullMarked
 public class UnpublishedOpenapiCannotBeSubscribeException extends ZerowebBusinessException {
 
+  /// 错误码：未发布接口不能订阅
   public static final String ERROR_CODE = "CFE02";
 
+  /// 构造器，设置默认错误信息
   public UnpublishedOpenapiCannotBeSubscribeException() {
     super("Cannot subscribe an unpublished OpenAPI.");
   }
 
   @Override
-  public String getCode() {
+  public String code() {
     return ERROR_CODE;
   }
 }

@@ -19,14 +19,20 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
 import org.springframework.stereotype.Component;
 
-/**
- * ID 生成器
- * 生成规则取决于配置 ${zeroweb.id-generator}
- * @author xezzon
- */
+/// Hibernate ID 生成器。
+///
+/// @author xezzon
 @Component
 public class HibernateIdGenerator implements IdentifierGenerator {
 
+  /// 生成实体 ID。
+  ///
+  /// 如果实体已经有 ID，则返回该 ID。
+  /// 否则，委托给配置的 [IdGenerator] 实现来生成一个新的 ID。
+  ///
+  /// @param sharedSessionContractImplementor Hibernate 会话契约实现器
+  /// @param o 待生成 ID 的实体对象
+  /// @return 生成的 ID
   @Override
   public Object generate(
       SharedSessionContractImplementor sharedSessionContractImplementor, Object o

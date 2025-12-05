@@ -23,16 +23,25 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-/// 线程池配置
+/// 线程池配置类，用于定义和配置应用程序中使用的不同类型的线程池。
+/// 主要包括 CPU 密集型任务线程池和 IO 密集型任务线程池。
+///
 /// @author xezzon
 @Configuration
 @ConfigurationProperties(prefix = "thread-pool")
 @EnableAsync
 public class ThreadPoolConfig {
 
+  /// CPU 密集型任务执行器 bean 的名称。
   public static final String CPU_INTENSIVE_EXECUTOR = "cpuIntensiveExecutor";
+  /// IO 密集型任务执行器 bean 的名称。
   public static final String IO_INTENSIVE_EXECUTOR = "ioIntensiveExecutor";
 
+  /// 创建并配置一个 CPU 密集型任务执行器。
+  /// 该执行器使用 [ForkJoinPool]，其并行度设置为可用处理器数量，
+  /// 并为工作线程设置自定义名称前缀 "cpu-intensive-task-"。
+  ///
+  /// @return 配置好的 CPU 密集型任务执行器。
   @Bean(CPU_INTENSIVE_EXECUTOR)
   Executor cpuIntensiveExecutor() {
     return new ForkJoinPool(
@@ -50,6 +59,11 @@ public class ThreadPoolConfig {
     );
   }
 
+  /// 创建并配置一个 IO 密集型任务执行器。
+  /// 该执行器使用虚拟线程，为每个任务创建一个新线程，线程名称前缀为 "io-intensive-task-"。
+  /// 被标记为 [Primary]，表示它是首选的 [Executor] 实现。
+  ///
+  /// @return 配置好的 IO 密集型任务执行器。
   @Bean(IO_INTENSIVE_EXECUTOR)
   @Primary
   Executor ioIntensiveExecutor() {

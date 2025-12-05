@@ -43,6 +43,9 @@ public class ThirdPartyAppHttpEndpoint {
   private final ThirdPartyAppService thirdPartyAppService;
   private final ThirdPartyAppPermissionManager thirdPartyAppPermissionManager;
 
+  /// 依赖注入
+  /// @param thirdPartyAppService 第三方应用管理
+  /// @param thirdPartyAppPermissionManager 第三方应用权限管理
   public ThirdPartyAppHttpEndpoint(
       final ThirdPartyAppService thirdPartyAppService,
       ThirdPartyAppPermissionManager thirdPartyAppPermissionManager

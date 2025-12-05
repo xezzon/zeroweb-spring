@@ -16,11 +16,16 @@ package io.github.xezzon.zeroweb.crypto;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
 import org.jspecify.annotations.NonNull;
 
+/// `JwtCryptoService` 声明了与 JWT 签名/验证相关的操作。
+///
+/// 实现类负责生成基于 `JwtClaim` 的签名字符串，以及导出公钥等与 JWT 加密相关的操作。
+///
 /// @author xezzon
 public interface JwtCryptoService {
 
-  /// 签发JWT
-  /// @param claim jwt构造器
-  /// @return JWT字符串
+  /// 根据给定的声明生成并签名一个 JWT 字符串。
+  ///
+  /// @param claim JWT 声明对象
+  /// @return 生成的 JWT 字符串
   String signJwt(@NonNull JwtClaim claim);
 }

@@ -19,9 +19,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-/**
- * @author xezzon
- */
+/// 对 [S3UploadId] 进行数据库操作的 JPA 接口
+/// @author xezzon
 @Repository
 @NullMarked
 public interface S3UploadIdRepository extends

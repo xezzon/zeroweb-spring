@@ -17,10 +17,13 @@ import io.github.xezzon.zeroweb.metadata.MenuInfo;
 import io.github.xezzon.zeroweb.metadata.PermissionConstantUtil;
 import java.util.List;
 
+/// 订阅权限常量类，定义了订阅相关的权限标识
 /// @author xezzon
 public class SubscriptionPermissionConstant {
 
+  /// 订阅权限：添加订阅
   public static final String SUBSCRIBE = "subscription:#:add";
+  /// 订阅权限：查询订阅列表
   public static final String LIST_SUBSCRIPTION = "subscription:#:read";
 
   private static final List<MenuInfo> PERMISSIONS;
@@ -29,9 +32,12 @@ public class SubscriptionPermissionConstant {
     PERMISSIONS = PermissionConstantUtil.read(SubscriptionPermissionConstant.class);
   }
 
+  /// 私有构造器，防止实例化
   private SubscriptionPermissionConstant() {
   }
 
+  /// 获取所有订阅权限列表
+  /// @return 权限信息列表
   public static List<MenuInfo> getPermissions() {
     return PERMISSIONS;
   }

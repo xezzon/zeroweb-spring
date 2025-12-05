@@ -22,6 +22,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+/// 字典数据仓库
+///
+/// 提供字典数据的持久化操作，继承自 [JpaRepository] 和 [JpaSpecificationExecutor]。
+///
 /// @author xezzon
 @Repository
 @NullMarked
@@ -29,9 +33,22 @@ public interface DictRepository extends
     JpaRepository<Dict, String>,
     JpaSpecificationExecutor<Dict> {
 
+  /// 根据字典目和字典码查找字典
+  ///
+  /// @param tag 字典目编码
+  /// @param code 字典码
+  /// @return 字典实体（可能为空）
   Optional<Dict> findByTagAndCode(String tag, String code);
 
+  /// 根据上级ID集合查找字典列表
+  ///
+  /// @param parentIds 上级ID集合
+  /// @return 字典列表
   List<Dict> findByParentIdIn(Collection<String> parentIds);
 
+  /// 根据字典目查找字典列表，并按排序号升序排列
+  ///
+  /// @param tag 字典目编码
+  /// @return 字典列表（已按排序号升序排列）
   List<Dict> findByTagOrderByOrdinalAsc(String tag);
 }

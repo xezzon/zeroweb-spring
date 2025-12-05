@@ -13,24 +13,19 @@
 
 package io.github.xezzon.zeroweb.common.constant;
 
-/**
- * 数据库相关常量
- * @author xezzon
- */
+/// 数据库相关常量
+/// @author xezzon
 public class DatabaseConstant {
 
-  /**
-   * 主键字段长度
-   */
+  /// 主键字段长度
   public static final int ID_LENGTH = 64;
-  /**
-   * 默认ID
-   * 用于表示不存在的根节点
-   */
+  /// 默认ID
+  /// 用于表示不存在的根节点
   public static final String ROOT_ID = "0";
   /// ID 列名
   public static final String ID_COLUMN = "id";
 
+  /// 私有构造函数，防止实例化
   private DatabaseConstant() {
   }
 }

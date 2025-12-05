@@ -30,15 +30,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserHttpEndpoint {
 
+  /// 用户服务接口
   private final UserService userService;
 
+  /// 依赖注入
+  ///
+  /// @param userService 用户服务接口
   UserHttpEndpoint(final UserService userService) {
     this.userService = userService;
   }
 
   /// 用户注册
   ///
-  /// @param req 用户名、昵称、密码等
+  /// 处理用户注册请求，创建新的用户账号。
+  ///
+  /// @param req 用户注册信息
   /// @return 用户ID
   @PostMapping("/register")
   public Id register(@RequestBody @Validated RegisterUserReq req) {

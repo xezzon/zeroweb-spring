@@ -15,15 +15,19 @@ package io.github.xezzon.zeroweb.common.exception;
 
 import java.io.Serial;
 
-/**
- * 不正确的口令
- * @author xezzon
- */
+/// 当用户提供的身份验证令牌无效时抛出此异常。
+/// 这通常发生在令牌过期、被篡改或格式不正确时。
+/// @author xezzon
 public class InvalidTokenException extends ZerowebRuntimeException {
 
   @Serial
   private static final long serialVersionUID = 4676151668260963197L;
 
+  /**
+   * 使用指定的原因构造一个新的 `InvalidTokenException`。
+   *
+   * @param e 导致此异常的原因。
+   */
   public InvalidTokenException(Throwable e) {
     super(e);
   }

@@ -22,19 +22,26 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * 资源工具类，用于从classpath中获取资源。
+ *
  * @author xezzon
  */
 public class ResourceUtil {
 
+  /// 文件URL协议名称
   public static final String URL_PROTOCOL_FILE = "file";
 
+  /**
+   * 私有构造函数，防止实例化。
+   */
   private ResourceUtil() {
   }
 
   /**
-   * 从所有的文件系统的classpath中获取资源
-   * @param resourceName 资源名称
-   * @return 资源路径列表
+   * 从所有文件系统的classpath中获取指定资源的所有路径。
+   *
+   * @param resourceName 资源名称，例如 "application.yml"
+   * @return 资源路径列表，如果找不到则返回空列表
    */
   public static List<Path> getResourcesFromClasspath(String resourceName) {
     try {

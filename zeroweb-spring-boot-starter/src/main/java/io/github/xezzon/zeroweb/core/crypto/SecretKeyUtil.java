@@ -22,24 +22,38 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.openssl.PEMException;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 
-/**
- * 读写密钥工具类
- * @author xezzon
- */
+/// ## 密钥读写工具类
+///
+/// `SecretKeyUtil` 提供了一系列静态方法，用于处理公钥和私钥的读取与写入操作。
+/// 它封装了底层密码学库的复杂性，使得在 ZeroWeb 框架中进行密钥管理变得更加简洁和安全。
+///
+/// **主要功能:**
+/// - 从 ASN.1 格式的输入源读取公钥和私钥。
+/// - 将公钥和私钥写入 ASN.1 格式的输出目标。
+///
+/// 本工具类依赖于 `Bouncy Castle` 库进行密钥格式转换和处理。
+///
+/// @author xezzon
 @Slf4j
 public class SecretKeyUtil {
 
+  /// 用于 PEM 格式密钥与 JCA 密钥对象之间转换的工具。
+  /// 此转换器由 Bouncy Castle 库提供，用于简化密钥的导入和导出操作。
   public static final JcaPEMKeyConverter keyConverter = new JcaPEMKeyConverter();
 
+  /// 私有构造函数，防止外部实例化。
+  /// 这是一个工具类，其所有方法均为静态方法，无需创建实例。
   private SecretKeyUtil() {
   }
 
-  /**
-   * 从ASN1PublicKeyReader中读取公钥
-   * @param reader ASN1PublicKeyReader对象，用于读取公钥
-   * @return 返回读取到的公钥
-   * @throws PEMException 如果读取公钥失败，抛出PEMException异常
-   */
+  /// 从提供的 `ASN1PublicKeyReader` 中读取公钥。
+  ///
+  /// 此方法通过读取 ASN.1 编码的公钥信息，并使用 `JcaPEMKeyConverter`
+  /// 将其转换为 `java.security.PublicKey` 对象。
+  ///
+  /// @param reader 用于读取 ASN.1 格式公钥的读取器。
+  /// @return 解析并转换后的 `PublicKey` 对象。
+  /// @throws PEMException 如果在读取或转换过程中发生密码学相关的错误，则抛出此异常。
   public static PublicKey readPublicKey(ASN1PublicKeyReader reader) throws PEMException {
     Object asn1;
     try {
@@ -51,12 +65,14 @@ public class SecretKeyUtil {
     return keyConverter.getPublicKey(publicKeyInfo);
   }
 
-  /**
-   * 从ASN1PrivateKeyReader中读取私钥
-   * @param reader ASN1PrivateKeyReader对象，用于读取私钥
-   * @return 返回读取到的私钥
-   * @throws PEMException 如果读取私钥失败，抛出PEMException异常
-   */
+  /// 从提供的 `ASN1PrivateKeyReader` 中读取私钥。
+  ///
+  /// 此方法通过读取 ASN.1 编码的私钥信息，并使用 `JcaPEMKeyConverter`
+  /// 将其转换为 `java.security.PrivateKey` 对象。
+  ///
+  /// @param reader 用于读取 ASN.1 格式私钥的读取器。
+  /// @return 解析并转换后的 `PrivateKey` 对象。
+  /// @throws PEMException 如果在读取或转换过程中发生密码学相关的错误，则抛出此异常。
   public static PrivateKey readPrivateKey(ASN1PrivateKeyReader reader) throws PEMException {
     Object asn1;
     try {
@@ -68,12 +84,13 @@ public class SecretKeyUtil {
     return keyConverter.getPrivateKey(privateKeyInfo);
   }
 
-  /**
-   * 将公钥写入ASN1PublicKeyWriter中。
-   * @param publicKey 要写入的公钥对象。
-   * @param writer 用于写入公钥的ASN1PublicKeyWriter对象。
-   * @throws PEMException 如果写入公钥失败，抛出PEMException异常。
-   */
+  /// 将公钥写入到提供的 `ASN1PublicKeyWriter` 中。
+  ///
+  /// 此方法将 `PublicKey` 对象的编码形式写入到 ASN.1 格式的输出流中。
+  ///
+  /// @param publicKey 要写入的 `PublicKey` 对象。
+  /// @param writer 用于写入 ASN.1 格式公钥的写入器。
+  /// @throws PEMException 如果在写入过程中发生 I/O 错误或密码学相关的错误，则抛出此异常。
   public static void writePublicKey(PublicKey publicKey, ASN1PublicKeyWriter writer)
       throws PEMException {
     try {
@@ -83,12 +100,13 @@ public class SecretKeyUtil {
     }
   }
 
-  /**
-   * 将私钥写入ASN1PrivateKeyWriter中。
-   * @param privateKey 要写入的私钥对象。
-   * @param writer 用于写入私钥的ASN1PrivateKeyWriter对象。
-   * @throws PEMException 如果写入私钥失败，抛出PEMException异常。
-   */
+  /// 将私钥写入到提供的 `ASN1PrivateKeyWriter` 中。
+  ///
+  /// 此方法将 `PrivateKey` 对象的编码形式写入到 ASN.1 格式的输出流中。
+  ///
+  /// @param privateKey 要写入的 `PrivateKey` 对象。
+  /// @param writer 用于写入 ASN.1 格式私钥的写入器。
+  /// @throws PEMException 如果在写入过程中发生 I/O 错误或密码学相关的错误，则抛出此异常。
   public static void writePrivateKey(PrivateKey privateKey, ASN1PrivateKeyWriter writer)
       throws PEMException {
     try {

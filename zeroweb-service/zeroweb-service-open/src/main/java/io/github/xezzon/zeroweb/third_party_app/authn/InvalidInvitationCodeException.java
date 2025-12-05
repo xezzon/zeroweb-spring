@@ -24,24 +24,29 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class InvalidInvitationCodeException extends ZerowebBusinessException {
 
+  /// 错误码
   public static final String ERROR_CODE = "CFE05";
 
+  /// 邀请码中指定的用户不是当前用户
   public InvalidInvitationCodeException() {
     super("This invitation code is invalid for you.");
   }
 
+  /// 邀请码已过期
+  /// @param e JWT 已过期
   public InvalidInvitationCodeException(JwtException e) {
     super("This is an invalid or expired invitation code.");
     this.initCause(e);
   }
 
   @Override
-  public String getCode() {
+  public String code() {
     return ERROR_CODE;
   }
 
+  /// @return 403 错误
   @Override
-  public int getHttpStatus() {
+  public int httpStatus() {
     return HttpResponseStatus.FORBIDDEN.code();
   }
 }

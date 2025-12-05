@@ -21,12 +21,12 @@ import org.hibernate.validator.constraints.URL;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-/// 更新服务信息
+/// `UpdateAppReq` 记录表示用于更新现有服务信息的请求体。
 ///
-/// @param id 服务ID
-/// @param name 服务名称
-/// @param baseUrl 服务基础访问路径
-/// @param ordinal 排序值 顺序越小越靠前
+/// @param id 服务ID，标识要更新的特定服务。
+/// @param name 服务名称，非空。
+/// @param baseUrl 服务的基础访问路径，必须是一个有效的 URL。
+/// @param ordinal 服务的显示顺序，值越小优先级越高。
 /// @author xezzon
 public record UpdateAppReq(
     String id,

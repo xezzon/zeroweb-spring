@@ -23,20 +23,28 @@ import io.github.xezzon.zeroweb.dict.converter.DictImportReqConverter;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/// 字典管理在本服务实现，所以不需要以 RPC 调用的方式导入字典。
-///
-/// 实现比 [RpcTrait] 优先级更高的 [DbTrait] 接口，以覆盖 [DictRpcHandler]。
-///
-/// @author xezzon
+  /// 字典数据库处理器
+  ///
+  /// 字典管理在本服务实现，所以不需要以 RPC 调用的方式导入字典。
+  ///
+  /// 实现比 [RpcTrait] 优先级更高的 [DbTrait] 接口，以覆盖 [DictRpcHandler]。
+  ///
+  /// @author xezzon
 @Service
 public class DictDbHandler implements DictImporter, DbTrait {
 
   private final DictService dictService;
 
-  public DictDbHandler(DictService dictService) {
+    /// 依赖注入
+    ///
+    /// @param dictService 字典管理服务
+    public DictDbHandler(DictService dictService) {
     this.dictService = dictService;
   }
 
+  /// 导入字典数据
+  ///
+  /// @param reqList 字典导入请求列表
   @Override
   public void importDict(DictImportReqList reqList) {
     List<Dict> dictList = reqList.getDataList().parallelStream()

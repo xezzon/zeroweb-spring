@@ -21,11 +21,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/// 新增服务
+/// 新增服务请求体。
 ///
 /// @param name 服务名称
 /// @param baseUrl 基础访问路径
-/// @param ordinal 排序值 顺序越小越靠前
+/// @param ordinal 排序值，顺序越小越靠前
 /// @author xezzon
 public record AddAppReq(
     String name,

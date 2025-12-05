@@ -23,27 +23,49 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-/**
- * @author xezzon
- */
+/// 业务参数服务
+///
+/// 提供业务参数的完整业务逻辑处理，包括新增、查询、更新、删除等操作。
+/// 负责业务参数的数据验证、重复检查和事务管理。
+/// @author xezzon
 @Service
 public class SettingService {
 
   private final SettingDAO settingDAO;
 
+  /// 依赖注入
+  /// @param settingDAO 业务参数数据库操作
   public SettingService(final SettingDAO settingDAO) {
     this.settingDAO = settingDAO;
   }
 
+  /// 新增配置项
+  ///
+  /// 向系统中添加新的业务参数配置，包含参数标识、约束定义和初始值。
+  /// 在保存前会进行重复性检查，确保参数标识的唯一性。
+  /// @param setting 要新增的配置项，包含完整的参数信息
+  /// @throws RepeatDataException 若参数标识已存在则抛出
   void addSetting(final Setting setting) {
     this.checkRepeat(setting);
     settingDAO.get().save(setting);
   }
 
+  /// 使用 OData 参数进行分页查询配置项
+  ///
+  /// 支持 OData 协议的复杂查询功能，包括过滤、排序、分页等操作。
+  /// 默认按更新时间降序返回结果。
+  /// @param odata OData 查询选项，包含查询条件、排序、分页等参数
+  /// @return 分页结果，包含配置项列表和分页信息
   Page<@NonNull Setting> querySettingPage(final ODataQueryOption odata) {
     return settingDAO.findAll(odata);
   }
 
+  /// 根据参数标识查询配置项
+  ///
+  /// 通过业务参数的唯一标识符查询具体的参数配置。
+  /// @param code 业务参数标识，如 "system.theme"
+  /// @return 查找到的配置项
+  /// @throws NoSuchElementException 当参数标识不存在时抛出
   Setting queryByCode(@NonNull final String code) {
     return settingDAO.get().findByCode(code)
         .orElseThrow(() ->
@@ -51,14 +73,29 @@ public class SettingService {
         );
   }
 
+  /// 更新业务参数
+  ///
+  /// 更新现有业务参数的约束定义或参数值。
+  /// 支持部分更新，仅修改指定的字段。
+  /// @param setting 要更新的配置项，包含需要更新的字段
   void updateSetting(final Setting setting) {
     settingDAO.partialUpdate(setting);
   }
 
+  /// 删除业务参数
+  ///
+  /// 根据ID删除指定的业务参数配置。
+  /// @param id 要删除的参数ID
   void deleteSetting(final String id) {
     settingDAO.get().deleteById(id);
   }
 
+  /// 检查参数标识重复性
+  ///
+  /// 在新增或更新参数时检查标识是否已存在，防止重复配置。
+  /// 允许更新自己的记录，不视为重复。
+  /// @param setting 要检查的配置项，包含参数标识和ID信息
+  /// @throws RepeatDataException 当发现重复的参数标识时抛出
   private void checkRepeat(final Setting setting) {
     Optional<Setting> exist = settingDAO.get().findByCode(setting.getCode());
     if (exist.isPresent() && !Objects.equals(exist.get().getId(), setting.getId())) {

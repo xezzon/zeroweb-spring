@@ -25,6 +25,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+/// 第三方应用数据访问对象
+///
+/// 封装对第三方应用实体的数据库操作，提供基础的增删改查和分页查询功能
+///
 /// @author xezzon
 @Repository
 @NullMarked

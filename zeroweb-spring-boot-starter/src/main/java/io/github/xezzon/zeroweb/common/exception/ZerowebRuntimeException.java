@@ -13,16 +13,29 @@
 
 package io.github.xezzon.zeroweb.common.exception;
 
-/**
- * ZeroWeb 自发抛出的系统异常
- * @author xezzon
- */
+/// ZeroWeb 自发抛出的运行时异常基类。
+/// 所有 ZeroWeb 内部业务逻辑或系统操作中抛出的运行时异常都应继承此类。
+///
+/// 提供了两个构造函数：
+/// 1. 接受详细消息和根本原因。
+/// 2. 仅接受根本原因。
+///
+/// @author xezzon
 public class ZerowebRuntimeException extends RuntimeException {
 
+  /// 构造一个新的 `ZerowebRuntimeException`，附带指定的详细消息和根本原因。
+  ///
+  /// @param message 异常的详细消息。
+  /// @param cause 根本原因（稍后可通过 `Throwable.getCause()` 方法检索）。
   public ZerowebRuntimeException(String message, Throwable cause) {
     super(message, cause);
   }
 
+  /// 构造一个新的 `ZerowebRuntimeException`，附带指定的根本原因和详细消息 `(cause==null ? null : cause.toString())`（通常包含 `cause` 的类和详细消息）。
+  /// 此构造函数对于包装其他可抛出对象以进行重新抛出非常有用。
+  ///
+  /// @param cause 根本原因（稍后可通过 `Throwable.getCause()` 方法检索）。
+  ///              `null` 值表示原因不存在或未知。
   public ZerowebRuntimeException(Throwable cause) {
     super(cause);
   }

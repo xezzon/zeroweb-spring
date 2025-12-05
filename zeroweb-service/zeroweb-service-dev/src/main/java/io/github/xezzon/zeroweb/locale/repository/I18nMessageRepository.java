@@ -22,6 +22,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+/// 国际化内容仓库接口。
+/// 用于国际化内容的数据库操作。
+///
 /// @author xezzon
 @Repository
 @NullMarked
@@ -29,8 +32,16 @@ public interface I18nMessageRepository extends
     JpaRepository<I18nMessage, String>,
     JpaSpecificationExecutor<I18nMessage> {
 
+  /// 根据命名空间和消息键查找国际化内容。
+  ///
+  /// @param namespace 国际化内容命名空间。
+  /// @param messageKey 国际化内容消息键。
+  /// @return 包含国际化内容的 Optional 对象。
   Optional<I18nMessage> findByNamespaceAndMessageKey(String namespace, String messageKey);
 
+  /// 查找所有不同的国际化内容命名空间。
+  ///
+  /// @return 国际化内容命名空间列表。
   @Query("SELECT DISTINCT namespace FROM I18nMessage")
   List<String> findDistinctNamespace();
 }

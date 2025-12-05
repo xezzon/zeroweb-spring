@@ -25,17 +25,24 @@ import io.grpc.stub.StreamObserver;
 import java.util.List;
 import org.springframework.grpc.server.service.GrpcService;
 
+/// 字典管理 gRPC 接口
+///
 /// @author xezzon
 @GrpcService
 public class DictGrpcEndpoint extends DictImplBase {
 
   private final DictService dictService;
 
+  /// 依赖注入
+  /// @param dictService 字典管理服务
   public DictGrpcEndpoint(final DictService dictService) {
     this.dictService = dictService;
   }
 
   /// 查询指定字典目下所有字典项的列表（服务间接口）
+  ///
+  /// @param request 字典请求对象，包含字典目编码
+  /// @param responseObserver 响应观察者，用于返回结果
   @Override
   public void getDictListByTag(DictReq request, StreamObserver<DictListResp> responseObserver) {
     List<Dict> dictItemList = dictService.getDictItemList(request.getTag());
@@ -58,6 +65,9 @@ public class DictGrpcEndpoint extends DictImplBase {
   }
 
   /// 导入字典数据（服务间接口）
+  ///
+  /// @param request 字典导入请求列表
+  /// @param responseObserver 响应观察者，用于返回结果
   @Override
   public void importDict(DictImportReqList request, StreamObserver<Empty> responseObserver) {
     List<Dict> dictList = request.getDataList().parallelStream()

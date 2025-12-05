@@ -17,30 +17,34 @@ import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.jspecify.annotations.NullMarked;
 
-/// 无效的访问密钥
+/// 无效的访问密钥异常
 ///
-/// 原因：
-/// 1. 没传AccessKey或摘要
+/// 当第三方应用访问密钥验证失败时抛出此异常。可能的原因包括：
+/// 1. 未传递AccessKey或消息摘要
 /// 2. AccessKey或签名使用的SecretKey不正确
 /// 3. AccessKey或签名使用的SecretKey不匹配
+/// 4. 访问密钥已过期或被吊销
 ///
 /// @author xezzon
 @NullMarked
 public class InvalidAccessKeyException extends ZerowebBusinessException {
 
+  /// 错误代码
   public static final String ERROR_CODE = "CFE03";
 
+  /// 默认构造函数
   public InvalidAccessKeyException() {
     super("An Invalid Access Key");
   }
 
   @Override
-  public String getCode() {
+  public String code() {
     return ERROR_CODE;
   }
 
+  /// @return HTTP状态码（403 Forbidden）
   @Override
-  public int getHttpStatus() {
+  public int httpStatus() {
     return HttpResponseStatus.FORBIDDEN.code();
   }
 }

@@ -13,11 +13,13 @@
 
 package io.github.xezzon.zeroweb.common.config;
 
-/// 存储后端
+/// 文件存储后端枚举。
+///
+/// 定义了支持的文件存储服务类型，例如文件系统 (FS) 和 S3 兼容的对象存储。
 /// @author xezzon
 public enum FileProviderEnum {
-  /// 硬盘存储
-  FS,
-  /// 对象存储（兼容 S3）
-  S3,
+    /// 硬盘存储：文件将直接存储在本地文件系统上。
+    FS,
+    /// 对象存储：文件将存储在兼容 S3 协议的对象存储服务上。
+    S3,
 }

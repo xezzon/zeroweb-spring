@@ -27,7 +27,9 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
- * @author xezzon
+ * ZeroWeb 开放接口请求构建器。
+ * 继承自 Feign.Builder，用于构建和配置 Feign 客户端，以便与 ZeroWeb 开放接口进行安全通信。
+ * 自动处理请求签名，包括添加应用访问凭据、时间戳和摘要。
  */
 public class ZerowebOpenRequestBuilder extends Feign.Builder {
 
@@ -36,17 +38,20 @@ public class ZerowebOpenRequestBuilder extends Feign.Builder {
   }
 
   /**
-   * 应用访问凭据
+   * 应用访问凭据（Access Key）。
+   * 用于唯一标识和认证调用开放接口的客户端应用。
    */
   private final String accessKey;
   /**
-   * 应用密钥（AES）
+   * 应用密钥（Secret Key）。
+   * 用于生成请求摘要，确保请求的完整性和安全性。
    */
   private final byte[] secretKey;
 
   /**
-   * @param accessKey 应用访问凭据
-   * @param secretKey 应用密钥
+   * 使用指定的应用访问凭据和应用密钥构造 ZeroWeb 开放接口请求构建器。
+   * @param accessKey 用于身份验证的应用访问凭据。
+   * @param secretKey 用于签名生成的应用密钥。
    */
   public ZerowebOpenRequestBuilder(String accessKey, String secretKey) {
     this.accessKey = accessKey;
@@ -55,10 +60,22 @@ public class ZerowebOpenRequestBuilder extends Feign.Builder {
   }
 
   /**
-   * OpenFeign 请求拦截器。向请求头中添加应用访问凭据、时间戳、摘要。
+   * <p>OpenFeign 请求拦截器实现。</p>
+   * <p>负责在每个请求发送前，向请求头中添加 ZeroWeb 开放接口所需的认证信息，
+   * 包括应用访问凭据（X-Access-Key）、时间戳（X-Timestamp）和请求摘要（X-Signature）。</p>
    */
   class ZerowebOpenRequestInterceptor implements RequestInterceptor {
 
+    /**
+     * <p>应用请求拦截逻辑。</p>
+     * <p>在此处为每个 Feign 请求添加 `X-Access-Key`、`X-Timestamp` 和 `X-Signature` 请求头。</p>
+     * <ul>
+     *   <li>`X-Access-Key`：客户端的应用访问凭据。</li>
+     *   <li>`X-Timestamp`：当前请求时间戳，用于签名盐值和防止重放攻击。</li>
+     *   <li>`X-Signature`：请求体和时间戳的 HMAC-SHA256 摘要，使用应用密钥进行签名。</li>
+     * </ul>
+     * @param requestTemplate HTTP 请求客户端。
+     */
     @Override
     public void apply(RequestTemplate requestTemplate) {
       // 应用访问凭据

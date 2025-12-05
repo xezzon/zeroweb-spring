@@ -39,10 +39,15 @@ import lombok.ToString;
 @Table(name = Openapi.TABLE_NAME)
 public class Openapi implements IEntity<String> {
 
+  /// 表名
   public static final String TABLE_NAME = "zeroweb_openapi";
+  /// 接口编码列名
   public static final String CODE_COLUMN = "code";
+  /// 后端地址列名
   public static final String DESTINATION_COLUMN = "destination";
+  /// HTTP方法列名
   public static final String HTTP_METHOD_COLUMN = "http_method";
+  /// 发布状态列名
   public static final String STATUS_COLUMN = "status";
 
   /// 对外接口标识
@@ -75,6 +80,9 @@ public class Openapi implements IEntity<String> {
   @Enumerated(EnumType.STRING)
   OpenapiStatus status;
 
+  /// 检查接口是否已发布
+  ///
+  /// @return 如果接口状态为已发布则返回 true，否则返回 false
   public boolean isPublished() {
     return this.status == OpenapiStatus.PUBLISHED;
   }

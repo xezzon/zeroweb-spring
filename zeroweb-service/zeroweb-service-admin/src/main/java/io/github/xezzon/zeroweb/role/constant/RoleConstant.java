@@ -16,11 +16,19 @@ package io.github.xezzon.zeroweb.role.constant;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.role.Role;
 
-/**
- * @author xezzon
- */
+/// 角色静态常量定义
+///
+/// 提供系统中预定义的角色实例，
+/// 用于代码中直接引用标准角色对象。
+///
+/// @author xezzon
 public class RoleConstant {
 
+  /// 超级管理员角色
+  ///
+  /// 系统预定义的超级管理员角色实例。
+  /// 拥有系统最高权限，可以进行所有操作。
+  /// 初始化时设置所有必要属性值。
   public static final Role ROOT = new Role();
 
   static {

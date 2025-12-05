@@ -21,9 +21,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/// 更新业务参数请求（仅更新值）
-/// @param id 需要更新的业务参数的ID
-/// @param value 业务参数的值
+/// 更新业务参数值请求
+///
+/// 用于更新现有业务参数的值，不修改参数标识和约束定义。
+/// 通过ID标识要更新的参数，仅更新value字段。
+/// @param id 需要更新的业务参数ID
+/// @param value 新的参数值，JSON格式
 /// @author xezzon
 public record UpdateValueRequest(
     String id,

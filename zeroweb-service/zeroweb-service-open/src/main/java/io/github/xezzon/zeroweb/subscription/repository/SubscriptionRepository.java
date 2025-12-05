@@ -21,13 +21,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+/// 订阅数据访问接口，提供对订阅数据的CRUD操作和查询功能
+/// @author xezzon
 @Repository
 @NullMarked
 public interface SubscriptionRepository extends
     JpaRepository<Subscription, String>,
     JpaSpecificationExecutor<Subscription> {
 
+  /// 根据应用ID和接口编码集合查询订阅记录
+  /// @param appId 应用ID
+  /// @param openapiCodes 接口编码集合
+  /// @return 订阅记录列表
   List<Subscription> findByAppIdAndOpenapiCodeIn(String appId, Collection<String> openapiCodes);
 
+  /// 根据应用ID查询所有订阅记录
+  /// @param appId 应用ID
+  /// @return 订阅记录列表
   List<Subscription> findByAppId(String appId);
 }

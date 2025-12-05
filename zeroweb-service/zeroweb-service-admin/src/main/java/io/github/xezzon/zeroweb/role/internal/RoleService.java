@@ -31,16 +31,36 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
+/// 角色服务实现类
+///
+/// `RoleService` 提供角色管理的业务逻辑实现。
+/// 它同时实现了 `ITreeService` 以支持树形结构相关的查询，
+/// 以及 `IRoleService4Auth` 为认证模块提供角色相关服务。
+///
 /// @author xezzon
 @Service
 public class RoleService implements ITreeService<Role, String>, IRoleService4Auth {
 
   private final RoleRepository roleRepository;
 
+  /// 依赖注入
+  ///
+  /// @param roleRepository 角色数据访问层
   public RoleService(final RoleRepository roleRepository) {
     this.roleRepository = roleRepository;
   }
 
+  /// 新增角色
+  ///
+  /// 创建新的角色实例，包含完整的业务逻辑验证和处理：
+  /// 1. 验证上级角色是否存在且允许继承
+  /// 2. 自动生成角色完整编码路径
+  /// 3. 检查角色编码重复性
+  /// 4. 持久化到数据库
+  ///
+  /// @param role 待创建的角色对象，id 和 value 字段会由系统自动生成
+  /// @throws RoleNotInheritableException 当上级角色不允许继承时抛出
+  /// @throws RepeatDataException 当角色编码重复时抛出
   void addRole(Role role) {
     /* 前置校验校验 */
     // 校验上级角色是否存在并允许继承
@@ -66,6 +86,12 @@ public class RoleService implements ITreeService<Role, String>, IRoleService4Aut
     roleRepository.save(role);
   }
 
+  /// 删除角色
+  ///
+  /// 根据角色ID删除角色，如果角色不存在则直接返回。
+  /// 实际删除操作会调用重载方法处理级联删除。
+  ///
+  /// @param id 角色ID
   void deleteRole(final String id) {
     final Optional<Role> role = roleRepository.findById(id);
     if (role.isEmpty()) {
@@ -74,9 +100,13 @@ public class RoleService implements ITreeService<Role, String>, IRoleService4Aut
     this.deleteRole(Collections.singleton(role.get()));
   }
 
-  /// 递归删除下级角色
+  /// 递归删除角色
   ///
-  /// @param roles 下级角色
+  /// 批量删除角色及其所有下级角色。
+  /// 采用递归方式确保删除指定角色及其所有子角色。
+  /// 操作在事务中执行，确保数据一致性。
+  ///
+  /// @param roles 待删除的角色集合
   @Transactional
   void deleteRole(final Collection<Role> roles) {
     if (roles.isEmpty()) {
@@ -91,6 +121,13 @@ public class RoleService implements ITreeService<Role, String>, IRoleService4Aut
     this.deleteRole(children);
   }
 
+  /// 查询当前用户的角色
+  ///
+  /// 获取当前登录用户的角色及其下一级角色。
+  /// 通过 Sa-Token 获取用户角色列表，然后查询对应的角色对象。
+  /// 为每个角色设置其直接子角色，构建角色树结构。
+  ///
+  /// @return 当前用户的角色列表，包含直接子角色
   List<Role> listMyRole() {
     final List<String> roleValues = StpUtil.getRoleList();
     List<Role> roles = roleRepository.findByValueIn(roleValues);

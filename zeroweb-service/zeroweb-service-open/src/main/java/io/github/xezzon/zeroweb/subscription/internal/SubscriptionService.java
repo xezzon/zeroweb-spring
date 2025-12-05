@@ -18,7 +18,6 @@ import io.github.xezzon.zeroweb.openapi.IOpenapiService4Subscription;
 import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
 import io.github.xezzon.zeroweb.subscription.ISubscriptionService4Call;
-import io.github.xezzon.zeroweb.subscription.ISubscriptionService4ThirdPartyApp;
 import io.github.xezzon.zeroweb.subscription.Subscription;
 import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
 import io.github.xezzon.zeroweb.subscription.exception.UnpublishedOpenapiCannotBeSubscribeException;
@@ -34,15 +33,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
+/// 订阅服务实现类，实现了第三方应用接口和调用接口的服务
 /// @author xezzon
 @Service
-public class SubscriptionService implements
-    ISubscriptionService4ThirdPartyApp,
-    ISubscriptionService4Call {
+public class SubscriptionService implements ISubscriptionService4Call {
 
+  /// 订阅数据仓库，用于数据库操作
   private final SubscriptionRepository subscriptionRepository;
+  /// 对外接口服务，用于查询接口信息
   private final IOpenapiService4Subscription openapiService;
 
+  /// 构造器，注入订阅仓库和接口服务
+  /// @param subscriptionRepository 订阅数据仓库
+  /// @param openapiService 对外接口服务
   public SubscriptionService(
       final SubscriptionRepository subscriptionRepository,
       final IOpenapiService4Subscription openapiService
@@ -89,7 +92,10 @@ public class SubscriptionService implements
     subscriptionRepository.save(entity);
   }
 
-  @Override
+  /// 获取订阅列表，包含所有已发布接口及指定应用的订阅状态
+  /// @param odata OData查询选项，用于指定查询条件、排序方式等
+  /// @param appId 第三方应用ID
+  /// @return 包含订阅信息的分页对象
   public Page<@NonNull Subscription> listSubscription(ODataQueryOption odata, String appId) {
     Page<@NonNull Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
     List<Subscription> subscriptions = subscriptionRepository.findByAppId(appId);
@@ -107,9 +113,12 @@ public class SubscriptionService implements
     return new PageImpl<>(subscriptions, openapiPage.getPageable(), openapiPage.getTotalElements());
   }
 
+  /// @param appId 应用ID
+  /// @param openapiCode 对外接口编码
+  /// @return 订阅信息
+  /// @throws UnsubscribeOpenapiException 查询未订阅的接口
   @Override
-  public Subscription getSubscription(String appId, String openapiCode)
-      throws UnsubscribeOpenapiException {
+  public Subscription getSubscription(String appId, String openapiCode) {
     List<Subscription> subscriptions = subscriptionRepository
         .findByAppIdAndOpenapiCodeIn(appId, Collections.singleton(openapiCode));
     if (subscriptions.isEmpty()) {

@@ -21,6 +21,7 @@ import jakarta.transaction.Transactional;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,12 +29,18 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+/// 字典服务
+///
+/// 提供字典管理的核心业务逻辑，包括新增、修改、删除、查询等操作。
+///
 /// @author xezzon
 @Service
 public class DictService {
 
   private final DictDAO dictDAO;
 
+  /// 依赖注入
+  /// @param dictDAO 字典相关的数据库操作
   public DictService(final DictDAO dictDAO) {
     this.dictDAO = dictDAO;
   }
@@ -61,6 +68,7 @@ public class DictService {
   ///
   /// @param dict 字典项
   /// @throws RepeatDataException 字典键冲突
+  /// @throws NoSuchElementException 字典不存在
   protected void modifyDict(Dict dict) {
     Dict entity = dictDAO.get().findById(dict.getId()).orElseThrow();
     /* 前置校验 */
@@ -100,7 +108,7 @@ public class DictService {
   /// 获取字典目下所有的字典项，按排序号升序排列
   ///
   /// @param tag 字典目编码
-  /// @return 字典项列表
+  /// @return 字典项列表（已按排序号升序排列）
   protected List<Dict> getDictItemList(String tag) {
     return dictDAO.get().findByTagOrderByOrdinalAsc(tag);
   }
@@ -133,9 +141,10 @@ public class DictService {
 
   /// 重复性校验
   ///
-  /// 两个不同的字典之间，不能具有相同的字典目与字典码
+  /// 两个不同的字典之间，不能具有相同的字典目与字典码。
   ///
   /// @param dict 待检查的字典 至少包含 字典目编码、字典码、ID（可为空）字段
+  /// @throws RepeatDataException 如果存在重复的字典项
   private void checkRepeat(Dict dict) {
     Optional<Dict> exist = dictDAO.get().findByTagAndCode(dict.getTag(), dict.getCode());
     if (exist.isPresent() && !Objects.equals(dict.getId(), exist.get().getId())) {

@@ -18,45 +18,42 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * 分页数据
- * @author xezzon
- */
+/// `PagedModel` 是一个用于封装分页数据的通用模型。
+/// 它包含当前页的数据内容和分页元数据。
+///
+/// @param <T> 数据内容的类型。
+/// @author xezzon
 @Setter(AccessLevel.PACKAGE)
 @Getter
 public class PagedModel<T> {
 
-  /**
-   * 数据内容
-   */
+  /// 当前页的数据内容列表。
+  ///
+  /// 例如，如果查询用户列表，这里将包含当前页的用户对象列表。
   private List<T> content;
-  /**
-   * 分页信息
-   */
+  /// 分页元数据，包含分页大小、页码、总数据量和总页数等信息。
   private PageMetadata page;
 
-  /**
-   * 分页信息
-   */
+  /// `PageMetadata` 提供了关于分页的详细信息，例如总页数、当前页码等。
   @Setter(AccessLevel.PACKAGE)
   @Getter
   public static class PageMetadata {
 
-    /**
-     * 分页大写
-     */
+    /// 当前页的分页大小，即每页包含的元素数量。
+    ///
+    /// 例如，如果 `size` 为 10，则表示每页显示 10 条数据。
     private long size;
-    /**
-     * 页码
-     */
+    /// 当前页码，通常从 0 开始计数。
+    ///
+    /// 例如，如果 `number` 为 0，表示第一页；如果为 1，表示第二页。
     private long number;
-    /**
-     * 总数据量
-     */
+    /// 所有页的总数据量。
+    ///
+    /// 例如，如果数据库中有 100 条记录，`totalElements` 将是 100。
     private long totalElements;
-    /**
-     * 总页数
-     */
+    /// 总页数，根据总数据量和分页大小计算得出。
+    ///
+    /// 例如，如果 `totalElements` 为 100 且 `size` 为 10，则 `totalPages` 将是 10。
     private long totalPages;
   }
 }

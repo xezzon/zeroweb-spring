@@ -20,12 +20,17 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/// 新增角色
+/// 新增角色请求对象
 ///
-/// @param code 角色简码
-/// @param name 角色名称
-/// @param inheritable 是否允许该角色新建其下级角色
-/// @param parentId 上级角色
+/// 用于封装新增角色时客户端提交的请求参数。
+/// 该类实现了 [Into] 接口，支持转换为[角色实体][Role]对象。
+/// 使用 MapStruct 进行对象转换，提供类型安全的映射功能。
+///
+/// @param code 角色简码，用于区分同级别角色
+/// @param name 角色名称，用于界面展示
+/// @param inheritable 是否允许创建下级角色
+/// @param parentId 上级角色ID
+///
 /// @author xezzon
 public record AddRoleReq(
     String code,
@@ -39,6 +44,11 @@ public record AddRoleReq(
     return Converter.INSTANCE.from(this);
   }
 
+  /// 对象转换器
+  ///
+  /// 使用 MapStruct 提供的类型安全的对象映射功能，
+  /// 将 `AddRoleReq` 对象转换为 `Role` 实体对象。
+  /// 转换时忽略 value、children、id 字段，这些字段由业务逻辑自动生成。
   @Mapper
   interface Converter extends From<AddRoleReq, Role> {
 

@@ -20,12 +20,21 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+/// AddUserReq到User的转换器
+///
+/// 使用MapStruct将注册请求对象转换为用户实体对象。
+///
 /// @author xezzon
 @Mapper
 public interface AddUserReqConverter extends From<AddUserReq, User> {
 
+  /// 转换器实例
   AddUserReqConverter INSTANCE = Mappers.getMapper(AddUserReqConverter.class);
 
+  /// 转换为用户实体
+  ///
+  /// @param req 注册请求对象
+  /// @return 用户实体对象
   @Mapping(target = "updateTime", ignore = true)
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "createTime", ignore = true)

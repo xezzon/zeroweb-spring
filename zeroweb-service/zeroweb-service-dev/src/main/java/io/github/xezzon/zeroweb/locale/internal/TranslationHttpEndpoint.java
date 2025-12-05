@@ -27,19 +27,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /// 国际化文本管理
+///
+/// @author xezzon
 @RestController
 @RequestMapping("/locale")
 public class TranslationHttpEndpoint {
 
   private final LocalizedService localizedService;
 
+  /**
+   * 构造函数。注入国际化服务类。
+   * @param localizedService 国际化服务类
+   */
   public TranslationHttpEndpoint(final LocalizedService localizedService) {
     this.localizedService = localizedService;
   }
 
-  /// 新增/更新 国际化文本
+  /// 新增或更新国际化文本。
   ///
-  /// @param req 国际化文本
+  /// @param req 国际化文本请求体。
+  /// @return 新增或更新的国际化文本 ID。
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
   public Id upsertTranslation(@RequestBody final UpsertTranslationReq req) {
@@ -48,11 +55,11 @@ public class TranslationHttpEndpoint {
     return Id.of(translation.getId());
   }
 
-  /// 加载国际化资源
+  /// 加载国际化资源。
   ///
-  /// @param language 国际化语言
-  /// @param namespace 命名空间
-  /// @return 国际化内容-国际化文本
+  /// @param language 国际化语言标签。
+  /// @param namespace 命名空间。
+  /// @return 国际化内容键-国际化文本的映射。
   @GetMapping("/{language}/{namespace}")
   public Map<String, String> loadTranslation(
       @PathVariable final String language,

@@ -50,18 +50,27 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PresignedUploadPartRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
+/// S3 对象存储服务实现。
+/// 如果没有配置 S3，则不会注册 Bean。
 /// @author xezzon
 @Slf4j
 @Service
 @ConditionalOnBean(ZerowebS3Config.class)
 public class S3Service implements IStorageService {
 
+  /// S3 对象元数据中存储文件名的键。
   public static final String FILENAME_METADATA_KEY = "filename";
   private final ZerowebS3Config zerowebS3Config;
   private final S3Presigner s3Presigner;
   private final S3Client s3Client;
   private final S3UploadIdRepository s3UploadIdRepository;
 
+  /// 注入依赖
+  ///
+  /// @param zerowebS3Config S3 配置。
+  /// @param s3Presigner S3 预签名器。
+  /// @param s3Client S3 客户端。
+  /// @param s3UploadIdRepository S3 上传 ID 仓库。
   public S3Service(
       final ZerowebS3Config zerowebS3Config,
       final S3Presigner s3Presigner,
@@ -79,6 +88,11 @@ public class S3Service implements IStorageService {
     return FileProviderEnum.S3;
   }
 
+  /// 获取文件上传信息。
+  /// 如果文件大小超过分段上传阈值，则会检查或创建分段上传 ID。
+  ///
+  /// @param attachment 附件信息。
+  /// @return 文件上传信息。
   @Override
   public UploadInfo getUploadInfo(Attachment attachment) {
     long partSize = zerowebS3Config.getPartSize();
@@ -111,7 +125,11 @@ public class S3Service implements IStorageService {
     );
   }
 
-  /// 创建预签名的 S3 URL，返回给前端
+  /// 创建预签名的 S3 URL，返回给前端。
+  /// 用于单文件上传。
+  ///
+  /// @param attachment 附件信息。
+  /// @return 包含预签名 URL 的上传访问点。
   public UploadEndpoint getUploadAddress(Attachment attachment) {
     PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder()
         .signatureDuration(Duration.ofMinutes(10))
@@ -130,12 +148,18 @@ public class S3Service implements IStorageService {
     return new UploadEndpoint(presignedPutObjectRequest.url().toString());
   }
 
-  /// 创建预签名的 S3 URL，返回给前端
   @Override
   public UploadEndpoint getUploadAddress(Attachment attachment, int partNumber) {
     return this.getUploadAddress(attachment, partNumber, StorageContext.CRC.get());
   }
 
+  /// 创建预签名的 S3 URL，返回给前端。
+  /// 用于分段上传的特定分段，并包含 CRC 校验码。
+  ///
+  /// @param attachment 附件信息。
+  /// @param partNumber 分段编号。
+  /// @param crc CRC 校验码。
+  /// @return 包含预签名 URL 的上传访问点。
   public UploadEndpoint getUploadAddress(Attachment attachment, Integer partNumber, String crc) {
     S3UploadId s3UploadId = s3UploadIdRepository.findById(attachment.getId())
         .orElseGet(() -> this.createMultipartUpload(attachment));
@@ -209,8 +233,10 @@ public class S3Service implements IStorageService {
     return response.asByteArray();
   }
 
-  /// 开启一次分段上传
-  /// @param attachment 附件
+  /// 开启一次分段上传。
+  ///
+  /// @param attachment 附件。
+  /// @return S3 上传 ID。
   private S3UploadId createMultipartUpload(Attachment attachment) {
     CreateMultipartUploadResponse createMultipartUploadResponse = s3Client.createMultipartUpload(
         builder -> builder
@@ -232,14 +258,13 @@ public class S3Service implements IStorageService {
     return s3UploadId;
   }
 
-  /**
-   * 获取已上传分段情况
-   * @param attachment 附件
-   * @param uploadId 上传ID
-   * @return 已上传分段列表
-   * @throws NoSuchUploadException 上传ID已过期或不存在
-   */
-  private List<Part> listParts(Attachment attachment, String uploadId) throws NoSuchUploadException {
+  /// 获取已上传分段情况
+  ///
+  /// @param attachment 附件
+  /// @param uploadId 上传ID
+  /// @return 已上传分段列表
+  /// @throws NoSuchUploadException 上传ID已过期或不存在
+  private List<Part> listParts(Attachment attachment, String uploadId) {
     ListPartsResponse listPartsResponse = s3Client.listParts(builder -> builder
         .bucket(zerowebS3Config.getBucket())
         .key(attachment.objectKey())
@@ -248,7 +273,9 @@ public class S3Service implements IStorageService {
     return listPartsResponse.parts();
   }
 
-  /// 文件上传前，先调用 S3 开启一次分段上传
+  /// 监听附件创建事件，如果附件类型为 S3 且需要分段上传，则开启一次分段上传。
+  ///
+  /// @param event 附件创建事件。
   @EventListener
   void listen(AttachmentCreatedEvent event) {
     Attachment attachment = event.attachment();
@@ -265,7 +292,9 @@ public class S3Service implements IStorageService {
     this.createMultipartUpload(attachment);
   }
 
-  /// 文件上传后，调用 S3 完成分段合并
+  /// 监听附件上传事件，如果附件类型为 S3 且为分段上传，则完成分段合并。
+  ///
+  /// @param event 附件上传事件。
   @EventListener
   void listen(AttachmentUploadedEvent event) {
     Attachment attachment = event.attachment();
@@ -293,7 +322,9 @@ public class S3Service implements IStorageService {
         });
   }
 
-  /// 附件删除后，将对应的文件也删除
+  /// 监听附件删除事件，删除 S3 中对应的文件。
+  ///
+  /// @param event 附件删除事件。
   @EventListener
   @Async()
   void listen(AttachmentDeletedEvent event) {

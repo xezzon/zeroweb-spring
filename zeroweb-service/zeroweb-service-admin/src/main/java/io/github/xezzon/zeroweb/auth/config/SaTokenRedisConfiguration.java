@@ -22,16 +22,21 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Configuration;
 
-/// 应用启动时检查是否配置了 Redis
+/// `SaTokenRedisConfiguration` 是 Sa-Token 框架的 Redis 配置类。
 ///
-/// 没有配置 Redis 时，使用内存作为 Session 的存储方式
+/// 它在应用程序启动时检查是否配置了 Redis。
+/// 如果没有配置 Redis，则使用内存作为 Session 的存储方式；否则使用 Redis。
 ///
-/// 否则以 Redis 作为 Session 的存储方式
 /// @author xezzon
 @Configuration
 @ConditionalOnMissingBean(RedisTemplateFactory.class)
 public class SaTokenRedisConfiguration implements ApplicationRunner {
 
+  /// 应用程序启动时运行的方法。
+  ///
+  /// 如果没有配置 Redis，则将 Sa-Token 的 DAO 实现设置为默认的内存实现。
+  ///
+  /// @param args 应用程序启动参数。
   @Override
   public void run(@NonNull final ApplicationArguments args) {
     SaManager.setSaTokenDao(new SaTokenDaoDefaultImpl());

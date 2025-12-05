@@ -20,6 +20,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+/// 新增附件请求体
 /// @author xezzon
 /// @param name 文件名
 /// @param checksum 文件摘要

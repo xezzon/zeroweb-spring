@@ -37,6 +37,8 @@ public class DictRpcHandler implements DictImporter, RpcTrait {
   @Resource
   private DictStub dictStub;
 
+  /// 用于标识导入是否已完成
+  /// @return 一个计数器，计数器归零时即导入已完成。
   @TestOnly
   public CountDownLatch getCountDownLatch() {
     return this.countDownLatch;

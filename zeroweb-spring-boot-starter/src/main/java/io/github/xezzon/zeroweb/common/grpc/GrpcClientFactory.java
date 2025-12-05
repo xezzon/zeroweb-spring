@@ -51,7 +51,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class GrpcClientFactory {
 
-  /// gRPC 全局配置
+/// gRPC 全局配置。
+/// 启用 gRPC 客户端的重试机制，并设置最大重试次数为 3。
   @Bean
   @Order(200)
   <T extends ManagedChannelBuilder<T>> GrpcChannelBuilderCustomizer<T> retryChannelCustomizer() {

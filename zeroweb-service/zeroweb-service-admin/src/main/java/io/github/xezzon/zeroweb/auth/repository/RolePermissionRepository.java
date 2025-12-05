@@ -22,18 +22,39 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+/// `RolePermissionRepository` 是角色-权限关联的 JPA 数据仓库接口。
+///
+/// 它提供了对 [RolePermission] 实体的数据库操作，包括按角色ID查询、检查是否存在、删除以及按权限查询。
+///
 @Repository
 @NullMarked
 public interface RolePermissionRepository extends
     JpaRepository<RolePermission, String>,
     JpaSpecificationExecutor<RolePermission> {
 
+  /// 根据角色ID集合查询角色-权限关联。
+  ///
+  /// @param roleIds 角色ID集合。
+  /// @return 匹配的角色-权限关联列表。
   List<RolePermission> findByRoleIdIn(Collection<String> roleIds);
 
+  /// 检查指定角色ID和权限编码的关联是否存在。
+  ///
+  /// @param roleId 角色ID。
+  /// @param permission 权限编码。
+  /// @return 如果存在则为 `true`，否则为 `false`。
   boolean existsByRoleIdAndPermission(String roleId, String permission);
 
+  /// 删除指定角色ID集合和权限编码的所有角色-权限关联。
+  ///
+  /// @param roleIds 角色ID集合。
+  /// @param permission 权限编码。
   @Transactional
   void deleteByRoleIdInAndPermission(Collection<String> roleIds, String permission);
 
+  /// 根据权限编码查询角色-权限关联。
+  ///
+  /// @param permission 权限编码。
+  /// @return 匹配的角色-权限关联列表。
   List<RolePermission> findByPermission(String permission);
 }

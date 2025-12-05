@@ -16,18 +16,26 @@ package io.github.xezzon.zeroweb.openapi.exception;
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
 import org.jspecify.annotations.NullMarked;
 
+/// 已发布的对外接口无法修改异常
+///
+/// 当尝试修改状态为已发布的对外接口时，抛出此业务异常。
+/// 根据业务规则，已发布的接口编码和基本信息不允许修改，
+/// 只能修改草稿状态的接口信息。
+///
 /// @author xezzon
 @NullMarked
 public class PublishedOpenapiCannotBeModifyException extends ZerowebBusinessException {
 
+  /// 错误码
   public static final String ERROR_CODE = "CFE01";
 
+  /// 默认构造函数
   public PublishedOpenapiCannotBeModifyException() {
     super("Published OpenAPI cannot be modified.");
   }
 
   @Override
-  public String getCode() {
+  public String code() {
     return ERROR_CODE;
   }
 }

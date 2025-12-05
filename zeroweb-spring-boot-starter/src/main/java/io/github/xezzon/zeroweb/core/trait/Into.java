@@ -20,5 +20,8 @@ package io.github.xezzon.zeroweb.core.trait;
  */
 public interface Into<T> {
 
+  /// 转换
+  ///
+  /// @return 目标类型实例
   T into();
 }

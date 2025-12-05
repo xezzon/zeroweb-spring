@@ -45,6 +45,8 @@ public class DictHttpEndpoint {
 
   private final DictService dictService;
 
+  /// 依赖注入
+  /// @param dictService 字典管理服务
   public DictHttpEndpoint(final DictService dictService) {
     this.dictService = dictService;
   }
@@ -68,6 +70,7 @@ public class DictHttpEndpoint {
 
   /// 分页查询字典目列表
   ///
+  /// @param odata OData 查询参数
   /// @return 字典目列表
   @SaCheckPermission({PermissionConstant.DICT_READ})
   @GetMapping()
@@ -87,7 +90,7 @@ public class DictHttpEndpoint {
 
   /// 更新字典目/字典项
   ///
-  /// @param req 字典
+  /// @param req 字典修改请求对象
   @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @PutMapping()
   public void modifyDict(@RequestBody ModifyDictReq req) {

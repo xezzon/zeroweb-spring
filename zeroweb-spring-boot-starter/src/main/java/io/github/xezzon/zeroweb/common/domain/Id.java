@@ -15,17 +15,15 @@ package io.github.xezzon.zeroweb.common.domain;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * 将ID封装成对象
- * @author xezzon
- */
+/// 封装 ID 的记录类。
+/// 将 ID 封装成强类型对象，避免原始类型偏执。
+/// @param id ID 字符串
+/// @author xezzon
 public record Id(String id) {
 
-  /**
-   * 静态化构造ID对象
-   * @param id ID
-   * @return ID对象
-   */
+  /// 静态方法，用于构造 `Id` 对象。
+  /// @param id ID 字符串
+  /// @return 对应的 `Id` 对象
   public static Id of(@NonNull String id) {
     return new Id(id);
   }

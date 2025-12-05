@@ -14,10 +14,16 @@
 package io.github.xezzon.zeroweb;
 
 /**
- * @author xezzon
+ * ZeroWeb 开放接口异常。
+ * 在调用 ZeroWeb 开放接口时，如果发生任何底层异常，都会被封装成此运行时异常。
+ * 这有助于统一异常处理逻辑，提高代码的可读性和健壮性。
  */
 public class ZerowebOpenException extends RuntimeException {
 
+  /**
+   * 使用指定的根本原因构造一个新的 ZeroWeb 开放接口异常。
+   * @param cause 异常的根本原因。
+   */
   public ZerowebOpenException(Throwable cause) {
     super(cause);
   }

@@ -20,6 +20,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+/// 对 [附件][Attachment] 进行数据库操作的 JPA 接口
 /// @author xezzon
 @Repository
 @NullMarked
@@ -27,5 +28,11 @@ public interface AttachmentRepository extends
     JpaRepository<Attachment, String>,
     JpaSpecificationExecutor<Attachment> {
 
+  /**
+   * 查询业务关联的附件列表
+   * @param bizType 业务类型
+   * @param bizId 业务ID
+   * @return 附件列表
+   */
   List<Attachment> findByBizTypeAndBizId(String bizType, String bizId);
 }

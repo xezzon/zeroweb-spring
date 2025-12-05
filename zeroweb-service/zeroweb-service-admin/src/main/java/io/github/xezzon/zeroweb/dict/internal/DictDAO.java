@@ -31,6 +31,11 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
+/// 字典数据访问对象
+///
+/// 继承自 [BaseDAO]，提供字典数据的增删改查功能。
+/// 实现了分页查询、状态更新等业务方法。
+///
 /// @author xezzon
 @Repository
 @NullMarked
@@ -40,6 +45,9 @@ public class DictDAO extends BaseDAO<Dict, String, DictRepository> {
     super(repository, Dict.class);
   }
 
+  /// 数据复制器实例
+  ///
+  /// @return 字典数据复制器
   @Override
   public ICopier<Dict> getCopier() {
     return Copier.INSTANCE;
@@ -56,7 +64,9 @@ public class DictDAO extends BaseDAO<Dict, String, DictRepository> {
     return this.findAll(odata, specification, sort);
   }
 
-  /// 根据 tag、code 判断，如果字典存在，则跳过；否则保存
+  /// 插入或更新字典数据
+  ///
+  /// 根据 tag、code 判断，如果字典存在，则跳过；否则保存。
   ///
   /// @param dict 字典信息
   public void upsert(final Dict dict) {

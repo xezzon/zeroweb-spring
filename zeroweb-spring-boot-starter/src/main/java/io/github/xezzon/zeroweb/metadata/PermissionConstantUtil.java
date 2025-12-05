@@ -19,11 +19,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author xezzon
- */
+/// 权限常量工具类。
+/// 用于读取指定 Class 中定义的公共静态字符串字段，并将其转换为 [MenuInfo] 对象，
+/// 表示接口权限。
+///
+/// @author xezzon
 public final class PermissionConstantUtil {
 
+  /// 读取指定类中定义的公共静态字符串字段，并将其转换为 [MenuInfo] 列表。
+  /// 这些字段的值被视为权限路径，并作为单一权限添加到 [MenuInfo] 中。
+  ///
+  /// @param constant 包含权限常量的类。
+  /// @return [MenuInfo] 对象的列表，每个对象代表一个接口权限。
+  /// @throws ZerowebRuntimeException 如果在访问字段时发生 [IllegalAccessException]。
   public static List<MenuInfo> read(Class<?> constant) {
     return Arrays.stream(constant.getDeclaredFields())
         .filter(field -> Modifier.isStatic(field.getModifiers()))
@@ -44,6 +52,7 @@ public final class PermissionConstantUtil {
         .toList();
   }
 
+  /// 私有构造函数，防止实例化。
   private PermissionConstantUtil() {
   }
 }

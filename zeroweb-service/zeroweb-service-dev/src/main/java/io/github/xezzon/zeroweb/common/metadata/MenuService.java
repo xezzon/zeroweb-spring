@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
+/// 提供本服务的所有权限，用于服务自省。
+/// @author xezzon
 @SuppressWarnings("unused")
 @Service
 public class MenuService implements IMenuService {
