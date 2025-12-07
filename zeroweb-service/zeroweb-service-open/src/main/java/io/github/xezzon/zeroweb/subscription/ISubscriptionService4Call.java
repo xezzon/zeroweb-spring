@@ -15,6 +15,7 @@ package io.github.xezzon.zeroweb.subscription;
 
 import io.github.xezzon.zeroweb.subscription.exception.UnsubscribeOpenapiException;
 
+/// 订阅服务向调用服务暴露的接口
 /// @author xezzon
 public interface ISubscriptionService4Call {
 
@@ -24,5 +25,5 @@ public interface ISubscriptionService4Call {
   /// @param openapiCode 对外接口编码
   /// @return 对外接口详情
   /// @throws UnsubscribeOpenapiException 不能调用未订阅的对外接口
-  Subscription getSubscription(String appId, String openapiCode) throws UnsubscribeOpenapiException;
+  Subscription getSubscription(String appId, String openapiCode);
 }

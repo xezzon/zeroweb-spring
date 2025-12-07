@@ -23,6 +23,8 @@ public record PublicKeyGeneratedEvent(
     PublicKey publicKey
 ) {
 
+  /// 用于签名的公钥
+  /// @return Base64 编码的公钥
   public String getPublicKey() {
     return Base64.getEncoder().encodeToString(publicKey.getEncoded());
   }

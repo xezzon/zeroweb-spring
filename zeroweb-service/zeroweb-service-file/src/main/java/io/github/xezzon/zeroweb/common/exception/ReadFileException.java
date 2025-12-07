@@ -13,10 +13,14 @@
 
 package io.github.xezzon.zeroweb.common.exception;
 
-/// 文件下载错误
+/// 文件读取错误。
+///
+/// 文件服务在下载文件时发生的任何错误，都应该抛出此异常。
 /// @author xezzon
 public class ReadFileException extends ZerowebRuntimeException {
 
+  /// 根据一个已有的异常构造一个新的文件读取异常。
+  /// @param cause 原始异常
   public ReadFileException(Throwable cause) {
     super(cause);
   }

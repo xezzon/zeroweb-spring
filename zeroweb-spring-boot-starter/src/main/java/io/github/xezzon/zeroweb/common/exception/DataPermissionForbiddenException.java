@@ -16,13 +16,21 @@ package io.github.xezzon.zeroweb.common.exception;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.util.Map;
 
-/**
- * @author xezzon
- */
+/// 数据权限不足异常。
+///
+/// 错误码：`C0007`
+///
+/// @author xezzon
 public class DataPermissionForbiddenException extends ZerowebBusinessException {
 
+  /// 错误码
   public static final String ERROR_CODE = "C0007";
 
+  /// 构造器。
+  ///
+  /// @param groupId 组ID
+  /// @param userId 用户ID
+  /// @param permission 权限
   public DataPermissionForbiddenException(String groupId, String userId, String permission) {
     super(
         Map.ofEntries(
@@ -35,12 +43,15 @@ public class DataPermissionForbiddenException extends ZerowebBusinessException {
   }
 
   @Override
-  public String getCode() {
+  public String code() {
     return ERROR_CODE;
   }
 
+  /// 该错误返回 403 HTTP 状态码
+  ///
+  /// @return HTTP状态码
   @Override
-  public int getHttpStatus() {
+  public int httpStatus() {
     return HttpResponseStatus.FORBIDDEN.code();
   }
 }

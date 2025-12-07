@@ -20,12 +20,28 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
 
-/**
- * @author xezzon
- */
+/// `ExcludeDbTrait` 是一个用于在测试环境中排除所有 [DbTrait] 类型 Bean 定义的 [ImportBeanDefinitionRegistrar]。
+///
+/// 它主要用于单元测试或集成测试，以确保数据库相关的 Bean 不被加载，从而隔离测试环境，避免不必要的数据库操作。
+///
+/// 通过实现 [ImportBeanDefinitionRegistrar] 接口，它可以在 Spring 容器启动时动态地注册或修改 Bean 定义。
+///
+/// @author xezzon
+/// @see TestOnly
+/// @see DbTrait
+/// @see ImportBeanDefinitionRegistrar
 @TestOnly
 public class ExcludeDbTrait implements ImportBeanDefinitionRegistrar {
 
+  /// 注册 Bean 定义的回调方法。此方法会在 Spring 容器初始化期间被调用。
+  ///
+  /// 在此实现中，如果 `registry` 是一个 [ListableBeanFactory] 的实例，
+  /// 它将查找所有类型为 [DbTrait] 的 Bean 定义，并从注册表中移除它们。
+  /// 这有效地阻止了任何实现了 [DbTrait] 接口的 Bean 被 Spring 容器加载，
+  /// 从而在测试环境中排除了数据库相关的组件。
+  ///
+  /// @param metadata 当前正在处理的 `@Configuration` 类的注解元数据。
+  /// @param registry 用于注册 Bean 定义的注册表。
   @Override
   public void registerBeanDefinitions(
       @NonNull final AnnotationMetadata metadata,

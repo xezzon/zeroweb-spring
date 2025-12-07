@@ -20,7 +20,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode;
 
-/// 系统管理服务
+/// `ZerowebAdminApplication` 是 ZeroWeb 系统管理服务的入口点。
+///
+/// 这个应用程序提供了系统管理相关的功能，例如用户管理、角色管理、字典管理和系统设置等。
+///
 /// @author xezzon
 @SpringBootApplication
 @EnableSpringDataWebSupport(pageSerializationMode = PageSerializationMode.VIA_DTO)
@@ -28,8 +31,14 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerial
 @EnableJpaAuditing
 public class ZerowebAdminApplication {
 
-  /// 系统管理服务入口
-  /// @param args 应用启动参数
+  ZerowebAdminApplication() {
+  }
+
+  /// 系统管理服务的主方法。
+  ///
+  /// 这是 Spring Boot 应用程序的入口，负责启动整个服务。
+  ///
+  /// @param args 命令行参数，用于配置应用程序。
   static void main(String[] args) {
     SpringApplication.run(ZerowebAdminApplication.class, args);
   }

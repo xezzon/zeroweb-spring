@@ -27,6 +27,8 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
+/// 国际化内容数据访问对象。
+///
 /// @author xezzon
 @Repository
 @NullMarked
@@ -36,11 +38,19 @@ public class I18nMessageDAO extends BaseDAO<I18nMessage, String, I18nMessageRepo
     super(repository, I18nMessage.class);
   }
 
+  /// 获取国际化内容复制器。
+  ///
+  /// @return 国际化内容复制器实例。
   @Override
   public ICopier<I18nMessage> getCopier() {
     return Copier.INSTANCE;
   }
 
+  /// 根据命名空间查询所有国际化内容。
+  ///
+  /// @param namespace 国际化内容命名空间。
+  /// @param odata OData 查询选项。
+  /// @return 包含国际化内容的页面。
   Page<I18nMessage> findAllWithNamespace(final String namespace, final ODataQueryOption odata) {
     final Specification<I18nMessage> spec = (root, _, cb) ->
         cb.equal(root.get(I18nMessage_.namespace), namespace);
@@ -48,6 +58,7 @@ public class I18nMessageDAO extends BaseDAO<I18nMessage, String, I18nMessageRepo
     return super.findAll(odata, spec, sort);
   }
 
+  /// 国际化内容复制器接口。
   @Mapper
   interface Copier extends ICopier<I18nMessage> {
 

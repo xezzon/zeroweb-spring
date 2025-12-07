@@ -17,25 +17,28 @@ import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.jspecify.annotations.NullMarked;
 
-/// 不能调用未订阅的接口
+/// 不能调用未订阅的接口异常，当尝试调用未订阅的对外接口时抛出
 ///
 /// @author xezzon
 @NullMarked
 public class UnsubscribeOpenapiException extends ZerowebBusinessException {
 
+  /// 错误码：不能调用未订阅的接口
   public static final String ERROR_CODE = "CFE04";
 
+  /// 构造器，设置默认错误信息
   public UnsubscribeOpenapiException() {
     super("Cannot call an unsubscribed OpenAPI.");
   }
 
   @Override
-  public String getCode() {
+  public String code() {
     return ERROR_CODE;
   }
 
+  /// @return HTTP状态码（403 Forbidden）
   @Override
-  public int getHttpStatus() {
+  public int httpStatus() {
     return HttpResponseStatus.FORBIDDEN.code();
   }
 }

@@ -22,11 +22,20 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+/// 访问凭据数据访问层
+///
+/// 提供对第三方应用访问凭据的数据库操作
+///
 /// @author xezzon
 @Repository
 @NullMarked
 public interface AccessSecretRepository extends JpaRepository<AccessSecret, String> {
 
+  /// 根据ID更新密钥
+  ///
+  /// @param id 应用ID
+  /// @param secretKey 新的密钥
+  /// @return 更新影响的行数
   @Transactional
   @Modifying
   @Query("update AccessSecret a set a.secretKey = :secretKey where a.id = :id")

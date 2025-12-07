@@ -18,16 +18,20 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode;
 
-/// 研发平台服务
+/// 研发平台服务启动类
 ///
 /// @author xezzon
 @SpringBootApplication
 @EnableSpringDataWebSupport(pageSerializationMode = PageSerializationMode.VIA_DTO)
 public class ZerowebDeveloperApplication {
 
+  /// 私有构造函数，防止实例化
   private ZerowebDeveloperApplication() {
   }
 
+  /// 应用程序主入口
+  ///
+  /// @param args 命令行参数
   static void main(String[] args) {
     SpringApplication.run(ZerowebDeveloperApplication.class, args);
   }

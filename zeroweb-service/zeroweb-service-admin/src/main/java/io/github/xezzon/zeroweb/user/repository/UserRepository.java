@@ -19,6 +19,7 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+/// 对 [用户][User] 进行数据库操作的 JPA 接口
 /// @author xezzon
 @Repository
 @NullMarked

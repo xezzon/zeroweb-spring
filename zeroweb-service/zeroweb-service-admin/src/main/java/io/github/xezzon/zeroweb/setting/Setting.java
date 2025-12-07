@@ -30,7 +30,10 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-/// 业务参数
+/// 业务参数实体类
+///
+/// 用于存储和管理系统中各种业务参数，包括系统配置、业务规则等。
+/// 支持JSON格式的参数值和参数约束定义。
 /// @author xezzon
 @Getter
 @Setter
@@ -40,22 +43,33 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners({AuditingEntityListener.class})
 public class Setting implements IEntity<String> {
 
+  /// 主键ID，唯一标识
   @Id
   @IdGenerator
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   private String id;
   /// 业务参数标识
+  ///
+  /// 唯一标识参数类型的编码，如 `system.theme`、`business.timeout` 等
+  /// 不可更新，创建时确定
   @Column(name = "code", nullable = false, updatable = false)
   private String code;
-  /// 约束
+  /// 参数约束定义
+  ///
+  /// JSON格式的约束配置，定义参数的格式、取值范围、验证规则等。
+  ///
+  /// @see <a href="https://json-schema.org/specification">JSON Schema</a>
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "`schema`", columnDefinition = "json", nullable = false)
   private String schema;
-  /// 参数值
+  /// 参数实际值
+  ///
+  /// JSON格式的参数值，支持复杂数据结构
+  /// 如 `{"theme": "dark", "language": "zh-CN"}`
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "value", columnDefinition = "json", nullable = false)
   private Map<String, Object> value;
-  /// 更新时间
+  /// 参数更新时间
   @Column(name = "update_time", nullable = false)
   private Instant updateTime;
 }

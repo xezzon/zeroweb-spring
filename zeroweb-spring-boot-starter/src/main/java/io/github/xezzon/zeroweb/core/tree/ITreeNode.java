@@ -23,21 +23,25 @@ import java.util.List;
 public interface ITreeNode<T extends ITreeNode<T, I>, I> {
 
   /**
+   * ID
    * @return ID
    */
   I getId();
 
   /**
+   * 上级ID
    * @return 上级ID
    */
   I getParentId();
 
   /**
+   * 设置子级数据
    * @param children 子级数据集合
    */
   void setChildren(List<T> children);
 
   /**
+   * 获取子级数据
    * @return 子级数据集合
    */
   List<T> getChildren();

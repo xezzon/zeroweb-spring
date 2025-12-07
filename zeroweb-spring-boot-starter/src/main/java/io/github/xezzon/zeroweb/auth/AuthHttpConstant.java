@@ -19,6 +19,7 @@ package io.github.xezzon.zeroweb.auth;
  */
 public final class AuthHttpConstant {
 
+  /// Prevent instantiation.
   private AuthHttpConstant() {
   }
 

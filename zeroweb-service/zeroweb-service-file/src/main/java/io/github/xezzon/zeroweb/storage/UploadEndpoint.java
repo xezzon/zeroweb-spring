@@ -15,6 +15,7 @@ package io.github.xezzon.zeroweb.storage;
 
 import lombok.Getter;
 
+/// 附件上传地址
 /// @author xezzon
 @Getter
 public class UploadEndpoint {
@@ -24,6 +25,7 @@ public class UploadEndpoint {
   /// 上传地址
   private String endpoint;
 
+  /// 默认构造函数
   @SuppressWarnings("unused")
   public UploadEndpoint() {
     super();

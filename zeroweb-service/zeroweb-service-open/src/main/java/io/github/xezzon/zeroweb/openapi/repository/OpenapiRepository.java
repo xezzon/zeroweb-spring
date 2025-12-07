@@ -20,6 +20,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+/// 对外接口数据访问仓库接口
+///
+/// 继承自 [JpaRepository] 和 [JpaSpecificationExecutor]，
+/// 提供对 [Openapi] 实体对象的数据库操作能力。
+///
 /// @author xezzon
 @Repository
 @NullMarked
@@ -27,5 +32,9 @@ public interface OpenapiRepository extends
     JpaRepository<Openapi, String>,
     JpaSpecificationExecutor<Openapi> {
 
+  /// 根据接口编码查询对外接口
+  ///
+  /// @param code 接口编码
+  /// @return 包含指定编码的对外接口（如果存在）
   Optional<Openapi> findByCode(String code);
 }

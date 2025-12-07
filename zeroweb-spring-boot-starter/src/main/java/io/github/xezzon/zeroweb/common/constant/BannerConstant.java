@@ -13,15 +13,16 @@
 
 package io.github.xezzon.zeroweb.common.constant;
 
-/**
- * 品牌相关
- * @author xezzon
- */
+/// 应用程序的品牌相关常量。
+///
+/// 定义了应用程序的品牌名称等信息。
+///
+/// @author xezzon
 public class BannerConstant {
 
-  /**
-   * 品牌名
-   */
+  /// 应用程序的品牌名称。
+  ///
+  /// 默认为 "zeroweb"。
   public static final String NAME = "zeroweb";
 
   private BannerConstant() {

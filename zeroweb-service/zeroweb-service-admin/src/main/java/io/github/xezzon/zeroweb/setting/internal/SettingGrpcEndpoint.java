@@ -27,29 +27,47 @@ import jakarta.annotation.Resource;
 import org.springframework.grpc.server.service.GrpcService;
 import tools.jackson.databind.ObjectMapper;
 
-/// 业务参数管理
+/// 业务参数gRPC服务访问点
+///
+/// 提供gRPC协议的远程调用接口，用于其他服务查询业务参数配置。
+/// 支持通过参数标识获取参数值，支持JSON格式的数据转换。
 /// @author xezzon
 @GrpcService
 public class SettingGrpcEndpoint extends SettingImplBase {
 
+  /// 业务参数服务，用于执行参数查询业务逻辑
   private final SettingService settingService;
+  /// JSON对象映射器，用于数据格式转换
   @Resource
   private ObjectMapper objectMapper;
 
+  /// 依赖注入
+  ///
+  /// @param settingService 业务参数服务实例
   public SettingGrpcEndpoint(final SettingService settingService) {
     this.settingService = settingService;
   }
 
+  /// 查询业务参数
+  ///
+  /// 根据参数标识查询对应的参数值，返回JSON格式的结构化数据。
+  /// 支持内部服务的远程调用，提供高效的参数查询服务。
+  /// @param request 查询请求，包含要查询的参数标识
+  /// @param responseObserver 响应观察器，用于返回查询结果
+  /// @throws ZerowebRuntimeException 当数据格式转换失败时抛出
   @Override
   public void getSetting(
       final GetSettingRequest request,
       final StreamObserver<SettingItem> responseObserver
   ) {
     try {
+      // 查询参数配置
       Setting setting = settingService.queryByCode(request.getCode());
+      // 将Java Map转换为Protobuf Struct格式
       String valueJson = objectMapper.writeValueAsString(setting.getValue());
       Builder valueBuilder = Struct.newBuilder();
       JsonFormat.parser().merge(valueJson, valueBuilder);
+      // 返回结构化的参数项
       responseObserver.onNext(SettingItem.newBuilder()
           .setCode(setting.getCode())
           .setValue(valueBuilder.build())

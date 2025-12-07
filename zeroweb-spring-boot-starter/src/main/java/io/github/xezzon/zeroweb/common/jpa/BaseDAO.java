@@ -33,12 +33,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-/**
- * @param <T> 实体类型
- * @param <I> ID类型
- * @param <M> 实体操作类类型
- * @author xezzon
- */
+/// 持久层基类，封装了常用的数据访问操作，支持 OData 查询。
+///
+/// @param <T> 实体类型
+/// @param <I> ID类型
+/// @param <M> 实体操作类类型
+/// @author xezzon
 public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<@NonNull T, @NonNull I> & JpaSpecificationExecutor<@NonNull T>>
     implements NewType<M> {
 
@@ -46,29 +46,40 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<@
   private final Class<T> typeToken;
   private EntityManager em;
 
+  /// 构造函数。
+  ///
+  /// @param repository 实体仓库
+  /// @param typeToken 实体类型标记
   protected BaseDAO(M repository, Class<T> typeToken) {
     this.repository = repository;
     this.typeToken = typeToken;
   }
 
+  /// 获取实体属性复制器。
+  ///
+  /// @return 实体属性复制器
   public abstract ICopier<T> getCopier();
 
+  /// 设置实体管理器。
+  ///
+  /// @param em 实体管理器
   @SuppressWarnings("unused")
   @Autowired
   private void setEntityManager(EntityManager em) {
     this.em = em;
   }
 
+  /// 获取底层的 JpaRepository 实例。
+  ///
+  /// @return JpaRepository 实例
   @Override
   public M get() {
     return this.repository;
   }
 
-  /**
-   * 局部更新实体（仅更新非空字段）
-   * @param target 目标实体
-   * @return 更新后的实体
-   */
+  /// 局部更新实体（仅更新非空字段）
+  /// @param target 目标实体
+  /// @return 更新后的实体
   public T partialUpdate(T target) {
     T entity = this.get().findById(target.getId())
         .orElseThrow();
@@ -77,22 +88,18 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<@
     return entity;
   }
 
-  /**
-   * 分页查询数据
-   * @param odata OData查询条件
-   * @return 分页数据
-   */
+  /// 分页查询数据
+  /// @param odata OData查询条件
+  /// @return 分页数据
   public Page<@NonNull T> findAll(@NonNull final ODataQueryOption odata) {
     return this.findAll(odata, null, null);
   }
 
-  /**
-   * 分页查询数据
-   * @param odata OData查询条件
-   * @param innerSpecification 服务端组装查询条件
-   * @param innerSort 服务端组装排序条件
-   * @return 分页数据
-   */
+  /// 分页查询数据
+  /// @param odata OData查询条件
+  /// @param innerSpecification 服务端组装查询条件
+  /// @param innerSort 服务端组装排序条件
+  /// @return 分页数据
   protected Page<@NonNull T> findAll(
       @NonNull final ODataQueryOption odata,
       @Nullable Specification<@NonNull T> innerSpecification,
@@ -117,11 +124,9 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<@
     return this.get().findAll(specification, pageable);
   }
 
-  /**
-   * 更新实体
-   * @param predicate 组装更新条件
-   * @return 更新影响的行数
-   */
+  /// 更新实体
+  /// @param predicate 组装更新条件
+  /// @return 更新影响的行数
   protected int update(UpdateCriteriaBuilder<T> predicate) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaUpdate<T> criteriaUpdate = cb.createCriteriaUpdate(typeToken);
@@ -130,28 +135,30 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<@
     return em.createQuery(criteriaUpdate).executeUpdate();
   }
 
-  /**
-   * 实体属性复制器
-   * @param <T> 实体类型
-   */
+  /// 实体属性复制器接口。
+  ///
+  /// @param <T> 实体类型
   public interface ICopier<T> {
 
-    /**
-     * 复制实体属性，如果源实体属性为null，则不复制
-     * @param target 目标实体
-     * @param entity 源实体
-     */
+    /// 复制实体属性，如果源实体属性为 null，则不复制。
+    ///
+    /// @param target 目标实体
+    /// @param entity 源实体
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void copy(T target, @MappingTarget T entity);
   }
 
-  /**
-   * 更新条件组装器
-   * @param <T> 实体类型
-   */
+  /// 更新条件组装器接口。
+  ///
+  /// @param <T> 实体类型
   @FunctionalInterface
   public interface UpdateCriteriaBuilder<T> {
 
+    /// 应用更新条件。
+    ///
+    /// @param root JPA Criteria API 的根对象
+    /// @param query JPA Criteria API 的更新查询
+    /// @param criteriaBuilder JPA Criteria API 的构建器
     void accept(Root<T> root, CriteriaUpdate<T> query, CriteriaBuilder criteriaBuilder);
   }
 }

@@ -15,15 +15,15 @@ package io.github.xezzon.zeroweb.core.crypto;
 
 import java.io.IOException;
 
-/**
- * @author xezzon
- */
+/// `ASN1PublicKeyReader` 接口定义了从 ASN.1 格式读取公钥的方法。
+/// 实现此接口的类负责解析 ASN.1 编码的公钥数据。
+///
+/// @author xezzon
 public interface ASN1PublicKeyReader {
 
-  /**
-   * 读取公钥形式的ASN.1
-   * @return ASN.1
-   * @throws IOException 读取密钥失败
-   */
+  /// 读取公钥形式的 ASN.1 数据。
+  ///
+  /// @return 表示公钥的 ASN.1 对象。
+  /// @throws IOException 如果在读取或解析公钥时发生 I/O 错误。
   Object readPublicKey() throws IOException;
 }

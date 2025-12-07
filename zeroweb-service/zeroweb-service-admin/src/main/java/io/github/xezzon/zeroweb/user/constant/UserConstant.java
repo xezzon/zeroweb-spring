@@ -15,11 +15,14 @@ package io.github.xezzon.zeroweb.user.constant;
 
 import io.github.xezzon.zeroweb.user.User;
 
-/**
- * @author xezzon
- */
+/// 用户常量类
+///
+/// 定义用户管理相关的常量值，包括默认用户等。
+///
+/// @author xezzon
 public class UserConstant {
 
+  /// 系统初始用户（超级管理员）
   public static final User ROOT = new User();
 
   static {

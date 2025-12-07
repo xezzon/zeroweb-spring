@@ -15,6 +15,7 @@ package io.github.xezzon.zeroweb.core.trait;
 
 /**
  * 参考 Rust 的 NewType 机制
+ * @param <T> 原数据类型
  * @author xezzon
  */
 public interface NewType<T> {

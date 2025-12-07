@@ -45,6 +45,8 @@ public class JwtKeyManager implements JwtCryptoService {
   private PrivateKey privateKey;
   private PublicKey publicKey;
 
+  /// 依赖注入
+  /// @param zerowebConfig JWT 设置
   public JwtKeyManager(ZerowebConfig zerowebConfig) {
     this.zerowebJwtConfig = zerowebConfig.getJwt();
   }

@@ -36,13 +36,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/// 认证管理
+/// 认证
 ///
 /// @author xezzon
 @RequestMapping("/auth")
@@ -54,17 +55,21 @@ public class AuthnHttpEndpoint {
   @Resource
   private JwtKeyManager keyManager;
 
+  /// 构造函数，注入 [AuthnService] 和 [ZerowebConfig]。
+  ///
+  /// @param authnService 认证服务实例。
+  /// @param zerowebConfig ZeroWeb 配置实例。
   public AuthnHttpEndpoint(final AuthnService authnService, final ZerowebConfig zerowebConfig) {
     this.authnService = authnService;
     this.zerowebJwtConfig = zerowebConfig.getJwt();
   }
 
-  /// 用户名口令认证
+  /// 通过用户名和密码进行基本认证登录。
   ///
-  /// @param basicAuth 用户名、口令
-  /// @return 令牌（即 Session ID）
+  /// @param basicAuth 包含用户名和密码的 [BasicAuth] 请求体。
+  /// @return 包含访问令牌、ID 令牌和过期时间的 [OidcToken] 对象。
   @PostMapping("/login/basic")
-  public OidcToken basicLogin(@RequestBody final BasicAuth basicAuth) {
+  public OidcToken basicLogin(@RequestBody @Validated final BasicAuth basicAuth) {
     authnService.basicLogin(basicAuth.username(), basicAuth.password());
     final String accessToken = StpUtil.getTokenValue();
     final Long expiredIn = StpUtil.getSessionTimeout();
@@ -72,7 +77,12 @@ public class AuthnHttpEndpoint {
     return new OidcToken(accessToken, idToken, expiredIn);
   }
 
-  /// @return 当前用户的认证信息
+  /// 获取当前用户的认证信息。
+  ///
+  /// 如果用户未登录，返回 204 No Content。
+  ///
+  /// @return 包含用户认证信息（JWT）的 [ResponseEntity]。
+  /// @throws InvalidProtocolBufferException 如果 JWT Claim 无法正确序列化。
   @GetMapping("/self")
   public ResponseEntity<byte @NonNull []> self() throws InvalidProtocolBufferException {
     if (!StpUtil.isLogin()) {
@@ -94,7 +104,12 @@ public class AuthnHttpEndpoint {
         .body(payload);
   }
 
-  /// @return 用户令牌
+  /// 获取当前用户的 SSO 令牌。
+  ///
+  /// 需要用户已登录。
+  ///
+  /// @param response [HttpServletResponse] 用于设置响应头。
+  /// @return 包含访问令牌、ID 令牌和过期时间的 [OidcToken] 对象。
   @SaCheckLogin
   @GetMapping("/token")
   public OidcToken getSsoToken(HttpServletResponse response) {

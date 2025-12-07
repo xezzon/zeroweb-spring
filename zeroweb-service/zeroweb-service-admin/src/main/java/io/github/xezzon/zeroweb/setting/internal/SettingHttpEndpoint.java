@@ -15,6 +15,7 @@ package io.github.xezzon.zeroweb.setting.internal;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.setting.Setting;
@@ -41,13 +42,19 @@ public class SettingHttpEndpoint {
 
   private final SettingService settingService;
 
+  /// 依赖注入
+  /// @param settingService 业务参数管理服务
   public SettingHttpEndpoint(final SettingService settingService) {
     this.settingService = settingService;
   }
 
   /// 新增业务参数
-  /// @param request 业务参数
-  /// @return ID
+  ///
+  /// 向系统中添加新的业务参数配置，包含参数标识、约束定义和初始值。
+  /// 需要写入权限验证。
+  /// @param request 新增请求，包含完整的参数信息
+  /// @return 新创建参数的ID
+  /// @throws RepeatDataException 当参数标识重复时抛出
   @SaCheckPermission({PermissionConstant.SETTING_WRITE})
   @PostMapping()
   Id addSetting(@RequestBody final AddSettingRequest request) {
@@ -58,23 +65,33 @@ public class SettingHttpEndpoint {
   }
 
   /// 查询业务参数列表（分页）
-  /// @param odata 查询参数
-  /// @return 业务参数列表
+  ///
+  /// 支持OData协议的复杂查询功能，包括过滤、排序、分页等操作。
+  /// 需要查看权限验证。
+  /// @param odata 查询参数，包含查询条件、排序、分页等
+  /// @return 分页结果，包含参数列表和分页信息
   @SaCheckPermission({PermissionConstant.SETTING_READ})
   @GetMapping()
   Page<@NonNull Setting> querySettingPage(final ODataRequestParam odata) {
     return settingService.querySettingPage(odata.into());
   }
 
+  /// 根据参数标识查询配置项
+  ///
+  /// 通过业务参数的唯一标识符查询具体的参数配置。
+  /// @param code 业务参数标识
+  /// @return 查找到的配置项
   @GetMapping("/{code}")
   Setting queryByCode(@PathVariable @NonNull final String code) {
     return settingService.queryByCode(code);
   }
 
-  /**
-   * 更新业务参数
-   * @param request 业务参数
-   */
+  /// 更新业务参数
+  ///
+  /// 更新现有业务参数的约束定义和参数值。
+  /// 会同时更新schema和value字段，并更新时间戳。
+  /// 需要写入权限验证。
+  /// @param request 更新请求，包含参数ID、约束定义和参数值
   @SaCheckPermission({PermissionConstant.SETTING_WRITE})
   @PutMapping("/schema")
   void updateSettingSchema(@RequestBody final UpdateSchemaRequest request) {
@@ -82,10 +99,11 @@ public class SettingHttpEndpoint {
     settingService.updateSetting(setting);
   }
 
-  /**
-   * 更新业务参数（仅更新值）
-   * @param request 业务参数
-   */
+  /// 更新业务参数（仅更新值）
+  ///
+  /// 仅更新业务参数的值，不修改约束定义和参数标识。
+  /// 需要查看权限验证。
+  /// @param request 更新请求，包含参数ID和新值
   @SaCheckPermission({PermissionConstant.SETTING_READ})
   @PutMapping("/value")
   void updateSettingValue(@RequestBody final UpdateValueRequest request) {
@@ -93,10 +111,12 @@ public class SettingHttpEndpoint {
     settingService.updateSetting(setting);
   }
 
-  /**
-   * 删除业务参数
-   * @param id 业务参数ID
-   */
+  /// 删除业务参数
+  ///
+  /// 根据ID删除指定的业务参数配置。
+  /// 删除操作不可逆，请谨慎使用。
+  /// 需要写入权限验证。
+  /// @param id 要删除的参数ID
   @SaCheckPermission({PermissionConstant.SETTING_WRITE})
   @DeleteMapping("/{id}")
   void deleteSetting(@PathVariable final String id) {

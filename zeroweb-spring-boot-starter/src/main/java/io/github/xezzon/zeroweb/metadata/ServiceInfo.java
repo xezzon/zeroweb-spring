@@ -16,28 +16,23 @@ package io.github.xezzon.zeroweb.metadata;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * 服务信息
- * @author xezzon
- */
+/// 服务元数据信息封装类。
+/// 包含服务的名称、版本、类型以及是否隐藏等信息，用于服务自省。
+///
+/// @author xezzon
 @Getter
 @Setter
 public class ServiceInfo {
 
-  /**
-   * 服务名称
-   */
+  /// 服务的名称，例如 "user-service" 或 "product-service"。
   private String name;
-  /**
-   * 服务版本
-   */
+  /// 服务的版本，例如 "1.0.0"。
   private String version;
-  /**
-   * 服务类型
-   */
+  /// 服务的类型，例如 [ServiceType#CLIENT] (前端) 或 [ServiceType#SERVER] (后端)。
+  /// 默认为 [ServiceType#SERVER]。
   private ServiceType type = ServiceType.SERVER;
-  /**
-   * 是否隐藏 站内的链接不应该包含`隐藏`的服务。
-   */
+  /// 指示服务是否应该在站内链接中隐藏。
+  /// 如果为 `true`，则通常不应在公共菜单或服务列表中显示。
+  /// 默认为 `true`。
   private boolean hidden = true;
 }

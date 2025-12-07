@@ -20,17 +20,22 @@ import java.util.stream.IntStream;
 import org.jetbrains.annotations.TestOnly;
 
 /**
+ * 生成测试数据的规范。
+ * @param <T> 测试数据类型
  * @author xezzon
  */
+@SuppressWarnings("unused")
 @TestOnly
 public interface IDataGenerator<T> {
 
   /// 生成一个数据的方法
+  /// @param i 测试数据的序号。有些测试数据的字段需要覆盖枚举值时可以用该字段。
+  /// @return 测试数据
   T generateData(int i);
 
-  /**
-   * 生成数据
-   */
+  /// 生成数据
+  /// @param count 需要生成的测试数据的数量
+  /// @return 测试数据列表
   default List<T> generate(int count) {
     return IntStream.range(0, count)
         .mapToObj(this::generateData)

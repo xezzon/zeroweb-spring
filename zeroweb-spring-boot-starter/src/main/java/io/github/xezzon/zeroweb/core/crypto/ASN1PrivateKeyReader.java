@@ -15,15 +15,14 @@ package io.github.xezzon.zeroweb.core.crypto;
 
 import java.io.IOException;
 
-/**
- * @author xezzon
- */
+/// 提供了从各种格式读取 ASN.1 编码私钥的功能。
+/// 该接口定义了读取私钥的方法，具体实现由实现类提供。
+/// @author xezzon
 public interface ASN1PrivateKeyReader {
 
-  /**
-   * 读取私钥形式的ASN.1
-   * @return ASN.1
-   * @throws IOException 读取密钥失败
-   */
+  /// 从底层源读取并解析 ASN.1 编码的私钥。
+  /// 此方法旨在处理私钥的通用读取逻辑，并将其转换为一个通用的 Java 对象。
+  /// @return 表示 ASN.1 编码私钥的通用对象。
+  /// @throws IOException 如果在读取或解析私钥过程中发生 I/O 错误。
   Object readPrivateKey() throws IOException;
 }

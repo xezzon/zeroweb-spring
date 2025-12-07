@@ -15,15 +15,14 @@ package io.github.xezzon.zeroweb.core.crypto;
 
 import java.io.IOException;
 
-/**
- * @author xezzon
- */
+/// 用于定义将 ASN.1 编码的公钥写入的契约。
+///
+/// @author xezzon
 public interface ASN1PublicKeyWriter {
 
-  /**
-   * 将ASN.1形式的公钥写入
-   * @param publicKey 公钥
-   * @throws IOException 写入密钥失败
-   */
+  /// 将 ASN.1 形式的公钥写入。
+  ///
+  /// @param publicKey ASN.1 编码的公钥字节数组。
+  /// @throws IOException 如果在写入过程中发生 I/O 错误。
   void writePublicKey(byte[] publicKey) throws IOException;
 }

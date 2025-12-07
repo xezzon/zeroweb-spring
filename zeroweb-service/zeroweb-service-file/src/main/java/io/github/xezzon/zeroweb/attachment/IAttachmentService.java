@@ -13,11 +13,17 @@
 
 package io.github.xezzon.zeroweb.attachment;
 
-/// @author xezzon
+/**
+ * 附件服务接口。
+ * 定义了附件相关的业务操作。
+ */
 public interface IAttachmentService {
 
-  /// 查询附件信息
-  /// @param id 附件ID
-  /// @return 附件信息
+  /**
+   * 查询附件信息。
+   *
+   * @param id 附件ID
+   * @return 附件信息
+   */
   Attachment queryById(String id);
 }

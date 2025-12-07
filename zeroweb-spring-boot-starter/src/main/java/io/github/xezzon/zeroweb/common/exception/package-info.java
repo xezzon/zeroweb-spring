@@ -12,6 +12,8 @@
  */
 
 /**
+ * 为 ZeroWeb 框架提供通用的异常类。
+ *
  * @author xezzon
  */
 @NullMarked

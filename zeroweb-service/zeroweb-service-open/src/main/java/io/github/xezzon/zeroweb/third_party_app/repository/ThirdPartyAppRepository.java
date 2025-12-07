@@ -21,11 +21,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+/// 第三方应用数据访问层
+///
+/// 提供对第三方应用实体的数据库操作，支持基本CRUD和复杂查询
+///
+/// @author xezzon
 @Repository
 @NullMarked
 public interface ThirdPartyAppRepository extends
     JpaRepository<ThirdPartyApp, String>,
     JpaSpecificationExecutor<ThirdPartyApp> {
 
+  /// 根据ID集合查询第三方应用列表，按创建时间降序排序
+  ///
+  /// @param ids 应用ID集合
+  /// @return 第三方应用列表
   List<ThirdPartyApp> findByIdInOrderByCreateTimeDesc(Collection<String> ids);
 }

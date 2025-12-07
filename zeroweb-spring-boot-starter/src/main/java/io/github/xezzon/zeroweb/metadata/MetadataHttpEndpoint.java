@@ -21,25 +21,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 服务自省
- * @author xezzon
- */
+/// 服务自省
+///
+/// @author xezzon
 @RestController
 @RequestMapping("/metadata")
 public class MetadataHttpEndpoint {
 
+  /// 当前应用的名称，从 Spring Environment 中注入。
   @Value("${spring.application.name}")
   private String appName;
+  /// 当前应用的版本，从 Spring Environment 中注入。
   @Value("${spring.application.version}")
   private String appVersion;
+  /// 注入所有实现 [IMenuService] 接口的服务，用于收集菜单/资源信息。
   @Resource
   private List<IMenuService> resourceServices;
 
-  /**
-   * 服务自省服务信息
-   * @return 服务信息
-   */
+  /// 获取当前服务的自省信息。
+  ///
+  /// @return 包含服务名称、版本、类型等信息的 [ServiceInfo] 对象。
   @GetMapping("/info.json")
   public ServiceInfo loadServiceInfo() {
     final ServiceInfo serviceInfo = new ServiceInfo();
@@ -50,10 +51,9 @@ public class MetadataHttpEndpoint {
     return serviceInfo;
   }
 
-  /**
-   * 服务自省资源信息
-   * @return 资源信息
-   */
+  /// 获取当前服务提供的所有菜单或资源信息。
+  ///
+  /// @return 包含所有 [MenuInfo] 对象的列表，聚合了所有 [IMenuService] 的结果。
   @GetMapping("/menu.json")
   public List<MenuInfo> loadResourceInfo() {
     return resourceServices.stream()

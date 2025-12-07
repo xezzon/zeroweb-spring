@@ -53,6 +53,9 @@ public class SubscriptionCallHttpEndpoint {
   private final ISubscriptionService4Call subscriptionService;
   private final IThirdPartyAppService4Call thirdPartyAppService;
 
+  /// 依赖注入
+  /// @param subscriptionService 订阅服务
+  /// @param thirdPartyAppService 第三方应用服务
   public SubscriptionCallHttpEndpoint(
       final ISubscriptionService4Call subscriptionService,
       final IThirdPartyAppService4Call thirdPartyAppService
@@ -62,6 +65,14 @@ public class SubscriptionCallHttpEndpoint {
   }
 
   /// 转发 GET 请求
+  /// @param openapiCode 对外接口编码
+  /// @param body 请求体
+  /// @param accessKey 用于标识一个第三方应用
+  /// @param timestamp 摘要生成时间
+  /// @param signature 请求体摘要
+  /// @param headers 请求头
+  /// @param request 请求信息
+  /// @return 响应内容
   @GetMapping(value = "/{openapiCode}")
   public ResponseEntity<byte @NonNull []> forwardForSafe(
       @PathVariable String openapiCode,
@@ -80,6 +91,14 @@ public class SubscriptionCallHttpEndpoint {
   }
 
   /// 转发非 GET 请求
+  /// @param openapiCode 对外接口编码
+  /// @param body 请求体
+  /// @param accessKey 用于标识一个第三方应用
+  /// @param timestamp 摘要生成时间
+  /// @param signature 请求体摘要
+  /// @param headers 请求头
+  /// @param request 请求信息
+  /// @return 响应内容
   @RequestMapping(value = "/{openapiCode}", method = {POST, PUT, DELETE, PATCH})
   public ResponseEntity<byte @NonNull []> forwardForUnsafe(
       @PathVariable String openapiCode,

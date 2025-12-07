@@ -20,14 +20,17 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class IncorrectFileException extends ZerowebBusinessException {
 
+  /// 错误码
   public static final String ERROR_CODE = "CFC02";
 
+  /// 创建一个 [IncorrectFileException] 实例。
+  /// @param message 错误信息
   public IncorrectFileException(String message) {
     super(message);
   }
 
   @Override
-  public String getCode() {
+  public String code() {
     return ERROR_CODE;
   }
 }

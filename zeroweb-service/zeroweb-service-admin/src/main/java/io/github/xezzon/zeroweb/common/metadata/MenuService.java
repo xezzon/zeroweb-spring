@@ -20,10 +20,19 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
+/// `MenuService` 是用于生成和返回系统菜单信息的实现。
+///
+/// 当前实现基于系统中定义的权限常量，生成与权限对应的 `MenuInfo` 列表。
+/// 该服务在系统管理控制台中为导航菜单提供数据支持。
+///
+/// @author xezzon
 @SuppressWarnings("unused")
 @Service
 public class MenuService implements IMenuService {
 
+  /// 列出所有菜单项。
+  ///
+  /// @return 系统中可用的菜单信息列表
   @Override
   public List<MenuInfo> list() {
     return Stream.of(

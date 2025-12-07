@@ -31,7 +31,8 @@ import org.springframework.context.annotation.Import;
 public @interface EnableDictScan {
 
   /**
-   * @return 注解扫描的目标包路径。默认为空，即扫描当前类所在的包及其子包。
+   * 注解扫描的目标包路径。
+   * @return 默认为空，即扫描当前类所在的包及其子包。
    */
   String value() default "";
 }

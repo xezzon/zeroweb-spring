@@ -21,10 +21,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/// 新增业务参数
-/// @param code 业务参数标识
-/// @param schema 约束
-/// @param value 业务参数的值
+/// 新增业务参数请求
+///
+/// 用于创建新的业务参数配置，包含参数标识、约束定义和初始值。
+/// 实现 [Into] 接口，提供转换为 [Setting] 实体对象的方法。
+/// @param code 业务参数标识，唯一标识参数类型
+/// @param schema 参数约束定义，JSON Schema 格式
+/// @param value 参数初始值，JSON格式
 /// @author xezzon
 public record AddSettingRequest(
     String code,

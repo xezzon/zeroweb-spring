@@ -19,14 +19,31 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+/// 第三方应用成员数据访问层
+///
+/// 提供对第三方应用成员信息的数据库操作
+///
 /// @author xezzon
 @Repository
 @NullMarked
 public interface ThirdPartyAppMemberRepository extends JpaRepository<ThirdPartyAppMember, String> {
 
+  /// 根据用户组ID和用户ID查询成员信息
+  ///
+  /// @param groupId 用户组ID（第三方应用ID）
+  /// @param userId 用户ID
+  /// @return 成员信息
   Optional<ThirdPartyAppMember> findByGroupIdAndUserId(String groupId, String userId);
 
+  /// 根据用户组ID查询成员列表，按创建时间降序排序
+  ///
+  /// @param groupId 用户组ID（第三方应用ID）
+  /// @return 成员列表
   List<ThirdPartyAppMember> findByGroupIdOrderByCreateTimeDesc(String groupId);
 
+  /// 根据用户ID查询该用户的所有成员关系
+  ///
+  /// @param userId 用户ID
+  /// @return 该用户的所有成员关系
   List<ThirdPartyAppMember> findByUserId(String userId);
 }

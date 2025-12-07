@@ -29,7 +29,9 @@ import org.springframework.boot.servlet.autoconfigure.MultipartProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-/// 文件系统存储配置
+/// 文件系统存储配置。
+/// 如果没有配置附件存储的基础路径，则不会注册 Bean。
+///
 /// @author xezzon
 @Setter
 @Configuration
@@ -45,27 +47,34 @@ public class ZerowebFsConfig {
   @Resource
   private MultipartProperties multipartProperties;
 
+  /// 应用启动后，创建文件上传基础目录（如果不存在）
+  /// @throws IOException 创建目录失败
   @PostConstruct
   public void init() throws IOException {
-    // 创建基础目录（如果不存在）
     Files.createDirectories(this.getBasePath());
   }
 
+  /// 获取文件上传基础路径
+  /// @return  文件上传基础路径
   public Path getBasePath() {
     return Path.of(basePath);
   }
 
+  /// 获取文件存储的分片大小
   /// @return 文件存储的分片大小。单位 Byte
   public long getPartSize() {
     return multipartProperties.getMaxFileSize().toBytes();
   }
 }
 
+/// 如果当前配置的存储方式是 [FileProviderEnum#FS]，要求 [ZerowebFsConfig] 被注册。
 @Component
 @ConditionalOnProperty(prefix = ZerowebFileConfig.PREFIX, name = "provider", havingValue = "FS")
 @SuppressWarnings("unused")
 class FsConfigValidator {
 
+  /// 校验文件系统相关配置是否正确
+  /// @param fsConfig 文件系统配置
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   FsConfigValidator(Optional<ZerowebFsConfig> fsConfig) {
     fsConfig.orElseThrow(() -> new UnsupportedFileProviderException(FileProviderEnum.FS));

@@ -20,6 +20,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+/// `AppRepository` 是服务实体的 JPA 数据仓库接口。
+///
+/// 它提供了对 [App] 实体的数据库操作，包括基本的 CRUD 和基于 JPA 规范的查询。
+///
 /// @author xezzon
 @Repository
 @NullMarked
@@ -27,5 +31,8 @@ public interface AppRepository extends
     JpaRepository<App, String>,
     JpaSpecificationExecutor<App> {
 
+  /// 查询所有服务，并按 `ordinal` 字段升序排列。
+  ///
+  /// @return 包含所有服务实体的列表，按顺序排序。
   List<App> findAllByOrderByOrdinalAsc();
 }

@@ -17,20 +17,25 @@ import java.util.Collections;
 import java.util.Map;
 import lombok.Getter;
 
-/**
- * ZeroWeb 业务异常
- * @author xezzon
- */
+/// 抽象的业务异常基类。
+/// 所有业务相关的异常都应该继承此抽象类。
+/// @author xezzon
 public abstract class ZerowebBusinessException extends RuntimeException {
 
+  /// 异常附带的参数，通常用于国际化消息的占位符替换。
   @Getter
   private final transient Map<String, Object> parameters;
 
+  /// 使用指定的详细消息构造一个 `ZerowebBusinessException`。
+  /// @param message 详细消息
   protected ZerowebBusinessException(String message) {
     super(message);
     this.parameters = Collections.emptyMap();
   }
 
+  /// 使用指定的参数和详细消息构造一个 `ZerowebBusinessException`。
+  /// @param parameters 异常附带的参数
+  /// @param message 详细消息
   protected ZerowebBusinessException(
       final Map<String, Object> parameters,
       final String message
@@ -39,9 +44,13 @@ public abstract class ZerowebBusinessException extends RuntimeException {
     this.parameters = parameters;
   }
 
-  public abstract String getCode();
+  /// 业务异常的错误码。
+  /// @return 错误码字符串
+  public abstract String code();
 
-  public int getHttpStatus() {
+  /// 业务异常对应的 HTTP 状态码。
+  /// @return HTTP 状态码
+  public int httpStatus() {
     return ErrorCodeConstant.CLIENT_ERROR_STATUS;
   }
 }

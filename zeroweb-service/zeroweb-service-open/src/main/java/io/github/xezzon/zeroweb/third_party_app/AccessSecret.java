@@ -31,6 +31,7 @@ import lombok.Setter;
 @Table(name = ThirdPartyApp.TABLE_NAME)
 public class AccessSecret {
 
+  /// 密钥列名
   public static final String SECRET_KEY_COLUMN = "secret_key";
 
   /// 第三方应用标识
@@ -43,7 +44,7 @@ public class AccessSecret {
       length = DatabaseConstant.ID_LENGTH
   )
   String id;
-  /// 第三方应用密钥
+  /// 第三方应用密钥，用于签名验证
   @Column(name = SECRET_KEY_COLUMN, nullable = false, length = 64)
   String secretKey;
 

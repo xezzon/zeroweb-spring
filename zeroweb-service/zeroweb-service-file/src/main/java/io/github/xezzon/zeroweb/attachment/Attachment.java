@@ -33,7 +33,8 @@ import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-/// 附件
+/// 附件实体类，表示系统中存储的文件附件。
+///
 /// @author xezzon
 @Getter
 @Setter
@@ -43,47 +44,59 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners({AuditingEntityListener.class})
 public class Attachment {
 
-  /// 附件ID
+  /**
+   * 附件的唯一标识符。
+   */
   @Id
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   @IdGenerator
   String id;
-  /// 文件名
+  /**
+   * 原始文件名，包含扩展名。
+   */
   @Column(name = "name", nullable = false)
   String name;
-  /// 文件摘要
+  /**
+   * 文件的内容摘要，用于验证文件完整性和唯一性。
+   * 通常是文件的哈希值。
+   */
   @Column(name = "checksum", nullable = false)
   String checksum;
-  /// 文件大小
-  ///
-  /// 单位：字节
+  /// 文件的大小。
+  /// 单位：`字节`。
   @Column(name = "size", nullable = false)
   Long size;
-  /// MIME 类型
+  /// 文件的 MIME 类型，例如 `image/jpeg`、`application/pdf`。
   @Column(name = "type", nullable = false)
   String type;
-  /// 业务类型
+  /// 附件所属的业务类型。
   @Column(name = "biz_type", nullable = false)
   String bizType;
-  /// 业务ID
+  /// 附件所属业务实体的ID。
+  /// 与 [#bizType] 结合使用以关联附件。
   @Column(name = "biz_id", length = DatabaseConstant.ID_LENGTH)
   String bizId;
-  /// 存储后端
+  /// 文件存储的后端提供者。
   @Column(name = "provider", nullable = false, updatable = false)
   @Enumerated(EnumType.STRING)
   FileProviderEnum provider;
-  /// 附件状态
+  /// 附件的当前状态。
   @Column(name = "status", nullable = false)
   @Enumerated(EnumType.STRING)
   AttachmentStatusEnum status;
-  /// 上传者
+  /// 上传此附件的用户ID。
   @Column(name = "owner_id", length = DatabaseConstant.ID_LENGTH)
   String ownerId;
-  /// 上传时间
+  /// 附件的上传时间。
+  /// 使用 [Instant] 存储，并由 [CreatedDate] 自动设置。
   @Column(name = "create_time", nullable = false, updatable = false)
   @CreatedDate
   Instant createTime;
 
+  /// 生成附件在存储系统中的对象键（Object Key）。
+  /// 对象键的格式为 `yyyy/MM/dd/id`，其中日期部分基于附件的创建时间（UTC）。
+  ///
+  /// @return 附件在存储系统中的唯一对象键。
   public String objectKey() {
     return DateTimeFormatter.ofPattern("yyyy/MM/dd").withZone(ZoneOffset.UTC)
         .format(this.createTime)

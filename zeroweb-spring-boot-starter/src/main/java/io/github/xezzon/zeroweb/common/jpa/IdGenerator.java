@@ -19,11 +19,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.hibernate.annotations.IdGeneratorType;
 
-/**
- * 标记实体类的 id 以自定义的方式生成
- * @author xezzon
- * @see HibernateIdGenerator
- */
+/// 标记实体类的 ID 以自定义的方式生成。
+///
+/// 该注解用于标识实体类中的 ID 字段，指示其 ID 的生成策略将委托给 [HibernateIdGenerator]。
+/// 这允许应用程序在持久化实体时，根据预设的规则（例如 UUID 或其他自定义逻辑）自动生成 ID，而不是依赖数据库的自增或其他默认机制。
+///
+/// @author xezzon
+/// @see HibernateIdGenerator
 @IdGeneratorType(HibernateIdGenerator.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})

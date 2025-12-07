@@ -20,14 +20,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-/**
- * @author xezzon
- */
+/// 对 [业务参数][Setting] 进行数据库操作的 JPA 接口
+///
+/// 提供业务参数实体的数据库访问接口，继承自Spring Data JPA的JpaRepository和JpaSpecificationExecutor。
+/// 支持基础的CRUD操作和复杂的规格查询，支持OData协议。
+/// @author xezzon
 @Repository
 @NullMarked
 public interface SettingRepository extends
     JpaRepository<Setting, String>,
     JpaSpecificationExecutor<Setting> {
 
+  /// 根据业务参数标识查询参数
+  ///
+  /// 通过参数的唯一标识符code查询对应的配置项。
+  /// 常用于根据参数标识快速获取参数配置的场景。
+  /// @param code 业务参数标识，如 `system.theme`
+  /// @return 业务参数
   Optional<Setting> findByCode(String code);
 }

@@ -36,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
 
 /**
+ * 附件管理
  * @author xezzon
  */
 @GrpcService
@@ -44,6 +45,8 @@ public class AttachmentGrpcEndpoint extends AttachmentImplBase {
 
   private final AttachmentService attachmentService;
 
+  /// 依赖注入
+  /// @param attachmentService 附件服务
   public AttachmentGrpcEndpoint(final AttachmentService attachmentService) {
     this.attachmentService = attachmentService;
   }
@@ -125,8 +128,10 @@ public class AttachmentGrpcEndpoint extends AttachmentImplBase {
   }
 }
 
+/// 附件相关的实体类转换
 interface AttachmentConverter {
 
+  /// 附件实体转换为 DTO
   static AttachmentItem from(Attachment attachment) {
     Builder builder = AttachmentItem.newBuilder();
     builder

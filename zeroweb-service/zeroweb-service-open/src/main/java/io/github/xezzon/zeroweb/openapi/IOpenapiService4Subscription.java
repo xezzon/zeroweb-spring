@@ -18,6 +18,12 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 
+/// 对外接口订阅服务接口
+///
+/// 为订阅服务提供查询对外接口的能力，包括根据编码查询接口和分页查询已发布接口列表。
+/// 该接口仅对外暴露查询相关的方法，不包含修改操作，
+/// 确保订阅服务的接口只读特性。
+///
 /// @author xezzon
 public interface IOpenapiService4Subscription {
 

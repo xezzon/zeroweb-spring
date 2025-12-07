@@ -15,6 +15,12 @@ package io.github.xezzon.zeroweb.third_party_app.event;
 
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
 
+/// 第三方应用创建事件
+///
+/// 当第三方应用创建成功后发布的事件，用于通知其他组件进行相关处理
+///
+/// @param thirdPartyApp 创建的第三方应用
+///
 /// @author xezzon
 public record ThirdPartyAppCreatedEvent(ThirdPartyApp thirdPartyApp) {
 

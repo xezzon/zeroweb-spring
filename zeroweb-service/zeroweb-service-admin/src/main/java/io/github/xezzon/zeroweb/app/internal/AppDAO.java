@@ -21,11 +21,18 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Repository;
 
+/// `AppDAO` 是服务实体的数据库访问对象（DAO）。
+///
+/// 它提供了对 [App] 实体的基本 CRUD 操作，并集成了 MapStruct 复制器。
+///
 /// @author xezzon
 @Repository
 @NullMarked
 public class AppDAO extends BaseDAO<App, String, AppRepository> {
 
+  /// 构造函数，注入 [AppRepository]。
+  ///
+  /// @param repository [AppRepository] 实例。
   protected AppDAO(final AppRepository repository) {
     super(repository, App.class);
   }

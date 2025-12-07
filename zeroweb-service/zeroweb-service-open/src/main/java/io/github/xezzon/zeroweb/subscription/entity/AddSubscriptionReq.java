@@ -20,6 +20,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+/// 添加订阅请求对象，用于向订阅系统申请订阅指定接口
 /// @param openapiCode 被订阅的对外接口的编码
 /// @param appId 订阅接口的第三方应用标识
 /// @author xezzon
@@ -28,11 +29,14 @@ public record AddSubscriptionReq(
     String openapiCode
 ) implements Into<Subscription> {
 
+  /// 将请求对象转换为订阅实体
+  /// @return 订阅实体对象
   @Override
   public Subscription into() {
     return Converter.INSTANCE.from(this);
   }
 
+  /// MapStruct 转换器接口，用于将 AddSubscriptionReq 转换为 Subscription
   @Mapper
   interface Converter extends From<AddSubscriptionReq, Subscription> {
 

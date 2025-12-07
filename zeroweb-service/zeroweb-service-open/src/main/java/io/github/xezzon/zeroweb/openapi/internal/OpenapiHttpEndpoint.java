@@ -40,6 +40,8 @@ public class OpenapiHttpEndpoint {
 
   private final OpenapiService openapiService;
 
+  /// 依赖注入
+  /// @param openapiService 对外接口管理
   public OpenapiHttpEndpoint(final OpenapiService openapiService) {
     this.openapiService = openapiService;
   }

@@ -15,13 +15,34 @@ package io.github.xezzon.zeroweb.openapi.enumeration;
 
 import io.github.xezzon.zeroweb.core.trait.IDict;
 
-/// 开放平台允许使用的HTTP方法
+/// HTTP请求方法枚举
+///
+/// 定义了开放平台允许使用的HTTP方法类型。
+/// 该枚举实现了 [IDict] 接口，
+/// 提供了统一的数据字典功能，包括获取标签、代码、标签和序号等方法。
+///
+/// @author xezzon
 public enum HttpMethod implements IDict {
 
+  /**
+   * HTTP GET请求
+   */
   GET,
+  /**
+   * HTTP POST请求
+   */
   POST,
+  /**
+   * HTTP PUT请求
+   */
   PUT,
+  /**
+   * HTTP DELETE请求
+   */
   DELETE,
+  /**
+   * HTTP PATCH请求
+   */
   PATCH,
   ;
 

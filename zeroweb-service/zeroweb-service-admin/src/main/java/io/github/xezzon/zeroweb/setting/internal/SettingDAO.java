@@ -26,27 +26,42 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Repository;
 
-/**
- * @author xezzon
- */
+/// 业务参数数据访问对象
+///
+/// 提供业务参数实体的数据库操作封装，继承自BaseDAO。
+/// @author xezzon
 @Repository
 public class SettingDAO extends BaseDAO<Setting, String, SettingRepository> {
 
+  /// 构造器
+  ///
+  /// @param repository 业务参数仓库实例
   SettingDAO(final SettingRepository repository) {
     super(repository, Setting.class);
   }
 
+  /// 查询所有业务参数（分页）
+  ///
+  /// 使用 OData 查询选项进行分页查询，默认按更新时间降序排序。
+  /// @param odata OData 查询选项，包含查询条件、排序、分页等参数
+  /// @return 分页结果，包含业务参数列表和分页信息
   @Override
   public Page<@NonNull Setting> findAll(final @NonNull ODataQueryOption odata) {
     Sort sort = Sort.by(Order.desc(Setting_.UPDATE_TIME));
     return super.findAll(odata, null, sort);
   }
 
+  /// 获取拷贝器
+  ///
+  /// @return 业务参数实体拷贝器实例
   @Override
   public ICopier<Setting> getCopier() {
     return Copier.INSTANCE;
   }
 
+  /// 业务参数实体拷贝器
+  ///
+  /// 使用MapStruct生成的拷贝工具，用于业务参数实体的字段映射和复制
   @Mapper
   interface Copier extends ICopier<Setting> {
 

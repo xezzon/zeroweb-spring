@@ -13,6 +13,8 @@
 
 package io.github.xezzon.zeroweb.auth.entity;
 
+/// `BasicAuth` 记录表示基本的认证信息。
+///
 /// @param username 用户名
 /// @param password 口令
 /// @author xezzon

@@ -15,20 +15,33 @@ package io.github.xezzon.zeroweb.locale;
 
 import jakarta.persistence.MappedSuperclass;
 
-/// 需要国际化的功能，需要实现该接口
+/// 国际化消息接口。
+///
+/// 任何需要支持国际化功能的对象都应实现此接口，
+/// 提供其命名空间和消息键，以便进行国际化文本的查找和匹配。
 @MappedSuperclass
 public interface II18nMessage {
 
-  /// @return 命名空间
+/// 获取国际化内容的命名空间。
+///
+/// 命名空间用于逻辑分组国际化消息。
+///
+/// @return 国际化消息的命名空间字符串。
   String getNamespace();
 
-  /// @return 国际化内容
+/// 获取国际化消息的键。
+///
+/// 消息键在特定命名空间内唯一标识一个国际化消息。
+///
+/// @return 国际化消息的键字符串。
   String getMessageKey();
 
-  /// 当命名空间与键都相同时，认为是同一国际化内容
-  ///
-  /// @param that 另一个实现了国际化内容接口的对象
-  /// @return 是否认定同一
+/// 判断当前国际化消息与另一个 [II18nMessage] 对象是否相同。
+///
+/// 当两个对象的命名空间和消息键都一致时，认为它们代表同一个国际化内容。
+///
+/// @param that 另一个实现了 [II18nMessage] 接口的对象。
+/// @return 如果命名空间和消息键都相同则返回 `true`，否则返回 `false`。
   default boolean eq(final II18nMessage that) {
     return getNamespace().equals(that.getNamespace())
         && getMessageKey().equals(that.getMessageKey());

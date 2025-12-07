@@ -24,7 +24,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/// 角色-用户
+/// `RoleUser` 实体表示角色与用户之间的关联。
+///
+/// 它定义了哪些用户属于哪些角色。
 ///
 /// @author xezzon
 @Getter
@@ -34,14 +36,15 @@ import lombok.ToString;
 @Table(name = "zeroweb_role_user")
 public class RoleUser {
 
+  /// 唯一标识符。
   @Id
   @IdGenerator
   @Column(name = "id", nullable = false, updatable = false, length = ID_LENGTH)
   private String id;
-  /// 角色ID
+  /// 关联的角色ID。
   @Column(name = "role_id", nullable = false, updatable = false, length = ID_LENGTH)
   private String roleId;
-  /// 用户ID
+  /// 关联的用户ID。
   @Column(name = "user_id", nullable = false, updatable = false, length = ID_LENGTH)
   private String userId;
 }

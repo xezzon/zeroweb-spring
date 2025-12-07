@@ -28,9 +28,13 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerial
 @EnableJpaAuditing
 public class ZerowebFileApplication {
 
+  /// 私有构造函数，防止实例化
   private ZerowebFileApplication() {
   }
 
+  /// 应用程序主入口
+  ///
+  /// @param args 命令行参数
   static void main(String[] args) {
     SpringApplication.run(ZerowebFileApplication.class, args);
   }

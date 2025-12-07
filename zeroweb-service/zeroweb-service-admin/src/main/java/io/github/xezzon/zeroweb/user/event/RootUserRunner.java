@@ -25,23 +25,30 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-/**
- * 启动时新增超级管理员账号
- * @author xezzon
- */
+/// 启动时新增超级管理员账号
+///
+/// 在应用启动时自动创建超级管理员账号，确保系统具有管理员权限。
+///
+/// @author xezzon
 @Component
 @Order(Short.MAX_VALUE - 1)
 public class RootUserRunner implements ApplicationRunner {
 
+  /// 用户仓储接口
   @Resource
   private UserRepository userRepository;
 
-  /**
-   * ROOT 账号的密码
-   */
+  /// ROOT 账号的密码
+  ///
+  /// 从环境变量zeroweb.root-password中读取。
   @Value("${zeroweb.root-password}")
   private String rootPassword;
 
+  /// 执行应用启动逻辑
+  ///
+  /// 检查并创建超级管理员账号。
+  ///
+  /// @param args 应用启动参数
   @Override
   public void run(@NonNull final ApplicationArguments args) {
     final User root = UserConstant.ROOT;

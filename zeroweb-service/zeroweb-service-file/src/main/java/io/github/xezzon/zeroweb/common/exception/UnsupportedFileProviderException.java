@@ -16,24 +16,27 @@ package io.github.xezzon.zeroweb.common.exception;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import org.jspecify.annotations.NullMarked;
 
-/// 启用的存储后端未正确配置
+/// 启用的存储后端未正确配置。
 /// @author xezzon
 @NullMarked
 public class UnsupportedFileProviderException extends ZerowebBusinessException {
 
+  /// 错误码
   public static final String ERROR_CODE = "SFC01";
 
+  /// 构造一个启用的存储后端未正确配置的异常。
+  /// @param provider 文件存储服务提供者
   public UnsupportedFileProviderException(FileProviderEnum provider) {
     super(provider + " is not configured correctly.");
   }
 
   @Override
-  public String getCode() {
+  public String code() {
     return ERROR_CODE;
   }
 
   @Override
-  public int getHttpStatus() {
+  public int httpStatus() {
     return ErrorCodeConstant.SERVER_ERROR_STATUS;
   }
 }

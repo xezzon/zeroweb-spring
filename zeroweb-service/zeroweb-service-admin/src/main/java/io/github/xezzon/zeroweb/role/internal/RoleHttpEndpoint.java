@@ -39,14 +39,20 @@ public class RoleHttpEndpoint {
 
   private final RoleService roleService;
 
+  /// 依赖注入
+  ///
+  /// @param roleService 角色服务实例
   public RoleHttpEndpoint(final RoleService roleService) {
     this.roleService = roleService;
   }
 
   /// 新增角色
   ///
-  /// @param req 角色信息
-  /// @return 角色ID
+  /// 创建新的角色实例，需要提供角色基本信息。
+  /// 角色编码会根据父角色自动生成完整路径。
+  ///
+  /// @param req 角色信息请求对象，包含简码、名称、是否可继承、上级角色ID
+  /// @return 新创建角色的ID
   @SaCheckPermission({PermissionConstant.ROLE_WRITE})
   @PostMapping()
   public Id addRole(@RequestBody final AddRoleReq req) {
@@ -57,7 +63,10 @@ public class RoleHttpEndpoint {
 
   /// 查询角色列表
   ///
-  /// @return 角色列表（树形）
+  /// 获取系统所有角色的树形结构列表。
+  /// 从系统根节点开始，返回完整的角色树。
+  ///
+  /// @return 角色列表（树形结构）
   @SaCheckPermission({PermissionConstant.ROLE_READ})
   @GetMapping()
   public List<Role> listAllRole() {
@@ -69,6 +78,9 @@ public class RoleHttpEndpoint {
 
   /// 删除角色
   ///
+  /// 删除指定的角色及其所有下级角色。
+  /// 删除操作会级联删除该角色的所有子角色。
+  ///
   /// @param id 角色ID
   @SaCheckPermission({PermissionConstant.ROLE_WRITE})
   @DeleteMapping("/{id}")
@@ -76,9 +88,12 @@ public class RoleHttpEndpoint {
     roleService.deleteRole(id);
   }
 
-  /// 查询当前登陆人的角色及它们的下一级角色
+  /// 查询当前登录人的角色
   ///
-  /// @return 角色列表
+  /// 获取当前登录用户的角色及其下一级角色。
+  /// 返回当前用户直接拥有的角色，以及这些角色的直接子角色。
+  ///
+  /// @return 当前用户的角色列表
   @SaCheckLogin
   @GetMapping("/mine")
   public List<Role> listMyRole() {

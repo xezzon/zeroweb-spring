@@ -21,23 +21,23 @@ import io.grpc.Context;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 
-/**
- * JWT认证相关
- * @author xezzon
- */
+/// JWT 认证工具类，用于管理和获取当前线程的 JWT 认证信息。
+/// 支持从 `ScopedValue` 和 gRPC `Context` 中获取认证数据。
+/// @author xezzon
 public class JwtAuth {
 
+  /// ScopedValue 用于在当前线程范围内存储 JWT 认证信息。
   public static final ScopedValue<JwtClaim> CLAIM = ScopedValue.newInstance();
+  /// gRPC Context.Key 用于在 gRPC 请求上下文中存储 JWT 认证信息。
   public static final Context.Key<JwtClaim> CONTEXT = Context.key("JwtClaim");
 
   private JwtAuth() {
   }
 
-  /**
-   * 获取当前认证信息。
-   * 如果没获取到则返回 {@link Optional#empty()}
-   * @return 当前认证信息
-   */
+  /// 获取当前线程的 JWT 认证信息。
+  /// 优先从 gRPC Context 中获取，如果不存在，则从 ScopedValue 中获取。
+  /// 如果两种方式都未获取到，则返回 [Optional#empty()]。
+  /// @return 包含 JWT 认证信息的 Optional 对象，如果不存在则为 empty。
   public static @NonNull Optional<JwtClaim> get() {
     JwtClaim grpcContext = CONTEXT.get();
     if (grpcContext != null) {
@@ -49,11 +49,10 @@ public class JwtAuth {
     return Optional.ofNullable(CLAIM.get());
   }
 
-  /**
-   * 获取当前认证信息。
-   * @return 认证信息
-   * @throws NotLoginException 没有认证
-   */
+  /// 获取当前线程的 JWT 认证信息，如果不存在则抛出异常。
+  /// 优先从 gRPC Context 中获取，如果不存在，则从 ScopedValue 中获取。
+  /// @return JWT 认证信息。
+  /// @throws NotLoginException 如果当前线程没有认证信息。
   public static @NonNull JwtClaim getOrThrow() {
     return get()
         .orElseThrow(() ->

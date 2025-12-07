@@ -22,6 +22,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Repository;
 
+/// 语言数据访问对象。
+///
 /// @author xezzon
 @Repository
 public class LanguageDAO extends BaseDAO<Language, String, LanguageRepository> {
@@ -30,19 +32,30 @@ public class LanguageDAO extends BaseDAO<Language, String, LanguageRepository> {
     super(repository, Language.class);
   }
 
+  /// 获取语言复制器。
+  ///
+  /// @return 语言复制器实例。
   @Override
   public ICopier<Language> getCopier() {
     return Copier.INSTANCE;
   }
 
+  /// 根据语言标签查找语言。
+  ///
+  /// @param languageTag 语言标签。
+  /// @return 包含语言的 Optional 对象。
   Optional<Language> findByLanguageTag(final String languageTag) {
     return this.get().findByDictTagAndLanguageTag(Language.LANGUAGE_DICT_TAG, languageTag);
   }
 
+  /// 按照排序查询所有语言。
+  ///
+  /// @return 语言列表。
   List<Language> findAllOrderByOrdinalAsc() {
     return this.get().findByDictTagOrderByOrdinalAsc(Language.LANGUAGE_DICT_TAG);
   }
 
+  /// 语言复制器接口。
   @Mapper
   interface Copier extends ICopier<Language> {
 

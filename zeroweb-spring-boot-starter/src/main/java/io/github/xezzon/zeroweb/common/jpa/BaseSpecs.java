@@ -16,9 +16,9 @@ package io.github.xezzon.zeroweb.common.jpa;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.data.jpa.domain.Specification;
 
-/**
- * @author xezzon
- */
+/// 基础 JPA 规范构建器，提供常用的规范方法。
+///
+/// @author xezzon
 @NullMarked
 public class BaseSpecs {
 

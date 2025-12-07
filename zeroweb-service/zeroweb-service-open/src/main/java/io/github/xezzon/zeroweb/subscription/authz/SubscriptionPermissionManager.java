@@ -17,16 +17,25 @@ import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenExceptio
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppMemberService;
 import org.springframework.stereotype.Component;
 
+/// 订阅权限管理器，用于校验用户对订阅功能的访问权限
 /// @author xezzon
 @Component
 public class SubscriptionPermissionManager {
 
+  /// 第三方应用成员服务，用于校验用户权限
   private final IThirdPartyAppMemberService thirdPartyAppMemberService;
 
+  /// 构造器注入第三方应用成员服务
+  /// @param thirdPartyAppMemberService 第三方应用成员服务实例
   public SubscriptionPermissionManager(IThirdPartyAppMemberService thirdPartyAppMemberService) {
     this.thirdPartyAppMemberService = thirdPartyAppMemberService;
   }
 
+  /// 检查用户权限
+  /// @param groupId 应用ID
+  /// @param userId 用户ID
+  /// @param permission 权限标识
+  /// @throws DataPermissionForbiddenException 权限不足时抛出异常
   public void check(String groupId, String userId, String permission) {
     thirdPartyAppMemberService
         .queryMember(groupId, userId)

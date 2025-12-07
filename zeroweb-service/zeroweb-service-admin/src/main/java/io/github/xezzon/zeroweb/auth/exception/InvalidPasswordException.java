@@ -16,20 +16,24 @@ package io.github.xezzon.zeroweb.auth.exception;
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
 import org.jspecify.annotations.NullMarked;
 
-/// 不正确的口令
+/// `InvalidPasswordException` 表示提供的密码不正确，或用户不存在。
+///
+/// 这是一个业务异常，用于处理认证过程中密码验证失败的情况。
 ///
 /// @author xezzon
 @NullMarked
 public class InvalidPasswordException extends ZerowebBusinessException {
 
+  /// 错误码，用于标识密码无效或用户不存在的错误。
   public static final String ERROR_CODE = "CFF01";
 
+  /// 构造一个新的 `InvalidPasswordException` 实例。
   public InvalidPasswordException() {
     super("Password is invalid, or user is not existed.");
   }
 
   @Override
-  public String getCode() {
+  public String code() {
     return ERROR_CODE;
   }
 }

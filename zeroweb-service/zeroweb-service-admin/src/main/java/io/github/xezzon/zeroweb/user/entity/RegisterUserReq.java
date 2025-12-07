@@ -21,6 +21,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+/// 用户注册请求
+///
+/// 包含用户注册所需的必要信息，包括用户名、昵称和密码。
+///
 /// @param username 用户名
 /// @param nickname 用户昵称
 /// @param password 密码。为了防止身份被冒用，由用户设置的、只有用户自己知晓的口令。
@@ -39,16 +43,27 @@ public record RegisterUserReq(
     String password
 ) implements Into<User> {
 
+  /// 转换为用户实体
+  ///
+  /// @return 用户实体对象
   @Override
   public User into() {
     return Converter.INSTANCE.from(this);
   }
 
+  /// 注册请求到用户的转换器
+  ///
+  /// @author xezzon
   @Mapper
   interface Converter extends From<RegisterUserReq, User> {
 
+    /// 转换器实例
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
+    /// 转换为用户实体
+    ///
+    /// @param registerUserReq 注册请求对象
+    /// @return 用户实体对象
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "id", ignore = true)

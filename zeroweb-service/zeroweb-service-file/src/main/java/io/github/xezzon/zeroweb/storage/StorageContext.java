@@ -20,8 +20,10 @@ package io.github.xezzon.zeroweb.storage;
 /// @author xezzon
 public class StorageContext {
 
+  /// 用于在线程内传递 CRC
   public static final ScopedValue<String> CRC = ScopedValue.newInstance();
 
+  /// 私有构造函数，防止实例化。
   private StorageContext() {
   }
 }

@@ -15,10 +15,11 @@ package io.github.xezzon.zeroweb.common.marker;
 
 import jakarta.annotation.Priority;
 
-/**
- * 以 RPC 调用的方式实现功能
- * @author xezzon
- */
+/// 标记接口，表示实现此接口的类可以通过远程过程调用（RPC）的方式提供或消费功能。
+///
+/// 此接口本身不包含任何方法，仅作为语义标记，用于在ZeroWeb框架中识别RPC相关的组件。
+///
+/// @author xezzon
 @Priority(16)
 public interface RpcTrait {
 

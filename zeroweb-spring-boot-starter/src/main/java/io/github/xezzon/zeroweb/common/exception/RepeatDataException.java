@@ -15,14 +15,20 @@ package io.github.xezzon.zeroweb.common.exception;
 
 import java.util.Collections;
 
-/**
- * 唯一键冲突
- * @author xezzon
- */
+/// 当数据重复时抛出的业务异常，通常是由于唯一键冲突导致。
+///
+/// 错误码：`C0006`
+/// @author xezzon
 public class RepeatDataException extends ZerowebBusinessException {
 
+  /// 错误码，表示唯一键冲突。
   public static final String ERROR_CODE = "C0006";
 
+  /**
+   * 构造一个新的 RepeatDataException 实例。
+   *
+   * @param key 导致冲突的唯一键。
+   */
   public RepeatDataException(String key) {
     super(
         Collections.singletonMap("keyword", key),
@@ -31,7 +37,7 @@ public class RepeatDataException extends ZerowebBusinessException {
   }
 
   @Override
-  public String getCode() {
+  public String code() {
     return ERROR_CODE;
   }
 }

@@ -22,11 +22,17 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
+/// 菜单服务实现
+/// 
+/// 提供菜单信息的聚合查询功能，整合来自多个权限源的菜单信息。
 /// @author xezzon
 @SuppressWarnings("unused")
 @Service
 public class MenuService implements IMenuService {
 
+  /// 查询所有菜单信息
+  /// 
+  /// @return 菜单信息列表
   @Override
   public List<MenuInfo> list() {
     return Stream.of(

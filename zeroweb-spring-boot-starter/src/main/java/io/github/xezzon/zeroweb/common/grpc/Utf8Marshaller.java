@@ -16,11 +16,17 @@ package io.github.xezzon.zeroweb.common.grpc;
 import io.grpc.Metadata.BinaryMarshaller;
 import java.nio.charset.StandardCharsets;
 
-/**
- * @author xezzon
- */
+/// `Utf8Marshaller` 用于在 gRPC `Metadata` 中序列化和反序列化 UTF-8 编码的字符串。
+/// 它实现了 `BinaryMarshaller<String>` 接口，提供了将字符串转换为字节数组和将字节数组解析回字符串的方法。
+///
+/// @author xezzon
 public class Utf8Marshaller implements BinaryMarshaller<String> {
 
+  /// 将字符串序列化为 UTF-8 字节数组。
+  /// 如果输入字符串为 `null`，则返回一个空字节数组。
+  ///
+  /// @param s 要序列化的字符串。
+  /// @return 表示输入字符串的 UTF-8 字节数组。
   @Override
   public byte[] toBytes(final String s) {
     if (s == null) {
@@ -29,6 +35,11 @@ public class Utf8Marshaller implements BinaryMarshaller<String> {
     return s.getBytes(StandardCharsets.UTF_8);
   }
 
+  /// 从 UTF-8 字节数组中反序列化字符串。
+  /// 如果输入字节数组为 `null` 或为空，则返回一个空字符串。
+  ///
+  /// @param bytes 要反序列化的字节数组。
+  /// @return 从输入字节数组解析的字符串。
   @Override
   public String parseBytes(final byte[] bytes) {
     if (bytes == null || bytes.length == 0) {

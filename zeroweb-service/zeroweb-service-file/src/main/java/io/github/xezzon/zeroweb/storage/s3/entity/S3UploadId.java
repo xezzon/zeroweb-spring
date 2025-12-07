@@ -22,9 +22,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/// S3 的上传 ID
-/// 
-/// @author xezzon
+/**
+ * S3 的上传 ID 实体。
+ * 用于存储 S3 分段上传的 ID 信息。
+ *
+ * @author xezzon
+ */
 @Getter
 @Setter
 @ToString
@@ -44,14 +47,22 @@ public class S3UploadId {
   /// S3上传ID
   @Column(name = "upload_id", nullable = false, length = 512)
   private String uploadId;
-  /// 循环冗余校验和。用于 S3 的完整对象校验
+  /// 循环冗余校验和。用于 S3 的完整对象校验。
+  ///
+  /// @see <a href="https://docs.aws.amazon.com/zh_cn/AmazonS3/latest/userguide/checking-object-integrity-upload.html#ChecksumTypes-Uploads">完整对象和复合校验和类型</a>
   @Column(name = "crc", nullable = false, updatable = false)
   private String crc;
 
+  /// 默认构造函数。
   public S3UploadId() {
     super();
   }
 
+  /// 全参构造函数。
+  ///
+  /// @param attachmentId 附件ID
+  /// @param uploadId     S3上传ID
+  /// @param crc          循环冗余校验和
   public S3UploadId(String attachmentId, String uploadId, String crc) {
     this.attachmentId = attachmentId;
     this.uploadId = uploadId;

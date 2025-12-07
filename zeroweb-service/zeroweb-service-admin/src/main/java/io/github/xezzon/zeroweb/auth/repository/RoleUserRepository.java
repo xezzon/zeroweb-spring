@@ -22,20 +22,46 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+/// `RoleUserRepository` 是角色-用户关联的 JPA 数据仓库接口。
+///
+/// 它提供了对 [RoleUser] 实体的数据库操作，包括按角色ID或用户ID查询、检查是否存在、删除以及按角色ID和用户ID查询。
+///
 @Repository
 @NullMarked
 public interface RoleUserRepository extends
     JpaRepository<RoleUser, String>,
     JpaSpecificationExecutor<RoleUser> {
 
+  /// 根据角色ID查询所有角色-用户关联。
+  ///
+  /// @param roleId 角色ID。
+  /// @return 匹配的角色-用户关联列表。
   List<RoleUser> findByRoleId(String roleId);
 
+  /// 检查指定角色ID和用户ID的关联是否存在。
+  ///
+  /// @param roleId 角色ID。
+  /// @param userId 用户ID。
+  /// @return 如果存在则为 `true`，否则为 `false`。
   boolean existsByRoleIdAndUserId(String roleId, String userId);
 
+  /// 删除指定角色ID和用户ID的角色-用户关联。
+  ///
+  /// @param roleId 角色ID。
+  /// @param userId 用户ID。
   @Transactional
   void deleteByRoleIdAndUserId(String roleId, String userId);
 
+  /// 根据用户ID查询所有角色-用户关联。
+  ///
+  /// @param userId 用户ID。
+  /// @return 匹配的角色-用户关联列表。
   List<RoleUser> findByUserId(String userId);
 
+  /// 根据角色ID和用户ID查询单个角色-用户关联。
+  ///
+  /// @param roleId 角色ID。
+  /// @param userId 用户ID。
+  /// @return 匹配的角色-用户关联的 [Optional]，如果不存在则为 [#empty()]。
   Optional<RoleUser> findByRoleIdAndUserId(String roleId, String userId);
 }

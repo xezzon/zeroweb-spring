@@ -15,12 +15,22 @@ package io.github.xezzon.zeroweb.openapi.enumeration;
 
 import io.github.xezzon.zeroweb.core.trait.IDict;
 
-/// 接口状态
+/// 对外接口状态枚举
+///
+/// 定义了对外接口的生命周期状态，包括草稿和已发布两个状态。
+/// 该枚举实现了 [IDict] 接口，
+/// 提供了统一的数据字典功能。
 ///
 /// @author xezzon
 public enum OpenapiStatus implements IDict {
 
+  /**
+   * 草稿状态
+   */
   DRAFT("草稿"),
+  /**
+   * 已发布状态
+   */
   PUBLISHED("已发布"),
   ;
 

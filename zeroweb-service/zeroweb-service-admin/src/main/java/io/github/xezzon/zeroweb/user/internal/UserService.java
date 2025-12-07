@@ -24,12 +24,17 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
+/// 用户服务
 /// @author xezzon
 @Service
 public class UserService implements IUserService4Auth {
 
+  /// 用户仓储接口
   private final UserRepository userRepository;
 
+  /// 依赖注入
+  ///
+  /// @param userRepository 用户数据库操作
   UserService(final UserRepository userRepository) {
     this.userRepository = userRepository;
   }

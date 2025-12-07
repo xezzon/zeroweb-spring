@@ -20,6 +20,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+/// 添加第三方应用的请求参数
+///
+/// 用于接收客户端添加第三方应用的请求数据
+///
 /// @param name 第三方应用名称
 /// @author xezzon
 public record AddThirdPartyAppReq(

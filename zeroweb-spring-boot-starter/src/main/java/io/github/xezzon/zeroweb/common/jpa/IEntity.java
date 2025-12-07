@@ -15,11 +15,17 @@ package io.github.xezzon.zeroweb.common.jpa;
 
 import jakarta.persistence.MappedSuperclass;
 
-/**
- * @author xezzon
- */
+/// 基础实体接口。
+///
+/// 所有需要持久化的实体类都应实现此接口，以提供统一的 ID 访问方式。
+///
+/// @param <T> 实体 ID 的类型
+/// @author xezzon
 @MappedSuperclass
 public interface IEntity<T> {
 
+  /// 获取实体 ID。
+  ///
+  /// @return 实体 ID
   T getId();
 }

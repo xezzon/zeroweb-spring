@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
+/// 用户服务向认证授权服务暴露的能力
 /// @author xezzon
 public interface IUserService4Auth {
 

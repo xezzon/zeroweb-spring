@@ -15,10 +15,10 @@ package io.github.xezzon.zeroweb.common.marker;
 
 import jakarta.annotation.Priority;
 
-/**
- * 以与数据库交互的方式实现功能
- * @author xezzon
- */
+/// `DbTrait` 是一个标记接口，用于标识那些主要通过与数据库交互来提供功能的类或组件。
+/// 实现了此接口的类通常会封装数据库操作，例如使用 `DAO` 或 `Repository` 进行数据访问。
+///
+/// @author xezzon
 @Priority(8)
 public interface DbTrait {
 
