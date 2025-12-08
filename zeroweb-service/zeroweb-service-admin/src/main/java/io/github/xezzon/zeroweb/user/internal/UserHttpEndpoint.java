@@ -13,10 +13,15 @@
 
 package io.github.xezzon.zeroweb.user.internal;
 
+import static io.github.xezzon.zeroweb.crypto.constant.ZxcvbnConstant.ZXCVBN;
+
 import cn.dev33.satoken.secure.BCrypt;
+import com.nulabinc.zxcvbn.Strength;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.crypto.IPasswordService;
 import io.github.xezzon.zeroweb.user.User;
 import io.github.xezzon.zeroweb.user.entity.RegisterUserReq;
+import java.util.Collections;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,14 +35,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserHttpEndpoint {
 
-  /// 用户服务接口
   private final UserService userService;
+  private final IPasswordService passwordService;
 
   /// 依赖注入
   ///
   /// @param userService 用户服务接口
-  UserHttpEndpoint(final UserService userService) {
+  /// @param passwordService 口令服务
+  UserHttpEndpoint(final UserService userService, final IPasswordService passwordService) {
     this.userService = userService;
+    this.passwordService = passwordService;
   }
 
   /// 用户注册
@@ -48,9 +55,14 @@ public class UserHttpEndpoint {
   /// @return 用户ID
   @PostMapping("/register")
   public Id register(@RequestBody @Validated RegisterUserReq req) {
+    // 计算并校验口令的强度
+    Strength measure = ZXCVBN.measure(req.password(), Collections.singletonList(req.username()));
+    passwordService.checkStrength(measure);
+    // 将口令进行慢哈希，得到密码
     User user = req.into();
     String cipher = BCrypt.hashpw(req.password(), BCrypt.gensalt());
     user.setCipher(cipher);
+    // 将用户保存到数据库
     userService.addUser(user);
     return Id.of(user.getId());
   }

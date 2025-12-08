@@ -52,5 +52,9 @@
       <groupId>cn.dev33</groupId>
       <artifactId>sa-token-redis-jackson</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.nulab-inc</groupId>
+      <artifactId>zxcvbn</artifactId>
+    </dependency>
   </dependencies>
 </project>
