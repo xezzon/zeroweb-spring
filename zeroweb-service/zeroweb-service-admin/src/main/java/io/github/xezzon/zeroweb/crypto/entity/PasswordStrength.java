@@ -15,7 +15,6 @@ package io.github.xezzon.zeroweb.crypto.entity;
 
 import com.nulabinc.zxcvbn.Strength;
 import io.github.xezzon.zeroweb.core.trait.From;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.mapstruct.Mapper;
@@ -25,8 +24,11 @@ import org.mapstruct.factory.Mappers;
  * @author xezzon
  */
 @Getter
-@Setter(AccessLevel.PACKAGE)
+@Setter
 public class PasswordStrength {
+
+  /// 密码强度设置的业务参数键值
+  public static final String SETTING_KEY = "password.strength";
 
   /// 口令强度分数
   private Integer score;

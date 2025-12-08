@@ -43,7 +43,7 @@ public class PasswordService implements IPasswordService {
   public void checkStrength(final Strength strength) {
     Setting setting;
     try {
-      setting = settingService.queryByCode("password.strength");
+      setting = settingService.queryByCode(PasswordStrength.SETTING_KEY);
     } catch (NoSuchElementException _) {
       // 没有设置强度要求
       return;

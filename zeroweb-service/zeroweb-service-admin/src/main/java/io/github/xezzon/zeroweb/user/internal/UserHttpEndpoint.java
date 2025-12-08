@@ -13,10 +13,10 @@
 
 package io.github.xezzon.zeroweb.user.internal;
 
+import static io.github.xezzon.zeroweb.crypto.constant.ZxcvbnConstant.ZXCVBN;
+
 import cn.dev33.satoken.secure.BCrypt;
 import com.nulabinc.zxcvbn.Strength;
-import com.nulabinc.zxcvbn.Zxcvbn;
-import com.nulabinc.zxcvbn.ZxcvbnBuilder;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.crypto.IPasswordService;
 import io.github.xezzon.zeroweb.user.User;
@@ -34,8 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 @RestController
 public class UserHttpEndpoint {
-
-  private static final Zxcvbn ZXCVBN = new ZxcvbnBuilder().build();
 
   private final UserService userService;
   private final IPasswordService passwordService;

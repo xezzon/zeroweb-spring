@@ -13,10 +13,13 @@
 
 package io.github.xezzon.zeroweb.crypto.internal;
 
+import static io.github.xezzon.zeroweb.crypto.constant.ZxcvbnConstant.ZXCVBN;
+
 import com.nulabinc.zxcvbn.Strength;
-import com.nulabinc.zxcvbn.Zxcvbn;
 import io.github.xezzon.zeroweb.crypto.entity.PasswordStrength;
-import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,8 +43,11 @@ public class CryptoHttpEndpoint {
       final String password,
       @RequestParam(required = false) final String username
   ) {
-    Zxcvbn zxcvbn = new Zxcvbn();
-    Strength measure = zxcvbn.measure(password, Collections.singletonList(username));
+    List<String> directories = Stream.of(username)
+        .filter(Objects::nonNull)
+        .filter(String::isBlank)
+        .toList();
+    Strength measure = ZXCVBN.measure(password, directories);
     return PasswordStrength.from(measure);
   }
 }
