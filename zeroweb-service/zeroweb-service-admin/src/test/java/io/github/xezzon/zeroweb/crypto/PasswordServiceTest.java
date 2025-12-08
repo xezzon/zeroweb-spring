@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.Collections;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,15 +28,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class PasswordServiceTest {
 
+  private static String schemaJson;
   private final Setting setting = new Setting();
   @Resource
   private IPasswordService passwordService;
   @Resource
   private SettingRepository settingRepository;
 
-  @BeforeEach
-  void setUp() throws IOException {
-    Path schemaResource = this.getClass().getClassLoader()
+  @BeforeAll
+  static void beforeAll() throws IOException {
+    Path schemaResource = PasswordServiceTest.class.getClassLoader()
         .resources("schemas/" + PasswordStrength.SETTING_KEY + ".json")
         .map(url -> {
           try {
@@ -46,14 +48,22 @@ class PasswordServiceTest {
         })
         .map(Path::of)
         .findFirst().orElseThrow();
+    schemaJson = Files.readString(schemaResource);
+  }
+
+  @BeforeEach
+  void setUp() {
     setting.setCode(PasswordStrength.SETTING_KEY);
-    setting.setSchema(Files.readString(schemaResource));
+    setting.setSchema(schemaJson);
     setting.setValue(Collections.singletonMap("score", 2));
     setting.setUpdateTime(Instant.now());
   }
 
   @AfterEach
   void tearDown() {
+    if (setting.getId() == null) {
+      return;
+    }
     settingRepository.delete(setting);
   }
 

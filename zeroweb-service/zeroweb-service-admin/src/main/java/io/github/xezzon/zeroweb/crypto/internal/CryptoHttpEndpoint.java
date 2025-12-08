@@ -40,12 +40,12 @@ public class CryptoHttpEndpoint {
   /// @see <a href="https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/wheeler">zxcvbn: Low-Budget Password Strength Estimation</a>
   @GetMapping("/password-strength")
   PasswordStrength passwordStrength(
-      final String password,
+      @RequestParam final String password,
       @RequestParam(required = false) final String username
   ) {
     List<String> directories = Stream.of(username)
         .filter(Objects::nonNull)
-        .filter(String::isBlank)
+        .filter(s -> !s.isBlank())
         .toList();
     Strength measure = ZXCVBN.measure(password, directories);
     return PasswordStrength.from(measure);
