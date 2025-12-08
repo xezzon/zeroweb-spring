@@ -29,6 +29,8 @@ import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 /// 业务参数实体类
 ///
@@ -42,6 +44,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "zeroweb_setting")
 @EntityListeners({AuditingEntityListener.class})
 public class Setting implements IEntity<String> {
+
+  private static final ObjectMapper JACKSON = new ObjectMapper();
 
   /// 主键ID，唯一标识
   @Id
@@ -72,4 +76,15 @@ public class Setting implements IEntity<String> {
   /// 参数更新时间
   @Column(name = "update_time", nullable = false)
   private Instant updateTime;
+
+  /// 将参数值转换为指定的类型。
+  ///
+  /// 慎用！可能会有性能问题。
+  ///
+  /// @param <T> 转换的类型
+  /// @param type 转换的类型
+  /// @return 转换后的对象
+  public <T> T convertValueTo(TypeReference<T> type) {
+    return JACKSON.convertValue(this.value, type);
+  }
 }

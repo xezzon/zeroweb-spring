@@ -15,6 +15,7 @@ package io.github.xezzon.zeroweb.setting.internal;
 
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
+import io.github.xezzon.zeroweb.setting.ISettingService;
 import io.github.xezzon.zeroweb.setting.Setting;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -29,7 +30,7 @@ import org.springframework.stereotype.Service;
 /// 负责业务参数的数据验证、重复检查和事务管理。
 /// @author xezzon
 @Service
-public class SettingService {
+public class SettingService implements ISettingService {
 
   private final SettingDAO settingDAO;
 
@@ -60,17 +61,10 @@ public class SettingService {
     return settingDAO.findAll(odata);
   }
 
-  /// 根据参数标识查询配置项
-  ///
-  /// 通过业务参数的唯一标识符查询具体的参数配置。
-  /// @param code 业务参数标识，如 "system.theme"
-  /// @return 查找到的配置项
-  /// @throws NoSuchElementException 当参数标识不存在时抛出
-  Setting queryByCode(@NonNull final String code) {
+  @Override
+  public Setting queryByCode(@NonNull final String code) {
     return settingDAO.get().findByCode(code)
-        .orElseThrow(() ->
-            new NoSuchElementException("Setting `" + code + "` does not exist.")
-        );
+        .orElseThrow(() -> new NoSuchElementException("Setting `" + code + "` does not exist."));
   }
 
   /// 更新业务参数
