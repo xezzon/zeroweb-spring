@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
 /**
@@ -99,6 +100,14 @@ class GlobalExceptionHandlerTest {
     Assertions.assertTrue(responseBody.getDetails().stream().anyMatch(detail ->
         Objects.equals("name", detail.getParameters().get("field"))
     ));
+  }
+
+  @Test
+  void httpRequestMethodNotSupportedException() {
+    testClient.post()
+        .uri("/HttpRequestMethodNotSupportedException")
+        .exchange()
+        .expectStatus().isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
   }
 
   @Test

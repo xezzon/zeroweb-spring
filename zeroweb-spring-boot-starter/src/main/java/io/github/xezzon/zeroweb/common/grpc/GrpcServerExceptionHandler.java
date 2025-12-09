@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.exception.GrpcExceptionHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 /// gRPC 服务端异常处理器。
 ///
@@ -55,7 +56,7 @@ public class GrpcServerExceptionHandler implements GrpcExceptionHandler {
 
     return switch (throwable) {
       case ZerowebBusinessException e -> newStatusException(Status.INVALID_ARGUMENT, e.code());
-      case MethodArgumentNotValidException _ ->
+      case MethodArgumentNotValidException _, HandlerMethodValidationException _ ->
           newStatusException(Status.INVALID_ARGUMENT, ErrorCodeConstant.ARGUMENT_INVALID);
       case NotLoginException _ ->
           newStatusException(Status.UNAUTHENTICATED, ErrorCodeConstant.UNAUTHENTICATED);

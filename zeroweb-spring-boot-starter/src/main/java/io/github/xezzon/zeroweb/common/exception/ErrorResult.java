@@ -100,6 +100,12 @@ public class ErrorResult {
   /// 它继承了 `ErrorResult` 的结构，允许以嵌套的方式提供更具体的错误描述。
   public static class Detail extends ErrorResult {
 
+    /// 默认构造函数，供 Jackson 等 JSON 序列化库使用。
+    @SuppressWarnings("unused")
+    public Detail() {
+      super();
+    }
+
     /// 构造一个带有指定错误码、消息和参数的详细错误信息。
     ///
     /// @param code 服务端定义的一组错误码
