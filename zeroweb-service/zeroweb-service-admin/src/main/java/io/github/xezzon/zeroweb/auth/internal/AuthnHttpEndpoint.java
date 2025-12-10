@@ -29,6 +29,7 @@ import io.github.xezzon.zeroweb.common.config.ZerowebConfig.ZerowebJwtConfig;
 import io.github.xezzon.zeroweb.crypto.internal.JwtKeyManager;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.jspecify.annotations.NonNull;
@@ -36,7 +37,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -69,7 +69,7 @@ public class AuthnHttpEndpoint {
   /// @param basicAuth 包含用户名和密码的 [BasicAuth] 请求体。
   /// @return 包含访问令牌、ID 令牌和过期时间的 [OidcToken] 对象。
   @PostMapping("/login/basic")
-  public OidcToken basicLogin(@RequestBody @Validated final BasicAuth basicAuth) {
+  public OidcToken basicLogin(@RequestBody @Valid final BasicAuth basicAuth) {
     authnService.basicLogin(basicAuth.username(), basicAuth.password());
     final String accessToken = StpUtil.getTokenValue();
     final Long expiredIn = StpUtil.getSessionTimeout();
@@ -112,7 +112,7 @@ public class AuthnHttpEndpoint {
   /// @return 包含访问令牌、ID 令牌和过期时间的 [OidcToken] 对象。
   @SaCheckLogin
   @GetMapping("/token")
-  public OidcToken getSsoToken(HttpServletResponse response) {
+  public OidcToken getSsoToken(final HttpServletResponse response) {
     final String accessToken = StpUtil.getTokenValue();
     final String idToken = authnService.signJwt();
     final Long expiredIn = zerowebJwtConfig.getTimeout();

@@ -17,6 +17,7 @@ import static io.github.xezzon.zeroweb.crypto.constant.ZxcvbnConstant.ZXCVBN;
 
 import com.nulabinc.zxcvbn.Strength;
 import io.github.xezzon.zeroweb.crypto.entity.PasswordStrength;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -40,7 +41,7 @@ public class CryptoHttpEndpoint {
   /// @see <a href="https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/wheeler">zxcvbn: Low-Budget Password Strength Estimation</a>
   @GetMapping("/password-strength")
   PasswordStrength passwordStrength(
-      @RequestParam final String password,
+      @RequestParam @NotBlank final String password,
       @RequestParam(required = false) final String username
   ) {
     List<String> directories = Stream.of(username)

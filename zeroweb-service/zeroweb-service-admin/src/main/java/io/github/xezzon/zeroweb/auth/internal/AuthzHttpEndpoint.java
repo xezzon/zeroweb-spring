@@ -21,6 +21,8 @@ import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.role.IRoleService4Auth;
 import io.github.xezzon.zeroweb.role.Role;
 import io.github.xezzon.zeroweb.user.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +58,7 @@ public class AuthzHttpEndpoint {
   /// @param roleId 角色ID。
   /// @return 绑定到该角色的用户信息列表。
   @GetMapping("/role/{roleId}/user")
-  public List<User> queryUserByRole(@PathVariable final String roleId) {
+  public List<User> queryUserByRole(@PathVariable @NotBlank final String roleId) {
     // 当前用户的角色是该角色的上级角色，或者有相应的读取权限
     if (!StpUtil.hasPermission(PermissionConstant.AUTHZ_READ)) {
       authzService.checkParentRole(roleId);
@@ -68,7 +70,7 @@ public class AuthzHttpEndpoint {
   ///
   /// @param roleUsers 包含角色ID和用户ID的 [RoleUser] 集合。
   @PutMapping("/role/-/user")
-  public void bindUserToRole(@RequestBody Collection<RoleUser> roleUsers) {
+  public void bindUserToRole(@RequestBody @NotNull final Collection<RoleUser> roleUsers) {
     for (RoleUser roleUser : roleUsers) {
       authzService.bindUserToRole(roleUser);
     }
@@ -78,7 +80,7 @@ public class AuthzHttpEndpoint {
   ///
   /// @param roleUsers 包含角色ID和用户ID的 [RoleUser] 集合。
   @DeleteMapping("/role/-/user")
-  public void releaseRoleUser(@RequestBody final Collection<RoleUser> roleUsers) {
+  public void releaseRoleUser(@RequestBody @NotNull final Collection<RoleUser> roleUsers) {
     for (final RoleUser roleUser : roleUsers) {
       authzService.releaseRoleUser(roleUser);
     }
@@ -89,7 +91,7 @@ public class AuthzHttpEndpoint {
   /// @param roleId 角色ID。
   /// @return 包含该角色所有接口权限编码的 [Set]。
   @GetMapping("/role/{roleId}/permission")
-  public Set<String> queryPermissionByRole(@PathVariable final String roleId) {
+  public Set<String> queryPermissionByRole(@PathVariable @NotBlank final String roleId) {
     // 当前用户的角色是该角色或其上级角色，或者有相应的读取权限
     final Role role = roleService.findByIdIn(Collections.singleton(roleId))
         .stream()
@@ -107,7 +109,9 @@ public class AuthzHttpEndpoint {
   ///
   /// @param rolePermissions 包含角色ID和权限编码的 [RolePermission] 集合。
   @PutMapping("/role/-/permission")
-  public void bindPermissionToRole(@RequestBody Collection<RolePermission> rolePermissions) {
+  public void bindPermissionToRole(
+      @RequestBody @NotNull final Collection<RolePermission> rolePermissions
+  ) {
     for (RolePermission rolePermission : rolePermissions) {
       authzService.bindPermissionToRole(rolePermission);
     }
@@ -117,7 +121,9 @@ public class AuthzHttpEndpoint {
   ///
   /// @param rolePermissions 包含角色ID和权限编码的 [RolePermission] 集合。
   @DeleteMapping("/role/-/permission")
-  public void releaseRolePermission(@RequestBody Collection<RolePermission> rolePermissions) {
+  public void releaseRolePermission(
+      @RequestBody @NotNull final Collection<RolePermission> rolePermissions
+  ) {
     for (RolePermission rolePermission : rolePermissions) {
       authzService.releaseRolePermission(rolePermission);
     }
@@ -131,7 +137,7 @@ public class AuthzHttpEndpoint {
   /// @return 关联到该用户的角色信息集合。
   @SaCheckPermission({PermissionConstant.AUTHZ_READ})
   @GetMapping("/user/{userId}/role")
-  public List<Role> queryRoleByUser(@PathVariable final String userId) {
+  public List<Role> queryRoleByUser(@PathVariable @NotBlank final String userId) {
     return authzService.queryRoleByUser(userId);
   }
 
@@ -143,7 +149,7 @@ public class AuthzHttpEndpoint {
   /// @return 关联到该接口权限的角色信息集合。
   @SaCheckPermission({PermissionConstant.AUTHZ_READ})
   @GetMapping("/permission/-/role")
-  public List<Role> queryRoleByPermission(@RequestParam final String permission) {
+  public List<Role> queryRoleByPermission(@RequestParam @NotBlank final String permission) {
     return authzService.queryRoleByPermission(permission);
   }
 }

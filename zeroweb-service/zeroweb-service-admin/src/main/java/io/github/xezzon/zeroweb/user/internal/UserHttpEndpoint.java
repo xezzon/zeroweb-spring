@@ -21,8 +21,8 @@ import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.crypto.IPasswordService;
 import io.github.xezzon.zeroweb.user.User;
 import io.github.xezzon.zeroweb.user.entity.RegisterUserReq;
+import jakarta.validation.Valid;
 import java.util.Collections;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,7 +54,7 @@ public class UserHttpEndpoint {
   /// @param req 用户注册信息
   /// @return 用户ID
   @PostMapping("/register")
-  public Id register(@RequestBody @Validated RegisterUserReq req) {
+  public Id register(@RequestBody @Valid final RegisterUserReq req) {
     // 计算并校验口令的强度
     Strength measure = ZXCVBN.measure(req.password(), Collections.singletonList(req.username()));
     passwordService.checkStrength(measure);

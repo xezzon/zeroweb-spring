@@ -21,6 +21,7 @@ import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.entity.AddOpenapiReq;
 import io.github.xezzon.zeroweb.openapi.entity.ModifyOpenapiReq;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,7 +53,7 @@ public class OpenapiHttpEndpoint {
   /// @return 添加的`对外接口`的唯一标识符
   @PostMapping()
   @SaCheckPermission({PermissionConstant.OPENAPI_WRITE})
-  public Id addOpenapi(@RequestBody @Valid AddOpenapiReq req) {
+  public Id addOpenapi(@RequestBody @Valid final AddOpenapiReq req) {
     Openapi openapi = req.into();
     openapiService.addOpenapi(openapi);
     return Id.of(openapi.getId());
@@ -63,7 +64,7 @@ public class OpenapiHttpEndpoint {
   /// @param odata OData查询参数，用于分页和排序
   /// @return 包含`对外接口`列表的分页对象
   @GetMapping()
-  public Page<@NonNull Openapi> getOpenapiList(ODataRequestParam odata) {
+  public Page<@NonNull Openapi> getOpenapiList(final ODataRequestParam odata) {
     return openapiService.pageList(odata.into());
   }
 
@@ -72,7 +73,7 @@ public class OpenapiHttpEndpoint {
   /// @param req 包含更新`对外接口`请求数据的请求体
   @PutMapping()
   @SaCheckPermission({PermissionConstant.OPENAPI_WRITE})
-  public void modifyOpenapi(@RequestBody ModifyOpenapiReq req) {
+  public void modifyOpenapi(@RequestBody @Valid final ModifyOpenapiReq req) {
     Openapi openapi = req.into();
     openapiService.modifyOpenapi(openapi);
   }
@@ -82,7 +83,7 @@ public class OpenapiHttpEndpoint {
   /// @param id 要发布的`对外接口`的唯一标识符
   @PutMapping("/publish/{id}")
   @SaCheckPermission({PermissionConstant.OPENAPI_PUBLISH})
-  public void publishOpenapi(@PathVariable String id) {
+  public void publishOpenapi(@PathVariable @NotBlank final String id) {
     openapiService.publishOpenapi(id);
   }
 }

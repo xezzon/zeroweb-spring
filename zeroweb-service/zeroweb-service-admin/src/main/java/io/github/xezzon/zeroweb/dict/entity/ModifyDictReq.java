@@ -13,9 +13,13 @@
 
 package io.github.xezzon.zeroweb.dict.entity;
 
+import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.dict.Dict;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -32,9 +36,13 @@ import org.mapstruct.factory.Mappers;
 /// @param parentId 上级字典ID
 /// @param enabled 启用状态
 public record ModifyDictReq(
+    @NotNull
     String id,
+    @Alphanumeric @NotBlank @Size(max = 255)
     String code,
+    @Size(max = 255)
     String label,
+    @NotNull
     Integer ordinal,
     String parentId,
     Boolean enabled

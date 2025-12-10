@@ -13,9 +13,12 @@
 
 package io.github.xezzon.zeroweb.locale.entity;
 
+import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.locale.Translation;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -28,9 +31,13 @@ import org.mapstruct.factory.Mappers;
 /// @param content 国际化文本
 /// @author xezzon
 public record UpsertTranslationReq(
+    @Alphanumeric @NotBlank @Size(max = 255)
     String namespace,
+    @Alphanumeric @NotBlank @Size(max = 255)
     String messageKey,
+    @Alphanumeric @NotBlank @Size(max = 255)
     String language,
+    @NotBlank
     String content
 ) implements Into<Translation> {
 

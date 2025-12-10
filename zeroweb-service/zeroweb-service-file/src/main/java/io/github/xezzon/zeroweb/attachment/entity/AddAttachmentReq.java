@@ -16,6 +16,9 @@ package io.github.xezzon.zeroweb.attachment.entity;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -29,10 +32,15 @@ import org.mapstruct.factory.Mappers;
 /// @param bizType 业务类型
 /// @param bizId 业务ID
 public record AddAttachmentReq(
+    @NotBlank @Size(max = 255)
     String name,
+    @NotBlank @Size(max = 128)
     String checksum,
+    @Positive
     Long size,
+    @NotBlank @Size(max = 255)
     String type,
+    @NotBlank @Size(max = 255)
     String bizType,
     String bizId
 ) implements Into<Attachment> {

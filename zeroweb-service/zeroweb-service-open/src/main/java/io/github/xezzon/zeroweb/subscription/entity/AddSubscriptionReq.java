@@ -13,9 +13,13 @@
 
 package io.github.xezzon.zeroweb.subscription.entity;
 
+import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.subscription.Subscription;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -25,7 +29,9 @@ import org.mapstruct.factory.Mappers;
 /// @param appId 订阅接口的第三方应用标识
 /// @author xezzon
 public record AddSubscriptionReq(
+    @NotNull
     String appId,
+    @Alphanumeric(excludes = {Alphanumeric.DOT}) @NotBlank @Size(max = 255)
     String openapiCode
 ) implements Into<Subscription> {
 

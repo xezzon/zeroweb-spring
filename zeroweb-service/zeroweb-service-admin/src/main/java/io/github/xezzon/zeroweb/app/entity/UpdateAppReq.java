@@ -14,9 +14,12 @@
 package io.github.xezzon.zeroweb.app.entity;
 
 import io.github.xezzon.zeroweb.app.App;
+import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -29,11 +32,13 @@ import org.mapstruct.factory.Mappers;
 /// @param ordinal 服务的显示顺序，值越小优先级越高。
 /// @author xezzon
 public record UpdateAppReq(
-    String id,
     @NotNull
+    String id,
+    @NotBlank @Size(max = 255)
     String name,
-    @URL
+    @URL @NotNull @Size(max = DatabaseConstant.URL_LENGTH)
     String baseUrl,
+    @NotNull
     Integer ordinal
 ) implements Into<App> {
 

@@ -13,9 +13,13 @@
 
 package io.github.xezzon.zeroweb.locale.entity;
 
+import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.locale.Language;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -28,9 +32,13 @@ import org.mapstruct.factory.Mappers;
 /// @param enabled 是否启用
 /// @author xezzon
 public record ModifyLanguageReq(
+    @NotNull
     String id,
+    @Alphanumeric @NotBlank @Size(max = 255)
     String languageTag,
+    @Size(max = 255)
     String description,
+    @NotNull
     Integer ordinal,
     Boolean enabled
 ) implements Into<Language> {

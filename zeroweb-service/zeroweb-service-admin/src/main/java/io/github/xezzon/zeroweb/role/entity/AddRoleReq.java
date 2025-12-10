@@ -13,9 +13,13 @@
 
 package io.github.xezzon.zeroweb.role.entity;
 
+import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.role.Role;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -33,9 +37,13 @@ import org.mapstruct.factory.Mappers;
 ///
 /// @author xezzon
 public record AddRoleReq(
+    @Alphanumeric @NotBlank @Size(max = 255)
     String code,
+    @NotBlank @Size(max = 255)
     String name,
+    @NotNull
     Boolean inheritable,
+    @NotNull
     String parentId
 ) implements Into<Role> {
 

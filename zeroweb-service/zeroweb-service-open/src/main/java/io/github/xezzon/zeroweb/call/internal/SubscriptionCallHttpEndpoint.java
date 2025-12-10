@@ -26,6 +26,7 @@ import io.github.xezzon.zeroweb.subscription.ISubscriptionService4Call;
 import io.github.xezzon.zeroweb.subscription.Subscription;
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppService4Call;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -75,13 +76,13 @@ public class SubscriptionCallHttpEndpoint {
   /// @return 响应内容
   @GetMapping(value = "/{openapiCode}")
   public ResponseEntity<byte @NonNull []> forwardForSafe(
-      @PathVariable String openapiCode,
+      @PathVariable @NotBlank final String openapiCode,
       @RequestBody(required = false) byte[] body,
-      @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) String accessKey,
-      @RequestHeader(ZerowebOpenConstant.TIMESTAMP_HEADER) Instant timestamp,
-      @RequestHeader(ZerowebOpenConstant.SIGNATURE_HEADER) String signature,
-      @RequestHeader HttpHeaders headers,
-      HttpServletRequest request
+      @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) final String accessKey,
+      @RequestHeader(ZerowebOpenConstant.TIMESTAMP_HEADER) final Instant timestamp,
+      @RequestHeader(ZerowebOpenConstant.SIGNATURE_HEADER) final String signature,
+      @RequestHeader final HttpHeaders headers,
+      final HttpServletRequest request
   ) {
     if (body == null) {
       body = new byte[0];
@@ -101,13 +102,13 @@ public class SubscriptionCallHttpEndpoint {
   /// @return 响应内容
   @RequestMapping(value = "/{openapiCode}", method = {POST, PUT, DELETE, PATCH})
   public ResponseEntity<byte @NonNull []> forwardForUnsafe(
-      @PathVariable String openapiCode,
+      @PathVariable @NotBlank final String openapiCode,
       @RequestBody(required = false) byte[] body,
-      @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) String accessKey,
-      @RequestHeader(ZerowebOpenConstant.TIMESTAMP_HEADER) Instant timestamp,
-      @RequestHeader(ZerowebOpenConstant.SIGNATURE_HEADER) String signature,
-      @RequestHeader HttpHeaders headers,
-      HttpServletRequest request
+      @RequestHeader(ZerowebOpenConstant.ACCESS_KEY_HEADER) final String accessKey,
+      @RequestHeader(ZerowebOpenConstant.TIMESTAMP_HEADER) final Instant timestamp,
+      @RequestHeader(ZerowebOpenConstant.SIGNATURE_HEADER) final String signature,
+      @RequestHeader final HttpHeaders headers,
+      final HttpServletRequest request
   ) {
     if (body == null) {
       body = new byte[0];
@@ -130,7 +131,7 @@ public class SubscriptionCallHttpEndpoint {
       String openapiCode, byte[] body, String accessKey, Instant timestamp, String signature,
       HttpHeaders originalHeaders, Map<String, String[]> parameterMap
   ) {
-    /* 签发JWT */
+    /* 签发 JWT */
     String jwt = thirdPartyAppService.signJwt(accessKey, body, signature, timestamp);
     /* 获取相应的后端地址 */
     String appId = JWT.decode(jwt).getSubject();
@@ -158,7 +159,7 @@ public class SubscriptionCallHttpEndpoint {
         })
         // 请求头由原始请求的请求头提供，但需要移除签名和时间戳
         .headers(headers -> headers.addAll(originalHeaders))
-        // 认证头由本系统签发的JWT提供
+        // 认证头由本系统签发的 JWT 提供
         .header(HttpHeaders.AUTHORIZATION, BEARER + " " + jwt)
         // 请求体由原始请求的请求体提供
         .body(body)

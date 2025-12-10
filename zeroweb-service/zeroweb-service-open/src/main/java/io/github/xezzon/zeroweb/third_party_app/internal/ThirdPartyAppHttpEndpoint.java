@@ -23,6 +23,8 @@ import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
 import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionManager;
 import io.github.xezzon.zeroweb.third_party_app.entity.AddThirdPartyAppReq;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,7 +61,7 @@ public class ThirdPartyAppHttpEndpoint {
   /// @param req 请求体，包含要添加的第三方应用信息
   /// @return 添加成功后返回的第三方应用ID
   @PostMapping()
-  public AccessSecret add(@RequestBody AddThirdPartyAppReq req) {
+  public AccessSecret add(@RequestBody @Valid final AddThirdPartyAppReq req) {
     ThirdPartyApp thirdPartyApp = req.into();
     thirdPartyApp.setOwnerId(JwtAuth.getOrThrow().getSub());
     return thirdPartyAppService.addThirdPartyApp(thirdPartyApp);
@@ -81,7 +83,7 @@ public class ThirdPartyAppHttpEndpoint {
   /// @return 所有第三方应用列表
   @GetMapping()
   @SaCheckPermission({PermissionConstant.THIRD_PARTY_APP_READ})
-  public Page<@NonNull ThirdPartyApp> listThirdPartyApp(ODataRequestParam odata) {
+  public Page<@NonNull ThirdPartyApp> listThirdPartyApp(final ODataRequestParam odata) {
     return thirdPartyAppService.listThirdPartyApp(odata.into());
   }
 
@@ -90,7 +92,7 @@ public class ThirdPartyAppHttpEndpoint {
   /// @param appId 第三方应用ID
   /// @return 更新后的第三方应用的凭据与密钥
   @PatchMapping("/{appId}/roll")
-  public AccessSecret rollAccessSecret(@PathVariable String appId) {
+  public AccessSecret rollAccessSecret(@PathVariable @NotBlank final String appId) {
     thirdPartyAppPermissionManager.check(appId, JwtAuth.getOrThrow().getSub(), ROLL_ACCESS_SECRET);
     return thirdPartyAppService.rollAccessSecret(appId);
   }

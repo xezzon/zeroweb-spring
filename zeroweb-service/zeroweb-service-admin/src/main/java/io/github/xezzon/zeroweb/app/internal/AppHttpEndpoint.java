@@ -19,8 +19,9 @@ import io.github.xezzon.zeroweb.app.entity.AddAppReq;
 import io.github.xezzon.zeroweb.app.entity.UpdateAppReq;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,7 +55,7 @@ public class AppHttpEndpoint {
   /// @return 新增服务的 ID。
   @SaCheckPermission({PermissionConstant.APP_WRITE})
   @PostMapping()
-  public Id addApp(@RequestBody @Validated final AddAppReq req) {
+  public Id addApp(@RequestBody @Valid final AddAppReq req) {
     final App app = req.into();
     appService.addApp(app);
     return Id.of(app.getId());
@@ -75,7 +76,7 @@ public class AppHttpEndpoint {
   /// @param req 包含要更新的服务信息和其 ID 的请求体。
   @SaCheckPermission({PermissionConstant.APP_WRITE})
   @PutMapping
-  public void updateApp(@RequestBody @Validated final UpdateAppReq req) {
+  public void updateApp(@RequestBody @Valid final UpdateAppReq req) {
     final App app = req.into();
     appService.updateApp(app);
   }
@@ -87,7 +88,7 @@ public class AppHttpEndpoint {
   /// @param id 要删除服务的 ID。
   @SaCheckPermission({PermissionConstant.APP_WRITE})
   @DeleteMapping("/{id}")
-  public void deleteApp(@PathVariable final String id) {
+  public void deleteApp(@PathVariable @NotBlank final String id) {
     appService.deleteApp(id);
   }
 }

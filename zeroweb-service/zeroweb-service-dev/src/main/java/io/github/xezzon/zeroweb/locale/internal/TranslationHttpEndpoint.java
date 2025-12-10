@@ -18,6 +18,8 @@ import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.locale.Translation;
 import io.github.xezzon.zeroweb.locale.entity.UpsertTranslationReq;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,7 +51,7 @@ public class TranslationHttpEndpoint {
   /// @return 新增或更新的国际化文本 ID。
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
-  public Id upsertTranslation(@RequestBody final UpsertTranslationReq req) {
+  public Id upsertTranslation(@RequestBody @Valid final UpsertTranslationReq req) {
     final Translation translation = req.into();
     localizedService.upsertTranslation(translation);
     return Id.of(translation.getId());
@@ -62,8 +64,8 @@ public class TranslationHttpEndpoint {
   /// @return 国际化内容键-国际化文本的映射。
   @GetMapping("/{language}/{namespace}")
   public Map<String, String> loadTranslation(
-      @PathVariable final String language,
-      @PathVariable final String namespace
+      @PathVariable @NotBlank final String language,
+      @PathVariable @NotBlank final String namespace
   ) {
     return localizedService.loadTranslation(language, namespace);
   }

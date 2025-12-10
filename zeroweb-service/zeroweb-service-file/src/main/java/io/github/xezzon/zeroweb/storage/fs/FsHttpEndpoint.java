@@ -17,6 +17,9 @@ import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.IAttachmentService;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.exception.UnsupportedFileProviderException;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -58,7 +61,10 @@ public class FsHttpEndpoint {
   /// @param id          附件ID
   /// @param fileContent 文件内容
   @PutMapping(FsService.UPLOAD_ENDPOINT)
-  public void upload(@PathVariable String id, @RequestBody byte[] fileContent) {
+  public void upload(
+      @PathVariable @NotBlank final String id,
+      @RequestBody @NotEmpty final byte[] fileContent
+  ) {
     fsService().upload(id, fileContent);
   }
 
@@ -70,9 +76,9 @@ public class FsHttpEndpoint {
    */
   @PutMapping(FsService.MULTIPART_UPLOAD_ENDPOINT)
   public void upload(
-      @PathVariable final String id,
-      @PathVariable final int partNumber,
-      @RequestBody byte[] fileContent
+      @PathVariable @NotBlank final String id,
+      @PathVariable @Max(10_000) final int partNumber,
+      @RequestBody @NotEmpty final byte[] fileContent
   ) {
     fsService().upload(id, partNumber, fileContent);
   }
@@ -82,7 +88,7 @@ public class FsHttpEndpoint {
   /// @param id 附件ID
   /// @return 文件内容
   @GetMapping(FsService.DOWNLOAD_ENDPOINT)
-  public ResponseEntity<byte @NonNull []> download(@PathVariable String id) {
+  public ResponseEntity<byte @NonNull []> download(@PathVariable @NotBlank final String id) {
     Attachment attachment = attachmentService.queryById(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.valueOf(attachment.getType()));

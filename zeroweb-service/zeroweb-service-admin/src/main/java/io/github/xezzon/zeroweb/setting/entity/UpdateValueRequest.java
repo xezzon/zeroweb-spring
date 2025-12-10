@@ -16,6 +16,7 @@ package io.github.xezzon.zeroweb.setting.entity;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.setting.Setting;
+import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -29,6 +30,7 @@ import org.mapstruct.factory.Mappers;
 /// @param value 新的参数值，JSON格式
 /// @author xezzon
 public record UpdateValueRequest(
+    @NotNull
     String id,
     Map<String, Object> value
 ) implements Into<Setting> {

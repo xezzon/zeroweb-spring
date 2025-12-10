@@ -11,49 +11,44 @@
  * You should have received a copy of the GNU Lesser General Public License along with ZeroWeb. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.xezzon.zeroweb.setting.entity;
+package io.github.xezzon.zeroweb.locale.entity;
 
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
-import io.github.xezzon.zeroweb.setting.Setting;
+import io.github.xezzon.zeroweb.locale.I18nMessage;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.util.Map;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/// 新增业务参数请求
+/// 修改国际化内容的请求参数。
 ///
-/// 用于创建新的业务参数配置，包含参数标识、约束定义和初始值。
-/// 实现 [Into] 接口，提供转换为 [Setting] 实体对象的方法。
-/// @param code 业务参数标识，唯一标识参数类型
-/// @param schema 参数约束定义，JSON Schema 格式
-/// @param value 参数初始值，JSON格式
+/// @param id 国际化内容 ID
+/// @param namespace 国际化内容命名空间。
+/// @param messageKey 国际化内容的键。
 /// @author xezzon
-public record AddSettingRequest(
-    @Alphanumeric @NotBlank @Size(max = 255)
-    String code,
+public record UpdateI18nMessageReq(
     @NotNull
-    String schema,
-    Map<String, Object> value
-) implements Into<Setting> {
+    String id,
+    @Alphanumeric @NotBlank @Size(max = 255)
+    String namespace,
+    @Alphanumeric @NotBlank @Size(max = 255)
+    String messageKey
+) implements Into<I18nMessage> {
 
   @Override
-  public Setting into() {
+  public I18nMessage into() {
     return Converter.INSTANCE.from(this);
   }
 
   @Mapper
-  interface Converter extends From<AddSettingRequest, Setting> {
+  interface Converter extends From<UpdateI18nMessageReq, I18nMessage> {
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
-    @Mapping(target = "updateTime", ignore = true)
-    @Mapping(target = "id", ignore = true)
     @Override
-    Setting from(AddSettingRequest request);
+    I18nMessage from(UpdateI18nMessageReq source);
   }
 }

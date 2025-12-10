@@ -13,9 +13,12 @@
 
 package io.github.xezzon.zeroweb.locale.entity;
 
+import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.locale.I18nMessage;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -26,7 +29,9 @@ import org.mapstruct.factory.Mappers;
 /// @param messageKey 国际化内容的键。
 /// @author xezzon
 public record AddI18nMessageReq(
+    @Alphanumeric @NotBlank @Size(max = 255)
     String namespace,
+    @Alphanumeric @NotBlank @Size(max = 255)
     String messageKey
 ) implements Into<I18nMessage> {
 

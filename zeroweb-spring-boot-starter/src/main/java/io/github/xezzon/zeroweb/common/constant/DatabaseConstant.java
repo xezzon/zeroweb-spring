@@ -24,6 +24,8 @@ public class DatabaseConstant {
   public static final String ROOT_ID = "0";
   /// ID 列名
   public static final String ID_COLUMN = "id";
+  /// URL 字段长度
+  public static final int URL_LENGTH = 2083;
 
   /// 私有构造函数，防止实例化
   private DatabaseConstant() {
