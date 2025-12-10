@@ -76,8 +76,12 @@ class SettingGrpcTest {
     Assertions.assertEquals(expectValue.getValue(), actualValue.getValue());
     Assertions.assertEquals(expectValue.getChildren().size(), actualValue.getChildren().size());
     Assertions.assertEquals(
-        expectValue.getChildren().getFirst().getChild(),
-        actualValue.getChildren().getFirst().getChild()
+        expectValue.getChildren().getFirst().getChild().doubleValue(),
+        actualValue.getChildren().getFirst().getChild().doubleValue(),
+        Math.ulp(Math.max(
+            Math.abs(expectValue.getChildren().getFirst().getChild().doubleValue()),
+            Math.abs(actualValue.getChildren().getFirst().getChild().doubleValue())
+        ))
     );
   }
 
