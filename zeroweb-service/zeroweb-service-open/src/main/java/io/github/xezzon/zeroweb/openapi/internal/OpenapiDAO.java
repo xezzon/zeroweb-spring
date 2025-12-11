@@ -39,6 +39,8 @@ import org.springframework.stereotype.Repository;
 @NullMarked
 public class OpenapiDAO extends BaseDAO<Openapi, String, OpenapiRepository> {
 
+  /// 依赖注入
+  /// @param repository 对外接口 JPA 接口
   protected OpenapiDAO(OpenapiRepository repository) {
     super(repository, Openapi.class);
   }

@@ -28,6 +28,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class LanguageDAO extends BaseDAO<Language, String, LanguageRepository> {
 
+  /// 依赖注入
+  /// @param repository 语言 JPA 接口
   protected LanguageDAO(final LanguageRepository repository) {
     super(repository, Language.class);
   }

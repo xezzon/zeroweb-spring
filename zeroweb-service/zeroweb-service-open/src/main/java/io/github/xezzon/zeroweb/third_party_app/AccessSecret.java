@@ -48,6 +48,7 @@ public class AccessSecret {
   @Column(name = SECRET_KEY_COLUMN, nullable = false, length = 64)
   String secretKey;
 
+  /// 获取第三方应用访问凭据
   /// @return 第三方应用访问凭据
   public String getAccessKey() {
     byte[] accessKey = this.id.getBytes(StandardCharsets.UTF_8);

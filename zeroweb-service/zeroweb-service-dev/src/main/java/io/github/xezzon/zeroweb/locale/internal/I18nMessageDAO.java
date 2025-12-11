@@ -34,6 +34,8 @@ import org.springframework.stereotype.Repository;
 @NullMarked
 public class I18nMessageDAO extends BaseDAO<I18nMessage, String, I18nMessageRepository> {
 
+  /// 依赖注入
+  /// @param repository 国际化内容 JPA 接口
   protected I18nMessageDAO(final I18nMessageRepository repository) {
     super(repository, I18nMessage.class);
   }

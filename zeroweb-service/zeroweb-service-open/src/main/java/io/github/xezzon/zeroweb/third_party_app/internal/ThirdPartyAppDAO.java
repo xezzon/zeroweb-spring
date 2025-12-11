@@ -34,6 +34,8 @@ import org.springframework.stereotype.Repository;
 @NullMarked
 public class ThirdPartyAppDAO extends BaseDAO<ThirdPartyApp, String, ThirdPartyAppRepository> {
 
+  /// 依赖注入
+  /// @param repository 第三方应用 JPA 接口
   protected ThirdPartyAppDAO(ThirdPartyAppRepository repository) {
     super(repository, ThirdPartyApp.class);
   }

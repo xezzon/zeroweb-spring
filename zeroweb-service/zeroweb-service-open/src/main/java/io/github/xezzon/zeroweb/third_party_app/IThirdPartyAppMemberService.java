@@ -16,6 +16,7 @@ package io.github.xezzon.zeroweb.third_party_app;
 import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMember;
 import java.util.Optional;
 
+/// 第三方应用成员管理对外暴露的接口
 /// @author xezzon
 public interface IThirdPartyAppMemberService {
 

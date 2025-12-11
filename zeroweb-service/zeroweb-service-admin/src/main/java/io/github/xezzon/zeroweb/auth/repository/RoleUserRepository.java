@@ -62,6 +62,6 @@ public interface RoleUserRepository extends
   ///
   /// @param roleId 角色ID。
   /// @param userId 用户ID。
-  /// @return 匹配的角色-用户关联的 [Optional]，如果不存在则为 [#empty()]。
+  /// @return 匹配的角色-用户关联的 [Optional]，如果不存在则为 [Optional#empty()]。
   Optional<RoleUser> findByRoleIdAndUserId(String roleId, String userId);
 }
