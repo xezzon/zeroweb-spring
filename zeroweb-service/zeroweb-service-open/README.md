@@ -28,10 +28,6 @@ service:
 
 其他配置请查看[公共配置清单](../../zeroweb-spring-boot-starter/README.md)。
 
-## 接口描述文档
-
-https://xezzon.github.io/zeroweb-spring/zeroweb-service/zeroweb-service-open/smart-doc/index/api.html
-
 ## 功能描述
 
 `TODO`
