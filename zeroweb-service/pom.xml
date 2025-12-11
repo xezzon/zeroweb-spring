@@ -128,24 +128,6 @@
     </plugins>
   </build>
 
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>io.github.xezzon</groupId>
-        <artifactId>smart-doc-maven-plugin</artifactId>
-        <version>${smart-doc-maven-plugin.version}</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>html</report>
-              <report>grpc-html</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-    </plugins>
-  </reporting>
-
   <profiles>
     <profile>
       <!-- 发布微服务应用时使用的配置。 -->
