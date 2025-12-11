@@ -15,10 +15,12 @@
   <description>系统管理服务</description>
 
   <properties>
-    <http.port>9001</http.port>
-    <grpc.port>9002</grpc.port>
-    <management.port>9009</management.port>
-    <mainClass>io.github.xezzon.zeroweb.ZerowebAdminApplication</mainClass>
+    <http.port>10001</http.port>
+    <grpc.port>10002</grpc.port>
+    <management.port>10009</management.port>
+    <spring-boot.run.main-class>
+      io.github.xezzon.zeroweb.ZerowebAdminApplication
+    </spring-boot.run.main-class>
   </properties>
 
   <dependencies>

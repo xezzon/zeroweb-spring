@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.xezzon</groupId>
@@ -23,11 +23,11 @@
 
   <properties>
     <maven.compiler.release>25</maven.compiler.release>
-    <mainClass/>
     <!-- 应用端口号 -->
     <http.port>8080</http.port>
     <grpc.port>9090</grpc.port>
     <management.port>8081</management.port>
+    <spring-boot.run.main-class/>
     <!-- Testcontainers -->
     <testcontainers.postgresql.url>
       jdbc:tc:postgresql:18-alpine:///postgres
@@ -233,9 +233,11 @@
                 <appRoot>${workdir}</appRoot>
                 <workingDirectory>${workdir}</workingDirectory>
                 <format>Docker</format>
-                <mainClass>${mainClass}</mainClass>
+                <mainClass>${spring-boot.run.main-class}</mainClass>
                 <labels>
-                  <maven.artifact>${project.groupId}:${project.artifactId}:${project.version}</maven.artifact>
+                  <maven.artifact>
+                    ${project.groupId}:${project.artifactId}:${project.version}
+                  </maven.artifact>
                 </labels>
               </container>
               <extraDirectories>

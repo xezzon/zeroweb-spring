@@ -15,10 +15,12 @@
   <description>附件管理服务</description>
 
   <properties>
-    <http.port>9021</http.port>
-    <grpc.port>9022</grpc.port>
-    <management.port>9029</management.port>
-    <mainClass>io.github.xezzon.zeroweb.ZerowebFileApplication</mainClass>
+    <http.port>10021</http.port>
+    <grpc.port>10022</grpc.port>
+    <management.port>10029</management.port>
+    <spring-boot.run.main-class>
+      io.github.xezzon.zeroweb.ZerowebFileApplication
+    </spring-boot.run.main-class>
   </properties>
 
   <dependencies>

@@ -25,9 +25,9 @@ spring:
     client:
       channels:
         admin:
-          address: zeroweb-service-admin:9002
+          address: zeroweb-service-admin:10002
         file:
-          address: zeroweb-service-file:9022
+          address: zeroweb-service-file:10022
   threads:
     virtual:
       enabled: true
@@ -40,8 +40,12 @@ logging:
 sa-token:
   is-read-cookie: false
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 springdoc:
-  api-docs:
-    enabled: false
-  swagger-ui:
-    enabled: false
+  show-actuator: true
+  use-management-port: true
