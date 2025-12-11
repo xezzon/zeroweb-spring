@@ -13,6 +13,8 @@
 
 package io.github.xezzon.zeroweb.storage.fs;
 
+import static io.github.xezzon.zeroweb.common.constant.FileConstant.MAX_MULTIPART_NUMBER;
+
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.IAttachmentService;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
@@ -20,6 +22,7 @@ import io.github.xezzon.zeroweb.common.exception.UnsupportedFileProviderExceptio
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -77,7 +80,7 @@ public class FsHttpEndpoint {
   @PutMapping(FsService.MULTIPART_UPLOAD_ENDPOINT)
   public void upload(
       @PathVariable @NotBlank final String id,
-      @PathVariable @Max(10_000) final int partNumber,
+      @PathVariable @Positive @Max(MAX_MULTIPART_NUMBER) final int partNumber,
       @RequestBody @NotEmpty final byte[] fileContent
   ) {
     fsService().upload(id, partNumber, fileContent);

@@ -13,6 +13,8 @@
 
 package io.github.xezzon.zeroweb.attachment.internal;
 
+import static io.github.xezzon.zeroweb.common.constant.FileConstant.MAX_MULTIPART_NUMBER;
+
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentReq;
 import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
@@ -23,6 +25,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -81,7 +84,7 @@ public class AttachmentHttpEndpoint {
   public UploadInfo getUploadInfo(
       @PathVariable @NotBlank final String id,
       @RequestParam @NotBlank final String checksum,
-      @RequestParam @Positive final int fileSize,
+      @RequestParam @Positive final long fileSize,
       @RequestParam(required = false) final String crc
   ) {
     return ScopedValue.where(StorageContext.CRC, crc)
@@ -96,7 +99,8 @@ public class AttachmentHttpEndpoint {
   @GetMapping("/{id}/endpoint/upload")
   public UploadEndpoint getUploadEndpoint(
       @PathVariable @NotBlank final String id,
-      @RequestParam(required = false, defaultValue = "0") @Max(10_000) final int partNumber,
+      @PositiveOrZero @Max(MAX_MULTIPART_NUMBER)
+      @RequestParam(required = false, defaultValue = "0") final int partNumber,
       @RequestParam(required = false) final String crc
   ) {
     return ScopedValue.where(StorageContext.CRC, crc)

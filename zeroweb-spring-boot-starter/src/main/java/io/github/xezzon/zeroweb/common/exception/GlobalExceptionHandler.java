@@ -215,7 +215,7 @@ public class GlobalExceptionHandler {
     log(e, request, Level.INFO);
     List<ErrorResult.Detail> errorDetails = e.getValueResults().stream()
         .flatMap(result -> {
-          String filed = result.getMethodParameter().getParameterName();
+          String field = result.getMethodParameter().getParameterName();
           return result.getResolvableErrors().stream()
               .map(error -> {
                 String code = Optional.ofNullable(error.getCodes())
@@ -227,7 +227,7 @@ public class GlobalExceptionHandler {
                     Objects.requireNonNullElse(error.getDefaultMessage(), "Unknown reason."),
                     Collections.singletonMap(
                         "field",
-                        Objects.requireNonNull(filed, "Unknown field.")
+                        Objects.requireNonNullElse(field, "Unknown field.")
                     )
                 );
               });

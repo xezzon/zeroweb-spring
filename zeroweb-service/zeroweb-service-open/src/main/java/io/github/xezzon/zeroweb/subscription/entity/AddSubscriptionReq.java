@@ -13,6 +13,8 @@
 
 package io.github.xezzon.zeroweb.subscription.entity;
 
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
+
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
@@ -31,7 +33,7 @@ import org.mapstruct.factory.Mappers;
 public record AddSubscriptionReq(
     @NotNull
     String appId,
-    @Alphanumeric(excludes = {Alphanumeric.DOT}) @NotBlank @Size(max = 255)
+    @Alphanumeric(excludes = {Alphanumeric.DOT}) @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String openapiCode
 ) implements Into<Subscription> {
 

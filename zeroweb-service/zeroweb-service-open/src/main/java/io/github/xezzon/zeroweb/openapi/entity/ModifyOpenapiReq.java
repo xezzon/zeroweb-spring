@@ -13,6 +13,8 @@
 
 package io.github.xezzon.zeroweb.openapi.entity;
 
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
+
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
@@ -39,8 +41,9 @@ import org.mapstruct.factory.Mappers;
 /// @param httpMethod 请求接口的HTTP方法，如 GET、POST 等
 /// @author xezzon
 public record ModifyOpenapiReq(
+    @NotNull
     String id,
-    @Alphanumeric(excludes = {Alphanumeric.DOT}) @NotBlank @Size(max = 255)
+    @Alphanumeric(excludes = {Alphanumeric.DOT}) @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String code,
     @URL @NotBlank @Size(max = DatabaseConstant.URL_LENGTH)
     String destination,

@@ -32,7 +32,7 @@ import org.mapstruct.factory.Mappers;
 /// @param ordinal 排序值，顺序越小越靠前
 /// @author xezzon
 public record AddAppReq(
-    @NotBlank @Size(max = 255)
+    @NotBlank @Size(max = DatabaseConstant.NORMAL_STRING_LENGTH)
     String name,
     @URL @NotNull @Size(max = DatabaseConstant.URL_LENGTH)
     String baseUrl,

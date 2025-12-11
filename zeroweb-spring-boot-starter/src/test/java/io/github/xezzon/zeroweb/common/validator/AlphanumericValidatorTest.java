@@ -76,5 +76,13 @@ class AlphanumericValidatorTest {
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody);
     Assertions.assertEquals("HandlerMethodValidation", responseBody.getCode());
+    List<ErrorResult.Detail> details = responseBody.getDetails();
+    Assertions.assertNotNull(details);
+    Assertions.assertTrue(details.stream()
+        .anyMatch(detail -> Objects.equals(
+            detail.getParameters().get("field"),
+            "alphabet"
+        ))
+    );
   }
 }

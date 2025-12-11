@@ -13,6 +13,8 @@
 
 package io.github.xezzon.zeroweb.user.entity;
 
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
+
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
@@ -32,9 +34,9 @@ import org.mapstruct.factory.Mappers;
 /// @param password 密码。为了防止身份被冒用，由用户设置的、只有用户自己知晓的口令。
 /// @author xezzon
 public record RegisterUserReq(
-    @Alphanumeric(excludes = {Alphanumeric.DOT}) @Size(min = 3, max = 32)
+    @Alphanumeric(excludes = {Alphanumeric.DOT}) @NotBlank @Size(min = 3, max = 32)
     String username,
-    @Size(max = 255)
+    @Size(max = NORMAL_STRING_LENGTH)
     String nickname,
     @NotBlank @Size(min = 4)
     String password

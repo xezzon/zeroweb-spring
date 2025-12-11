@@ -34,7 +34,7 @@ import org.mapstruct.factory.Mappers;
 public record UpdateAppReq(
     @NotNull
     String id,
-    @NotBlank @Size(max = 255)
+    @NotBlank @Size(max = DatabaseConstant.NORMAL_STRING_LENGTH)
     String name,
     @URL @NotNull @Size(max = DatabaseConstant.URL_LENGTH)
     String baseUrl,

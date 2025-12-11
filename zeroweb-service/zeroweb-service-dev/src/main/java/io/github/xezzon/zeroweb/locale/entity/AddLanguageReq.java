@@ -13,6 +13,8 @@
 
 package io.github.xezzon.zeroweb.locale.entity;
 
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
+
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
@@ -32,9 +34,9 @@ import org.mapstruct.factory.Mappers;
 /// @param enabled 是否启用
 /// @author xezzon
 public record AddLanguageReq(
-    @Alphanumeric @NotBlank @Size(max = 255)
+    @Alphanumeric @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String languageTag,
-    @Size(max = 255)
+    @Size(max = NORMAL_STRING_LENGTH)
     String description,
     @NotNull
     Integer ordinal,

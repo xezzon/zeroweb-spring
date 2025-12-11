@@ -13,6 +13,8 @@
 
 package io.github.xezzon.zeroweb.dict.entity;
 
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
+
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
@@ -33,14 +35,14 @@ import org.mapstruct.factory.Mappers;
 /// @param code 字典键
 /// @param label 字典值
 /// @param ordinal 排序号
-/// @param parentId 上级字典ID
+/// @param parentId 上级字典 ID
 /// @param enabled 启用状态
 public record ModifyDictReq(
     @NotNull
     String id,
-    @Alphanumeric @NotBlank @Size(max = 255)
+    @Alphanumeric @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String code,
-    @Size(max = 255)
+    @Size(max = NORMAL_STRING_LENGTH)
     String label,
     @NotNull
     Integer ordinal,
