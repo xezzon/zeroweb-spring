@@ -22,6 +22,9 @@ import io.github.xezzon.zeroweb.core.tree.TreeList;
 import io.github.xezzon.zeroweb.dict.Dict;
 import io.github.xezzon.zeroweb.dict.entity.AddDictReq;
 import io.github.xezzon.zeroweb.dict.entity.ModifyDictReq;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 import org.jspecify.annotations.NonNull;
@@ -57,7 +60,7 @@ public class DictHttpEndpoint {
   /// @return 字典ID
   @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @PostMapping()
-  public Id addDict(@RequestBody AddDictReq req) {
+  public Id addDict(@RequestBody @Valid final AddDictReq req) {
     Dict dict = req.into();
     if (dict.getTag() == null || dict.getParentId() == null) {
       // 新增字典目时，由后端设置以下属性的值
@@ -74,7 +77,7 @@ public class DictHttpEndpoint {
   /// @return 字典目列表
   @SaCheckPermission({PermissionConstant.DICT_READ})
   @GetMapping()
-  public Page<@NonNull Dict> getDictTagList(ODataRequestParam odata) {
+  public Page<@NonNull Dict> getDictTagList(final ODataRequestParam odata) {
     return dictService.pagedList(odata.into());
   }
 
@@ -83,7 +86,7 @@ public class DictHttpEndpoint {
   /// @param tag 字典目编码
   /// @return 字典项列表（树形结构）
   @GetMapping("/tag/{tag}")
-  public List<Dict> getDictTreeByTag(@PathVariable String tag) {
+  public List<Dict> getDictTreeByTag(@PathVariable @NotBlank final String tag) {
     List<Dict> dictItemList = dictService.getDictItemList(tag);
     return TreeList.from(dictItemList);
   }
@@ -93,7 +96,7 @@ public class DictHttpEndpoint {
   /// @param req 字典修改请求对象
   @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @PutMapping()
-  public void modifyDict(@RequestBody ModifyDictReq req) {
+  public void modifyDict(@RequestBody @Valid final ModifyDictReq req) {
     Dict dict = req.into();
     dictService.modifyDict(dict);
   }
@@ -105,8 +108,8 @@ public class DictHttpEndpoint {
   @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @PutMapping("/update-status")
   public void updateDictStatus(
-      @RequestBody Collection<String> ids,
-      @RequestParam Boolean enabled
+      @RequestBody @NotNull final Collection<String> ids,
+      @RequestParam final Boolean enabled
   ) {
     dictService.updateDictStatus(ids, enabled);
   }
@@ -116,7 +119,7 @@ public class DictHttpEndpoint {
   /// @param ids 字典ID集合
   @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @DeleteMapping()
-  public void removeDict(@RequestBody Collection<String> ids) {
+  public void removeDict(@RequestBody @NotNull final Collection<String> ids) {
     dictService.remove(ids);
   }
 }

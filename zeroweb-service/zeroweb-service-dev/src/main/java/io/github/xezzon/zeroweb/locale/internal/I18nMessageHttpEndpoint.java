@@ -19,6 +19,9 @@ import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.locale.I18nMessage;
 import io.github.xezzon.zeroweb.locale.entity.AddI18nMessageReq;
+import io.github.xezzon.zeroweb.locale.entity.UpdateI18nMessageReq;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.NonNull;
@@ -55,7 +58,7 @@ public class I18nMessageHttpEndpoint {
   /// @return 新增国际化内容的 ID。
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PostMapping()
-  public Id addI18nMessage(@RequestBody final AddI18nMessageReq req) {
+  public Id addI18nMessage(@RequestBody @Valid final AddI18nMessageReq req) {
     final I18nMessage i18nMessage = req.into();
     localizedService.addI18nMessage(i18nMessage);
     return Id.of(i18nMessage.getId());
@@ -78,7 +81,7 @@ public class I18nMessageHttpEndpoint {
   @SaCheckPermission({PermissionConstant.LOCALE_READ})
   @GetMapping("/{namespace}")
   public Page<@NonNull I18nMessage> queryI18nMessageList(
-      @PathVariable final String namespace,
+      @PathVariable @NotBlank final String namespace,
       final ODataRequestParam odata
   ) {
     return localizedService.queryI18nMessageList(namespace, odata.into());
@@ -86,10 +89,11 @@ public class I18nMessageHttpEndpoint {
 
   /// 更新国际化内容。
   ///
-  /// @param i18nMessage 国际化内容。
+  /// @param req 国际化内容。
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
-  public void updateI18nMessage(@RequestBody final I18nMessage i18nMessage) {
+  public void updateI18nMessage(@RequestBody @Valid final UpdateI18nMessageReq req) {
+    I18nMessage i18nMessage = req.into();
     localizedService.updateI18nMessage(i18nMessage);
   }
 
@@ -98,7 +102,7 @@ public class I18nMessageHttpEndpoint {
   /// @param id 国际化内容 ID。
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @DeleteMapping("/{id}")
-  public void deleteI18nMessage(@PathVariable final String id) {
+  public void deleteI18nMessage(@PathVariable @NotBlank final String id) {
     localizedService.deleteI18nMessage(id);
   }
 
@@ -109,8 +113,8 @@ public class I18nMessageHttpEndpoint {
   /// @return 语言-国际化文本的映射。
   @GetMapping("/{namespace}/{messageKey}")
   public Map<String, String> queryTranslation(
-      @PathVariable final String namespace,
-      @PathVariable final String messageKey
+      @PathVariable @NotBlank final String namespace,
+      @PathVariable @NotBlank final String messageKey
   ) {
     return localizedService.queryTranslation(namespace, messageKey);
   }

@@ -22,6 +22,8 @@ import io.github.xezzon.zeroweb.setting.Setting;
 import io.github.xezzon.zeroweb.setting.entity.AddSettingRequest;
 import io.github.xezzon.zeroweb.setting.entity.UpdateSchemaRequest;
 import io.github.xezzon.zeroweb.setting.entity.UpdateValueRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
@@ -57,7 +59,7 @@ public class SettingHttpEndpoint {
   /// @throws RepeatDataException 当参数标识重复时抛出
   @SaCheckPermission({PermissionConstant.SETTING_WRITE})
   @PostMapping()
-  Id addSetting(@RequestBody final AddSettingRequest request) {
+  Id addSetting(@RequestBody @Valid final AddSettingRequest request) {
     Setting setting = request.into();
     setting.setUpdateTime(Instant.now());
     settingService.addSetting(setting);
@@ -94,7 +96,7 @@ public class SettingHttpEndpoint {
   /// @param request 更新请求，包含参数ID、约束定义和参数值
   @SaCheckPermission({PermissionConstant.SETTING_WRITE})
   @PutMapping("/schema")
-  void updateSettingSchema(@RequestBody final UpdateSchemaRequest request) {
+  void updateSettingSchema(@RequestBody @Valid final UpdateSchemaRequest request) {
     Setting setting = request.into();
     settingService.updateSetting(setting);
   }
@@ -106,7 +108,7 @@ public class SettingHttpEndpoint {
   /// @param request 更新请求，包含参数ID和新值
   @SaCheckPermission({PermissionConstant.SETTING_READ})
   @PutMapping("/value")
-  void updateSettingValue(@RequestBody final UpdateValueRequest request) {
+  void updateSettingValue(@RequestBody @Valid final UpdateValueRequest request) {
     Setting setting = request.into();
     settingService.updateSetting(setting);
   }
@@ -119,7 +121,7 @@ public class SettingHttpEndpoint {
   /// @param id 要删除的参数ID
   @SaCheckPermission({PermissionConstant.SETTING_WRITE})
   @DeleteMapping("/{id}")
-  void deleteSetting(@PathVariable final String id) {
+  void deleteSetting(@PathVariable @NotBlank final String id) {
     settingService.deleteSetting(id);
   }
 }

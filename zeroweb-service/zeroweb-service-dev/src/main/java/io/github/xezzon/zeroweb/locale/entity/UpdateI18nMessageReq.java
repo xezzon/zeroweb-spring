@@ -20,38 +20,37 @@ import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.locale.I18nMessage;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-/// 新增国际化内容的请求参数。
+/// 修改国际化内容的请求参数。
 ///
+/// @param id 国际化内容 ID
 /// @param namespace 国际化内容命名空间。
 /// @param messageKey 国际化内容的键。
 /// @author xezzon
-public record AddI18nMessageReq(
+public record UpdateI18nMessageReq(
+    @NotNull
+    String id,
     @Alphanumeric @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String namespace,
     @Alphanumeric @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String messageKey
 ) implements Into<I18nMessage> {
 
-  /// 将当前请求对象转换为 [I18nMessage] 实体。
-  ///
-  /// @return 转换后的 [I18nMessage] 实体。
   @Override
   public I18nMessage into() {
     return Converter.INSTANCE.from(this);
   }
 
   @Mapper
-  interface Converter extends From<AddI18nMessageReq, I18nMessage> {
+  interface Converter extends From<UpdateI18nMessageReq, I18nMessage> {
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
-    @Mapping(target = "id", ignore = true)
     @Override
-    I18nMessage from(AddI18nMessageReq source);
+    I18nMessage from(UpdateI18nMessageReq source);
   }
 }

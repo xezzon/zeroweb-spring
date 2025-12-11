@@ -13,23 +13,15 @@
 
 package io.github.xezzon.zeroweb.common.constant;
 
-/// 数据库相关常量
+/// file 模块相关的常量
 /// @author xezzon
-public class DatabaseConstant {
+public class FileConstant {
 
-  /// 主键字段长度
-  public static final int ID_LENGTH = 64;
-  /// 默认ID
-  /// 用于表示不存在的根节点
-  public static final String ROOT_ID = "0";
-  /// ID 列名
-  public static final String ID_COLUMN = "id";
-  /// URL 字段长度
-  public static final int URL_LENGTH = 2083;
-  /// 字符串默认长度
-  public static final int NORMAL_STRING_LENGTH = 255;
+  /// 最大分段数量。采用 S3 的约束。
+  /// @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/qfacts.html">Amazon S3 multipart upload limits</a>
+  public static final int MAX_MULTIPART_NUMBER = 10_000;
 
-  /// 私有构造函数，防止实例化
-  private DatabaseConstant() {
+  /// 私有化构造函数，防止实例化。
+  private FileConstant() {
   }
 }

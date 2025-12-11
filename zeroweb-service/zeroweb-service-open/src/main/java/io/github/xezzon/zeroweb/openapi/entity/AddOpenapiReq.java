@@ -13,11 +13,18 @@
 
 package io.github.xezzon.zeroweb.openapi.entity;
 
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.URL_LENGTH;
+
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.enumeration.HttpMethod;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.URL;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -32,8 +39,11 @@ import org.mapstruct.factory.Mappers;
 /// @param httpMethod 请求接口的HTTP方法，如 GET、POST 等
 /// @author xezzon
 public record AddOpenapiReq(
-    @Alphanumeric(excludes = {Alphanumeric.DOT}) String code,
+    @Alphanumeric(excludes = {Alphanumeric.DOT}) @NotBlank @Size(max = NORMAL_STRING_LENGTH)
+    String code,
+    @URL @NotBlank @Size(max = URL_LENGTH)
     String destination,
+    @NotNull
     HttpMethod httpMethod
 ) implements Into<Openapi> {
 

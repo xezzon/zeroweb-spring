@@ -20,6 +20,8 @@ import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.role.Role;
 import io.github.xezzon.zeroweb.role.entity.AddRoleReq;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,7 +57,7 @@ public class RoleHttpEndpoint {
   /// @return 新创建角色的ID
   @SaCheckPermission({PermissionConstant.ROLE_WRITE})
   @PostMapping()
-  public Id addRole(@RequestBody final AddRoleReq req) {
+  public Id addRole(@RequestBody @Valid final AddRoleReq req) {
     final Role role = req.into();
     roleService.addRole(role);
     return Id.of(role.getId());
@@ -84,7 +86,7 @@ public class RoleHttpEndpoint {
   /// @param id 角色ID
   @SaCheckPermission({PermissionConstant.ROLE_WRITE})
   @DeleteMapping("/{id}")
-  public void deleteRole(@PathVariable final String id) {
+  public void deleteRole(@PathVariable @NotBlank final String id) {
     roleService.deleteRole(id);
   }
 

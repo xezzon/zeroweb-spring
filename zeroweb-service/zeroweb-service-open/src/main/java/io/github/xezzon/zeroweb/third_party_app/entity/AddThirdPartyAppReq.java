@@ -13,9 +13,13 @@
 
 package io.github.xezzon.zeroweb.third_party_app.entity;
 
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
+
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -27,6 +31,7 @@ import org.mapstruct.factory.Mappers;
 /// @param name 第三方应用名称
 /// @author xezzon
 public record AddThirdPartyAppReq(
+    @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String name
 ) implements Into<ThirdPartyApp> {
 

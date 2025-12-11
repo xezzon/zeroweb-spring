@@ -1,7 +1,8 @@
 package io.github.xezzon.zeroweb.common.exception;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.validation.annotation.Validated;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,8 +34,13 @@ public class ExceptionController {
   }
 
   @RequestMapping("/MethodArgumentNotValidException")
-  public void methodArgumentNotValidException(@RequestBody @Validated ValidEntity entity) {
+  public void methodArgumentNotValidException(@RequestBody @Valid ValidEntity entity) {
     throw new UnsupportedOperationException(entity.getName());
+  }
+
+  @GetMapping("/HttpRequestMethodNotSupportedException")
+  public void httpRequestMethodNotSupportedException() {
+    throw new UnsupportedOperationException();
   }
 
   @RequestMapping("/DataPermissionForbiddenException")

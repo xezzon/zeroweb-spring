@@ -13,9 +13,15 @@
 
 package io.github.xezzon.zeroweb.role.entity;
 
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
+
+import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.role.Role;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -29,13 +35,17 @@ import org.mapstruct.factory.Mappers;
 /// @param code 角色简码，用于区分同级别角色
 /// @param name 角色名称，用于界面展示
 /// @param inheritable 是否允许创建下级角色
-/// @param parentId 上级角色ID
+/// @param parentId 上级角色 ID
 ///
 /// @author xezzon
 public record AddRoleReq(
+    @Alphanumeric @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String code,
+    @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String name,
+    @NotNull
     Boolean inheritable,
+    @NotNull
     String parentId
 ) implements Into<Role> {
 

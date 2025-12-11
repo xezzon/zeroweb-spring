@@ -68,7 +68,7 @@ public class Openapi implements IEntity<String> {
   /// 后端地址
   ///
   /// 即该接口应该转发到的后端地址
-  @Column(name = DESTINATION_COLUMN, nullable = false, length = 2083)
+  @Column(name = DESTINATION_COLUMN, nullable = false, length = DatabaseConstant.URL_LENGTH)
   @JsonInclude(Include.NON_NULL)
   String destination;
   /// 请求接口的HTTP方法

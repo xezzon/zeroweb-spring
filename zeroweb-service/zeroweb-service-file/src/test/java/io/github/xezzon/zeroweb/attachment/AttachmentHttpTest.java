@@ -170,7 +170,7 @@ abstract class AttachmentHttpTest {
     AddAttachmentReq req = new AddAttachmentReq(
         RandomUtil.randomString(8),
         RandomUtil.randomString(44),
-        RandomUtil.randomLong(5) * 1024 * 1024,
+        RandomUtil.randomLong(5) * 1024 * 1024 + 1,
         RandomUtil.randomString(8),
         RandomUtil.randomString(8),
         UUID.randomUUID().toString()
@@ -200,7 +200,7 @@ abstract class AttachmentHttpTest {
     AddAttachmentReq req = new AddAttachmentReq(
         RandomUtil.randomString(8),
         RandomUtil.randomString(44),
-        RandomUtil.randomLong(5) * 1024 * 1024,
+        RandomUtil.randomLong(5) * 1024 * 1024 + 1,
         RandomUtil.randomString(8),
         RandomUtil.randomString(8),
         UUID.randomUUID().toString()

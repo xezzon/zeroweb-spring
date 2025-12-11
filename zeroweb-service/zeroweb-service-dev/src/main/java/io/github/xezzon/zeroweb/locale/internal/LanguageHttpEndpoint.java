@@ -19,6 +19,8 @@ import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.locale.Language;
 import io.github.xezzon.zeroweb.locale.entity.AddLanguageReq;
 import io.github.xezzon.zeroweb.locale.entity.ModifyLanguageReq;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +50,7 @@ public class LanguageHttpEndpoint {
   /// @return 新增语言的 ID。
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PostMapping()
-  public Id addLanguage(@RequestBody final AddLanguageReq req) {
+  public Id addLanguage(@RequestBody @Valid final AddLanguageReq req) {
     final Language language = req.into();
     localizedService.addLanguage(language);
     return Id.of(language.getId());
@@ -67,7 +69,7 @@ public class LanguageHttpEndpoint {
   /// @param req 语言请求体。
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
-  public void updateLanguage(@RequestBody final ModifyLanguageReq req) {
+  public void updateLanguage(@RequestBody @Valid final ModifyLanguageReq req) {
     final Language language = req.into();
     localizedService.updateLanguage(language);
   }
@@ -77,7 +79,7 @@ public class LanguageHttpEndpoint {
   /// @param id 语言 ID。
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @DeleteMapping("/{id}")
-  public void deleteLanguage(@PathVariable final String id) {
+  public void deleteLanguage(@PathVariable @NotBlank final String id) {
     localizedService.deleteLanguage(id);
   }
 }

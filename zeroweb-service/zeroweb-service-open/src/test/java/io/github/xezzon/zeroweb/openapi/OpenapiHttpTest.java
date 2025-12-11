@@ -65,7 +65,7 @@ class OpenapiHttpTest {
   void addOpenapi() {
     AddOpenapiReq req = new AddOpenapiReq(
         RandomUtil.randomString(8),
-        RandomUtil.randomString(8),
+        "http://localhost/" + RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
     Id responseBody = testClient.post()
@@ -92,7 +92,7 @@ class OpenapiHttpTest {
 
     AddOpenapiReq req = new AddOpenapiReq(
         exist.getCode(),
-        RandomUtil.randomString(8),
+        "http://localhost/" + RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
     testClient.post()
@@ -145,7 +145,7 @@ class OpenapiHttpTest {
     ModifyOpenapiReq req = new ModifyOpenapiReq(
         draftOne.getId(),
         RandomUtil.randomString(8),
-        RandomUtil.randomString(8),
+        "http://localhost/" + RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
     testClient.put()
@@ -171,7 +171,7 @@ class OpenapiHttpTest {
     ModifyOpenapiReq req = new ModifyOpenapiReq(
         target.getId(),
         repeated.getCode(),
-        RandomUtil.randomString(8),
+        "http://localhost/" + RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
     testClient.put()
@@ -194,7 +194,7 @@ class OpenapiHttpTest {
     ModifyOpenapiReq req = new ModifyOpenapiReq(
         RandomUtil.randomString(8),
         RandomUtil.randomString(8),
-        RandomUtil.randomString(8),
+        "http://localhost/" + RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
     testClient.put()
@@ -216,7 +216,7 @@ class OpenapiHttpTest {
     ModifyOpenapiReq req = new ModifyOpenapiReq(
         publishedOpenapi.getId(),
         RandomUtil.randomString(8),
-        RandomUtil.randomString(8),
+        "http://localhost/" + RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
     testClient.put()
@@ -232,7 +232,7 @@ class OpenapiHttpTest {
     req = new ModifyOpenapiReq(
         publishedOpenapi.getId(),
         publishedOpenapi.getCode(),
-        RandomUtil.randomString(8),
+        "http://localhost/" + RandomUtil.randomString(8),
         RandomUtil.randomEle(HttpMethod.values())
     );
     testClient.put()

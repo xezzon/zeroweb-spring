@@ -26,6 +26,8 @@ import io.github.xezzon.zeroweb.subscription.Subscription;
 import io.github.xezzon.zeroweb.subscription.authz.SubscriptionPermissionManager;
 import io.github.xezzon.zeroweb.subscription.entity.AddSubscriptionReq;
 import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,7 +65,10 @@ public class SubscriptionHttpEndpoint {
   /// @param appId 第三方应用ID
   /// @return 所有已发布的对外接口以及指定第三方应用的订阅情况
   @GetMapping("/third-party-app/{appId}/subscription")
-  public Page<@NonNull Subscription> listSubscription(ODataRequestParam odata, @PathVariable String appId) {
+  public Page<@NonNull Subscription> listSubscription(
+      final ODataRequestParam odata,
+      @PathVariable @NotBlank final String appId
+  ) {
     if (!StpUtil.hasPermission(PermissionConstant.SUBSCRIPTION_AUDIT)) {
       // 应用管理员可以查看所有应用的订阅，非管理员则需要对应的权限
       subscriptionPermissionManager.check(appId, JwtAuth.getOrThrow().getSub(), LIST_SUBSCRIPTION);
@@ -76,7 +81,7 @@ public class SubscriptionHttpEndpoint {
   /// @param req 接口订阅信息
   /// @return 订阅标识
   @PostMapping("/subscription")
-  public Id subscribe(@RequestBody AddSubscriptionReq req) {
+  public Id subscribe(@RequestBody @Valid final AddSubscriptionReq req) {
     subscriptionPermissionManager.check(req.appId(), JwtAuth.getOrThrow().getSub(), SUBSCRIBE);
     Subscription subscription = req.into();
     subscription.setStatus(SubscriptionStatus.AUDITING);
@@ -91,7 +96,7 @@ public class SubscriptionHttpEndpoint {
   /// @param id 订阅标识
   @PutMapping("/subscription/audit/{id}")
   @SaCheckPermission({PermissionConstant.SUBSCRIPTION_AUDIT})
-  public void auditSubscription(@PathVariable String id) {
+  public void auditSubscription(@PathVariable @NotBlank final String id) {
     subscriptionService.auditSubscription(id);
   }
 }

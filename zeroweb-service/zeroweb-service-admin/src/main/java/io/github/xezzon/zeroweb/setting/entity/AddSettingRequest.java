@@ -13,9 +13,15 @@
 
 package io.github.xezzon.zeroweb.setting.entity;
 
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
+
+import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.setting.Setting;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.Map;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,7 +36,9 @@ import org.mapstruct.factory.Mappers;
 /// @param value 参数初始值，JSON格式
 /// @author xezzon
 public record AddSettingRequest(
+    @Alphanumeric @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String code,
+    @NotNull
     String schema,
     Map<String, Object> value
 ) implements Into<Setting> {

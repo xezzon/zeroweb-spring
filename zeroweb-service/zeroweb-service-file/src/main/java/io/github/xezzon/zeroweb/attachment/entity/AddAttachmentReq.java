@@ -13,9 +13,15 @@
 
 package io.github.xezzon.zeroweb.attachment.entity;
 
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
+
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -27,12 +33,17 @@ import org.mapstruct.factory.Mappers;
 /// @param size 文件大小。单位：字节。
 /// @param type MIME 类型
 /// @param bizType 业务类型
-/// @param bizId 业务ID
+/// @param bizId 业务 ID
 public record AddAttachmentReq(
+    @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String name,
+    @NotBlank @Size(max = 128)
     String checksum,
+    @NotNull @Positive
     Long size,
+    @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String type,
+    @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String bizType,
     String bizId
 ) implements Into<Attachment> {

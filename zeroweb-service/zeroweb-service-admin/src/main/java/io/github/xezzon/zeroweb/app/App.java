@@ -43,7 +43,7 @@ public class App implements IEntity<String> {
   @Column(name = "name", nullable = false)
   private String name;
   /// 服务的基础访问路径，通常是一个 URL。
-  @Column(name = "base_url", nullable = false, length = 2083)
+  @Column(name = "base_url", nullable = false, length = DatabaseConstant.URL_LENGTH)
   private String baseUrl;
   /// 服务的显示顺序。
   ///

@@ -13,12 +13,19 @@
 
 package io.github.xezzon.zeroweb.attachment.internal;
 
+import static io.github.xezzon.zeroweb.common.constant.FileConstant.MAX_MULTIPART_NUMBER;
+
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentReq;
 import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
 import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.StorageContext;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,8 +59,8 @@ public class AttachmentHttpEndpoint {
   /// @return 文件上传元数据
   @PostMapping()
   public UploadInfo addAttachment(
-      @RequestBody AddAttachmentReq req,
-      @RequestParam(required = false) String crc
+      @RequestBody @Valid final AddAttachmentReq req,
+      @RequestParam(required = false) final String crc
   ) {
     Attachment attachment = req.into();
     return ScopedValue.where(StorageContext.CRC, crc)
@@ -75,9 +82,9 @@ public class AttachmentHttpEndpoint {
   /// @return 上传元信息
   @GetMapping("/{id}/resume")
   public UploadInfo getUploadInfo(
-      @PathVariable final String id,
-      @RequestParam final String checksum,
-      @RequestParam final int fileSize,
+      @PathVariable @NotBlank final String id,
+      @RequestParam @NotBlank final String checksum,
+      @RequestParam @Positive final long fileSize,
       @RequestParam(required = false) final String crc
   ) {
     return ScopedValue.where(StorageContext.CRC, crc)
@@ -91,7 +98,8 @@ public class AttachmentHttpEndpoint {
   /// @return 附件上传地址
   @GetMapping("/{id}/endpoint/upload")
   public UploadEndpoint getUploadEndpoint(
-      @PathVariable final String id,
+      @PathVariable @NotBlank final String id,
+      @PositiveOrZero @Max(MAX_MULTIPART_NUMBER)
       @RequestParam(required = false, defaultValue = "0") final int partNumber,
       @RequestParam(required = false) final String crc
   ) {
@@ -102,7 +110,7 @@ public class AttachmentHttpEndpoint {
   /// 文件上传完成后，将其状态变更为已完成
   /// @param id 附件ID
   @PutMapping("/{id}/status/done")
-  public void finishUpload(@PathVariable String id) {
+  public void finishUpload(@PathVariable @NotBlank final String id) {
     attachmentService.updateStatus(id);
   }
 
@@ -112,8 +120,8 @@ public class AttachmentHttpEndpoint {
   /// @return 附件信息集合（不包含下载地址）
   @GetMapping("/list")
   public List<Attachment> queryByBiz(
-      @RequestParam String bizType,
-      @RequestParam String bizId
+      @RequestParam @NotBlank final String bizType,
+      @RequestParam @NotBlank final String bizId
   ) {
     return attachmentService.queryByBiz(bizType, bizId);
   }
@@ -122,14 +130,14 @@ public class AttachmentHttpEndpoint {
   /// @param id 附件ID
   /// @return 附件下载地址
   @GetMapping("/{id}/endpoint/download")
-  public DownloadEndpoint getDownloadEndpoint(@PathVariable final String id) {
+  public DownloadEndpoint getDownloadEndpoint(@PathVariable @NotBlank final String id) {
     return attachmentService.getDownloadEndpoint(id);
   }
 
   /// 删除附件
   /// @param id 附件ID
   @DeleteMapping("/{id}")
-  public void deleteAttachment(@PathVariable final String id) {
+  public void deleteAttachment(@PathVariable @NotBlank final String id) {
     attachmentService.deleteAttachment(id);
   }
 }

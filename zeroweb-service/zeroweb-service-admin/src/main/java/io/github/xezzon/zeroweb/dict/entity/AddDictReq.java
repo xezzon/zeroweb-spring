@@ -13,9 +13,15 @@
 
 package io.github.xezzon.zeroweb.dict.entity;
 
+import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
+
+import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.dict.Dict;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.jspecify.annotations.Nullable;
@@ -37,18 +43,22 @@ public class AddDictReq implements Into<Dict> {
   ///
   /// 用于区分不同字典的命名空间，可为空。如果为空，系统将使用默认的字典目。
   @Nullable
+  @Alphanumeric @Size(max = NORMAL_STRING_LENGTH)
   private String tag;
   /// 字典键
   ///
   /// 同一字典目下，键值唯一。约定：由用户定义的字典键，应该以小写字母开头；由系统生成的字典键，应该以大写字母开头。
+  @Alphanumeric @NotBlank @Size(max = NORMAL_STRING_LENGTH)
   private String code;
   /// 字典值
   ///
   /// 字典项的显示名称。
+  @Size(max = NORMAL_STRING_LENGTH)
   private String label;
   /// 排序号
   ///
   /// 数值越小，顺序越靠前。
+  @NotNull
   private Integer ordinal;
   /// 上级字典ID
   ///

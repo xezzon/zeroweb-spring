@@ -17,6 +17,7 @@ import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionConstant;
 import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionManager;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -53,9 +54,9 @@ public class ThirdPartAppMemberHttpEndpoint {
   /// @return 邀请码
   @PostMapping("/third-party-app/{appId}/member")
   public String inviteMember(
-      @PathVariable String appId,
-      @RequestParam(required = false) String userId,
-      @RequestParam(required = false, defaultValue = "24") int timeout
+      @PathVariable @NotBlank final String appId,
+      @RequestParam(required = false) final String userId,
+      @RequestParam(required = false, defaultValue = "24") final int timeout
   ) {
     thirdPartyAppPermissionManager
         .check(appId, JwtAuth.getOrThrow().getSub(), ThirdPartyAppPermissionConstant.INVITE_MEMBER);
@@ -67,7 +68,7 @@ public class ThirdPartAppMemberHttpEndpoint {
   /// @param token 邀请码
   /// @return 成员ID
   @PutMapping("/third-party-app/-/member")
-  public Id acceptInvitation(@RequestParam String token) {
+  public Id acceptInvitation(@RequestParam @NotBlank final String token) {
     String id = thirdPartyAppMemberService.acceptInvitation(token);
     return Id.of(id);
   }
@@ -77,7 +78,7 @@ public class ThirdPartAppMemberHttpEndpoint {
   /// @param appId 第三方应用ID
   /// @return 第三方应用成员列表
   @GetMapping("/third-party-app/{appId}/member")
-  public List<ThirdPartyAppMember> listMember(@PathVariable String appId) {
+  public List<ThirdPartyAppMember> listMember(@PathVariable @NotBlank final String appId) {
     thirdPartyAppPermissionManager
         .check(appId, JwtAuth.getOrThrow().getSub(), ThirdPartyAppPermissionConstant.LIST_MEMBER);
     return thirdPartyAppMemberService.listMember(appId);
@@ -88,7 +89,10 @@ public class ThirdPartAppMemberHttpEndpoint {
   /// @param appId 第三方应用 ID
   /// @param userId 转移的目标用户
   @PatchMapping("/third-party-app/{appId}/owner")
-  public void moveOwnership(@PathVariable String appId, @RequestParam String userId) {
+  public void moveOwnership(
+      @PathVariable @NotBlank final String appId,
+      @RequestParam @NotBlank final String userId
+  ) {
     thirdPartyAppMemberService.moveOwnership(appId, userId);
   }
 }
