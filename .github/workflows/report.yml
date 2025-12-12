@@ -1,6 +1,9 @@
 name: report
 
-permissions: read-all
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 on:
   workflow_dispatch:
@@ -45,8 +48,7 @@ jobs:
           mvn -B 
           verify 
           -D openapi.enabled=true 
-          -D skipTests=true 
-          -T 1C
+          -D skipTests=true
       - name: Generate the report
         run: >
           mvn -B 

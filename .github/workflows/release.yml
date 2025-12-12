@@ -81,15 +81,10 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   report:
     needs: set-version
-    runs-on: ubuntu-24.04
     permissions:
       contents: read
       pages: write
       id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: ./.github/workflows/report.yml
-        with:
-          version: ${{ needs.set-version.outputs.project_version }}
+    uses: ./.github/workflows/report.yml
+    with:
+      version: ${{ needs.set-version.outputs.project_version }}
