@@ -1,16 +1,14 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ZerowebAdminApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+  <configuration default="false" name="ZerowebAdminApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="dev" />
     <option name="envFilePaths">
       <option value="$PROJECT_DIR$/.idea/.env" />
     </option>
-    <option name="MAIN_CLASS_NAME" value="io.github.xezzon.zeroweb.ZerowebAdminApplication" />
     <module name="zeroweb-service-admin" />
-    <extension name="coverage">
-      <pattern>
-        <option name="PATTERN" value="io.github.xezzon.zeroweb.*" />
-        <option name="ENABLED" value="true" />
-      </pattern>
-    </extension>
+    <selectedOptions>
+      <option name="environmentVariables" />
+    </selectedOptions>
+    <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.xezzon.zeroweb.ZerowebAdminApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -1,14 +1,14 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ZerowebFileApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="ZerowebDeveloperApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="dev" />
     <option name="envFilePaths">
       <option value="$PROJECT_DIR$/.idea/.env" />
     </option>
-    <module name="zeroweb-service-file" />
+    <module name="zeroweb-service-dev" />
     <selectedOptions>
       <option name="environmentVariables" />
     </selectedOptions>
-    <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.xezzon.zeroweb.ZerowebFileApplication" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.xezzon.zeroweb.ZerowebDeveloperApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
