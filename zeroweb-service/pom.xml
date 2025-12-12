@@ -319,6 +319,9 @@
           <value>true</value>
         </property>
       </activation>
+      <properties>
+        <jmx.port>9001</jmx.port>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>com.h2database</groupId>
@@ -330,6 +333,9 @@
           <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+              <jmxPort>${jmx.port}</jmxPort>
+            </configuration>
             <executions>
               <execution>
                 <id>start</id>
