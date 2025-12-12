@@ -90,23 +90,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Apache Maven Central
-        uses: actions/setup-java@v4
+      - uses: ./.github/workflows/report.yml
         with:
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-          java-version: ${{ env.JAVA_VERSION }}
-          cache: 'maven'
-      - name: Set Version
-        run: mvn -B versions:set -D newVersion=${{ needs.set-version.outputs.project_version }}
-      - name: Generate the report
-        run: mvn -B site site:stage -P report -T 1C
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'target/staging'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          version: ${{ needs.set-version.outputs.project_version }}
