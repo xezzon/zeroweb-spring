@@ -15,9 +15,11 @@
   <description>研发平台服务</description>
 
   <properties>
-    <http.port>9991</http.port>
-    <grpc.port>9992</grpc.port>
-    <management.port>9999</management.port>
-    <mainClass>io.github.xezzon.zeroweb.ZerowebDeveloperApplication</mainClass>
+    <http.port>10991</http.port>
+    <grpc.port>10992</grpc.port>
+    <management.port>10999</management.port>
+    <spring-boot.run.main-class>
+      io.github.xezzon.zeroweb.ZerowebDeveloperApplication
+    </spring-boot.run.main-class>
   </properties>
 </project>

@@ -36,8 +36,8 @@ services:
       - DB_URL=postgresql:5432/zeroweb
       - DB_USERNAME=postgres_user
       - DB_PASSWORD=postgres_password
-      - spring.grpc.client.channels.user.address=zeroweb-service-admin:9002
-      - spring.grpc.client.channels.dict.address=zeroweb-service-admin:9002
+      - spring.grpc.client.channels.user.address=zeroweb-service-admin:10002
+      - spring.grpc.client.channels.dict.address=zeroweb-service-admin:10002
     labels:
       - traefik.enable=true
       - traefik.http.routers.zeroweb-service-open.rule=PathPrefix(`/api/open`)
@@ -56,8 +56,8 @@ services:
       - DB_PASSWORD=postgres_password
       - ZEROWEB_FILE_PROVIDER=FS
       - ZEROWEB_FS_BASEPATH=/srv/zeroweb/Uploads
-      - spring.grpc.client.channels.user.address=zeroweb-service-admin:9002
-      - spring.grpc.client.channels.dict.address=zeroweb-service-admin:9002
+      - spring.grpc.client.channels.user.address=zeroweb-service-admin:10002
+      - spring.grpc.client.channels.dict.address=zeroweb-service-admin:10002
     volumes:
       - $PWD/pem:/app/resources/pem
     labels:
@@ -76,8 +76,8 @@ services:
       - DB_URL=postgresql:5432/zeroweb
       - DB_USERNAME=postgres_user
       - DB_PASSWORD=postgres_password
-      - spring.grpc.client.channels.user.address=zeroweb-service-admin:9002
-      - spring.grpc.client.channels.dict.address=zeroweb-service-admin:9002
+      - spring.grpc.client.channels.user.address=zeroweb-service-admin:10002
+      - spring.grpc.client.channels.dict.address=zeroweb-service-admin:10002
     labels:
       - traefik.enable=true
       - traefik.http.routers.zeroweb-service-open.rule=PathPrefix(`/api/open`)

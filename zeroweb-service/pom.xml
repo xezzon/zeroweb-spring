@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.xezzon</groupId>
@@ -23,11 +23,11 @@
 
   <properties>
     <maven.compiler.release>25</maven.compiler.release>
-    <mainClass/>
     <!-- 应用端口号 -->
     <http.port>8080</http.port>
     <grpc.port>9090</grpc.port>
     <management.port>8081</management.port>
+    <spring-boot.run.main-class/>
     <!-- Testcontainers -->
     <testcontainers.postgresql.url>
       jdbc:tc:postgresql:18-alpine:///postgres
@@ -127,24 +127,6 @@
       </plugin>
     </plugins>
   </build>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>io.github.xezzon</groupId>
-        <artifactId>smart-doc-maven-plugin</artifactId>
-        <version>${smart-doc-maven-plugin.version}</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>html</report>
-              <report>grpc-html</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-    </plugins>
-  </reporting>
 
   <profiles>
     <profile>
@@ -251,9 +233,11 @@
                 <appRoot>${workdir}</appRoot>
                 <workingDirectory>${workdir}</workingDirectory>
                 <format>Docker</format>
-                <mainClass>${mainClass}</mainClass>
+                <mainClass>${spring-boot.run.main-class}</mainClass>
                 <labels>
-                  <maven.artifact>${project.groupId}:${project.artifactId}:${project.version}</maven.artifact>
+                  <maven.artifact>
+                    ${project.groupId}:${project.artifactId}:${project.version}
+                  </maven.artifact>
                 </labels>
               </container>
               <extraDirectories>
@@ -323,6 +307,88 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+    </profile>
+    <profile>
+      <id>openapi</id>
+      <activation>
+        <file>
+          <exists>src</exists>
+        </file>
+        <property>
+          <name>openapi.enabled</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <jmx.port>9001</jmx.port>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+              <jmxPort>${jmx.port}</jmxPort>
+            </configuration>
+            <executions>
+              <execution>
+                <id>start</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+                <configuration>
+                  <systemPropertyVariables>
+                    <spring.datasource.url>jdbc:h2:mem:zeroweb</spring.datasource.url>
+                    <spring.datasource.driver-class-name>
+                      org.h2.Driver
+                    </spring.datasource.driver-class-name>
+                    <spring.jpa.hibernate.ddl-auto>none</spring.jpa.hibernate.ddl-auto>
+                    <spring.liquibase.enabled>false</spring.liquibase.enabled>
+                    <springdoc.show-actuator>false</springdoc.show-actuator>
+                    <springdoc.use-management-port>false</springdoc.use-management-port>
+                  </systemPropertyVariables>
+                  <environmentVariables>
+                    <JDBC_TYPE>h2</JDBC_TYPE>
+                    <ZEROWEB_ROOT_PASSWORD>random</ZEROWEB_ROOT_PASSWORD>
+                    <ZEROWEB_FS_BASEPATH>/tmp/zeroweb/upload</ZEROWEB_FS_BASEPATH>
+                  </environmentVariables>
+                </configuration>
+              </execution>
+              <execution>
+                <id>stop</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>integration-test</phase>
+                <goals>
+                  <goal>generate</goal>
+                </goals>
+                <configuration>
+                  <apiDocsUrl>http://localhost:${http.port}/v3/api-docs</apiDocsUrl>
+                  <outputDir>${project.reporting.outputDirectory}</outputDir>
+                  <outputFileName>openapi.json</outputFileName>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>

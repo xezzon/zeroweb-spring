@@ -19,6 +19,7 @@ import io.github.xezzon.zeroweb.role.constant.RoleConstant;
 import io.github.xezzon.zeroweb.user.constant.UserConstant;
 import jakarta.annotation.Resource;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Component;
 /// 这个组件确保在系统首次启动或特定条件下，超级管理员拥有必要的最高权限。
 ///
 /// @author xezzon
+@Slf4j
 @Component
 @Order(Short.MAX_VALUE)
 public class RootUserRoleRunner implements ApplicationRunner {
@@ -44,15 +46,19 @@ public class RootUserRoleRunner implements ApplicationRunner {
   /// @param args 应用程序启动参数。
   @Override
   public void run(@NonNull final ApplicationArguments args) {
-    Optional<RoleUser> root = roleUserRepository.findByRoleIdAndUserId(
-        RoleConstant.ROOT.getId(),
-        UserConstant.ROOT.getId()
-    );
-    if (root.isEmpty()) {
-      RoleUser roleUser = new RoleUser();
-      roleUser.setRoleId(RoleConstant.ROOT.getId());
-      roleUser.setUserId(UserConstant.ROOT.getId());
-      roleUserRepository.saveAndFlush(roleUser);
+    try {
+      Optional<RoleUser> root = roleUserRepository.findByRoleIdAndUserId(
+          RoleConstant.ROOT.getId(),
+          UserConstant.ROOT.getId()
+      );
+      if (root.isEmpty()) {
+        RoleUser roleUser = new RoleUser();
+        roleUser.setRoleId(RoleConstant.ROOT.getId());
+        roleUser.setUserId(UserConstant.ROOT.getId());
+        roleUserRepository.saveAndFlush(roleUser);
+      }
+    } catch (RuntimeException e) {
+      log.warn("Failed to add role for root user.", e);
     }
   }
 }

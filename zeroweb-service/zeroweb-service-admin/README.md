@@ -33,7 +33,3 @@ service:
 | ZEROWEB_ROOT_PASSWORD | root 账号口令。必填。      |                  |
 
 其他配置请查看[公共配置清单](../../zeroweb-spring-boot-starter/README.md)。
-
-## 接口描述文档
-
-https://xezzon.github.io/zeroweb-spring/zeroweb-service/zeroweb-service-admin/smart-doc/index/api.html

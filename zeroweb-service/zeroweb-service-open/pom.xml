@@ -15,10 +15,12 @@
   <description>开放平台服务</description>
 
   <properties>
-    <http.port>9011</http.port>
-    <grpc.port>9012</grpc.port>
-    <management.port>9019</management.port>
-    <mainClass>io.github.xezzon.zeroweb.ZerowebOpenApplication</mainClass>
+    <http.port>10011</http.port>
+    <grpc.port>10012</grpc.port>
+    <management.port>10019</management.port>
+    <spring-boot.run.main-class>
+      io.github.xezzon.zeroweb.ZerowebOpenApplication
+    </spring-boot.run.main-class>
   </properties>
 
   <dependencies>
