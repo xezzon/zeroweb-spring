@@ -17,7 +17,10 @@ import static io.github.xezzon.zeroweb.crypto.constant.ZxcvbnConstant.ZXCVBN;
 
 import com.nulabinc.zxcvbn.Strength;
 import io.github.xezzon.zeroweb.crypto.entity.PasswordStrength;
+import io.jsonwebtoken.security.JwkSet;
+import io.jsonwebtoken.security.Jwks;
 import jakarta.validation.constraints.NotBlank;
+import java.security.interfaces.ECPublicKey;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -33,6 +36,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping
 public class CryptoHttpEndpoint {
+
+  private final JwtKeyManager jwtKeyManager;
+
+  /// 依赖注入
+  /// @param jwtKeyManager JWT 密钥管理
+  public CryptoHttpEndpoint(final JwtKeyManager jwtKeyManager) {
+    this.jwtKeyManager = jwtKeyManager;
+  }
 
   /// 计算口令强度。
   /// @param password 口令。
@@ -50,5 +61,21 @@ public class CryptoHttpEndpoint {
         .toList();
     Strength measure = ZXCVBN.measure(password, directories);
     return PasswordStrength.from(measure);
+  }
+
+  /**
+   * 以 JWKs 的形式对外暴露用于签名的公钥
+   * @return JWK 集合。如果有多条数据，从前往后，优先级递减。
+   * @see <a href="https://tools.ietf.org/html/rfc7517">JSON Web Key</a>
+   */
+  @GetMapping("/well-known/jwks.json")
+  JwkSet wellKnownJwks() {
+    ECPublicKey publicKey = jwtKeyManager.getPublicKey();
+    return Jwks.set()
+        .add(Jwks.builder()
+            .key(publicKey)
+            .build()
+        )
+        .build();
   }
 }
