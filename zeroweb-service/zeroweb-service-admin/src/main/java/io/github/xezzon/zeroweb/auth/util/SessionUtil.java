@@ -82,6 +82,12 @@ public final class SessionUtil {
 /// `RoleSet` 是一个继承自 [HashSet] 的内部类，用于在 Session 中存储角色集合。
 class RoleSet extends HashSet<String> {
 
+  /// 构造函数，用于反序列化。
+  @SuppressWarnings("unused")
+  RoleSet() {
+    super();
+  }
+
   /// 构造函数，使用给定的角色集合初始化。
   ///
   /// @param roles 角色字符串集合。
@@ -92,6 +98,12 @@ class RoleSet extends HashSet<String> {
 
 /// `PermissionSet` 是一个继承自 [HashSet] 的内部类，用于在 Session 中存储权限集合。
 class PermissionSet extends HashSet<String> {
+
+  /// 构造函数，用于反序列化。
+  @SuppressWarnings("unused")
+  PermissionSet() {
+    super();
+  }
 
   /// 构造函数，使用给定的权限集合初始化。
   ///

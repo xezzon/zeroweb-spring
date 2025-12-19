@@ -39,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -121,5 +122,13 @@ public class AuthnHttpEndpoint {
     );
     response.setHeader(AUTHORIZATION, BEARER + " " + idToken);
     return new OidcToken(accessToken, idToken, expiredIn);
+  }
+
+  /// 登出当前用户。
+  ///
+  /// 调用认证服务的 logout 方法。
+  @PutMapping("/logout")
+  public void logout() {
+    authnService.logout();
   }
 }

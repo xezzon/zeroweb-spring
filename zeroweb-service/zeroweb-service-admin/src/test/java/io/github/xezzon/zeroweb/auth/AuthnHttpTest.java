@@ -268,4 +268,45 @@ class AuthnHttpTest {
         .exchange()
         .expectStatus().isEqualTo(HttpStatus.NO_CONTENT);
   }
+
+  @Test
+  void logout() {
+    final String uri = "/auth/logout";
+    User user = users.getFirst();
+    BasicAuth basicAuth = new BasicAuth(user.getUsername(), password);
+    OidcToken responseBody = testClient.post()
+        .uri(BASIC_LOGIN_URI)
+        .body(basicAuth)
+        .exchange()
+        .expectBody(OidcToken.class)
+        .returnResult()
+        .getResponseBody();
+    assertNotNull(responseBody);
+
+    // 登出
+    testClient.put()
+        .uri(uri)
+        .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
+        .exchange()
+        .expectStatus().isOk();
+
+    // 验证已登出
+    testClient.get()
+        .uri("/auth/token")
+        .header(saTokenConfig.getTokenName(), responseBody.getAccessToken())
+        .exchange()
+        .expectStatus().isUnauthorized();
+  }
+
+  /// 测试幂等性
+  @Test
+  void logout_notLogin() {
+    final String uri = "/auth/logout";
+
+    // 登出
+    testClient.put()
+        .uri(uri)
+        .exchange()
+        .expectStatus().isOk();
+  }
 }

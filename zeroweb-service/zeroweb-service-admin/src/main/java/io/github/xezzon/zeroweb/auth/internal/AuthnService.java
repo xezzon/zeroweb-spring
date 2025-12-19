@@ -115,6 +115,13 @@ public class AuthnService {
     return jwtCryptoService.signJwt(claim);
   }
 
+  /// 登出当前用户。
+  ///
+  /// 调用 Sa-Token 的 logout 方法。
+  protected void logout() {
+    StpUtil.logout();
+  }
+
   /// 监听用户登录事件，将用户信息加载到会话中。
   ///
   /// @param event 用户登录事件 [UserLoginEvent]。
