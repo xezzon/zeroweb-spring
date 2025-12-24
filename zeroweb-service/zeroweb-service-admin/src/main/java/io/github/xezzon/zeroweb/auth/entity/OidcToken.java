@@ -13,11 +13,11 @@
 
 package io.github.xezzon.zeroweb.auth.entity;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.github.xezzon.zeroweb.auth.AuthHttpConstant;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import tools.jackson.databind.annotation.JsonNaming;
 
 /// `OidcToken` 表示遵循 OpenID Connect (OIDC) 规范的 Token 响应体。
 ///
