@@ -2,8 +2,20 @@
 
 # 参考：https://doc.traefik.io/traefik/middlewares/http/forwardauth/
 [http.middlewares.jwt-auth.forwardAuth]
-address = "http://zeroweb-service-admin:10001/auth/self"
+address = "http://zeroweb-service-admin:10001/admin/auth/self"
+authResponseHeaders = ["Authorization", "X-Public-Key", "X-SESSION-ID"]
+authRequestHeaders = ["X-SESSION-ID"]
 
 # 参考：https://doc.traefik.io/traefik/middlewares/http/stripprefixregex/
 [http.middlewares.stripprefix-api.stripPrefixRegex]
 regex = ["/api/[^/]+/"]
+
+# 参考：https://doc.traefik.io/traefik/reference/routing-configuration/http/middlewares/headers/#cors-headers
+[http.middlewares.cors.headers]
+accessControlAllowMethods = ["OPTIONS", "GET", "POST", "PUT", "DELETE", "PATCH"]
+accessControlAllowHeaders = [ "*" ]
+accessControlAllowOriginList = [
+    "*"
+]
+accessControlMaxAge = 100
+addVaryHeader = true

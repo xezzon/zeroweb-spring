@@ -1,0 +1,34 @@
+[http]
+[http.routers]
+
+[http.routers.zeroweb-app-admin]
+rule = "PathPrefix(`/admin`)"
+service = "zeroweb-service-admin-zeroweb@docker"
+middlewares = [
+    "jwt-auth@file",
+    "cors@file"
+]
+
+[http.routers.zeroweb-app-open]
+rule = "PathPrefix(`/open`)"
+service = "zeroweb-service-open-zeroweb@docker"
+middlewares = [
+    "jwt-auth@file",
+    "cors@file"
+]
+
+[http.routers.zeroweb-app-file]
+rule = "PathPrefix(`/file`)"
+service = "zeroweb-service-file-zeroweb@docker"
+middlewares = [
+    "jwt-auth@file",
+    "cors@file"
+]
+
+[http.routers.zeroweb-app-dev]
+rule = "PathPrefix(`/dev`)"
+service = "zeroweb-service-dev-zeroweb@docker"
+middlewares = [
+    "jwt-auth@file",
+    "cors@file"
+]
