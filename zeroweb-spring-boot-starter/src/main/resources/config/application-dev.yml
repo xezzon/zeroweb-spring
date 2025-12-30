@@ -5,6 +5,9 @@ spring:
       ddl-auto: update
   liquibase:
     enabled: false
+  datasource:
+    hikari:
+      leak-detection-threshold: 60000  # 测试环境检测连接泄露
 
 logging:
   level:

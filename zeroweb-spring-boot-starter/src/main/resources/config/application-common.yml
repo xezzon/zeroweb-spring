@@ -6,9 +6,13 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
-      connectionTimeout: 30000
-      idleTimeout: 600000
-      maxLifetime: 1800000
+      minimum-idle: 2  # 空闲时维持的连接数（同时也是初始连接数）减少到 2 个，减少空闲时的资源消耗。
+      maximum-pool-size: 10  # 最大连接数。使用默认值 10 个，保证繁忙时由足够的连接可用
+      max-lifetime: 1800000  # 连接最大保持时间。使用默认值 30 分钟。定期强制刷新连接可避免数据库端长连接问题。
+      connection-timeout: 10000  # 10 秒内获取不到连接则让线程即时失败。长时间获取不到连接说明此时已发生拥塞或者慢查询过多。
+      validation-timeout: 5000  # 验证连接是否可用的超时时间。使用默认值 5 秒。
+      idle-timeout: 300000  # 连接空闲超过 5 分钟即被释放，直到空闲连接数小于等于 `minimum-idle`。
+      keepalive-time: 240000  # keepalive 查询间隔增加到 4 分钟，减少空闲时的资源消耗。
   jackson:
     deserialization:
       fail-on-unknown-properties: false
