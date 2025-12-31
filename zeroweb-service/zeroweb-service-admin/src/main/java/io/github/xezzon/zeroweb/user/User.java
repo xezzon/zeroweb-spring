@@ -15,6 +15,7 @@ package io.github.xezzon.zeroweb.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
+import io.github.xezzon.zeroweb.common.jpa.IEntity;
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,7 +39,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "zeroweb_user")
 @EntityListeners({AuditingEntityListener.class})
-public class User {
+public class User implements IEntity<String> {
 
   @Id
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)

@@ -42,6 +42,8 @@ public final class PermissionConstant {
   public static final String SETTING_READ = "setting:read";
   /// 系统设置写权限
   public static final String SETTING_WRITE = "setting:write";
+  /// 获取用户列表的权限
+  public static final String USER_LIST = "user:list";
 
   /// 权限信息列表，从类的常量字段中解析生成
   private static final List<MenuInfo> PERMISSIONS;
