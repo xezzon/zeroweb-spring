@@ -11,26 +11,35 @@
  * You should have received a copy of the GNU Lesser General Public License along with ZeroWeb. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.xezzon.zeroweb.user.repository;
+package io.github.xezzon.zeroweb.user.internal;
 
+import io.github.xezzon.zeroweb.common.jpa.BaseDAO;
 import io.github.xezzon.zeroweb.user.User;
-import java.util.Optional;
-import org.jspecify.annotations.NullMarked;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import io.github.xezzon.zeroweb.user.repository.UserRepository;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Repository;
 
-/// 对 [用户][User] 进行数据库操作的 JPA 接口
-/// @author xezzon
+/**
+ * @author xezzon
+ */
 @Repository
-@NullMarked
-public interface UserRepository extends
-    JpaRepository<User, String>,
-    JpaSpecificationExecutor<User> {
+public class UserDAO extends BaseDAO<User, String, UserRepository> {
 
-  /// 根据用户名获取记录
-  ///
-  /// @param username 用户名
-  /// @return 用户记录
-  Optional<User> findByUsername(String username);
+  /// 依赖注入
+  /// @param repository 用户 JPA 接口
+  protected UserDAO(final UserRepository repository) {
+    super(repository, User.class);
+  }
+
+  @Override
+  public ICopier<User> getCopier() {
+    return Copier.INSTANCE;
+  }
+
+  @Mapper
+  interface Copier extends ICopier<User> {
+
+    Copier INSTANCE = Mappers.getMapper(Copier.class);
+  }
 }

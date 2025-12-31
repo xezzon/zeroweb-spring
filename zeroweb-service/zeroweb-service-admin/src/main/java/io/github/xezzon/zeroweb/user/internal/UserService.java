@@ -14,14 +14,15 @@
 package io.github.xezzon.zeroweb.user.internal;
 
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
+import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.user.IUserService4Auth;
 import io.github.xezzon.zeroweb.user.User;
-import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 /// 用户服务
@@ -30,13 +31,13 @@ import org.springframework.stereotype.Service;
 public class UserService implements IUserService4Auth {
 
   /// 用户仓储接口
-  private final UserRepository userRepository;
+  private final UserDAO userDAO;
 
   /// 依赖注入
   ///
-  /// @param userRepository 用户数据库操作
-  UserService(final UserRepository userRepository) {
-    this.userRepository = userRepository;
+  /// @param userDAO 用户数据库操作
+  UserService(final UserDAO userDAO) {
+    this.userDAO = userDAO;
   }
 
   /// 添加用户
@@ -45,12 +46,12 @@ public class UserService implements IUserService4Auth {
   /// @throws RepeatDataException 如果用户名已存在，则抛出此异常
   protected void addUser(User user) {
     /* 前置校验 */
-    Optional<User> exist = userRepository.findByUsername(user.getUsername());
+    Optional<User> exist = userDAO.get().findByUsername(user.getUsername());
     if (exist.isPresent()) {
       throw new RepeatDataException("`" + user.getUsername() + "`");
     }
     /* 持久化 */
-    userRepository.save(user);
+    userDAO.get().save(user);
   }
 
   /// 根据用户名获取用户信息
@@ -58,7 +59,14 @@ public class UserService implements IUserService4Auth {
   /// @param username 用户名
   /// @return 返回与用户名对应的用户信息，若不存在则返回null
   protected @Nullable User getByUsername(@NonNull final String username) {
-    return userRepository.findByUsername(username).orElse(null);
+    return userDAO.get().findByUsername(username).orElse(null);
+  }
+
+  /// 使用 OData 参数进行分页查询用户
+  /// @param odata OData 查询选项，包含查询条件、排序、分页等参数
+  /// @return 分页结果，包含用户列表和分页信息
+  Page<User> listAll(final ODataQueryOption odata) {
+    return userDAO.findAll(odata);
   }
 
   @Override
@@ -68,6 +76,6 @@ public class UserService implements IUserService4Auth {
 
   @Override
   public List<User> findByIdIn(final Collection<String> userIds) {
-    return userRepository.findAllById(userIds);
+    return userDAO.get().findAllById(userIds);
   }
 }

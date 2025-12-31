@@ -15,14 +15,19 @@ package io.github.xezzon.zeroweb.user.internal;
 
 import static io.github.xezzon.zeroweb.crypto.constant.ZxcvbnConstant.ZXCVBN;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.secure.BCrypt;
 import com.nulabinc.zxcvbn.Strength;
 import io.github.xezzon.zeroweb.common.domain.Id;
+import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
+import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.crypto.IPasswordService;
 import io.github.xezzon.zeroweb.user.User;
 import io.github.xezzon.zeroweb.user.entity.RegisterUserReq;
 import jakarta.validation.Valid;
 import java.util.Collections;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,5 +68,14 @@ public class UserHttpEndpoint {
     // 将用户保存到数据库
     userService.addUser(user);
     return Id.of(user.getId());
+  }
+
+  /// 获取用户列表
+  /// @param odata 查询参数
+  /// @return 包含分页信息的用户列表
+  @GetMapping()
+  @SaCheckPermission(PermissionConstant.USER_LIST)
+  public Page<User> getUserPaged(final ODataRequestParam odata) {
+    return userService.listAll(odata.into());
   }
 }
