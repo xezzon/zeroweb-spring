@@ -49,10 +49,8 @@ public class UserHttpEndpoint {
 
   /// 用户注册
   ///
-  /// 处理用户注册请求，创建新的用户账号。
-  ///
   /// @param req 用户注册信息
-  /// @return 用户ID
+  /// @return 用户 ID
   @PostMapping("/register")
   public Id register(@RequestBody @Valid final RegisterUserReq req) {
     // 计算并校验口令的强度

@@ -125,8 +125,6 @@ public class AuthnHttpEndpoint {
   }
 
   /// 登出当前用户。
-  ///
-  /// 调用认证服务的 logout 方法。
   @PutMapping("/logout")
   public void logout() {
     authnService.logout();

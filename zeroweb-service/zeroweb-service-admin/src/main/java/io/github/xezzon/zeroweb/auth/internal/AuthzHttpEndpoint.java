@@ -131,8 +131,6 @@ public class AuthzHttpEndpoint {
 
   /// 查询指定用户关联的所有角色。
   ///
-  /// 需要 `AUTHZ_READ` 权限。
-  ///
   /// @param userId 用户ID。
   /// @return 关联到该用户的角色信息集合。
   @SaCheckPermission({PermissionConstant.AUTHZ_READ})
@@ -142,8 +140,6 @@ public class AuthzHttpEndpoint {
   }
 
   /// 查询指定接口权限关联的所有角色。
-  ///
-  /// 需要 `AUTHZ_READ` 权限。
   ///
   /// @param permission 接口权限编码。
   /// @return 关联到该接口权限的角色信息集合。

@@ -49,8 +49,6 @@ public class AppHttpEndpoint {
 
   /// 新增一个服务。
   ///
-  /// 需要 `app:write` 权限。
-  ///
   /// @param req 包含服务基础信息的新增服务请求体。
   /// @return 新增服务的 ID。
   @SaCheckPermission({PermissionConstant.APP_WRITE})
@@ -71,8 +69,6 @@ public class AppHttpEndpoint {
 
   /// 更新一个现有服务的信息。
   ///
-  /// 需要 `app:write` 权限。
-  ///
   /// @param req 包含要更新的服务信息和其 ID 的请求体。
   @SaCheckPermission({PermissionConstant.APP_WRITE})
   @PutMapping
@@ -82,8 +78,6 @@ public class AppHttpEndpoint {
   }
 
   /// 根据服务ID删除一个服务。
-  ///
-  /// 需要 `app:write` 权限。
   ///
   /// @param id 要删除服务的 ID。
   @SaCheckPermission({PermissionConstant.APP_WRITE})
