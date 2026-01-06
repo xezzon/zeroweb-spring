@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -48,6 +48,17 @@ public class AppService {
   /// @return 包含所有服务实体的列表。
   List<App> listApp() {
     return appDAO.get().findAllByOrderByOrdinalAsc();
+  }
+
+  /**
+   * 查询指定服务
+   * @param id 服务 ID
+   * @return 服务信息
+   * @throws java.util.NoSuchElementException ID 没有对应的服务
+   */
+  App queryAppById(final String id) {
+    return appDAO.get().findById(id)
+        .orElseThrow();
   }
 
   /// 更新一个现有服务的信息。

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -65,6 +65,16 @@ public class AppHttpEndpoint {
   @GetMapping()
   public List<App> listApp() {
     return appService.listApp();
+  }
+
+  /**
+   * 查询指定服务
+   * @param id 服务 ID
+   * @return 服务信息
+   */
+  @GetMapping("/{id}")
+  public App queryAppById(@PathVariable String id) {
+    return appService.queryAppById(id);
   }
 
   /// 更新一个现有服务的信息。
