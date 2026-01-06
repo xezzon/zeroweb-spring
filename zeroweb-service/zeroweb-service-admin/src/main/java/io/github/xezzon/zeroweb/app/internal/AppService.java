@@ -50,12 +50,10 @@ public class AppService {
     return appDAO.get().findAllByOrderByOrdinalAsc();
   }
 
-  /**
-   * 查询指定服务
-   * @param id 服务 ID
-   * @return 服务信息
-   * @throws java.util.NoSuchElementException ID 没有对应的服务
-   */
+  /// 查询指定服务
+  /// @param id 服务 ID
+  /// @return 服务信息
+  /// @throws java.util.NoSuchElementException ID 没有对应的服务
   App queryAppById(final String id) {
     return appDAO.get().findById(id)
         .orElseThrow();

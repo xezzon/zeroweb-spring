@@ -67,13 +67,11 @@ public class AppHttpEndpoint {
     return appService.listApp();
   }
 
-  /**
-   * 查询指定服务
-   * @param id 服务 ID
-   * @return 服务信息
-   */
+  /// 查询指定服务
+  /// @param id 服务 ID
+  /// @return 服务信息
   @GetMapping("/{id}")
-  public App queryAppById(@PathVariable String id) {
+  public App queryAppById(@PathVariable @NotBlank String id) {
     return appService.queryAppById(id);
   }
 
