@@ -121,6 +121,38 @@ class AppHttpTest {
   }
 
   @Test
+  void queryAppById_shouldReturnApp() {
+    // Arrange
+    List<App> dataset = repository.findAll();
+    App expectedApp = dataset.getFirst();
+
+    // Act & Assert
+    App responseBody = testClient.get()
+        .uri("/app/{id}", expectedApp.getId())
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(App.class)
+        .returnResult().getResponseBody();
+
+    assertNotNull(responseBody);
+    assertEquals(expectedApp.getId(), responseBody.getId());
+    assertEquals(expectedApp.getName(), responseBody.getName());
+    assertEquals(expectedApp.getBaseUrl(), responseBody.getBaseUrl());
+    assertEquals(expectedApp.getOrdinal(), responseBody.getOrdinal());
+  }
+
+  @Test
+  void queryAppById_shouldReturnNotFound_whenAppDoesNotExist() {
+    String nonExistentId = "non-existent-id";
+
+    testClient.get()
+        .uri("/app/{id}", nonExistentId)
+        .exchange()
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);
+  }
+
+  @Test
   void updateApp() {
     // Arrange
     List<App> dataset = repository.findAll();
@@ -232,7 +264,6 @@ class AppHttpTest {
             .expectStatus().isOk()
         );
   }
-
 
   @Test
   void deleteApp() {
