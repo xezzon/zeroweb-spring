@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -13,6 +13,11 @@
 
 package io.github.xezzon.zeroweb.auth.internal;
 
+import static cn.dev33.satoken.exception.NotLoginException.NOT_TOKEN;
+import static cn.dev33.satoken.exception.NotLoginException.NOT_TOKEN_MESSAGE;
+
+import cn.dev33.satoken.error.SaErrorCode;
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
@@ -94,6 +99,10 @@ public class AuthnService {
   /// @return 包含用户 ID、用户名、昵称、角色和权限的 [JwtClaim] 对象。
   protected JwtClaim getCustomClaim() {
     final User user = SessionUtil.loadUser();
+    if (user == null) {
+      throw NotLoginException.newInstance(StpUtil.TYPE, NOT_TOKEN, NOT_TOKEN_MESSAGE, null)
+          .setCode(SaErrorCode.CODE_11011);
+    }
     final Set<String> roles = SessionUtil.loadRoles();
     final Set<String> permissions = SessionUtil.loadPermissions();
     return JwtClaim.newBuilder()
