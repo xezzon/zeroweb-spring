@@ -2,6 +2,11 @@ zeroweb:
   id-generator: ${ZEROWEB_ID_GENERATOR:UUID}
 
 spring:
+  mvc:
+    apiversion:
+      default: 1
+      use:
+        header: X-API-Version
   datasource:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
