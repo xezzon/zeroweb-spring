@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -144,7 +144,7 @@ class AlphanumericValidator implements ConstraintValidator<Alphanumeric, String>
     }
     String invalidCharacter = pattern.matcher(value).replaceAll("");
     context.unwrap(HibernateConstraintValidatorContext.class)
-        .addMessageParameter("0", invalidCharacter)
+        .addMessageParameter("invalidCharacter", invalidCharacter)
         .buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
         .addConstraintViolation()
     ;

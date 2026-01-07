@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -21,13 +21,16 @@ import cn.dev33.satoken.exception.NotRoleException;
 import io.opentelemetry.api.trace.Span;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.slf4j.event.Level;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -185,13 +188,22 @@ public class GlobalExceptionHandler {
   ) {
     log(e, request, Level.INFO);
     List<ErrorResult.Detail> errorDetails = e.getFieldErrors().stream()
-        .map(error -> new ErrorResult.Detail(
-            Objects.requireNonNullElse(error.getCode(), "Invalid error code."),
-            Objects.requireNonNullElse(error.getDefaultMessage(), "Unknown reason."),
-            Map.ofEntries(
-                Map.entry("field", error.getField())
-            )
-        ))
+        .map(error -> {
+          Map<String, Object> parameters = new HashMap<>(Map.ofEntries(
+              Map.entry("field", error.getField())
+          ));
+          try {
+            ConstraintViolationImpl<?> source = error.unwrap(ConstraintViolationImpl.class);
+            parameters.putAll(source.getMessageParameters());
+          } catch (IllegalArgumentException _) {
+            // 如果不是采用 Hibernate Validator 实现，则不添加消息参数
+          }
+          return new ErrorResult.Detail(
+              Objects.requireNonNullElse(error.getCode(), "Invalid error code."),
+              Objects.requireNonNullElse(error.getDefaultMessage(), "Unknown reason."),
+              parameters
+          );
+        })
         .toList();
     return ResponseEntity
         .status(ErrorCodeConstant.CLIENT_ERROR_STATUS)
@@ -218,6 +230,21 @@ public class GlobalExceptionHandler {
           String field = result.getMethodParameter().getParameterName();
           return result.getResolvableErrors().stream()
               .map(error -> {
+                Map<String, Object> parameter = new HashMap<>(
+                    Collections.singletonMap(
+                        "field",
+                        Objects.requireNonNullElse(field, "Unknown field.")
+                    )
+                );
+                try {
+                  ConstraintViolation<?> violation = result
+                      .unwrap(error, ConstraintViolation.class);
+                  if (violation instanceof ConstraintViolationImpl<?> violationImpl) {
+                    parameter.putAll(violationImpl.getMessageParameters());
+                  }
+                } catch (IllegalArgumentException _) {
+                  // 如果不是采用 Hibernate Validator 实现，则不添加消息参数
+                }
                 String code = Optional.ofNullable(error.getCodes())
                     .filter(codes -> codes.length > 0)
                     .map(codes -> codes[codes.length - 1])
@@ -225,10 +252,7 @@ public class GlobalExceptionHandler {
                 return new ErrorResult.Detail(
                     code,
                     Objects.requireNonNullElse(error.getDefaultMessage(), "Unknown reason."),
-                    Collections.singletonMap(
-                        "field",
-                        Objects.requireNonNullElse(field, "Unknown field.")
-                    )
+                    parameter
                 );
               });
         })

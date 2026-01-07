@@ -48,16 +48,16 @@ class AlphanumericValidatorTest {
     Assertions.assertNotNull(details);
     Assertions.assertEquals(2, details.size());
     Assertions.assertTrue(details.stream()
-        .anyMatch(detail -> Objects.equals(
-            detail.getParameters().get("field"),
-            "alphabet"
-        ))
+        .anyMatch(detail ->
+            Objects.equals(detail.getParameters().get("field"), "alphabet")
+            && Objects.equals(detail.getParameters().get("invalidCharacter"), "@.")
+        )
     );
     Assertions.assertTrue(details.stream()
-        .anyMatch(detail -> Objects.equals(
-            detail.getParameters().get("field"),
-            "childEntity.alphabet"
-        ))
+        .anyMatch(detail ->
+            Objects.equals(detail.getParameters().get("field"), "childEntity.alphabet")
+              && Objects.equals(detail.getParameters().get("invalidCharacter"), "_-")
+        )
     );
   }
 
@@ -79,10 +79,10 @@ class AlphanumericValidatorTest {
     List<ErrorResult.Detail> details = responseBody.getDetails();
     Assertions.assertNotNull(details);
     Assertions.assertTrue(details.stream()
-        .anyMatch(detail -> Objects.equals(
-            detail.getParameters().get("field"),
-            "alphabet"
-        ))
+        .anyMatch(detail ->
+            Objects.equals(detail.getParameters().get("field"), "alphabet")
+            && Objects.equals(detail.getParameters().get("invalidCharacter"), "@")
+        )
     );
   }
 }
