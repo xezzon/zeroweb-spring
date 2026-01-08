@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:sqlserver://;${DB_URL:sqlserver:3306;database=zeroweb}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  liquibase:
+    parameters:
+      "[type.timestamp]": "DATETIMEOFFSET(3)"
+      "[type.json]": "JSON"
