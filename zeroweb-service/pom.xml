@@ -71,6 +71,10 @@
       <artifactId>mysql-connector-j</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.ibm.db2</groupId>
+      <artifactId>jcc</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-liquibase</artifactId>
     </dependency>
@@ -303,6 +307,27 @@
         <dependency>
           <groupId>org.testcontainers</groupId>
           <artifactId>testcontainers-mysql</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <!-- 使用 DB2 数据库进行单元测试时使用的配置文件 -->
+      <id>db2</id>
+      <activation>
+        <property>
+          <name>db.type</name>
+          <value>db2</value>
+        </property>
+      </activation>
+      <properties>
+        <db.type>db2</db.type>
+        <db.url>jdbc:tc:db2:11.5.0.0a:///databasename</db.url>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.testcontainers</groupId>
+          <artifactId>testcontainers-db2</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>

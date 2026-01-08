@@ -1,0 +1,4 @@
+spring:
+  datasource:
+    url: jdbc:sqlserver://${DB_URL:db2:50000/zeroweb}
+    driver-class-name: com.ibm.db2.jcc.DB2Driver
