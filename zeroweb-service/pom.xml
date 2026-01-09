@@ -220,7 +220,6 @@
                 </environment>
                 <ports>
                   <port>${http.port}</port>
-                  <port>${grpc.port}</port>
                 </ports>
                 <volumes>
                   <volume>${workdir}/resources</volume>
