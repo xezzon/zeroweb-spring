@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+  ~ SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
   ~ SPDX-License-Identifier: LGPL-3.0-or-later
   ~
   ~ This file is part of ZeroWeb.
@@ -29,7 +29,7 @@
       <column name="owner_id" type="VARCHAR(64)" remarks="第三方应用所有者标识">
         <constraints nullable="false"/>
       </column>
-      <column name="create_time" type="TIMESTAMP(3)" remarks="创建时间">
+      <column name="create_time" type="${type.timestamp}" remarks="创建时间">
         <constraints nullable="false"/>
       </column>
     </createTable>

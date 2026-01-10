@@ -5,3 +5,7 @@ spring:
   jpa:
     properties:
       "[hibernate.type.preferred_boolean_jdbc_type]": BIT
+  liquibase:
+    parameters:
+      "[type.timestamp]": "TIMESTAMPTZ(3)"
+      "[type.json]": "JSONB"
