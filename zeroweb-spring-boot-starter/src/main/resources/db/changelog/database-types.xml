@@ -18,22 +18,6 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-  <changeSet id="82" author="xezzon">
-    <createTable tableName="zeroweb_role_permission" remarks="角色-权限绑定关系">
-      <column name="id" type="VARCHAR(64)">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="role_id" type="VARCHAR(64)" remarks="角色ID">
-        <constraints nullable="false"/>
-      </column>
-      <column name="permission" type="VARCHAR(255)" remarks="接口权限编码">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
-    <insert tableName="zeroweb_role_permission">
-      <column name="id" value="1"/>
-      <column name="role_id" value="3"/>
-      <column name="permission" value="*"/>
-    </insert>
-  </changeSet>
+  <property name="type.timestamp" value="TIMESTAMP(3)" global="true"/>
+  <property name="type.json" value="JSON" global="true"/>
 </databaseChangeLog>

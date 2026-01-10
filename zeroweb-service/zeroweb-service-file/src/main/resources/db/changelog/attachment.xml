@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+  ~ SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
   ~ SPDX-License-Identifier: LGPL-3.0-or-later
   ~
   ~ This file is part of ZeroWeb.
@@ -16,7 +16,7 @@
   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+  https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
   <changeSet id="101" author="xezzon" labels="0.7">
     <createTable tableName="zeroweb_attachment" remarks="附件" ifNotExists="true">
@@ -50,7 +50,7 @@
       <column name="owner_id" type="VARCHAR(64)" remarks="上传者">
         <constraints/>
       </column>
-      <column name="create_time" type="TIMESTAMP" remarks="上传时间">
+      <column name="create_time" type="${type.timestamp}" remarks="上传时间">
         <constraints nullable="false"/>
       </column>
     </createTable>

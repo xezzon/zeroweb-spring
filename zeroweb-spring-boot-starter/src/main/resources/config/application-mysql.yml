@@ -5,3 +5,7 @@ spring:
   jpa:
     properties:
       "[hibernate.type.preferred_boolean_jdbc_type]": TINYINT
+  liquibase:
+    parameters:
+      "[type.timestamp]": "TIMESTAMP(3)"
+      "[type.json]": "JSON"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+  ~ SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
   ~ SPDX-License-Identifier: LGPL-3.0-or-later
   ~
   ~ This file is part of ZeroWeb.
@@ -13,12 +13,12 @@
   -->
 
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
   <changeSet id="0" author="xezzon">
-    <dropView viewName="test" ifExists="true"/>
+    <comment>noop</comment>
   </changeSet>
 </databaseChangeLog>

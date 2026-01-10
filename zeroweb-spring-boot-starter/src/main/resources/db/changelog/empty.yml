@@ -5,6 +5,4 @@ databaseChangeLog:
       id: "0"
       author: "xezzon"
       changes:
-        - dropView:
-            viewName: "test"
-            ifExists: true
+        - comment: noop
