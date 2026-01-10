@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+  ~ SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
   ~ SPDX-License-Identifier: LGPL-3.0-or-later
   ~
   ~ This file is part of ZeroWeb.
@@ -16,7 +16,7 @@
   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+  https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
   <changeSet id="42" author="xezzon" labels="0.4">
     <createTable tableName="zeroweb_openapi_subscription" remarks="订阅的对外接口">
