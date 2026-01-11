@@ -19,6 +19,7 @@ import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,6 +61,7 @@ public class Translation implements IEntity<String> {
   /// 国际化翻译的实际文本内容。
   ///
   /// 特定语言下对应消息键的翻译结果，不可为空。
+  @Lob
   @Column(name = "content", length = 4095, nullable = false)
   String content;
 }
