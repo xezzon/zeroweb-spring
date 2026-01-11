@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -64,7 +64,7 @@ public class Setting implements IEntity<String> {
   ///
   /// @see <a href="https://json-schema.org/specification">JSON Schema</a>
   @JdbcTypeCode(SqlTypes.JSON)
-  @Column(name = "`schema`", columnDefinition = "json", nullable = false)
+  @Column(name = "definition", columnDefinition = "json", nullable = false)
   private String schema;
   /// 参数实际值
   ///

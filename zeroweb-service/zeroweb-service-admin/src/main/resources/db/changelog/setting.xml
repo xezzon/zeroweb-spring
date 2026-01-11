@@ -26,7 +26,7 @@
       <column name="code" type="VARCHAR(255)" remarks="业务参数标识">
         <constraints nullable="false" unique="true"/>
       </column>
-      <column name="schema" type="JSON" remarks="约束">
+      <column name="definition" type="JSON" remarks="约束">
         <constraints nullable="false"/>
       </column>
       <column name="value" type="JSON" remarks="参数值">

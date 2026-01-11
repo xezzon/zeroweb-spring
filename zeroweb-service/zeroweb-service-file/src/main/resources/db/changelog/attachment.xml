@@ -23,16 +23,16 @@
       <column name="id" type="VARCHAR(64)" remarks="附件ID">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="name" type="VARCHAR(2048)" remarks="文件名">
+      <column name="file_name" type="VARCHAR(2048)" remarks="文件名">
         <constraints nullable="false"/>
       </column>
       <column name="checksum" type="VARCHAR(128)" remarks="文件摘要">
         <constraints nullable="false"/>
       </column>
-      <column name="size" type="BIGINT" remarks="文件大小。单位：字节。">
+      <column name="file_size" type="BIGINT" remarks="文件大小。单位：字节。">
         <constraints nullable="false"/>
       </column>
-      <column name="type" type="VARCHAR(100)" remarks="MIME 类型">
+      <column name="file_type" type="VARCHAR(100)" remarks="MIME 类型">
         <constraints nullable="false"/>
       </column>
       <column name="biz_type" type="VARCHAR(100)" remarks="业务类型">
