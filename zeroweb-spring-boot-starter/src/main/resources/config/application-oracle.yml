@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:oracle:thin:${DB_URL:oracle:1521/zeroweb}
+    driver-class-name: oracle.jdbc.OracleDriver
+  liquibase:
+    parameters:
+      "[type.timestamp]": "TIMESTAMPTZ(3) WITH TIME ZONE"
+      "[type.json]": "JSON"
