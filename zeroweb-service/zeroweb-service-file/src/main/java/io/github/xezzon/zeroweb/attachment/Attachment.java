@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -54,7 +54,7 @@ public class Attachment {
   /**
    * 原始文件名，包含扩展名。
    */
-  @Column(name = "name", nullable = false)
+  @Column(name = "file_name", nullable = false)
   String name;
   /**
    * 文件的内容摘要，用于验证文件完整性和唯一性。
@@ -64,10 +64,10 @@ public class Attachment {
   String checksum;
   /// 文件的大小。
   /// 单位：`字节`。
-  @Column(name = "size", nullable = false)
+  @Column(name = "file_size", nullable = false)
   Long size;
   /// 文件的 MIME 类型，例如 `image/jpeg`、`application/pdf`。
-  @Column(name = "type", nullable = false)
+  @Column(name = "file_type", nullable = false)
   String type;
   /// 附件所属的业务类型。
   @Column(name = "biz_type", nullable = false)
