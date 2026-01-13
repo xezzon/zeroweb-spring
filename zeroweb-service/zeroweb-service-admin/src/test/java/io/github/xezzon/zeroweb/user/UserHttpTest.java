@@ -15,7 +15,6 @@ import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
-import io.github.xezzon.zeroweb.user.constant.UserConstant;
 import io.github.xezzon.zeroweb.user.entity.RegisterUserReq;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;

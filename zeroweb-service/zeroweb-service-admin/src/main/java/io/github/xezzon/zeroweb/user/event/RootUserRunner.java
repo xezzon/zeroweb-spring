@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,7 +15,7 @@ package io.github.xezzon.zeroweb.user.event;
 
 import cn.dev33.satoken.secure.BCrypt;
 import io.github.xezzon.zeroweb.user.User;
-import io.github.xezzon.zeroweb.user.constant.UserConstant;
+import io.github.xezzon.zeroweb.user.UserConstant;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

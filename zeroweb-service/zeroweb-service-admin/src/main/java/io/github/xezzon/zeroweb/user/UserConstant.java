@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -11,16 +11,14 @@
  * You should have received a copy of the GNU Lesser General Public License along with ZeroWeb. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.xezzon.zeroweb.user.constant;
-
-import io.github.xezzon.zeroweb.user.User;
+package io.github.xezzon.zeroweb.user;
 
 /// 用户常量类
 ///
 /// 定义用户管理相关的常量值，包括默认用户等。
 ///
 /// @author xezzon
-public class UserConstant {
+public final class UserConstant {
 
   /// 系统初始用户（超级管理员）
   public static final User ROOT = new User();
