@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -14,6 +14,7 @@
 package io.github.xezzon.zeroweb.crypto.exception;
 
 import io.github.xezzon.zeroweb.common.exception.ZerowebBusinessException;
+import java.util.Map;
 import org.jspecify.annotations.NullMarked;
 
 /// 口令强度不符合要求
@@ -28,10 +29,16 @@ public class PasswordStrengthException extends ZerowebBusinessException {
   /// @param score 实际得分
   /// @param requirement 要求得分
   public PasswordStrengthException(int score, int requirement) {
-    super(String.format(
-        "The strength of this password does not meet the requirements. The required strength is %s, but the current strength is %s.",
-        requirement, score
-    ));
+    super(
+        Map.ofEntries(
+            Map.entry("requirement", requirement),
+            Map.entry("score", score)
+        ),
+        String.format(
+            "The strength of this password does not meet the requirements. The required strength is %s, but the current strength is %s.",
+            requirement, score
+        )
+    );
   }
 
   @Override
