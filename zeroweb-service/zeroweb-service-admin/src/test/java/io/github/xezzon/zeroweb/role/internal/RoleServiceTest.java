@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.role.internal;
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.role.Role;
+import io.github.xezzon.zeroweb.role.RoleConstant;
 import io.github.xezzon.zeroweb.role.entity.AddRoleReq;
 import io.github.xezzon.zeroweb.role.exception.RoleNotInheritableException;
 import io.github.xezzon.zeroweb.role.repository.RoleRepository;
@@ -33,7 +34,7 @@ class RoleServiceTest {
       role.setValue(role.getCode());
       role.setName(RandomUtil.randomString(8));
       role.setInheritable(RandomUtil.randomBoolean());
-      role.setParentId("1");
+      role.setParentId(RoleConstant.ADMIN_ID);
       repository.save(role);
       if (role.getInheritable()) {
         role.setChildren(new ArrayList<>());
@@ -58,7 +59,7 @@ class RoleServiceTest {
         RandomUtil.randomString(8),
         RandomUtil.randomString(8),
         true,
-        "1"
+        RoleConstant.ADMIN_ID
     ).into();
     roleService.addRole(req1);
     Role actual1 = repository.findById(req1.getId()).orElseThrow();
@@ -96,7 +97,7 @@ class RoleServiceTest {
         RandomUtil.randomString(8),
         RandomUtil.randomString(8),
         RandomUtil.randomBoolean(),
-        "2"
+        RoleConstant.SUPER_ID
     ).into();
     Assertions.assertThrows(
         RoleNotInheritableException.class,
@@ -127,7 +128,7 @@ class RoleServiceTest {
     roleService.deleteRole(role.getId());
     Assertions.assertFalse(repository.existsById(role.getId()));
 
-    roleService.deleteRole("1");
+    roleService.deleteRole(RoleConstant.ADMIN_ID);
     Role child = dataset.stream()
         .filter(Role::getInheritable)
         .findAny().orElseThrow();
