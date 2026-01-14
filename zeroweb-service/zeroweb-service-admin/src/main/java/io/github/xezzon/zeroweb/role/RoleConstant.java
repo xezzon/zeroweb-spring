@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -12,6 +12,8 @@
  */
 
 package io.github.xezzon.zeroweb.role;
+
+import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 
 /// 角色常量定义
 ///
@@ -31,6 +33,25 @@ public final class RoleConstant {
   /// 系统管理员角色的默认ID值。
   /// 该值在数据库初始化时设置，具有特殊意义。
   public static final String ADMIN_ID = "1";
+
+  /// 应用管理员 ID
+  public static final String SUPER_ID = "2";
+
+  /// 超级管理员角色
+  ///
+  /// 系统预定义的超级管理员角色实例。
+  /// 拥有系统最高权限，可以进行所有操作。
+  /// 初始化时设置所有必要属性值。
+  public static final Role ROOT = new Role();
+
+  static {
+    ROOT.setId("3");
+    ROOT.setCode("ROOT");
+    ROOT.setValue("ROOT");
+    ROOT.setName("超级管理员");
+    ROOT.setInheritable(false);
+    ROOT.setParentId(DatabaseConstant.ROOT_ID);
+  }
 
   private RoleConstant() {
   }

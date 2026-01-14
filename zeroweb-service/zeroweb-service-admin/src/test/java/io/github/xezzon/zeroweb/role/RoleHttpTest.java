@@ -85,7 +85,7 @@ class RoleHttpTest {
         RandomUtil.randomString(8),
         RandomUtil.randomString(8),
         true,
-        "1"
+        RoleConstant.ADMIN_ID
     );
     Id responseBody1 = testClient.post()
         .uri("/role")

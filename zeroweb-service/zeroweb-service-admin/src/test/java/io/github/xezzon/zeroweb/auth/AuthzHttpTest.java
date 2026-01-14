@@ -69,7 +69,7 @@ class AuthzHttpTest {
       role.setValue(role.getCode());
       role.setName(RandomUtil.randomString(8));
       role.setInheritable(i % 4 == 0 || RandomUtil.randomBoolean());
-      role.setParentId("1");
+      role.setParentId(RoleConstant.ADMIN_ID);
       role.setChildren(new ArrayList<>());
       roles.add(role);
     }
@@ -685,5 +685,61 @@ class AuthzHttpTest {
         )
         .exchange()
         .expectStatus().isForbidden();
+  }
+
+  @Test
+  void bindUserToRole_repeat() {
+    long before = roleUserRepository.count();
+    User user = users.getFirst();
+    Role role = roles.getFirst();
+    RoleUser roleUser = new RoleUser();
+    roleUser.setUserId(user.getId());
+    roleUser.setRoleId(role.getId());
+
+    testClient.put()
+        .uri("/auth/role/-/user")
+        .body(Collections.singleton(roleUser))
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .exchange()
+        .expectStatus().isOk();
+    testClient.put()
+        .uri("/auth/role/-/user")
+        .body(Collections.singleton(roleUser))
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .exchange()
+        .expectStatus().isOk();
+
+    long after = roleUserRepository.count();
+    Assertions.assertEquals(before + 1, after);
+  }
+
+  @Test
+  void bindPermissionToRole_repeat() {
+    long before = rolePermissionRepository.count();
+    Role role = roleRepository.findById(RoleConstant.ADMIN_ID).orElseThrow();
+    String permission = permissions.getFirst();
+    RolePermission rolePermission = new RolePermission();
+    rolePermission.setRoleId(role.getId());
+    rolePermission.setPermission(permission);
+
+    testClient.put()
+        .uri("/auth/role/-/permission")
+        .body(Collections.singleton(rolePermission))
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .exchange()
+        .expectStatus().isOk();
+    testClient.put()
+        .uri("/auth/role/-/permission")
+        .body(Collections.singleton(rolePermission))
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .exchange()
+        .expectStatus().isOk();
+
+    long after = rolePermissionRepository.count();
+    Assertions.assertEquals(before + 1, after);
   }
 }

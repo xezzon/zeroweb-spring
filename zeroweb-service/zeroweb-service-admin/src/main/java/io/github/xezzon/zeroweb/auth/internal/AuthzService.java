@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -12,6 +12,9 @@
  */
 
 package io.github.xezzon.zeroweb.auth.internal;
+
+import static io.github.xezzon.zeroweb.role.RoleConstant.ADMIN_ID;
+import static io.github.xezzon.zeroweb.role.RoleConstant.SUPER_ID;
 
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.stp.StpUtil;
@@ -157,16 +160,20 @@ public class AuthzService {
     if (!StpUtil.hasPermission(PermissionConstant.AUTHZ_ROLE_PERMISSION)) {
       this.checkParentRole(roleId);
     }
-    // 角色的权限不能超过其上级角色
-    final Role parent = roleService.findParent(roleId).orElseThrow();
-    final List<String> parentPermissions = rolePermissionRepository
-        .findByRoleIdIn(Collections.singleton(parent.getId()))
-        .stream()
-        .map(RolePermission::getPermission)
-        .distinct()
-        .toList();
-    if (Boolean.FALSE.equals(SaStrategy.instance.hasElement.apply(parentPermissions, permission))) {
-      throw new NotPermissionException(permission);
+    if (!Set.of(ADMIN_ID, SUPER_ID).contains(roleId)) {
+      // 角色的权限不能超过其上级角色。（内置角色没有上级，不参与校验）
+      final Role parent = roleService.findParent(roleId).orElseThrow();
+      final List<String> parentPermissions = rolePermissionRepository
+          .findByRoleIdIn(Collections.singleton(parent.getId()))
+          .stream()
+          .map(RolePermission::getPermission)
+          .distinct()
+          .toList();
+      if (Boolean.FALSE.equals(
+          SaStrategy.instance.hasElement.apply(parentPermissions, permission)
+      )) {
+        throw new NotPermissionException(permission);
+      }
     }
     if (rolePermissionRepository.existsByRoleIdAndPermission(roleId, permission)) {
       return;
