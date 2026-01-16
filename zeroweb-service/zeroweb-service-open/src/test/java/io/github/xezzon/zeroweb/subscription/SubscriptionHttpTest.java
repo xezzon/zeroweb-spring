@@ -47,7 +47,7 @@ class SubscriptionHttpTest {
 
   private static final String SUBSCRIPTION_LIST_URI = "/third-party-app/{appId}/subscription";
   private static final String SUBSCRIBE_URI = "/subscription";
-  private static final String AUDIT_SUBSCRIPTION_URI = "/subscription/audit/{id}";
+  private static final String AUDIT_SUBSCRIPTION_URI = "/subscription/{id}/audit";
   private static final String THIRD_PARTY_APP_MEMBER = UUID.randomUUID().toString();
 
   @Resource

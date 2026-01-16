@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -18,6 +18,7 @@ import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.openapi.IOpenapiService4Subscription;
 import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
+import io.github.xezzon.zeroweb.openapi.exception.PublishedOpenapiCannotBeDeleteException;
 import io.github.xezzon.zeroweb.openapi.exception.PublishedOpenapiCannotBeModifyException;
 import java.util.Objects;
 import java.util.Optional;
@@ -88,6 +89,19 @@ public class OpenapiService implements IOpenapiService4Subscription {
     Openapi entity = openapiDAO.get().findById(id).orElseThrow();
     entity.setStatus(OpenapiStatus.PUBLISHED);
     openapiDAO.get().save(entity);
+  }
+
+  /// 删除对外接口
+  /// @param id 接口 ID
+  /// @throws PublishedOpenapiCannotBeDeleteException 如果接口已发布，则抛出异常
+  void deleteOpenapi(final String id) {
+    openapiDAO.get().findById(id)
+        .ifPresent(openapi -> {
+          if (openapi.getStatus() == OpenapiStatus.PUBLISHED) {
+            throw new PublishedOpenapiCannotBeDeleteException();
+          }
+          openapiDAO.get().deleteById(id);
+        });
   }
 
   /// 检查接口编码是否重复

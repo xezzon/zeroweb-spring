@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -24,6 +24,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -81,9 +82,17 @@ public class OpenapiHttpEndpoint {
   /// 发布指定的`对外接口`
   ///
   /// @param id 要发布的`对外接口`的唯一标识符
-  @PutMapping("/publish/{id}")
+  @PutMapping("/{id}/publish")
   @SaCheckPermission({PermissionConstant.OPENAPI_PUBLISH})
   public void publishOpenapi(@PathVariable @NotBlank final String id) {
     openapiService.publishOpenapi(id);
+  }
+
+  /// 删除对外接口
+  /// @param id 接口 ID
+  @DeleteMapping("/{id}")
+  @SaCheckPermission({PermissionConstant.OPENAPI_WRITE})
+  public void deleteOpenapi(@PathVariable @NotBlank final String id) {
+    openapiService.deleteOpenapi(id);
   }
 }
