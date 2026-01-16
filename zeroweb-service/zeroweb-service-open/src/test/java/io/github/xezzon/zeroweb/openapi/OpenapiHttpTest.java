@@ -4,6 +4,7 @@ import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.hutool.core.util.RandomUtil;
@@ -16,6 +17,7 @@ import io.github.xezzon.zeroweb.openapi.entity.AddOpenapiReq;
 import io.github.xezzon.zeroweb.openapi.entity.ModifyOpenapiReq;
 import io.github.xezzon.zeroweb.openapi.enumeration.HttpMethod;
 import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
+import io.github.xezzon.zeroweb.openapi.exception.PublishedOpenapiCannotBeDeleteException;
 import io.github.xezzon.zeroweb.openapi.exception.PublishedOpenapiCannotBeModifyException;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
 import jakarta.annotation.Resource;
@@ -38,6 +40,7 @@ class OpenapiHttpTest {
   private static final String GET_OPENAPI_URI = "/openapi";
   private static final String MODIFY_OPENAPI_URI = "/openapi";
   private static final String PUBLISH_OPENAPI_URI = "/openapi/{id}/publish";
+  private static final String DELETE_OPENAPI_URI = "/openapi/{id}";
 
   @Resource
   private OpenapiRepository repository;
@@ -51,7 +54,7 @@ class OpenapiHttpTest {
       openapi.setCode(RandomUtil.randomString(8));
       openapi.setDestination(RandomUtil.randomString(8));
       openapi.setHttpMethod(RandomUtil.randomEle(HttpMethod.values()));
-      openapi.setStatus(RandomUtil.randomEle(OpenapiStatus.values()));
+      openapi.setStatus(OpenapiStatus.values()[i % OpenapiStatus.values().length]);
       repository.save(openapi);
     }
   }
@@ -276,5 +279,53 @@ class OpenapiHttpTest {
         .exchange()
         .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
         .expectHeader().valueEquals(ERROR_CODE_HEADER, ErrorCodeConstant.NO_SUCH_DATA);
+  }
+
+  @Test
+  void deleteOpenapi() {
+    List<Openapi> dataset = repository.findAll();
+    Openapi target = dataset.stream()
+        .filter(openapi -> openapi.getStatus() == OpenapiStatus.DRAFT)
+        .findAny().orElseThrow();
+
+    testClient.delete()
+        .uri(DELETE_OPENAPI_URI, target.getId())
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .exchange()
+        .expectStatus().isOk();
+
+    assertEquals(dataset.size() - 1, repository.count());
+    assertFalse(repository.existsById(target.getId()));
+  }
+
+  @Test
+  void deleteOpenapi_noSuchData() {
+    long before = repository.count();
+
+    testClient.delete()
+        .uri(DELETE_OPENAPI_URI, RandomUtil.randomString(8))
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .exchange()
+        .expectStatus().isOk();
+
+    assertEquals(before, repository.count());
+  }
+
+  @Test
+  void deleteOpenapi_published() {
+    Openapi target = repository.findAll().stream()
+        .filter(openapi -> openapi.getStatus() == OpenapiStatus.PUBLISHED)
+        .findAny().orElseThrow();
+
+    testClient.delete()
+        .uri(DELETE_OPENAPI_URI, target.getId())
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .exchange()
+        .expectStatus().isEqualTo(ErrorCodeConstant.CLIENT_ERROR_STATUS)
+        .expectHeader()
+        .valueEquals(ERROR_CODE_HEADER, PublishedOpenapiCannotBeDeleteException.ERROR_CODE);
   }
 }
