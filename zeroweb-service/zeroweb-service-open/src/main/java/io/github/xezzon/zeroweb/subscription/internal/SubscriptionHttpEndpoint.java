@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -94,7 +94,7 @@ public class SubscriptionHttpEndpoint {
   /// 审核后第三方应用即可调用该接口
   ///
   /// @param id 订阅标识
-  @PutMapping("/subscription/audit/{id}")
+  @PutMapping("/subscription/{id}/audit")
   @SaCheckPermission({PermissionConstant.SUBSCRIPTION_AUDIT})
   public void auditSubscription(@PathVariable @NotBlank final String id) {
     subscriptionService.auditSubscription(id);

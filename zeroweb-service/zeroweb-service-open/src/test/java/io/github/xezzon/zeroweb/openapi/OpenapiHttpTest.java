@@ -37,7 +37,7 @@ class OpenapiHttpTest {
   private static final String OPENAPI_ADD_URI = "/openapi";
   private static final String GET_OPENAPI_URI = "/openapi";
   private static final String MODIFY_OPENAPI_URI = "/openapi";
-  private static final String PUBLISH_OPENAPI_URI = "/openapi/publish/{id}";
+  private static final String PUBLISH_OPENAPI_URI = "/openapi/{id}/publish";
 
   @Resource
   private OpenapiRepository repository;

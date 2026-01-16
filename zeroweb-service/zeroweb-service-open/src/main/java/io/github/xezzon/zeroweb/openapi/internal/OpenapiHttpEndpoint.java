@@ -81,7 +81,7 @@ public class OpenapiHttpEndpoint {
   /// 发布指定的`对外接口`
   ///
   /// @param id 要发布的`对外接口`的唯一标识符
-  @PutMapping("/publish/{id}")
+  @PutMapping("/{id}/publish")
   @SaCheckPermission({PermissionConstant.OPENAPI_PUBLISH})
   public void publishOpenapi(@PathVariable @NotBlank final String id) {
     openapiService.publishOpenapi(id);
