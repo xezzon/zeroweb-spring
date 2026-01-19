@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -16,11 +16,13 @@ package io.github.xezzon.zeroweb.third_party_app.internal;
 import static io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionConstant.ROLL_ACCESS_SECRET;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.stp.StpUtil;
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
 import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.third_party_app.AccessSecret;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
+import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionConstant;
 import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionManager;
 import io.github.xezzon.zeroweb.third_party_app.entity.AddThirdPartyAppReq;
 import jakarta.validation.Valid;
@@ -75,6 +77,19 @@ public class ThirdPartyAppHttpEndpoint {
   public Page<@NonNull ThirdPartyApp> listMyThirdPartyApp() {
     String userId = JwtAuth.getOrThrow().getSub();
     return thirdPartyAppService.listThirdPartyAppByUser(userId);
+  }
+
+  /// 查询指定的第三方应用
+  /// @param id 第三方应用 ID
+  /// @return 第三方应用信息
+  @GetMapping("/{id}")
+  public ThirdPartyApp queryThirdPartyApp(@PathVariable final String id) {
+    String userId = JwtAuth.getOrThrow().getSub();
+    if (!StpUtil.hasPermission(PermissionConstant.THIRD_PARTY_APP_READ)) {
+      thirdPartyAppPermissionManager
+          .check(id, userId, ThirdPartyAppPermissionConstant.THIRD_PARTY_APP_READ);
+    }
+    return thirdPartyAppService.queryThirdPartyAppById(id);
   }
 
   /// 查询所有第三方应用列表

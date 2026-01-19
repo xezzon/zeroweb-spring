@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.third_party_app;
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
@@ -36,6 +37,7 @@ class ThirdPartyAppHttpTest {
 
   private static final String THIRD_PARTY_APP_ADD_URI = "/third-party-app";
   private static final String THIRD_PARTY_LIST_MINE_API = "/third-party-app/mine";
+  private static final String QUERY_THIRD_PARTY_APP_API = "/third-party-app/{id}";
   private static final String THIRD_PARTY_LIST_API = "/third-party-app";
   private static final String ROLL_ACCESS_SECRET_URI = "/third-party-app/{appId}/roll";
 
@@ -142,6 +144,22 @@ class ThirdPartyAppHttpTest {
     for (int i = 0, cnt = responseBody.getContent().size(); i < cnt; i++) {
       assertEquals(except.get(i).getId(), responseBody.getContent().get(i).getId());
     }
+  }
+
+  @Test
+  void queryThirdPartyApp() {
+    ThirdPartyApp target = repository.findAll().getFirst();
+
+    ThirdPartyApp responseBody = testClient.get()
+        .uri(QUERY_THIRD_PARTY_APP_API, target.getId())
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(target.getOwnerId()).bearer())
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(ThirdPartyApp.class)
+        .returnResult().getResponseBody();
+    assertNotNull(responseBody);
+    assertEquals(target.getId(), responseBody.getId());
   }
 
   @Test
