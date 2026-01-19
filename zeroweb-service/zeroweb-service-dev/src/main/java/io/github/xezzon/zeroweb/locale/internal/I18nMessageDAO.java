@@ -19,8 +19,6 @@ import io.github.xezzon.zeroweb.locale.I18nMessage;
 import io.github.xezzon.zeroweb.locale.I18nMessage_;
 import io.github.xezzon.zeroweb.locale.repository.I18nMessageRepository;
 import org.jspecify.annotations.NullMarked;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -40,14 +38,6 @@ public class I18nMessageDAO extends BaseDAO<I18nMessage, String, I18nMessageRepo
     super(repository, I18nMessage.class);
   }
 
-  /// 获取国际化内容复制器。
-  ///
-  /// @return 国际化内容复制器实例。
-  @Override
-  public ICopier<I18nMessage> getCopier() {
-    return Copier.INSTANCE;
-  }
-
   /// 根据命名空间查询所有国际化内容。
   ///
   /// @param namespace 国际化内容命名空间。
@@ -58,12 +48,5 @@ public class I18nMessageDAO extends BaseDAO<I18nMessage, String, I18nMessageRepo
         cb.equal(root.get(I18nMessage_.namespace), namespace);
     final Sort sort = Sort.by(Order.asc(I18nMessage_.MESSAGE_KEY));
     return super.findAll(odata, spec, sort);
-  }
-
-  /// 国际化内容复制器接口。
-  @Mapper
-  interface Copier extends ICopier<I18nMessage> {
-
-    Copier INSTANCE = Mappers.getMapper(Copier.class);
   }
 }

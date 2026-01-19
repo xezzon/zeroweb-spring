@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -16,9 +16,9 @@ package io.github.xezzon.zeroweb.openapi.entity;
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.URL_LENGTH;
 
+import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.enumeration.HttpMethod;
 import jakarta.validation.constraints.NotBlank;
@@ -32,7 +32,6 @@ import org.mapstruct.factory.Mappers;
 /// 新增对外接口请求对象
 ///
 /// 用于创建新的对外接口，包含接口编码、后端地址和HTTP方法等信息。
-/// 该请求对象实现了 [Into] 接口，可以转换为 [Openapi] 实体对象。
 ///
 /// @param code 接口编码，唯一标识一个对外接口
 /// @param destination 后端地址，即该接口应该转发到的后端服务地址
@@ -45,7 +44,7 @@ public record AddOpenapiReq(
     String destination,
     @NotNull
     HttpMethod httpMethod
-) implements Into<Openapi> {
+) implements CreateRequest<Openapi> {
 
   @Override
   public Openapi into() {

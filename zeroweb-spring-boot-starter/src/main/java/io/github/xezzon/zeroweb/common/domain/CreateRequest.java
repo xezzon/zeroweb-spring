@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -11,22 +11,12 @@
  * You should have received a copy of the GNU Lesser General Public License along with ZeroWeb. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.xezzon.zeroweb.user.internal;
+package io.github.xezzon.zeroweb.common.domain;
 
-import io.github.xezzon.zeroweb.common.jpa.BaseDAO;
-import io.github.xezzon.zeroweb.user.User;
-import io.github.xezzon.zeroweb.user.repository.UserRepository;
-import org.springframework.stereotype.Repository;
+import io.github.xezzon.zeroweb.core.trait.Into;
 
-/**
- * @author xezzon
- */
-@Repository
-public class UserDAO extends BaseDAO<User, String, UserRepository> {
-
-  /// 依赖注入
-  /// @param repository 用户 JPA 接口
-  UserDAO(final UserRepository repository) {
-    super(repository, User.class);
-  }
+/// 新增请求的请求体
+/// @author xezzon
+/// @param <T> 新增请求对应的实体类
+public interface CreateRequest<T> extends Into<T> {
 }

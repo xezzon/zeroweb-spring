@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,8 +15,8 @@ package io.github.xezzon.zeroweb.app.entity;
 
 import io.github.xezzon.zeroweb.app.App;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
+import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -38,7 +38,7 @@ public record AddAppReq(
     String baseUrl,
     @NotNull
     Integer ordinal
-) implements Into<App> {
+) implements CreateRequest<App> {
 
   @Override
   public App into() {

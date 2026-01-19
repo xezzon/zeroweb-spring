@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,14 +15,15 @@ package io.github.xezzon.zeroweb.locale.entity;
 
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 
+import io.github.xezzon.zeroweb.common.domain.UpdateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
-import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
+import io.github.xezzon.zeroweb.core.trait.Merge;
 import io.github.xezzon.zeroweb.locale.I18nMessage;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 /// 修改国际化内容的请求参数。
@@ -38,19 +39,22 @@ public record UpdateI18nMessageReq(
     String namespace,
     @Alphanumeric @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String messageKey
-) implements Into<I18nMessage> {
+) implements UpdateRequest<I18nMessage> {
 
   @Override
-  public I18nMessage into() {
-    return Converter.INSTANCE.from(this);
+  public I18nMessage merge(final I18nMessage oldValue) {
+    return Converter.INSTANCE.merge(this, oldValue);
   }
 
   @Mapper
-  interface Converter extends From<UpdateI18nMessageReq, I18nMessage> {
+  interface Converter extends Merge<UpdateI18nMessageReq, I18nMessage> {
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
     @Override
-    I18nMessage from(UpdateI18nMessageReq source);
+    @Mapping(target = "id", source = "origin.id")
+    @Mapping(target = "namespace", source = "value.namespace")
+    @Mapping(target = "messageKey", source = "value.messageKey")
+    I18nMessage merge(UpdateI18nMessageReq value, I18nMessage origin);
   }
 }

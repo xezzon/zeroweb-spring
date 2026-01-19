@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -11,22 +11,18 @@
  * You should have received a copy of the GNU Lesser General Public License along with ZeroWeb. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.xezzon.zeroweb.user.internal;
+package io.github.xezzon.zeroweb.core.trait;
 
-import io.github.xezzon.zeroweb.common.jpa.BaseDAO;
-import io.github.xezzon.zeroweb.user.User;
-import io.github.xezzon.zeroweb.user.repository.UserRepository;
-import org.springframework.stereotype.Repository;
+/// 将源对象与目标对象合并
+/// @author xezzon
+/// @param <S> 源对象类型
+/// @param <T> 目标对象类型
+public interface Merge<S, T> {
 
-/**
- * @author xezzon
- */
-@Repository
-public class UserDAO extends BaseDAO<User, String, UserRepository> {
-
-  /// 依赖注入
-  /// @param repository 用户 JPA 接口
-  UserDAO(final UserRepository repository) {
-    super(repository, User.class);
-  }
+  /// 将源对象与目标对象合并
+  /// 如果字段在源对象中存在，则合并后的对象，该字段的值取自源对象；否则取自目标对象。
+  /// @param value 源对象
+  /// @param origin 目标对象
+  /// @return 合并后的对象
+  T merge(S value, T origin);
 }

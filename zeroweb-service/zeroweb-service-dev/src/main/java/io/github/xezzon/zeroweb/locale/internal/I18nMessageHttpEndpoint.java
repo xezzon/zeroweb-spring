@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -93,8 +93,9 @@ public class I18nMessageHttpEndpoint {
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
   public void updateI18nMessage(@RequestBody @Valid final UpdateI18nMessageReq req) {
-    I18nMessage i18nMessage = req.into();
-    localizedService.updateI18nMessage(i18nMessage);
+    I18nMessage oldValue = localizedService.queryI18nMessageById(req.id());
+    I18nMessage newValue = req.merge(oldValue);
+    localizedService.updateI18nMessage(oldValue, newValue);
   }
 
   /// 删除国际化内容。

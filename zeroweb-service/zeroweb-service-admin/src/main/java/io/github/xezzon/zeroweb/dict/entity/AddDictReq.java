@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,9 +15,9 @@ package io.github.xezzon.zeroweb.dict.entity;
 
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 
+import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.dict.Dict;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,12 +32,11 @@ import org.mapstruct.factory.Mappers;
 /// 新增字典请求对象
 ///
 /// 用于封装新增字典目或字典项的请求参数。
-/// 该对象实现了 [Into] 接口，可以转换为 [Dict] 实体对象。
 ///
 /// @author xezzon
 @Getter
 @Setter
-public class AddDictReq implements Into<Dict> {
+public class AddDictReq implements CreateRequest<Dict> {
 
   /// 字典目
   ///

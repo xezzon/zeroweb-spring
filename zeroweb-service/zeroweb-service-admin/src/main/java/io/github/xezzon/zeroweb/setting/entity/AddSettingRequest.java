@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,9 +15,9 @@ package io.github.xezzon.zeroweb.setting.entity;
 
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 
+import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.setting.Setting;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -30,7 +30,7 @@ import org.mapstruct.factory.Mappers;
 /// 新增业务参数请求
 ///
 /// 用于创建新的业务参数配置，包含参数标识、约束定义和初始值。
-/// 实现 [Into] 接口，提供转换为 [Setting] 实体对象的方法。
+///
 /// @param code 业务参数标识，唯一标识参数类型
 /// @param schema 参数约束定义，JSON Schema 格式
 /// @param value 参数初始值，JSON格式
@@ -41,7 +41,7 @@ public record AddSettingRequest(
     @NotNull
     String schema,
     Map<String, Object> value
-) implements Into<Setting> {
+) implements CreateRequest<Setting> {
 
   @Override
   public Setting into() {

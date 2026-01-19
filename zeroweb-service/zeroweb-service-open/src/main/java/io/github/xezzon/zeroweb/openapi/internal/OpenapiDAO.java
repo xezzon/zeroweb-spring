@@ -20,8 +20,6 @@ import io.github.xezzon.zeroweb.openapi.Openapi_;
 import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
 import org.jspecify.annotations.NullMarked;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -46,11 +44,6 @@ public class OpenapiDAO extends BaseDAO<Openapi, String, OpenapiRepository> {
   }
 
   @Override
-  public ICopier<Openapi> getCopier() {
-    return Copier.INSTANCE;
-  }
-
-  @Override
   public Page<Openapi> findAll(ODataQueryOption odata) {
     Sort sort = Sort.by(Order.asc(Openapi_.CODE));
     return super.findAll(odata, null, sort);
@@ -65,11 +58,5 @@ public class OpenapiDAO extends BaseDAO<Openapi, String, OpenapiRepository> {
         cb.equal(root.get(Openapi_.status), OpenapiStatus.PUBLISHED);
     Sort sort = Sort.by(Order.asc(Openapi_.CODE));
     return super.findAll(odata, spec, sort);
-  }
-
-  @Mapper
-  interface Copier extends ICopier<Openapi> {
-
-    Copier INSTANCE = Mappers.getMapper(Copier.class);
   }
 }

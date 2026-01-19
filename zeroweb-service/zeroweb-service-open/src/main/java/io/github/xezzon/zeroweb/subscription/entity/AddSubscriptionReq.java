@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,9 +15,9 @@ package io.github.xezzon.zeroweb.subscription.entity;
 
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 
+import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.subscription.Subscription;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,7 +35,7 @@ public record AddSubscriptionReq(
     String appId,
     @Alphanumeric(excludes = {Alphanumeric.DOT}) @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String openapiCode
-) implements Into<Subscription> {
+) implements CreateRequest<Subscription> {
 
   /// 将请求对象转换为订阅实体
   /// @return 订阅实体对象

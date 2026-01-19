@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -21,9 +21,6 @@ import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Root;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,11 +52,6 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<@
     this.typeToken = typeToken;
   }
 
-  /// 获取实体属性复制器。
-  ///
-  /// @return 实体属性复制器
-  public abstract ICopier<T> getCopier();
-
   /// 设置实体管理器。
   ///
   /// @param em 实体管理器
@@ -77,19 +69,8 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<@
     return this.repository;
   }
 
-  /// 局部更新实体（仅更新非空字段）
-  /// @param target 目标实体
-  /// @return 更新后的实体
-  public T partialUpdate(T target) {
-    T entity = this.get().findById(target.getId())
-        .orElseThrow();
-    this.getCopier().copy(target, entity);
-    this.get().save(entity);
-    return entity;
-  }
-
   /// 分页查询数据
-  /// @param odata OData查询条件
+  /// @param odata OData 查询条件
   /// @return 分页数据
   public Page<@NonNull T> findAll(@NonNull final ODataQueryOption odata) {
     return this.findAll(odata, null, null);
@@ -133,19 +114,6 @@ public abstract class BaseDAO<T extends IEntity<I>, I, M extends JpaRepository<@
     Root<T> root = criteriaUpdate.from(typeToken);
     predicate.accept(root, criteriaUpdate, cb);
     return em.createQuery(criteriaUpdate).executeUpdate();
-  }
-
-  /// 实体属性复制器接口。
-  ///
-  /// @param <T> 实体类型
-  public interface ICopier<T> {
-
-    /// 复制实体属性，如果源实体属性为 null，则不复制。
-    ///
-    /// @param target 目标实体
-    /// @param entity 源实体
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void copy(T target, @MappingTarget T entity);
   }
 
   /// 更新条件组装器接口。

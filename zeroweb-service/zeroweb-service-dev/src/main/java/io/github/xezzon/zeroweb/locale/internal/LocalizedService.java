@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -21,6 +21,8 @@ import io.github.xezzon.zeroweb.locale.Language;
 import io.github.xezzon.zeroweb.locale.Translation;
 import io.github.xezzon.zeroweb.locale.event.I18nMessageChangedEvent;
 import io.github.xezzon.zeroweb.locale.event.I18nMessageDeletedEvent;
+import io.github.xezzon.zeroweb.locale.repository.I18nMessageRepository;
+import io.github.xezzon.zeroweb.locale.repository.LanguageRepository;
 import io.github.xezzon.zeroweb.locale.repository.TranslationRepository;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
@@ -43,20 +45,44 @@ import org.springframework.stereotype.Service;
 @Service
 public class LocalizedService {
 
+  private final LanguageRepository languageRepository;
   private final LanguageDAO languageDAO;
+  private final I18nMessageRepository i18nMessageRepository;
   private final I18nMessageDAO i18nMessageDAO;
   private final TranslationRepository translationRepository;
   @Resource
   private ApplicationEventPublisher eventPublisher;
 
+  /// 依赖注入
+  /// @param languageRepository 语言相关的数据库操作
+  /// @param languageDAO 语言相关数据库操作
+  /// @param i18nMessageDAO 国际化内容相关的数据库操作
+  /// @param i18nMessageRepository 国际化内容相关的数据库操作
+  /// @param translationRepository 国际化翻译文本相关的数据库操作
   LocalizedService(
+      final LanguageRepository languageRepository,
       final LanguageDAO languageDAO,
+      final I18nMessageRepository i18nMessageRepository,
       final I18nMessageDAO i18nMessageDAO,
       final TranslationRepository translationRepository
   ) {
+    this.languageRepository = languageRepository;
     this.languageDAO = languageDAO;
+    this.i18nMessageRepository = i18nMessageRepository;
     this.i18nMessageDAO = i18nMessageDAO;
     this.translationRepository = translationRepository;
+  }
+
+  /// 查询指定的语言
+  /// @param id 语言的 ID
+  Language queryLanguageById(final String id) {
+    return languageRepository.findById(id).orElseThrow();
+  }
+
+  /// 查询指定的国际化消息
+  /// @param id 国际化消息的 ID
+  I18nMessage queryI18nMessageById(final String id) {
+    return i18nMessageRepository.findById(id).orElseThrow();
   }
 
   /// 新增语言。
@@ -67,7 +93,7 @@ public class LocalizedService {
     /* 前置校验 */
     checkRepeat(language);
     /* 持久化 */
-    languageDAO.get().save(language);
+    languageRepository.save(language);
   }
 
   /// 查询语言列表。
@@ -79,19 +105,16 @@ public class LocalizedService {
 
   /// 更新语言。
   ///
-  /// @param language 待更新的语言信息。
-  void updateLanguage(final Language language) {
-    final Language entity = languageDAO.get().findById(language.getId()).orElseThrow();
+  /// @param oldValue 更新前的语言信息。
+  /// @param newValue 待更新的语言信息。
+  void updateLanguage(final Language oldValue, final Language newValue) {
     /* 前置校验 */
-    this.checkRepeat(language);
-    /* 属性赋值 */
-    final String oldTag = entity.getLanguageTag();
-    languageDAO.getCopier().copy(language, entity);
+    this.checkRepeat(newValue);
     /* 持久化 */
-    languageDAO.get().save(entity);
+    languageRepository.save(newValue);
     /* 后置处理 */
-    if (!Objects.equals(oldTag, language.getLanguageTag())) {
-      translationRepository.updateByLanguage(oldTag, language.getLanguageTag());
+    if (!Objects.equals(oldValue.getLanguageTag(), newValue.getLanguageTag())) {
+      translationRepository.updateByLanguage(oldValue.getLanguageTag(), newValue.getLanguageTag());
     }
   }
 
@@ -99,11 +122,11 @@ public class LocalizedService {
   ///
   /// @param id 待删除语言的 ID。
   void deleteLanguage(final String id) {
-    final Optional<Language> entity = languageDAO.get().findById(id);
+    final Optional<Language> entity = languageRepository.findById(id);
     if (entity.isEmpty()) {
       return;
     }
-    languageDAO.get().deleteById(id);
+    languageRepository.deleteById(id);
     /* 后置处理 */
     translationRepository.deleteByLanguage(entity.get().getLanguageTag());
   }
@@ -116,14 +139,14 @@ public class LocalizedService {
     /* 前置校验 */
     this.checkRepeat(i18nMessage);
     /* 持久化 */
-    i18nMessageDAO.get().save(i18nMessage);
+    i18nMessageRepository.save(i18nMessage);
   }
 
   /// 列举国际化内容命名空间。
   ///
   /// @return 国际化内容命名空间列表。
   List<String> listI18nNamespace() {
-    return i18nMessageDAO.get().findDistinctNamespace()
+    return i18nMessageRepository.findDistinctNamespace()
         .stream()
         .sorted()
         .toList();
@@ -140,31 +163,28 @@ public class LocalizedService {
 
   /// 更新国际化内容。
   ///
-  /// @param i18nMessage 待更新的国际化内容。
+  /// @param oldValue 更新前的国际化内容
+  /// @param newValue 待更新的国际化内容。
   /// @throws RepeatDataException 如果国际化内容已存在。
   /// @throws jakarta.persistence.EntityNotFoundException 如果国际化内容不存在或已删除。
-  void updateI18nMessage(final I18nMessage i18nMessage) {
-    final I18nMessage entity = i18nMessageDAO.get().findById(i18nMessage.getId()).orElseThrow();
-    final I18nMessage oldValue = new I18nMessage();
-    i18nMessageDAO.getCopier().copy(entity, oldValue);
+  void updateI18nMessage(final I18nMessage oldValue, final I18nMessage newValue) {
     /* 前置校验 */
-    this.checkRepeat(i18nMessage);
+    this.checkRepeat(newValue);
     /* 持久化 */
-    i18nMessageDAO.getCopier().copy(i18nMessage, entity);
-    i18nMessageDAO.get().save(entity);
+    i18nMessageRepository.save(newValue);
     /* 后置处理 */
-    eventPublisher.publishEvent(new I18nMessageChangedEvent(oldValue, i18nMessage));
+    eventPublisher.publishEvent(new I18nMessageChangedEvent(oldValue, newValue));
   }
 
   /// 删除国际化内容。
   ///
   /// @param id 待删除国际化内容的 ID。
   void deleteI18nMessage(final String id) {
-    final Optional<I18nMessage> entity = i18nMessageDAO.get().findById(id);
+    final Optional<I18nMessage> entity = i18nMessageRepository.findById(id);
     if (entity.isEmpty()) {
       return;
     }
-    i18nMessageDAO.get().deleteById(id);
+    i18nMessageRepository.deleteById(id);
     /* 后置处理 */
     eventPublisher.publishEvent(new I18nMessageDeletedEvent(entity.get()));
   }
@@ -194,7 +214,7 @@ public class LocalizedService {
         ));
     final String namespace = translation.getNamespace();
     final String messageKey = translation.getMessageKey();
-    final I18nMessage i18nMessage = i18nMessageDAO.get()
+    final I18nMessage i18nMessage = i18nMessageRepository
         .findByNamespaceAndMessageKey(namespace, messageKey)
         .orElseThrow(() -> new EntityNotFoundException(
             String.format("I18nMessage `%s`.`%s` not found", namespace, messageKey)
@@ -241,7 +261,7 @@ public class LocalizedService {
   private void checkRepeat(final I18nMessage i18nMessage) {
     final String namespace = i18nMessage.getNamespace();
     final String messageKey = i18nMessage.getMessageKey();
-    final Optional<I18nMessage> exist = i18nMessageDAO.get()
+    final Optional<I18nMessage> exist = i18nMessageRepository
         .findByNamespaceAndMessageKey(namespace, messageKey);
     if (exist.isPresent() && !exist.get().getId().equals(i18nMessage.getId())) {
       throw new RepeatDataException(String.format("`%s`.`%s`", namespace, messageKey));

@@ -1,8 +1,6 @@
 package io.github.xezzon.zeroweb.common.jpa;
 
 import jakarta.transaction.Transactional;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -21,16 +19,5 @@ public class TestEntityDAO extends BaseDAO<TestEntity, String, TestEntityReposit
         .set(TestEntity_.field2, field2)
         .where(cb.equal(root.get(TestEntity_.field1), field1))
     );
-  }
-
-  @Override
-  public ICopier<TestEntity> getCopier() {
-    return Copier.INSTANCE;
-  }
-
-  @Mapper
-  interface Copier extends ICopier<TestEntity> {
-
-    Copier INSTANCE = Mappers.getMapper(Copier.class);
   }
 }

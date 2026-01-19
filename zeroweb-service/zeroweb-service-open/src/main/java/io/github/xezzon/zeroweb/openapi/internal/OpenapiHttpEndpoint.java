@@ -75,8 +75,9 @@ public class OpenapiHttpEndpoint {
   @PutMapping()
   @SaCheckPermission({PermissionConstant.OPENAPI_WRITE})
   public void modifyOpenapi(@RequestBody @Valid final ModifyOpenapiReq req) {
-    Openapi openapi = req.into();
-    openapiService.modifyOpenapi(openapi);
+    Openapi oldValue = openapiService.queryById(req.id());
+    Openapi newValue = req.merge(oldValue);
+    openapiService.modifyOpenapi(oldValue, newValue);
   }
 
   /// 发布指定的`对外接口`

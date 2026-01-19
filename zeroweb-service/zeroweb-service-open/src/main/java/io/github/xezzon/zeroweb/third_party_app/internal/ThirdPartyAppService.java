@@ -29,6 +29,7 @@ import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMemberReposit
 import io.github.xezzon.zeroweb.third_party_app.event.ThirdPartyAppCreatedEvent;
 import io.github.xezzon.zeroweb.third_party_app.exception.InvalidAccessKeyException;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
+import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
 import io.jsonwebtoken.Jwts.SIG;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -59,6 +60,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ThirdPartyAppService implements IThirdPartyAppService4Call {
 
+  private final ThirdPartyAppRepository thirdPartyAppRepository;
   private final ThirdPartyAppDAO thirdPartyAppDAO;
   private final AccessSecretRepository accessSecretRepository;
   private final ThirdPartyAppMemberRepository thirdPartyAppMemberRepository;
@@ -67,16 +69,19 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
   private ApplicationEventPublisher eventPublisher;
 
   /// 依赖注入
+  /// @param thirdPartyAppRepository 第三方应用的 JPA 接口
   /// @param thirdPartyAppDAO 第三方应用的数据库操作
   /// @param accessSecretRepository 访问凭据的 JPA 接口
   /// @param thirdPartyAppMemberRepository 第三方应用成员的 JPA 接口
   /// @param zerowebConfig JWT 相关设置
   public ThirdPartyAppService(
+      final ThirdPartyAppRepository thirdPartyAppRepository,
       final ThirdPartyAppDAO thirdPartyAppDAO,
       final AccessSecretRepository accessSecretRepository,
-      ThirdPartyAppMemberRepository thirdPartyAppMemberRepository,
+      final ThirdPartyAppMemberRepository thirdPartyAppMemberRepository,
       final ZerowebConfig zerowebConfig
   ) {
+    this.thirdPartyAppRepository = thirdPartyAppRepository;
     this.thirdPartyAppDAO = thirdPartyAppDAO;
     this.accessSecretRepository = accessSecretRepository;
     this.thirdPartyAppMemberRepository = thirdPartyAppMemberRepository;
@@ -89,7 +94,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
   /// @return 生成的访问密钥对象
   @Transactional()
   AccessSecret addThirdPartyApp(ThirdPartyApp thirdPartyApp) {
-    thirdPartyAppDAO.get().save(thirdPartyApp);
+    thirdPartyAppRepository.save(thirdPartyApp);
     eventPublisher.publishEvent(new ThirdPartyAppCreatedEvent(thirdPartyApp));
     return this.rollAccessSecret(thirdPartyApp.getId());
   }
@@ -103,7 +108,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
     Set<String> appIds = members.stream()
         .map(ThirdPartyAppMember::getGroupId)
         .collect(Collectors.toSet());
-    List<ThirdPartyApp> list = thirdPartyAppDAO.get().findByIdInOrderByCreateTimeDesc(appIds);
+    List<ThirdPartyApp> list = thirdPartyAppRepository.findByIdInOrderByCreateTimeDesc(appIds);
     return new PageImpl<>(list);
   }
 
@@ -149,7 +154,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
     );
     this.validateSignature(appId, body, signature, iat);
     /* 构造JWT */
-    ThirdPartyApp thirdPartyApp = thirdPartyAppDAO.get().findById(appId).orElseThrow();
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findById(appId).orElseThrow();
     JwtClaim claim = JwtClaim.newBuilder()
         .setSub(appId)
         .setPreferredUsername(thirdPartyApp.getId())

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,13 +15,14 @@ package io.github.xezzon.zeroweb.app.entity;
 
 import io.github.xezzon.zeroweb.app.App;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
-import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
+import io.github.xezzon.zeroweb.common.domain.UpdateRequest;
+import io.github.xezzon.zeroweb.core.trait.Merge;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 /// `UpdateAppReq` 记录表示用于更新现有服务信息的请求体。
@@ -40,19 +41,23 @@ public record UpdateAppReq(
     String baseUrl,
     @NotNull
     Integer ordinal
-) implements Into<App> {
+) implements UpdateRequest<App> {
 
   @Override
-  public App into() {
-    return Converter.INSTANCE.from(this);
+  public App merge(final App oldValue) {
+    return Converter.INSTANCE.merge(this, oldValue);
   }
 
   @Mapper
-  interface Converter extends From<UpdateAppReq, App> {
+  interface Converter extends Merge<UpdateAppReq, App> {
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
     @Override
-    App from(UpdateAppReq source);
+    @Mapping(target = "id", source = "origin.id")
+    @Mapping(target = "name", source = "value.name")
+    @Mapping(target = "baseUrl", source = "value.baseUrl")
+    @Mapping(target = "ordinal", source = "value.ordinal")
+    App merge(UpdateAppReq value, App origin);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,9 +15,9 @@ package io.github.xezzon.zeroweb.role.entity;
 
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 
+import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.role.Role;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,8 +29,6 @@ import org.mapstruct.factory.Mappers;
 /// 新增角色请求对象
 ///
 /// 用于封装新增角色时客户端提交的请求参数。
-/// 该类实现了 [Into] 接口，支持转换为[角色实体][Role]对象。
-/// 使用 MapStruct 进行对象转换，提供类型安全的映射功能。
 ///
 /// @param code 角色简码，用于区分同级别角色
 /// @param name 角色名称，用于界面展示
@@ -47,7 +45,7 @@ public record AddRoleReq(
     Boolean inheritable,
     @NotNull
     String parentId
-) implements Into<Role> {
+) implements CreateRequest<Role> {
 
   @Override
   public Role into() {

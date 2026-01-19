@@ -17,6 +17,8 @@ import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.user.IUserService4Auth;
 import io.github.xezzon.zeroweb.user.User;
+import io.github.xezzon.zeroweb.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -30,13 +32,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService implements IUserService4Auth {
 
-  /// 用户仓储接口
+  /// 用户 JPA 接口
+  private final UserRepository userRepository;
+  /// 用户数据库操作
   private final UserDAO userDAO;
 
   /// 依赖注入
   ///
+  /// @param userRepository 用户 JPA 接口
   /// @param userDAO 用户数据库操作
-  UserService(final UserDAO userDAO) {
+  UserService(final UserRepository userRepository, final UserDAO userDAO) {
+    this.userRepository = userRepository;
     this.userDAO = userDAO;
   }
 
@@ -44,14 +50,15 @@ public class UserService implements IUserService4Auth {
   ///
   /// @param user 用户
   /// @throws RepeatDataException 如果用户名已存在，则抛出此异常
+  @Transactional()
   void addUser(User user) {
     /* 前置校验 */
-    Optional<User> exist = userDAO.get().findByUsername(user.getUsername());
+    Optional<User> exist = userRepository.findByUsername(user.getUsername());
     if (exist.isPresent()) {
       throw new RepeatDataException("`" + user.getUsername() + "`");
     }
     /* 持久化 */
-    userDAO.get().save(user);
+    userRepository.save(user);
   }
 
   /// 根据用户名获取用户信息
@@ -59,7 +66,7 @@ public class UserService implements IUserService4Auth {
   /// @param username 用户名
   /// @return 返回与用户名对应的用户信息，若不存在则返回null
   @Nullable User getByUsername(@NonNull final String username) {
-    return userDAO.get().findByUsername(username).orElse(null);
+    return userRepository.findByUsername(username).orElse(null);
   }
 
   /// 使用 OData 参数进行分页查询用户
@@ -76,6 +83,6 @@ public class UserService implements IUserService4Auth {
 
   @Override
   public List<User> findByIdIn(final Collection<String> userIds) {
-    return userDAO.get().findAllById(userIds);
+    return userRepository.findAllById(userIds);
   }
 }

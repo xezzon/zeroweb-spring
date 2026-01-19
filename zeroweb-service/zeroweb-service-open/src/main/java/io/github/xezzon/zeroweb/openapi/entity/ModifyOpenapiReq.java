@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -16,9 +16,9 @@ package io.github.xezzon.zeroweb.openapi.entity;
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
+import io.github.xezzon.zeroweb.common.domain.UpdateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
-import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
+import io.github.xezzon.zeroweb.core.trait.Merge;
 import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.enumeration.HttpMethod;
 import jakarta.validation.constraints.NotBlank;
@@ -32,8 +32,6 @@ import org.mapstruct.factory.Mappers;
 /// 修改对外接口请求对象
 ///
 /// 用于修改现有的对外接口，包含接口标识、编码、后端地址和HTTP方法等信息。
-/// 该请求对象实现了 [Into] 接口，
-/// 可以转换为 [Openapi] 实体对象。
 ///
 /// @param id 对外接口标识，唯一标识要修改的接口
 /// @param code 接口编码，唯一标识一个对外接口
@@ -49,20 +47,23 @@ public record ModifyOpenapiReq(
     String destination,
     @NotNull
     HttpMethod httpMethod
-) implements Into<Openapi> {
+) implements UpdateRequest<Openapi> {
 
   @Override
-  public Openapi into() {
-    return Converter.INSTANCE.from(this);
+  public Openapi merge(final Openapi oldValue) {
+    return Converter.INSTANCE.merge(this, oldValue);
   }
 
   @Mapper
-  interface Converter extends From<ModifyOpenapiReq, Openapi> {
+  interface Converter extends Merge<ModifyOpenapiReq, Openapi> {
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
-    @Mapping(target = "status", ignore = true)
     @Override
-    Openapi from(ModifyOpenapiReq source);
+    @Mapping(target = "id", source = "origin.id")
+    @Mapping(target = "code", source = "value.code")
+    @Mapping(target = "destination", source = "value.destination")
+    @Mapping(target = "httpMethod", source = "value.httpMethod")
+    Openapi merge(ModifyOpenapiReq value, Openapi origin);
   }
 }
