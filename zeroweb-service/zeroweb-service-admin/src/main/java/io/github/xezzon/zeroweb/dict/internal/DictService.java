@@ -17,6 +17,7 @@ import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.dict.Dict;
+import io.github.xezzon.zeroweb.dict.repository.DictRepository;
 import jakarta.transaction.Transactional;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -37,18 +38,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class DictService {
 
+  private final DictRepository dictRepository;
   private final DictDAO dictDAO;
 
   /// 依赖注入
+  /// @param dictRepository 字典相关的数据库操作
   /// @param dictDAO 字典相关的数据库操作
-  public DictService(final DictDAO dictDAO) {
+  public DictService(final DictRepository dictRepository, final DictDAO dictDAO) {
+    this.dictRepository = dictRepository;
     this.dictDAO = dictDAO;
   }
 
   /// 查询指定的字典
   /// @param id 字典 ID
   Dict queryById(final String id) {
-    return dictDAO.get().findById(id).orElseThrow();
+    return dictRepository.findById(id).orElseThrow();
   }
 
   /// 新增字典
@@ -59,7 +63,7 @@ public class DictService {
     /* 前置校验 */
     checkRepeat(dict);
     /* 持久化 */
-    dictDAO.get().save(dict);
+    dictRepository.save(dict);
   }
 
   /// 根据OData查询选项获取字典分页列表
@@ -79,7 +83,7 @@ public class DictService {
     /* 前置校验 */
     this.checkRepeat(dict);
     /* 持久化 */
-    dictDAO.get().save(dict);
+    dictRepository.save(dict);
   }
 
   /// 更新字典状态
@@ -99,8 +103,8 @@ public class DictService {
   @Transactional
   void remove(Collection<String> ids) {
     while (!ids.isEmpty()) {
-      dictDAO.get().deleteAllByIdInBatch(ids);
-      List<Dict> children = dictDAO.get().findByParentIdIn(ids);
+      dictRepository.deleteAllByIdInBatch(ids);
+      List<Dict> children = dictRepository.findByParentIdIn(ids);
       ids = children.parallelStream()
           .map(Dict::getId)
           .collect(Collectors.toSet());
@@ -112,7 +116,7 @@ public class DictService {
   /// @param tag 字典目编码
   /// @return 字典项列表（已按排序号升序排列）
   List<Dict> getDictItemList(String tag) {
-    return dictDAO.get().findByTagOrderByOrdinalAsc(tag);
+    return dictRepository.findByTagOrderByOrdinalAsc(tag);
   }
 
   /// 批量导入字典。
@@ -132,7 +136,7 @@ public class DictService {
         .filter(o -> !Objects.equals(o.getTag(), Dict.DICT_TAG))
         .toList();
     for (Dict item : itemList) {
-      Optional<Dict> parentDict = dictDAO.get().findByTagAndCode(Dict.DICT_TAG, item.getTag());
+      Optional<Dict> parentDict = dictRepository.findByTagAndCode(Dict.DICT_TAG, item.getTag());
       if (parentDict.isEmpty()) {
         continue;
       }
@@ -148,7 +152,7 @@ public class DictService {
   /// @param dict 待检查的字典 至少包含 字典目编码、字典码、ID（可为空）字段
   /// @throws RepeatDataException 如果存在重复的字典项
   private void checkRepeat(Dict dict) {
-    Optional<Dict> exist = dictDAO.get().findByTagAndCode(dict.getTag(), dict.getCode());
+    Optional<Dict> exist = dictRepository.findByTagAndCode(dict.getTag(), dict.getCode());
     if (exist.isPresent() && !Objects.equals(dict.getId(), exist.get().getId())) {
       // 存在冲突的字典项
       throw new RepeatDataException(

@@ -17,6 +17,7 @@ import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.setting.ISettingService;
 import io.github.xezzon.zeroweb.setting.Setting;
+import io.github.xezzon.zeroweb.setting.repository.SettingRepository;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,19 +33,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class SettingService implements ISettingService {
 
+  private final SettingRepository settingRepository;
   private final SettingDAO settingDAO;
 
   /// 依赖注入
+  /// @param settingRepository 业务参数数据库操作
   /// @param settingDAO 业务参数数据库操作
-  public SettingService(final SettingDAO settingDAO) {
+  public SettingService(final SettingRepository settingRepository, final SettingDAO settingDAO) {
+    this.settingRepository = settingRepository;
     this.settingDAO = settingDAO;
   }
 
   /// 查询指定的设置
   /// @param id 设置 ID
   Setting queryById(final String id) {
-    return settingDAO.get().findById(id)
-        .orElseThrow();
+    return settingRepository.findById(id).orElseThrow();
   }
 
   /// 新增配置项
@@ -55,7 +58,7 @@ public class SettingService implements ISettingService {
   /// @throws RepeatDataException 若参数标识已存在则抛出
   void addSetting(final Setting setting) {
     this.checkRepeat(setting);
-    settingDAO.get().save(setting);
+    settingRepository.save(setting);
   }
 
   /// 使用 OData 参数进行分页查询配置项
@@ -74,7 +77,7 @@ public class SettingService implements ISettingService {
   /// 支持部分更新，仅修改指定的字段。
   /// @param setting 要更新的配置项，包含需要更新的字段
   void updateSetting(final Setting setting) {
-    settingDAO.get().save(setting);
+    settingRepository.save(setting);
   }
 
   /// 删除业务参数
@@ -82,12 +85,12 @@ public class SettingService implements ISettingService {
   /// 根据ID删除指定的业务参数配置。
   /// @param id 要删除的参数 ID
   void deleteSetting(final String id) {
-    settingDAO.get().deleteById(id);
+    settingRepository.deleteById(id);
   }
 
   @Override
   public Setting queryByCode(@NonNull final String code) {
-    return settingDAO.get().findByCode(code)
+    return settingRepository.findByCode(code)
         .orElseThrow(() -> new NoSuchElementException("Setting `" + code + "` does not exist."));
   }
 
@@ -98,7 +101,7 @@ public class SettingService implements ISettingService {
   /// @param setting 要检查的配置项，包含参数标识和ID信息
   /// @throws RepeatDataException 当发现重复的参数标识时抛出
   private void checkRepeat(final Setting setting) {
-    Optional<Setting> exist = settingDAO.get().findByCode(setting.getCode());
+    Optional<Setting> exist = settingRepository.findByCode(setting.getCode());
     if (exist.isPresent() && !Objects.equals(exist.get().getId(), setting.getId())) {
       throw new RepeatDataException(setting.getCode());
     }

@@ -20,6 +20,7 @@ import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.enumeration.OpenapiStatus;
 import io.github.xezzon.zeroweb.openapi.exception.PublishedOpenapiCannotBeDeleteException;
 import io.github.xezzon.zeroweb.openapi.exception.PublishedOpenapiCannotBeModifyException;
+import io.github.xezzon.zeroweb.openapi.repository.OpenapiRepository;
 import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
@@ -37,18 +38,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class OpenapiService implements IOpenapiService4Subscription {
 
+  private final OpenapiRepository openapiRepository;
   private final OpenapiDAO openapiDAO;
 
   /// 依赖注入
+  /// @param openapiRepository 对外接口数据库管理
   /// @param openapiDAO 对外接口数据库管理
-  public OpenapiService(final OpenapiDAO openapiDAO) {
+  public OpenapiService(final OpenapiRepository openapiRepository, final OpenapiDAO openapiDAO) {
+    this.openapiRepository = openapiRepository;
     this.openapiDAO = openapiDAO;
   }
 
   /// 查询指定的对外接口
   /// @param id 对外接口 ID
   Openapi queryById(final String id) {
-    return openapiDAO.get().findById(id).orElseThrow();
+    return openapiRepository.findById(id).orElseThrow();
   }
 
   /// 添加一个新的对外接口对象到数据库
@@ -57,7 +61,7 @@ public class OpenapiService implements IOpenapiService4Subscription {
   /// @throws RepeatDataException 如果要添加的对外接口编码重复，则抛出异常
   void addOpenapi(Openapi openapi) {
     this.checkRepeat(openapi);
-    openapiDAO.get().save(openapi);
+    openapiRepository.save(openapi);
   }
 
   /// 根据OData查询选项分页查询对外接口列表
@@ -83,7 +87,7 @@ public class OpenapiService implements IOpenapiService4Subscription {
       // 已发布的接口不能修改编码（即对外的路径）
       throw new PublishedOpenapiCannotBeModifyException();
     }
-    openapiDAO.get().save(newValue);
+    openapiRepository.save(newValue);
   }
 
   /// 发布指定的对外接口
@@ -92,21 +96,21 @@ public class OpenapiService implements IOpenapiService4Subscription {
   ///
   /// @param id 要发布的对外接口的ID
   void publishOpenapi(String id) {
-    Openapi entity = openapiDAO.get().findById(id).orElseThrow();
+    Openapi entity = openapiRepository.findById(id).orElseThrow();
     entity.setStatus(OpenapiStatus.PUBLISHED);
-    openapiDAO.get().save(entity);
+    openapiRepository.save(entity);
   }
 
   /// 删除对外接口
   /// @param id 接口 ID
   /// @throws PublishedOpenapiCannotBeDeleteException 如果接口已发布，则抛出异常
   void deleteOpenapi(final String id) {
-    openapiDAO.get().findById(id)
+    openapiRepository.findById(id)
         .ifPresent(openapi -> {
           if (openapi.getStatus() == OpenapiStatus.PUBLISHED) {
             throw new PublishedOpenapiCannotBeDeleteException();
           }
-          openapiDAO.get().deleteById(id);
+          openapiRepository.deleteById(id);
         });
   }
 
@@ -115,7 +119,7 @@ public class OpenapiService implements IOpenapiService4Subscription {
   /// @param openapi 要检查的对外接口对象
   /// @throws RepeatDataException 如果接口编码已存在且不是当前接口本身，则抛出异常
   private void checkRepeat(Openapi openapi) {
-    Optional<Openapi> exist = openapiDAO.get().findByCode(openapi.getCode());
+    Optional<Openapi> exist = openapiRepository.findByCode(openapi.getCode());
     if (exist.isPresent() && !Objects.equals(exist.get().getId(), openapi.getId())) {
       throw new RepeatDataException("`" + openapi.getCode() + "`");
     }
@@ -128,6 +132,6 @@ public class OpenapiService implements IOpenapiService4Subscription {
 
   @Override
   public @Nullable Openapi getByCode(String openapiCode) {
-    return openapiDAO.get().findByCode(openapiCode).orElse(null);
+    return openapiRepository.findByCode(openapiCode).orElse(null);
   }
 }

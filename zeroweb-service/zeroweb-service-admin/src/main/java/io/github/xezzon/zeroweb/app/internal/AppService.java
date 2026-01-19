@@ -14,6 +14,7 @@
 package io.github.xezzon.zeroweb.app.internal;
 
 import io.github.xezzon.zeroweb.app.App;
+import io.github.xezzon.zeroweb.app.repository.AppRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
@@ -27,27 +28,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppService {
 
-  private final AppDAO appDAO;
+  private final AppRepository appRepository;
 
-  /// 构造函数，注入 [AppDAO]。
+  /// 依赖注入
   ///
-  /// @param appDAO [AppDAO] 实例。
-  public AppService(final AppDAO appDAO) {
-    this.appDAO = appDAO;
+  /// @param appRepository 应用数据接口
+  public AppService(final AppRepository appRepository) {
+    this.appRepository = appRepository;
   }
 
   /// 新增一个服务。
   ///
   /// @param app 包含服务信息 [App] 的实体。
   void addApp(final App app) {
-    appDAO.get().save(app);
+    appRepository.save(app);
   }
 
   /// 查询所有服务列表，并按顺序升序排列。
   ///
   /// @return 包含所有服务实体的列表。
   List<App> listApp() {
-    return appDAO.get().findAllByOrderByOrdinalAsc();
+    return appRepository.findAllByOrderByOrdinalAsc();
   }
 
   /// 查询指定服务
@@ -55,7 +56,7 @@ public class AppService {
   /// @return 服务信息
   /// @throws java.util.NoSuchElementException ID 没有对应的服务
   App queryAppById(final String id) {
-    return appDAO.get().findById(id)
+    return appRepository.findById(id)
         .orElseThrow();
   }
 
@@ -65,7 +66,7 @@ public class AppService {
   ///
   /// @param app 包含要更新的服务信息和其 ID 的实体。
   void updateApp(final App app) {
-    appDAO.get().save(app);
+    appRepository.save(app);
   }
 
   /// 根据服务ID删除一个服务。
@@ -74,10 +75,10 @@ public class AppService {
   ///
   /// @param id 要删除服务的 ID。
   void deleteApp(final String id) {
-    final Optional<App> app = appDAO.get().findById(id);
+    final Optional<App> app = appRepository.findById(id);
     if (app.isEmpty()) {
       return;
     }
-    appDAO.get().deleteById(id);
+    appRepository.deleteById(id);
   }
 }
