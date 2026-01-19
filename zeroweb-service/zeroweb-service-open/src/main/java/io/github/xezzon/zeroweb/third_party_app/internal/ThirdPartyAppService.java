@@ -135,6 +135,10 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
     return accessSecret;
   }
 
+  ThirdPartyApp queryThirdPartyAppById(final String id) {
+    return thirdPartyAppDAO.get().findById(id).orElseThrow();
+  }
+
   /// 校验摘要并签发JWT
   ///
   /// 首先验证消息摘要的有效性，然后为第三方应用签发包含认证信息的JWT

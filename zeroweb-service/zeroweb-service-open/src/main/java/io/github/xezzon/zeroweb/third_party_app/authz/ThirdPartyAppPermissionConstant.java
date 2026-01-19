@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -30,6 +30,8 @@ public class ThirdPartyAppPermissionConstant {
   public static final String LIST_MEMBER = "third-party-app:#:list-member";
   /// 转移所有权权限
   public static final String MOVE_OWNERSHIP = "third-party-app:#:move-ownership";
+  /// 查看第三方应用详情
+  public static final String THIRD_PARTY_APP_READ = "third-party-app:#:read";
   /// 轮换访问密钥权限
   public static final String ROLL_ACCESS_SECRET = "third-party-app:#:roll-access-secret";
 

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -14,11 +14,12 @@
 package io.github.xezzon.zeroweb.third_party_app.authz;
 
 import static io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionConstant.LIST_MEMBER;
+import static io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionConstant.THIRD_PARTY_APP_READ;
 
 import io.github.xezzon.zeroweb.common.exception.DataPermissionForbiddenException;
 import io.github.xezzon.zeroweb.third_party_app.IThirdPartyAppMemberService;
 import io.github.xezzon.zeroweb.third_party_app.authn.ThirdPartyAppMember;
-import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 import org.springframework.stereotype.Component;
 
@@ -40,10 +41,8 @@ public class ThirdPartyAppPermissionManager {
 
   /// 检查用户权限
   ///
-  /// 所有者拥有所有权限，普通成员只能查看成员列表
-  ///
   /// @param groupId 用户组ID（第三方应用ID）
-  /// @param userId 用户ID
+  /// @param userId 用户 ID
   /// @param permission 权限标识符
   /// @throws DataPermissionForbiddenException 权限不足时抛出异常
   public void check(String groupId, String userId, String permission) {
@@ -56,7 +55,8 @@ public class ThirdPartyAppPermissionManager {
       // 所有者拥有该资源的所有权限
       return;
     }
-    if (!Objects.equals(LIST_MEMBER, permission)) {
+    // 普通成员有 查看应用详情、列出应用成员 权限
+    if (!Set.of(THIRD_PARTY_APP_READ, LIST_MEMBER).contains(permission)) {
       throw thr.get();
     }
   }
