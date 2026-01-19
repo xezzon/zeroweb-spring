@@ -15,10 +15,8 @@ package io.github.xezzon.zeroweb.common.domain;
 
 import io.github.xezzon.zeroweb.core.trait.Into;
 
-/**
- * 新增请求的请求体
- * @author xezzon
- * @param <T> 新增请求对应的实体类
- */
+/// 新增请求的请求体
+/// @author xezzon
+/// @param <T> 新增请求对应的实体类
 public interface CreateRequest<T> extends Into<T> {
 }

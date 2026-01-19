@@ -18,7 +18,6 @@ import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_S
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
 import io.github.xezzon.zeroweb.common.domain.UpdateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.core.trait.Merge;
 import io.github.xezzon.zeroweb.openapi.Openapi;
 import io.github.xezzon.zeroweb.openapi.enumeration.HttpMethod;
@@ -33,8 +32,6 @@ import org.mapstruct.factory.Mappers;
 /// 修改对外接口请求对象
 ///
 /// 用于修改现有的对外接口，包含接口标识、编码、后端地址和HTTP方法等信息。
-/// 该请求对象实现了 [Into] 接口，
-/// 可以转换为 [Openapi] 实体对象。
 ///
 /// @param id 对外接口标识，唯一标识要修改的接口
 /// @param code 接口编码，唯一标识一个对外接口

@@ -15,9 +15,7 @@ package io.github.xezzon.zeroweb.app.internal;
 
 import io.github.xezzon.zeroweb.app.App;
 import io.github.xezzon.zeroweb.app.repository.AppRepository;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /// `AppService` 是服务管理的服务层组件。
@@ -62,8 +60,6 @@ public class AppService {
 
   /// 更新一个现有服务的信息。
   ///
-  /// 如果服务不存在，将抛出 [EntityNotFoundException]。
-  ///
   /// @param app 包含要更新的服务信息和其 ID 的实体。
   void updateApp(final App app) {
     appRepository.save(app);
@@ -75,10 +71,6 @@ public class AppService {
   ///
   /// @param id 要删除服务的 ID。
   void deleteApp(final String id) {
-    final Optional<App> app = appRepository.findById(id);
-    if (app.isEmpty()) {
-      return;
-    }
     appRepository.deleteById(id);
   }
 }

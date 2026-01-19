@@ -18,7 +18,6 @@ import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_S
 import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.setting.Setting;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -31,7 +30,7 @@ import org.mapstruct.factory.Mappers;
 /// 新增业务参数请求
 ///
 /// 用于创建新的业务参数配置，包含参数标识、约束定义和初始值。
-/// 实现 [Into] 接口，提供转换为 [Setting] 实体对象的方法。
+///
 /// @param code 业务参数标识，唯一标识参数类型
 /// @param schema 参数约束定义，JSON Schema 格式
 /// @param value 参数初始值，JSON格式

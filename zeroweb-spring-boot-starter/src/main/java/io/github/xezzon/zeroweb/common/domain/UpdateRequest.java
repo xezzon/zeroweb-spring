@@ -13,11 +13,9 @@
 
 package io.github.xezzon.zeroweb.common.domain;
 
-/**
- * 更新请求的请求体
- * @author xezzon
- * @param <T> 请求体对应的实体类
- */
+/// 更新请求的请求体
+/// @author xezzon
+/// @param <T> 请求体对应的实体类
 public interface UpdateRequest<T> {
 
   /// 将更新请求的字段合并到数据库实体中

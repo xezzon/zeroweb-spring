@@ -18,6 +18,7 @@ import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.user.IUserService4Auth;
 import io.github.xezzon.zeroweb.user.User;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService implements IUserService4Auth {
 
+  /// 用户 JPA 接口
   private final UserRepository userRepository;
   /// 用户数据库操作
   private final UserDAO userDAO;
@@ -48,6 +50,7 @@ public class UserService implements IUserService4Auth {
   ///
   /// @param user 用户
   /// @throws RepeatDataException 如果用户名已存在，则抛出此异常
+  @Transactional()
   void addUser(User user) {
     /* 前置校验 */
     Optional<User> exist = userRepository.findByUsername(user.getUsername());

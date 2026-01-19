@@ -13,12 +13,10 @@
 
 package io.github.xezzon.zeroweb.core.trait;
 
-/**
- * 将源对象与目标对象合并
- * @author xezzon
- * @param <S> 源对象类型
- * @param <T> 目标对象类型
- */
+/// 将源对象与目标对象合并
+/// @author xezzon
+/// @param <S> 源对象类型
+/// @param <T> 目标对象类型
 public interface Merge<S, T> {
 
   /// 将源对象与目标对象合并

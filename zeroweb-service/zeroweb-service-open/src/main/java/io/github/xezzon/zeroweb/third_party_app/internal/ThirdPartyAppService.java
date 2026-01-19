@@ -78,7 +78,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
       final ThirdPartyAppRepository thirdPartyAppRepository,
       final ThirdPartyAppDAO thirdPartyAppDAO,
       final AccessSecretRepository accessSecretRepository,
-      ThirdPartyAppMemberRepository thirdPartyAppMemberRepository,
+      final ThirdPartyAppMemberRepository thirdPartyAppMemberRepository,
       final ZerowebConfig zerowebConfig
   ) {
     this.thirdPartyAppRepository = thirdPartyAppRepository;

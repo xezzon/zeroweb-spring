@@ -17,7 +17,6 @@ import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_S
 
 import io.github.xezzon.zeroweb.common.domain.UpdateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.core.trait.Merge;
 import io.github.xezzon.zeroweb.dict.Dict;
 import jakarta.validation.constraints.NotBlank;
@@ -30,9 +29,8 @@ import org.mapstruct.factory.Mappers;
 /// 修改字典请求对象
 ///
 /// 用于封装修改字典项的请求参数。
-/// 该对象实现了 [Into] 接口，可以转换为 [Dict] 实体对象。
 ///
-/// @param id 字典ID
+/// @param id 字典 ID
 /// @param code 字典键
 /// @param label 字典值
 /// @param ordinal 排序号
@@ -64,11 +62,13 @@ public record ModifyDictReq(
 
     @Override
     @Mapping(target = "id", source = "origin.id")
+    @Mapping(target = "tag", source = "origin.tag")
     @Mapping(target = "code", source = "value.code")
     @Mapping(target = "label", source = "value.label")
     @Mapping(target = "ordinal", source = "value.ordinal")
     @Mapping(target = "parentId", source = "value.parentId")
     @Mapping(target = "enabled", source = "value.enabled")
+    @Mapping(target = "editable", source = "origin.editable")
     Dict merge(ModifyDictReq value, Dict origin);
   }
 }

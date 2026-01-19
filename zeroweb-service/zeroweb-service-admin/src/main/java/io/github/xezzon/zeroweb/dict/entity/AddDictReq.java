@@ -18,7 +18,6 @@ import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_S
 import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.dict.Dict;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,7 +32,6 @@ import org.mapstruct.factory.Mappers;
 /// 新增字典请求对象
 ///
 /// 用于封装新增字典目或字典项的请求参数。
-/// 该对象实现了 [Into] 接口，可以转换为 [Dict] 实体对象。
 ///
 /// @author xezzon
 @Getter
