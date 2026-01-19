@@ -18,8 +18,6 @@ import io.github.xezzon.zeroweb.locale.Language;
 import io.github.xezzon.zeroweb.locale.repository.LanguageRepository;
 import java.util.List;
 import java.util.Optional;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Repository;
 
 /// 语言数据访问对象。
@@ -32,14 +30,6 @@ public class LanguageDAO extends BaseDAO<Language, String, LanguageRepository> {
   /// @param repository 语言 JPA 接口
   LanguageDAO(final LanguageRepository repository) {
     super(repository, Language.class);
-  }
-
-  /// 获取语言复制器。
-  ///
-  /// @return 语言复制器实例。
-  @Override
-  public ICopier<Language> getCopier() {
-    return Copier.INSTANCE;
   }
 
   /// 根据语言标签查找语言。
@@ -55,12 +45,5 @@ public class LanguageDAO extends BaseDAO<Language, String, LanguageRepository> {
   /// @return 语言列表。
   List<Language> findAllOrderByOrdinalAsc() {
     return this.get().findByDictTagOrderByOrdinalAsc(Language.LANGUAGE_DICT_TAG);
-  }
-
-  /// 语言复制器接口。
-  @Mapper
-  interface Copier extends ICopier<Language> {
-
-    Copier INSTANCE = Mappers.getMapper(Copier.class);
   }
 }

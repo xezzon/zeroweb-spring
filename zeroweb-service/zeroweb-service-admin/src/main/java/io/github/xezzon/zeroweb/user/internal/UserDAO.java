@@ -16,8 +16,6 @@ package io.github.xezzon.zeroweb.user.internal;
 import io.github.xezzon.zeroweb.common.jpa.BaseDAO;
 import io.github.xezzon.zeroweb.user.User;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -30,16 +28,5 @@ public class UserDAO extends BaseDAO<User, String, UserRepository> {
   /// @param repository 用户 JPA 接口
   UserDAO(final UserRepository repository) {
     super(repository, User.class);
-  }
-
-  @Override
-  public ICopier<User> getCopier() {
-    return Copier.INSTANCE;
-  }
-
-  @Mapper
-  interface Copier extends ICopier<User> {
-
-    Copier INSTANCE = Mappers.getMapper(Copier.class);
   }
 }

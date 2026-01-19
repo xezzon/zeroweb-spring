@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -23,8 +23,6 @@ import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.Optional;
 import org.jspecify.annotations.NullMarked;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -43,14 +41,6 @@ public class DictDAO extends BaseDAO<Dict, String, DictRepository> {
 
   DictDAO(DictRepository repository) {
     super(repository, Dict.class);
-  }
-
-  /// 数据复制器实例
-  ///
-  /// @return 字典数据复制器
-  @Override
-  public ICopier<Dict> getCopier() {
-    return Copier.INSTANCE;
   }
 
   /// 分页查询
@@ -88,11 +78,5 @@ public class DictDAO extends BaseDAO<Dict, String, DictRepository> {
         .set(Dict_.enabled, enabled)
         .where(root.get(Dict_.id).in(ids))
     );
-  }
-
-  @Mapper
-  interface Copier extends ICopier<Dict> {
-
-    Copier INSTANCE = Mappers.getMapper(Copier.class);
   }
 }

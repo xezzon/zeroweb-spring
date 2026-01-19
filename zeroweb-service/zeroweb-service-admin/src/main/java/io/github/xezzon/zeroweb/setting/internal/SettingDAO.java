@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -19,8 +19,6 @@ import io.github.xezzon.zeroweb.setting.Setting;
 import io.github.xezzon.zeroweb.setting.Setting_;
 import io.github.xezzon.zeroweb.setting.repository.SettingRepository;
 import org.jspecify.annotations.NonNull;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -49,22 +47,5 @@ public class SettingDAO extends BaseDAO<Setting, String, SettingRepository> {
   public Page<@NonNull Setting> findAll(final @NonNull ODataQueryOption odata) {
     Sort sort = Sort.by(Order.desc(Setting_.UPDATE_TIME));
     return super.findAll(odata, null, sort);
-  }
-
-  /// 获取拷贝器
-  ///
-  /// @return 业务参数实体拷贝器实例
-  @Override
-  public ICopier<Setting> getCopier() {
-    return Copier.INSTANCE;
-  }
-
-  /// 业务参数实体拷贝器
-  ///
-  /// 使用MapStruct生成的拷贝工具，用于业务参数实体的字段映射和复制
-  @Mapper
-  interface Copier extends ICopier<Setting> {
-
-    Copier INSTANCE = Mappers.getMapper(Copier.class);
   }
 }

@@ -21,23 +21,6 @@ class BaseDAOTest {
   @Resource
   private TestEntityRepository repository;
 
-
-  @Test
-  void partialUpdate() {
-    TestEntity testEntity = new TestEntity();
-    testEntity.setField1(RandomUtil.randomString(8));
-    testEntity.setField2(RandomUtil.randomString(8));
-    repository.save(testEntity);
-    TestEntity testEntity1 = new TestEntity();
-    testEntity1.setId(testEntity.getId());
-    testEntity1.setField1(RandomUtil.randomString(8));
-    testEntityDAO.partialUpdate(testEntity1);
-
-    TestEntity result = repository.findById(testEntity.getId()).orElseThrow();
-    Assertions.assertEquals(testEntity1.getField1(), result.getField1());
-    Assertions.assertEquals(testEntity.getField2(), result.getField2());
-  }
-
   @Test
   void findAll() {
     final int loopTime = 16;

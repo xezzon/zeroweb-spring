@@ -17,8 +17,6 @@ import io.github.xezzon.zeroweb.app.App;
 import io.github.xezzon.zeroweb.app.repository.AppRepository;
 import io.github.xezzon.zeroweb.common.jpa.BaseDAO;
 import org.jspecify.annotations.NullMarked;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Repository;
 
 /// `AppDAO` 是服务实体的数据库访问对象（DAO）。
@@ -35,16 +33,5 @@ public class AppDAO extends BaseDAO<App, String, AppRepository> {
   /// @param repository [AppRepository] 实例。
   AppDAO(final AppRepository repository) {
     super(repository, App.class);
-  }
-
-  @Override
-  public ICopier<App> getCopier() {
-    return Copier.INSTANCE;
-  }
-
-  @Mapper
-  interface Copier extends ICopier<App> {
-
-    Copier INSTANCE = Mappers.getMapper(Copier.class);
   }
 }
