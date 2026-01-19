@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -41,7 +41,7 @@ public class OpenapiDAO extends BaseDAO<Openapi, String, OpenapiRepository> {
 
   /// 依赖注入
   /// @param repository 对外接口 JPA 接口
-  protected OpenapiDAO(OpenapiRepository repository) {
+  OpenapiDAO(OpenapiRepository repository) {
     super(repository, Openapi.class);
   }
 

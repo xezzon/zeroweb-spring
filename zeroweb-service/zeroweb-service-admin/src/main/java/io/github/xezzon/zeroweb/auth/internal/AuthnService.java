@@ -67,7 +67,7 @@ public class AuthnService {
   /// @param username 用户名。
   /// @param password 原始密码。
   /// @throws InvalidPasswordException 如果用户不存在或密码不匹配。
-  protected void basicLogin(String username, String password) {
+  void basicLogin(String username, String password) {
     final User user = userService.getUserByUsername(username);
     /* 校验用户名、口令 */
     if (user == null) {
@@ -97,7 +97,7 @@ public class AuthnService {
   /// 获取当前用户的认证信息，用于构建 JWT Claim。
   ///
   /// @return 包含用户 ID、用户名、昵称、角色和权限的 [JwtClaim] 对象。
-  protected JwtClaim getCustomClaim() {
+  JwtClaim getCustomClaim() {
     final User user = SessionUtil.loadUser();
     if (user == null) {
       throw NotLoginException.newInstance(StpUtil.TYPE, NOT_TOKEN, NOT_TOKEN_MESSAGE, null)
@@ -119,7 +119,7 @@ public class AuthnService {
   /// JWT 中包含当前用户的认证信息。
   ///
   /// @return 返回生成的 JWT 签名字符串。
-  protected String signJwt() {
+  String signJwt() {
     final JwtClaim claim = this.getCustomClaim();
     return jwtCryptoService.signJwt(claim);
   }
@@ -127,7 +127,7 @@ public class AuthnService {
   /// 登出当前用户。
   ///
   /// 调用 Sa-Token 的 logout 方法。
-  protected void logout() {
+  void logout() {
     StpUtil.logout();
   }
 
@@ -135,7 +135,7 @@ public class AuthnService {
   ///
   /// @param event 用户登录事件 [UserLoginEvent]。
   @EventListener
-  protected void listen(final UserLoginEvent event) {
+  void listen(final UserLoginEvent event) {
     SessionUtil.saveUser(event.getUser());
   }
 }

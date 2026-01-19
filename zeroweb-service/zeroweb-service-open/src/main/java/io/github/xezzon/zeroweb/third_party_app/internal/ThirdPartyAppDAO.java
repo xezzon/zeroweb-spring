@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -36,7 +36,7 @@ public class ThirdPartyAppDAO extends BaseDAO<ThirdPartyApp, String, ThirdPartyA
 
   /// 依赖注入
   /// @param repository 第三方应用 JPA 接口
-  protected ThirdPartyAppDAO(ThirdPartyAppRepository repository) {
+  ThirdPartyAppDAO(ThirdPartyAppRepository repository) {
     super(repository, ThirdPartyApp.class);
   }
 

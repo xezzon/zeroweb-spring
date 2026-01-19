@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -28,7 +28,7 @@ public class UserDAO extends BaseDAO<User, String, UserRepository> {
 
   /// 依赖注入
   /// @param repository 用户 JPA 接口
-  protected UserDAO(final UserRepository repository) {
+  UserDAO(final UserRepository repository) {
     super(repository, User.class);
   }
 

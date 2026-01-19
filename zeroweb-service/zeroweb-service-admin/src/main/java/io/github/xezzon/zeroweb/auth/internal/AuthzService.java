@@ -220,7 +220,7 @@ public class AuthzService {
   ///
   /// @param event 用户登录事件 [UserLoginEvent]。
   @EventListener
-  protected void listen(final UserLoginEvent event) {
+  void listen(final UserLoginEvent event) {
     final List<Role> roles = this.queryRoleByUser(event.getUser().getId());
     final Set<String> roleValues = roles.stream()
         .map(Role::getValue)

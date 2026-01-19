@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -33,7 +33,7 @@ public class AppDAO extends BaseDAO<App, String, AppRepository> {
   /// 构造函数，注入 [AppRepository]。
   ///
   /// @param repository [AppRepository] 实例。
-  protected AppDAO(final AppRepository repository) {
+  AppDAO(final AppRepository repository) {
     super(repository, App.class);
   }
 

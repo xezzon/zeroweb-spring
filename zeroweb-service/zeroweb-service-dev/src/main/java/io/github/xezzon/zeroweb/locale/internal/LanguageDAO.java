@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -30,7 +30,7 @@ public class LanguageDAO extends BaseDAO<Language, String, LanguageRepository> {
 
   /// 依赖注入
   /// @param repository 语言 JPA 接口
-  protected LanguageDAO(final LanguageRepository repository) {
+  LanguageDAO(final LanguageRepository repository) {
     super(repository, Language.class);
   }
 

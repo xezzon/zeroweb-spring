@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -60,7 +60,7 @@ public class SubscriptionService implements ISubscriptionService4Call {
   ///
   /// @param subscription 要添加的订阅对象
   /// @throws UnpublishedOpenapiCannotBeSubscribeException 如果要订阅的Openapi未发布，则抛出异常
-  protected void addSubscription(Subscription subscription) {
+  void addSubscription(Subscription subscription) {
     Openapi openapi = openapiService.getByCode(subscription.getOpenapiCode());
     if (openapi == null || !Objects.equals(openapi.getStatus(), OpenapiStatus.PUBLISHED)) {
       throw new UnpublishedOpenapiCannotBeSubscribeException();
@@ -82,7 +82,7 @@ public class SubscriptionService implements ISubscriptionService4Call {
   /// 只对审核中的订阅有效。其他状态不变更。
   ///
   /// @param id 订阅的ID
-  protected void auditSubscription(String id) {
+  void auditSubscription(String id) {
     Subscription entity = subscriptionRepository.findById(id).orElseThrow();
     if (!Objects.equals(entity.getSubscriptionStatus(), SubscriptionStatus.AUDITING)) {
       // 不是审核中，不变更状态

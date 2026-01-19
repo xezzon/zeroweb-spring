@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -88,7 +88,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
   /// @param thirdPartyApp 要添加的第三方应用对象
   /// @return 生成的访问密钥对象
   @Transactional()
-  protected AccessSecret addThirdPartyApp(ThirdPartyApp thirdPartyApp) {
+  AccessSecret addThirdPartyApp(ThirdPartyApp thirdPartyApp) {
     thirdPartyAppDAO.get().save(thirdPartyApp);
     eventPublisher.publishEvent(new ThirdPartyAppCreatedEvent(thirdPartyApp));
     return this.rollAccessSecret(thirdPartyApp.getId());
@@ -98,7 +98,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
   ///
   /// @param userId 用户ID
   /// @return 分页查询结果，包含符合条件的第三方应用列表
-  protected Page<@NonNull ThirdPartyApp> listThirdPartyAppByUser(String userId) {
+  Page<@NonNull ThirdPartyApp> listThirdPartyAppByUser(String userId) {
     List<ThirdPartyAppMember> members = thirdPartyAppMemberRepository.findByUserId(userId);
     Set<String> appIds = members.stream()
         .map(ThirdPartyAppMember::getGroupId)
@@ -111,7 +111,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
   ///
   /// @param odata OData查询选项，用于指定分页和排序等条件
   /// @return 分页查询结果，包含符合条件的第三方应用列表
-  protected Page<@NonNull ThirdPartyApp> listThirdPartyApp(ODataQueryOption odata) {
+  Page<@NonNull ThirdPartyApp> listThirdPartyApp(ODataQueryOption odata) {
     return thirdPartyAppDAO.findAll(odata);
   }
 
@@ -119,7 +119,7 @@ public class ThirdPartyAppService implements IThirdPartyAppService4Call {
   ///
   /// @param appId 应用标识
   /// @return 更新后的应用访问凭据与密钥
-  protected AccessSecret rollAccessSecret(String appId) {
+  AccessSecret rollAccessSecret(String appId) {
     SecretKey secretKey = SIG.HS256.key().build();
     AccessSecret accessSecret = new AccessSecret();
     accessSecret.setId(appId);

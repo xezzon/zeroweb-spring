@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -36,7 +36,7 @@ public class I18nMessageDAO extends BaseDAO<I18nMessage, String, I18nMessageRepo
 
   /// 依赖注入
   /// @param repository 国际化内容 JPA 接口
-  protected I18nMessageDAO(final I18nMessageRepository repository) {
+  I18nMessageDAO(final I18nMessageRepository repository) {
     super(repository, I18nMessage.class);
   }
 

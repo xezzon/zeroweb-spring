@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -44,7 +44,7 @@ public class UserService implements IUserService4Auth {
   ///
   /// @param user 用户
   /// @throws RepeatDataException 如果用户名已存在，则抛出此异常
-  protected void addUser(User user) {
+  void addUser(User user) {
     /* 前置校验 */
     Optional<User> exist = userDAO.get().findByUsername(user.getUsername());
     if (exist.isPresent()) {
@@ -58,7 +58,7 @@ public class UserService implements IUserService4Auth {
   ///
   /// @param username 用户名
   /// @return 返回与用户名对应的用户信息，若不存在则返回null
-  protected @Nullable User getByUsername(@NonNull final String username) {
+  @Nullable User getByUsername(@NonNull final String username) {
     return userDAO.get().findByUsername(username).orElse(null);
   }
 

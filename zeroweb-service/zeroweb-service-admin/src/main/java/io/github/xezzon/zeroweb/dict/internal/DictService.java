@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -49,7 +49,7 @@ public class DictService {
   ///
   /// @param dict 字典项
   /// @throws RepeatDataException 字典键冲突
-  protected void addDict(Dict dict) {
+  void addDict(Dict dict) {
     /* 前置校验 */
     checkRepeat(dict);
     /* 持久化 */
@@ -60,7 +60,7 @@ public class DictService {
   ///
   /// @param odata OData查询选项
   /// @return 字典分页列表
-  protected Page<@NonNull Dict> pagedList(ODataQueryOption odata) {
+  Page<@NonNull Dict> pagedList(ODataQueryOption odata) {
     return dictDAO.findAll(odata);
   }
 
@@ -69,7 +69,7 @@ public class DictService {
   /// @param dict 字典项
   /// @throws RepeatDataException 字典键冲突
   /// @throws NoSuchElementException 字典不存在
-  protected void modifyDict(Dict dict) {
+  void modifyDict(Dict dict) {
     Dict entity = dictDAO.get().findById(dict.getId()).orElseThrow();
     /* 前置校验 */
     dict.setTag(entity.getTag());
@@ -84,7 +84,7 @@ public class DictService {
   ///
   /// @param ids 字典ID集合
   /// @param enabled 更新后的字典启用状态
-  protected void updateDictStatus(Collection<String> ids, Boolean enabled) {
+  void updateDictStatus(Collection<String> ids, Boolean enabled) {
     if (ids.isEmpty()) {
       return;
     }
@@ -95,7 +95,7 @@ public class DictService {
   ///
   /// @param ids 字典ID集合
   @Transactional
-  protected void remove(Collection<String> ids) {
+  void remove(Collection<String> ids) {
     while (!ids.isEmpty()) {
       dictDAO.get().deleteAllByIdInBatch(ids);
       List<Dict> children = dictDAO.get().findByParentIdIn(ids);
@@ -109,7 +109,7 @@ public class DictService {
   ///
   /// @param tag 字典目编码
   /// @return 字典项列表（已按排序号升序排列）
-  protected List<Dict> getDictItemList(String tag) {
+  List<Dict> getDictItemList(String tag) {
     return dictDAO.get().findByTagOrderByOrdinalAsc(tag);
   }
 
@@ -118,7 +118,7 @@ public class DictService {
   /// 先给导入字典目，得到字典目的ID，再给字典项的parentId赋值。
   ///
   /// @param dictList 字典列表
-  protected void importDict(List<Dict> dictList) {
+  void importDict(List<Dict> dictList) {
     List<Dict> tagList = dictList.stream()
         .filter(o -> Objects.equals(o.getTag(), Dict.DICT_TAG))
         .toList();

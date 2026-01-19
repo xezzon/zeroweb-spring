@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TestEntityDAO extends BaseDAO<TestEntity, String, TestEntityRepository> {
 
-  protected TestEntityDAO(TestEntityRepository repository) {
+  TestEntityDAO(TestEntityRepository repository) {
     super(repository, TestEntity.class);
   }
 

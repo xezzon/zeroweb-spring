@@ -49,7 +49,7 @@ public class OpenapiService implements IOpenapiService4Subscription {
   ///
   /// @param openapi 要添加的对外接口对象
   /// @throws RepeatDataException 如果要添加的对外接口编码重复，则抛出异常
-  protected void addOpenapi(Openapi openapi) {
+  void addOpenapi(Openapi openapi) {
     this.checkRepeat(openapi);
     openapiDAO.get().save(openapi);
   }
@@ -58,7 +58,7 @@ public class OpenapiService implements IOpenapiService4Subscription {
   ///
   /// @param odata OData查询选项
   /// @return 分页查询结果，包含符合条件的对外接口列表
-  protected Page<@NonNull Openapi> pageList(ODataQueryOption odata) {
+  Page<@NonNull Openapi> pageList(ODataQueryOption odata) {
     return openapiDAO.findAll(odata);
   }
 
@@ -67,7 +67,7 @@ public class OpenapiService implements IOpenapiService4Subscription {
   /// @param openapi 需要修改的对外接口对象
   /// @throws RepeatDataException 如果要修改的对外接口编码重复，则抛出异常
   /// @throws PublishedOpenapiCannotBeModifyException 如果要修改的Openapi已经发布且编码（即对外的路径）被修改，则抛出异常
-  protected void modifyOpenapi(Openapi openapi) {
+  void modifyOpenapi(Openapi openapi) {
     this.checkRepeat(openapi);
     Openapi entity = openapiDAO.get().findById(openapi.getId()).orElseThrow();
     if (entity.isPublished()
@@ -85,7 +85,7 @@ public class OpenapiService implements IOpenapiService4Subscription {
   /// 如果指定接口已发布，则不做处理
   ///
   /// @param id 要发布的对外接口的ID
-  protected void publishOpenapi(String id) {
+  void publishOpenapi(String id) {
     Openapi entity = openapiDAO.get().findById(id).orElseThrow();
     entity.setStatus(OpenapiStatus.PUBLISHED);
     openapiDAO.get().save(entity);
