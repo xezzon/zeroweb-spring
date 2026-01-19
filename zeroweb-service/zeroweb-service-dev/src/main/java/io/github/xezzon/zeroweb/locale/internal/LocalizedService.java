@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -59,6 +59,18 @@ public class LocalizedService {
     this.translationRepository = translationRepository;
   }
 
+  /// 查询指定的语言
+  /// @param id 语言的 ID
+  Language queryLanguageById(final String id) {
+    return languageDAO.get().findById(id).orElseThrow();
+  }
+
+  /// 查询指定的国际化消息
+  /// @param id 国际化消息的 ID
+  I18nMessage queryI18nMessageById(final String id) {
+    return i18nMessageDAO.get().findById(id).orElseThrow();
+  }
+
   /// 新增语言。
   ///
   /// @param language 待新增的语言。
@@ -79,19 +91,16 @@ public class LocalizedService {
 
   /// 更新语言。
   ///
-  /// @param language 待更新的语言信息。
-  void updateLanguage(final Language language) {
-    final Language entity = languageDAO.get().findById(language.getId()).orElseThrow();
+  /// @param oldValue 更新前的语言信息。
+  /// @param newValue 待更新的语言信息。
+  void updateLanguage(final Language oldValue, final Language newValue) {
     /* 前置校验 */
-    this.checkRepeat(language);
-    /* 属性赋值 */
-    final String oldTag = entity.getLanguageTag();
-    languageDAO.getCopier().copy(language, entity);
+    this.checkRepeat(newValue);
     /* 持久化 */
-    languageDAO.get().save(entity);
+    languageDAO.get().save(newValue);
     /* 后置处理 */
-    if (!Objects.equals(oldTag, language.getLanguageTag())) {
-      translationRepository.updateByLanguage(oldTag, language.getLanguageTag());
+    if (!Objects.equals(oldValue.getLanguageTag(), newValue.getLanguageTag())) {
+      translationRepository.updateByLanguage(oldValue.getLanguageTag(), newValue.getLanguageTag());
     }
   }
 
@@ -140,20 +149,17 @@ public class LocalizedService {
 
   /// 更新国际化内容。
   ///
-  /// @param i18nMessage 待更新的国际化内容。
+  /// @param oldValue 更新前的国际化内容
+  /// @param newValue 待更新的国际化内容。
   /// @throws RepeatDataException 如果国际化内容已存在。
   /// @throws jakarta.persistence.EntityNotFoundException 如果国际化内容不存在或已删除。
-  void updateI18nMessage(final I18nMessage i18nMessage) {
-    final I18nMessage entity = i18nMessageDAO.get().findById(i18nMessage.getId()).orElseThrow();
-    final I18nMessage oldValue = new I18nMessage();
-    i18nMessageDAO.getCopier().copy(entity, oldValue);
+  void updateI18nMessage(final I18nMessage oldValue, final I18nMessage newValue) {
     /* 前置校验 */
-    this.checkRepeat(i18nMessage);
+    this.checkRepeat(newValue);
     /* 持久化 */
-    i18nMessageDAO.getCopier().copy(i18nMessage, entity);
-    i18nMessageDAO.get().save(entity);
+    i18nMessageDAO.get().save(newValue);
     /* 后置处理 */
-    eventPublisher.publishEvent(new I18nMessageChangedEvent(oldValue, i18nMessage));
+    eventPublisher.publishEvent(new I18nMessageChangedEvent(oldValue, newValue));
   }
 
   /// 删除国际化内容。

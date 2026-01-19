@@ -45,6 +45,12 @@ public class DictService {
     this.dictDAO = dictDAO;
   }
 
+  /// 查询指定的字典
+  /// @param id 字典 ID
+  Dict queryById(final String id) {
+    return dictDAO.get().findById(id).orElseThrow();
+  }
+
   /// 新增字典
   ///
   /// @param dict 字典项
@@ -70,14 +76,10 @@ public class DictService {
   /// @throws RepeatDataException 字典键冲突
   /// @throws NoSuchElementException 字典不存在
   void modifyDict(Dict dict) {
-    Dict entity = dictDAO.get().findById(dict.getId()).orElseThrow();
     /* 前置校验 */
-    dict.setTag(entity.getTag());
     this.checkRepeat(dict);
-    /* 属性复制（忽略空属性） */
-    dictDAO.getCopier().copy(dict, entity);
     /* 持久化 */
-    dictDAO.get().save(entity);
+    dictDAO.get().save(dict);
   }
 
   /// 更新字典状态

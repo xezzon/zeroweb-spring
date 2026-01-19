@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -97,8 +97,9 @@ public class SettingHttpEndpoint {
   @SaCheckPermission({PermissionConstant.SETTING_WRITE})
   @PutMapping("/schema")
   void updateSettingSchema(@RequestBody @Valid final UpdateSchemaRequest request) {
-    Setting setting = request.into();
-    settingService.updateSetting(setting);
+    Setting oldValue = settingService.queryById(request.id());
+    Setting newValue = request.merge(oldValue);
+    settingService.updateSetting(newValue);
   }
 
   /// 更新业务参数（仅更新值）
@@ -109,8 +110,9 @@ public class SettingHttpEndpoint {
   @SaCheckPermission({PermissionConstant.SETTING_READ})
   @PutMapping("/value")
   void updateSettingValue(@RequestBody @Valid final UpdateValueRequest request) {
-    Setting setting = request.into();
-    settingService.updateSetting(setting);
+    Setting oldValue = settingService.queryById(request.id());
+    Setting newValue = request.merge(oldValue);
+    settingService.updateSetting(newValue);
   }
 
   /// 删除业务参数

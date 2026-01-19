@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,14 +15,15 @@ package io.github.xezzon.zeroweb.locale.entity;
 
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 
+import io.github.xezzon.zeroweb.common.domain.UpdateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
-import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
+import io.github.xezzon.zeroweb.core.trait.Merge;
 import io.github.xezzon.zeroweb.locale.Language;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 /// 修改语言的请求参数
@@ -43,19 +44,24 @@ public record ModifyLanguageReq(
     @NotNull
     Integer ordinal,
     Boolean enabled
-) implements Into<Language> {
+) implements UpdateRequest<Language> {
 
   @Override
-  public Language into() {
-    return Converter.INSTANCE.from(this);
+  public Language merge(final Language oldValue) {
+    return Converter.INSTANCE.merge(this, oldValue);
   }
 
   @Mapper
-  interface Converter extends From<ModifyLanguageReq, Language> {
+  interface Converter extends Merge<ModifyLanguageReq, Language> {
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
     @Override
-    Language from(ModifyLanguageReq source);
+    @Mapping(target = "id", source = "origin.id")
+    @Mapping(target = "languageTag", source = "value.languageTag")
+    @Mapping(target = "description", source = "value.description")
+    @Mapping(target = "ordinal", source = "value.ordinal")
+    @Mapping(target = "enabled", source = "value.enabled")
+    Language merge(ModifyLanguageReq value, Language origin);
   }
 }

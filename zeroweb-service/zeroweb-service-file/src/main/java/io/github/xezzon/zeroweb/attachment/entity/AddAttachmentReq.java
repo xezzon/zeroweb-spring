@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -16,8 +16,8 @@ package io.github.xezzon.zeroweb.attachment.entity;
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 
 import io.github.xezzon.zeroweb.attachment.Attachment;
+import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -46,7 +46,7 @@ public record AddAttachmentReq(
     @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String bizType,
     String bizId
-) implements Into<Attachment> {
+) implements CreateRequest<Attachment> {
 
   @Override
   public Attachment into() {

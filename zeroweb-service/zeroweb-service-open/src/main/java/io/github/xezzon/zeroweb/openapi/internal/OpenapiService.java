@@ -45,6 +45,12 @@ public class OpenapiService implements IOpenapiService4Subscription {
     this.openapiDAO = openapiDAO;
   }
 
+  /// 查询指定的对外接口
+  /// @param id 对外接口 ID
+  Openapi queryById(final String id) {
+    return openapiDAO.get().findById(id).orElseThrow();
+  }
+
   /// 添加一个新的对外接口对象到数据库
   ///
   /// @param openapi 要添加的对外接口对象
@@ -64,20 +70,20 @@ public class OpenapiService implements IOpenapiService4Subscription {
 
   /// 修改指定的对外接口对象
   ///
-  /// @param openapi 需要修改的对外接口对象
+  /// @param oldValue 更新前的对外接口对象
+  /// @param newValue 需要修改的对外接口对象
   /// @throws RepeatDataException 如果要修改的对外接口编码重复，则抛出异常
   /// @throws PublishedOpenapiCannotBeModifyException 如果要修改的Openapi已经发布且编码（即对外的路径）被修改，则抛出异常
-  void modifyOpenapi(Openapi openapi) {
-    this.checkRepeat(openapi);
-    Openapi entity = openapiDAO.get().findById(openapi.getId()).orElseThrow();
-    if (entity.isPublished()
-        && openapi.getCode() != null
-        && !Objects.equals(entity.getCode(), openapi.getCode())
+  void modifyOpenapi(final Openapi oldValue, final Openapi newValue) {
+    this.checkRepeat(newValue);
+    if (oldValue.isPublished()
+        && newValue.getCode() != null
+        && !Objects.equals(oldValue.getCode(), newValue.getCode())
     ) {
       // 已发布的接口不能修改编码（即对外的路径）
       throw new PublishedOpenapiCannotBeModifyException();
     }
-    openapiDAO.partialUpdate(openapi);
+    openapiDAO.get().save(newValue);
   }
 
   /// 发布指定的对外接口

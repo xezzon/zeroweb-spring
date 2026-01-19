@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -70,8 +70,9 @@ public class LanguageHttpEndpoint {
   @SaCheckPermission({PermissionConstant.LOCALE_WRITE})
   @PutMapping()
   public void updateLanguage(@RequestBody @Valid final ModifyLanguageReq req) {
-    final Language language = req.into();
-    localizedService.updateLanguage(language);
+    Language oldValue = localizedService.queryLanguageById(req.id());
+    final Language newValue = req.merge(oldValue);
+    localizedService.updateLanguage(oldValue, newValue);
   }
 
   /// 删除语言。

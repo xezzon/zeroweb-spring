@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,9 +15,10 @@ package io.github.xezzon.zeroweb.dict.entity;
 
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 
+import io.github.xezzon.zeroweb.common.domain.UpdateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
-import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
+import io.github.xezzon.zeroweb.core.trait.Merge;
 import io.github.xezzon.zeroweb.dict.Dict;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -48,33 +49,26 @@ public record ModifyDictReq(
     Integer ordinal,
     String parentId,
     Boolean enabled
-) implements Into<Dict> {
+) implements UpdateRequest<Dict> {
 
-  /// 转换为字典实体对象
-  ///
-  /// @return 字典实体对象
   @Override
-  public Dict into() {
-    return Converter.INSTANCE.from(this);
+  public Dict merge(final Dict oldValue) {
+    return Converter.INSTANCE.merge(this, oldValue);
   }
 
   /// 请求对象到实体对象的转换器
   @Mapper
-  interface Converter extends From<ModifyDictReq, Dict> {
+  interface Converter extends Merge<ModifyDictReq, Dict> {
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
-    /// 转换规则：
-    /// - 忽略 `editable`，不允许修改
-    /// - 忽略 `tag`，不允许修改
-    /// - 忽略 `children`，该字段为瞬态字段
-    ///
-    /// @param source 修改字典请求对象
-    /// @return 字典实体对象
-    @Mapping(target = "editable", ignore = true)
-    @Mapping(target = "tag", ignore = true)
-    @Mapping(target = "children", ignore = true)
     @Override
-    Dict from(ModifyDictReq source);
+    @Mapping(target = "id", source = "origin.id")
+    @Mapping(target = "code", source = "value.code")
+    @Mapping(target = "label", source = "value.label")
+    @Mapping(target = "ordinal", source = "value.ordinal")
+    @Mapping(target = "parentId", source = "value.parentId")
+    @Mapping(target = "enabled", source = "value.enabled")
+    Dict merge(ModifyDictReq value, Dict origin);
   }
 }

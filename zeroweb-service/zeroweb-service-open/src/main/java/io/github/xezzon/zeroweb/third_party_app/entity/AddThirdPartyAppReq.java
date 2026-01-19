@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,8 +15,8 @@ package io.github.xezzon.zeroweb.third_party_app.entity;
 
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 
+import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
 import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -33,7 +33,7 @@ import org.mapstruct.factory.Mappers;
 public record AddThirdPartyAppReq(
     @NotBlank @Size(max = NORMAL_STRING_LENGTH)
     String name
-) implements Into<ThirdPartyApp> {
+) implements CreateRequest<ThirdPartyApp> {
 
   @Override
   public ThirdPartyApp into() {

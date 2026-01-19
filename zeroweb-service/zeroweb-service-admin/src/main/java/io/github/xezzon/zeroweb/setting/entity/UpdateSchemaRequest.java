@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -13,8 +13,8 @@
 
 package io.github.xezzon.zeroweb.setting.entity;
 
-import io.github.xezzon.zeroweb.core.trait.From;
-import io.github.xezzon.zeroweb.core.trait.Into;
+import io.github.xezzon.zeroweb.common.domain.UpdateRequest;
+import io.github.xezzon.zeroweb.core.trait.Merge;
 import io.github.xezzon.zeroweb.setting.Setting;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
@@ -36,21 +36,22 @@ public record UpdateSchemaRequest(
     @NotNull
     String schema,
     Map<String, Object> value
-) implements Into<Setting> {
+) implements UpdateRequest<Setting> {
 
   @Override
-  public Setting into() {
-    return Converter.INSTANCE.from(this);
+  public Setting merge(final Setting oldValue) {
+    return Converter.INSTANCE.merge(this, oldValue);
   }
 
   @Mapper
-  interface Converter extends From<UpdateSchemaRequest, Setting> {
+  interface Converter extends Merge<UpdateSchemaRequest, Setting> {
 
     Converter INSTANCE = Mappers.getMapper(Converter.class);
 
-    @Mapping(target = "updateTime", expression = "java(java.time.Instant.now())")
-    @Mapping(target = "code", ignore = true)
     @Override
-    Setting from(UpdateSchemaRequest source);
+    @Mapping(target = "id", source = "origin.id")
+    @Mapping(target = "schema", source = "value.schema")
+    @Mapping(target = "value", source = "value.value")
+    Setting merge(UpdateSchemaRequest value, Setting origin);
   }
 }

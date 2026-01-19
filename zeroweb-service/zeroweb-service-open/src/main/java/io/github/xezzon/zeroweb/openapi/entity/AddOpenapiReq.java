@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -16,6 +16,7 @@ package io.github.xezzon.zeroweb.openapi.entity;
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.URL_LENGTH;
 
+import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
@@ -45,7 +46,7 @@ public record AddOpenapiReq(
     String destination,
     @NotNull
     HttpMethod httpMethod
-) implements Into<Openapi> {
+) implements CreateRequest<Openapi> {
 
   @Override
   public Openapi into() {

@@ -65,10 +65,6 @@ public class AppService {
   ///
   /// @param app 包含要更新的服务信息和其 ID 的实体。
   void updateApp(final App app) {
-    final App entity = appDAO.get().findById(app.getId())
-        .orElseThrow(EntityNotFoundException::new);
-    final App oldValue = new App();
-    appDAO.getCopier().copy(entity, oldValue);
     appDAO.get().save(app);
   }
 

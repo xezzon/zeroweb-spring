@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,6 +15,7 @@ package io.github.xezzon.zeroweb.dict.entity;
 
 import static io.github.xezzon.zeroweb.common.constant.DatabaseConstant.NORMAL_STRING_LENGTH;
 
+import io.github.xezzon.zeroweb.common.domain.CreateRequest;
 import io.github.xezzon.zeroweb.common.validator.Alphanumeric;
 import io.github.xezzon.zeroweb.core.trait.From;
 import io.github.xezzon.zeroweb.core.trait.Into;
@@ -37,7 +38,7 @@ import org.mapstruct.factory.Mappers;
 /// @author xezzon
 @Getter
 @Setter
-public class AddDictReq implements Into<Dict> {
+public class AddDictReq implements CreateRequest<Dict> {
 
   /// 字典目
   ///

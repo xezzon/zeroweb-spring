@@ -81,8 +81,9 @@ public class AppHttpEndpoint {
   @SaCheckPermission({PermissionConstant.APP_WRITE})
   @PutMapping
   public void updateApp(@RequestBody @Valid final UpdateAppReq req) {
-    final App app = req.into();
-    appService.updateApp(app);
+    App oldValue = appService.queryAppById(req.id());
+    final App newValue = req.merge(oldValue);
+    appService.updateApp(newValue);
   }
 
   /// 根据服务ID删除一个服务。

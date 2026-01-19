@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -97,8 +97,9 @@ public class DictHttpEndpoint {
   @SaCheckPermission({PermissionConstant.DICT_WRITE})
   @PutMapping()
   public void modifyDict(@RequestBody @Valid final ModifyDictReq req) {
-    Dict dict = req.into();
-    dictService.modifyDict(dict);
+    Dict oldValue = dictService.queryById(req.id());
+    Dict newValue = req.merge(oldValue);
+    dictService.modifyDict(newValue);
   }
 
   /// 批量更新字典状态
