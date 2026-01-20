@@ -17,6 +17,7 @@ import static io.github.xezzon.zeroweb.crypto.constant.ZxcvbnConstant.ZXCVBN;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.secure.BCrypt;
+import cn.dev33.satoken.stp.StpUtil;
 import com.nulabinc.zxcvbn.Strength;
 import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.metadata.PermissionConstant;
@@ -70,6 +71,16 @@ public class UserHttpEndpoint {
     // 将用户保存到数据库
     userService.addUser(user);
     return Id.of(user.getId());
+  }
+
+  /**
+   * 查询当前用户信息
+   * @return 用户信息
+   */
+  @GetMapping("/me")
+  public User getMyInfo() {
+    String userId = StpUtil.getLoginIdAsString();
+    return userService.queryById(userId);
   }
 
   /// 获取用户列表
