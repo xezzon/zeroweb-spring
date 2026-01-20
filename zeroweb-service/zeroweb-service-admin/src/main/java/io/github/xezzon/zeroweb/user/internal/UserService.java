@@ -46,6 +46,13 @@ public class UserService implements IUserService4Auth {
     this.userDAO = userDAO;
   }
 
+  /// 根据 ID 查询用户
+  /// @param id 用户 ID
+  /// @return 用户信息
+  User queryById(final String id) {
+    return userRepository.findById(id).orElseThrow();
+  }
+
   /// 添加用户
   ///
   /// @param user 用户

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -24,10 +24,12 @@ import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.crypto.IPasswordService;
 import io.github.xezzon.zeroweb.user.User;
 import io.github.xezzon.zeroweb.user.entity.RegisterUserReq;
+import io.github.xezzon.zeroweb.user.entity.UserInfoResp;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,7 +77,19 @@ public class UserHttpEndpoint {
   /// @return 包含分页信息的用户列表
   @GetMapping()
   @SaCheckPermission(PermissionConstant.USER_LIST)
-  public Page<User> getUserPaged(final ODataRequestParam odata) {
-    return userService.listAll(odata.into());
+  public Page<UserInfoResp> getUserPaged(final ODataRequestParam odata) {
+    return userService.listAll(odata.into())
+        .map(UserInfoResp::from);
+  }
+
+  /**
+   * 查询指定用户
+   * @param id 用户 ID
+   * @return 用户信息
+   */
+  @GetMapping("/{id}")
+  public UserInfoResp queryUserById(@PathVariable final String id) {
+    User user = userService.queryById(id);
+    return UserInfoResp.from(user);
   }
 }
