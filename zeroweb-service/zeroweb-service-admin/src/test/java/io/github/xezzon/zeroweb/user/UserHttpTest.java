@@ -5,6 +5,7 @@ import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
 import static io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant.ERROR_CODE_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.dev33.satoken.secure.BCrypt;
@@ -18,6 +19,7 @@ import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.user.entity.RegisterUserReq;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +37,8 @@ class UserHttpTest {
 
   private static final String USER_REGISTER_URI = "/user/register";
   private static final String USER_LIST_URI = "/user";
+  private static final String QUERY_USER_URI = "/user/{id}";
+  private static final String GET_MY_INFO_URI = "/user/me";
 
   private final User user = new User();
   @Resource
@@ -126,5 +130,46 @@ class UserHttpTest {
     assertTrue(responseBody.getContent().stream().anyMatch(
         o -> Objects.equals(o.getId(), UserConstant.ROOT.getId())
     ));
+  }
+
+  @Test
+  void queryUserById() {
+    User responseBody = testClient.get()
+        .uri(QUERY_USER_URI, user.getId())
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(User.class)
+        .returnResult().getResponseBody();
+    assertNotNull(responseBody);
+    assertEquals(user.getId(), responseBody.getId());
+    assertNull(responseBody.getCipher());
+    assertNull(responseBody.getCreateTime());
+  }
+
+  @Test
+  void getMyInfo() {
+    User responseBody = testClient.get()
+        .uri(GET_MY_INFO_URI)
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().id(user.id).bearer())
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(User.class)
+        .returnResult().getResponseBody();
+    assertNotNull(responseBody);
+    assertEquals(user.getId(), responseBody.getId());
+    assertNull(responseBody.getCipher());
+    assertTrue(
+        Duration.between(user.getCreateTime(), responseBody.getCreateTime())
+            .abs().toMillis() < 1
+    );
+  }
+
+  @Test
+  void getMyInfo_notLogin() {
+    testClient.get()
+        .uri(GET_MY_INFO_URI)
+        .exchange()
+        .expectStatus().isUnauthorized();
   }
 }
