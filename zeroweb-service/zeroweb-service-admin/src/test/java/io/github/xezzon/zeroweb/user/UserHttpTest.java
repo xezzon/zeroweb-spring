@@ -16,6 +16,7 @@ import io.github.xezzon.zeroweb.common.domain.Id;
 import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
+import io.github.xezzon.zeroweb.crypto.IPasswordService;
 import io.github.xezzon.zeroweb.user.entity.RegisterUserReq;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
 /// @author xezzon
@@ -39,6 +41,9 @@ class UserHttpTest {
   private static final String USER_LIST_URI = "/user";
   private static final String QUERY_USER_URI = "/user/{id}";
   private static final String GET_MY_INFO_URI = "/user/me";
+
+  @MockitoBean
+  IPasswordService passwordService;
 
   private final User user = new User();
   @Resource
