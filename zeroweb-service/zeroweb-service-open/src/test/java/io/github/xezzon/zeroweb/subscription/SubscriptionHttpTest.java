@@ -45,7 +45,8 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class SubscriptionHttpTest {
 
-  private static final String SUBSCRIPTION_LIST_URI = "/third-party-app/{appId}/subscription";
+  private static final String SUBSCRIPTION_PAGE_URI = "/third-party-app/{appId}/subscription";
+  private static final String SUBSCRIPTION_LIST_URI = "/subscription";
   private static final String SUBSCRIBE_URI = "/subscription";
   private static final String AUDIT_SUBSCRIPTION_URI = "/subscription/{id}/audit";
   private static final String THIRD_PARTY_APP_MEMBER = UUID.randomUUID().toString();
@@ -108,13 +109,13 @@ class SubscriptionHttpTest {
   }
 
   @Test
-  void listSubscription() {
+  void listSubscriptionWithOpenapi() {
     final int top = 2000;
     final int skip = 0;
     List<Subscription> dataset = repository.findAll();
 
     PagedModel<Subscription> responseBody = testClient.get()
-        .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
+        .uri(builder -> builder.path(SUBSCRIPTION_PAGE_URI)
             .queryParam("top", top)
             .queryParam("skip", skip)
             .build(dataset.getFirst().getAppId())
@@ -169,13 +170,50 @@ class SubscriptionHttpTest {
   }
 
   @Test
+  void listSubscription() {
+    List<Subscription> dataset = repository.findAll();
+    String appId = dataset.getFirst().getAppId();
+
+    List<Subscription> subscriptions = testClient.get()
+        .uri(uri -> uri
+            .path(SUBSCRIPTION_LIST_URI)
+            .queryParam("appId", appId)
+            .build()
+        )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator
+            .userBuilder()
+            .id(THIRD_PARTY_APP_MEMBER)
+            .bearer()
+        )
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(new ParameterizedTypeReference<List<Subscription>>() {
+        })
+        .returnResult().getResponseBody();
+    Assertions.assertNotNull(subscriptions);
+
+    List<Subscription> expect = dataset.parallelStream()
+        .filter(o -> Objects.equals(o.getAppId(), appId))
+        .sorted(Comparator.comparing(Subscription::getId))
+        .toList();
+    List<Subscription> actual = subscriptions.parallelStream()
+        .sorted(Comparator.comparing(Subscription::getId))
+        .toList();
+    Assertions.assertEquals(expect.size(), actual.size());
+    for (int i = 0, cnt = expect.size(); i < cnt; i++) {
+      Assertions.assertEquals(expect.get(i).getId(), actual.get(i).getId());
+    }
+  }
+
+  @Test
   void listSubscription_dataPermission() {
     final int top = 2000;
     final int skip = 0;
     List<Subscription> dataset = repository.findAll();
 
     testClient.get()
-        .uri(builder -> builder.path(SUBSCRIPTION_LIST_URI)
+        .uri(builder -> builder.path(SUBSCRIPTION_PAGE_URI)
             .queryParam("top", top)
             .queryParam("skip", skip)
             .build(dataset.getFirst().getAppId())

@@ -92,11 +92,20 @@ public class SubscriptionService implements ISubscriptionService4Call {
     subscriptionRepository.save(entity);
   }
 
+  /// 查询指定应用的订阅列表
+  /// @param appId 第三方应用 ID
+  /// @return 订阅列表
+  List<Subscription> listSubscription(final String appId) {
+    return subscriptionRepository.findByAppId(appId);
+  }
+
   /// 获取订阅列表，包含所有已发布接口及指定应用的订阅状态
   /// @param odata OData查询选项，用于指定查询条件、排序方式等
   /// @param appId 第三方应用ID
   /// @return 包含订阅信息的分页对象
-  public Page<@NonNull Subscription> listSubscription(ODataQueryOption odata, String appId) {
+  public Page<@NonNull Subscription> listSubscriptionWithOpenapi(
+      final ODataQueryOption odata, final String appId
+  ) {
     Page<@NonNull Openapi> openapiPage = openapiService.listPublishedOpenapi(odata);
     List<Subscription> subscriptions = subscriptionRepository.findByAppId(appId);
     Map<String, Subscription> subscriptionMap = subscriptions.stream()

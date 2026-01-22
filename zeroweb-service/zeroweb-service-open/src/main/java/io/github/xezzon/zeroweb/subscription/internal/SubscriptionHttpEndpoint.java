@@ -28,6 +28,7 @@ import io.github.xezzon.zeroweb.subscription.entity.AddSubscriptionReq;
 import io.github.xezzon.zeroweb.subscription.enumeration.SubscriptionStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /// 接口订阅管理
@@ -59,13 +61,27 @@ public class SubscriptionHttpEndpoint {
     this.subscriptionPermissionManager = subscriptionPermissionManager;
   }
 
+  /// 查询已订阅的接口
+  /// @param appId 第三方应用 ID
+  /// @return 订阅列表
+  @GetMapping("/subscription")
+  public List<Subscription> listSubscription(
+      @RequestParam final String appId
+  ) {
+    if (!StpUtil.hasPermission(PermissionConstant.SUBSCRIPTION_AUDIT)) {
+      // 应用管理员可以查看所有应用的订阅，非管理员则需要对应的权限
+      subscriptionPermissionManager.check(appId, JwtAuth.getOrThrow().getSub(), LIST_SUBSCRIPTION);
+    }
+    return subscriptionService.listSubscription(appId);
+  }
+
   /// 查询所有已发布的对外接口以及指定第三方应用的订阅情况
   ///
   /// @param odata 查询参数
-  /// @param appId 第三方应用ID
+  /// @param appId 第三方应用 ID
   /// @return 所有已发布的对外接口以及指定第三方应用的订阅情况
   @GetMapping("/third-party-app/{appId}/subscription")
-  public Page<@NonNull Subscription> listSubscription(
+  public Page<@NonNull Subscription> listSubscriptionWithOpenapi(
       final ODataRequestParam odata,
       @PathVariable @NotBlank final String appId
   ) {
@@ -73,7 +89,7 @@ public class SubscriptionHttpEndpoint {
       // 应用管理员可以查看所有应用的订阅，非管理员则需要对应的权限
       subscriptionPermissionManager.check(appId, JwtAuth.getOrThrow().getSub(), LIST_SUBSCRIPTION);
     }
-    return subscriptionService.listSubscription(odata.into(), appId);
+    return subscriptionService.listSubscriptionWithOpenapi(odata.into(), appId);
   }
 
   /// 订阅对外接口
