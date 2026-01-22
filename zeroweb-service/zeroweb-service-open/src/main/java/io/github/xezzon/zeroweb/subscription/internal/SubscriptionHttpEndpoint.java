@@ -61,22 +61,24 @@ public class SubscriptionHttpEndpoint {
     this.subscriptionPermissionManager = subscriptionPermissionManager;
   }
 
-  /**
-   * 查询已订阅的接口
-   * @param appId 第三方应用 ID
-   * @return 订阅列表
-   */
+  /// 查询已订阅的接口
+  /// @param appId 第三方应用 ID
+  /// @return 订阅列表
   @GetMapping("/subscription")
   public List<Subscription> listSubscription(
       @RequestParam final String appId
   ) {
+    if (!StpUtil.hasPermission(PermissionConstant.SUBSCRIPTION_AUDIT)) {
+      // 应用管理员可以查看所有应用的订阅，非管理员则需要对应的权限
+      subscriptionPermissionManager.check(appId, JwtAuth.getOrThrow().getSub(), LIST_SUBSCRIPTION);
+    }
     return subscriptionService.listSubscription(appId);
   }
 
   /// 查询所有已发布的对外接口以及指定第三方应用的订阅情况
   ///
   /// @param odata 查询参数
-  /// @param appId 第三方应用ID
+  /// @param appId 第三方应用 ID
   /// @return 所有已发布的对外接口以及指定第三方应用的订阅情况
   @GetMapping("/third-party-app/{appId}/subscription")
   public Page<@NonNull Subscription> listSubscriptionWithOpenapi(

@@ -92,11 +92,9 @@ public class SubscriptionService implements ISubscriptionService4Call {
     subscriptionRepository.save(entity);
   }
 
-  /**
-   * 查询指定应用的订阅列表
-   * @param appId 第三方应用 ID
-   * @return 订阅列表
-   */
+  /// 查询指定应用的订阅列表
+  /// @param appId 第三方应用 ID
+  /// @return 订阅列表
   List<Subscription> listSubscription(final String appId) {
     return subscriptionRepository.findByAppId(appId);
   }
