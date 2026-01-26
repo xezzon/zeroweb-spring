@@ -134,15 +134,21 @@ JDBC_TYPE=postgresql
   - 分析：依赖于非官方维护的项目，难以获得最好的社区支持，容易踩坑。
   - 正例：使用 NodeJS + ECharts 为技术栈的微服务，调用其提供的 HTTP 访问点获得图表。
 
+可供参考的社区规范包括但不限于：
+
+- [The Twelve-Factor App](https://12factor.net/)
+- [Standards.REST](https://standards.rest/)
+- [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
+- [阿里巴巴《Java开发手册》](https://github.com/alibaba/p3c/)
+
 ### 设计原则优先于设计模式
 
-- 遵循 SOLID原则、KISS原则、YAGNI原则、DRY原则、迪米特法则等设计原则。它们相当于代码界的公理，并不局限于语言或编程范式。遵循这些设计原则更容易写出高质量的代码。
+- 遵循 SOLID 原则、KISS原则、YAGNI原则、DRY原则、迪米特法则等设计原则。它们相当于代码界的公理，并不局限于语言或编程范式。遵循这些设计原则更容易写出高质量的代码。
 - 遵循面向接口编程、组合优于继承、约定优于配置等社区公认的实践经验。
 
 ### 结构化编程
 
-以 [dict](./zeroweb-service/zeroweb-service-admin/src/main/java/io/github/xezzon/zeroweb/dict)
-功能为模板。
+以 [dict](./zeroweb-service/zeroweb-service-admin/src/main/java/io/github/xezzon/zeroweb/dict) 功能为模板。
 
 #### JPA Entity
 
@@ -239,7 +245,8 @@ JDBC_TYPE=postgresql
   访问点进行测试。
 - 其他类的测试命名方式为`${类名}Test.java`。
 - 测试类的方法命名为`${被测试的方法名}_${预期的情况}`。测试类与测试方法的访问级别
-- 所有对中间件与外部系统的依赖都通过 [Testcontainers for Java](https://java.testcontainers.org/) 解决。严禁使用任何 Mock 方法或框架进行单元测试。
+- 所有对中间件与外部系统的依赖都通过 [Testcontainers for Java](https://java.testcontainers.org/) 解决。
+- 可以对 service 层接口实现 Mock 类。其他任何严禁使用任何 Mock 方法或框架进行单元测试。
 - 所有依赖于 Spring Boot 的测试类，都需要用 `@SpringBootTest`（如果是针对 HTTP 访问点的测试，则是
   `@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)`）
 - 如果需要，所有方法测试（@BeforeEach）前向相关的数据表中写入随机的测试数据，测试方法结束后（@AfterEach）将数据表中的数据全部删除。
@@ -267,8 +274,6 @@ JDBC_TYPE=postgresql
 
 ### 代码风格
 
-- 代码风格参考 [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
-  和 [阿里巴巴《Java开发手册》](https://github.com/alibaba/p3c/)。
 - 依赖注入使用构造器的方式。
 - 时间类型优先使用 `java.time.Instant`。如果有需要使用 `java.time.LocalDateTime` 的情形需要进行说明。
 
