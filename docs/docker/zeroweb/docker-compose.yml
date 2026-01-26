@@ -16,7 +16,7 @@ services:
       - db
     environment:
       - ZEROWEB_ROOT_PASSWORD=zeroweb
-      - DB_URL=postgresql:5432/zeroweb
+      - DB_URL=postgres:5432/zeroweb
       - DB_USERNAME=postgres_user
       - DB_PASSWORD=postgres_password
       - server.servlet.context-path=/admin
@@ -26,21 +26,21 @@ services:
     labels:
       - traefik.enable=true
     depends_on:
-      - postgresql
+      - postgres
   zeroweb-service-dev:
     image: ghcr.io/xezzon/zeroweb-service-dev:latest
     networks:
       - gateway
       - db
     environment:
-      - DB_URL=postgresql:5432/zeroweb
+      - DB_URL=postgres:5432/zeroweb
       - DB_USERNAME=postgres_user
       - DB_PASSWORD=postgres_password
       - server.servlet.context-path=/dev
     labels:
       - traefik.enable=true
     depends_on:
-      - postgresql
+      - postgres
       - zeroweb-service-admin
   zeroweb-service-file:
     image: ghcr.io/xezzon/zeroweb-service-file:latest
@@ -48,7 +48,7 @@ services:
       - gateway
       - db
     environment:
-      - DB_URL=postgresql:5432/zeroweb
+      - DB_URL=postgres:5432/zeroweb
       - DB_USERNAME=postgres_user
       - DB_PASSWORD=postgres_password
       - ZEROWEB_FILE_PROVIDER=FS
@@ -56,11 +56,11 @@ services:
       - server.servlet.context-path=/file
       - spring.grpc.client.channels.file.address=localhost:10022
     volumes:
-      - $PWD/pem:/app/resources/pem
+      - $PWD/Uploads:/srv/zeroweb/Uploads
     labels:
       - traefik.enable=true
     depends_on:
-      - postgresql
+      - postgres
       - zeroweb-service-admin
   zeroweb-service-open:
     image: ghcr.io/xezzon/zeroweb-service-open:latest
@@ -68,16 +68,16 @@ services:
       - gateway
       - db
     environment:
-      - DB_URL=postgresql:5432/zeroweb
+      - DB_URL=postgres:5432/zeroweb
       - DB_USERNAME=postgres_user
       - DB_PASSWORD=postgres_password
       - server.servlet.context-path=/open
     labels:
       - traefik.enable=true
     depends_on:
-      - postgresql
+      - postgres
       - zeroweb-service-admin
-  postgresql:
+  postgres:
     image: postgres:18
     networks:
       - db

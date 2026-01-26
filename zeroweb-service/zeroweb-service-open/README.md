@@ -1,22 +1,25 @@
 # 开放平台服务
 
+[OpenAPI 规范](https://xezzon.github.io/zeroweb-spring/zeroweb-service/zeroweb-service-open/openapi.json)
+
 ## 安装
 
 ### Docker Compose 示例配置
 
 ```yaml
 # docker-compose.yml
-version: 3
 service:
-  pgsql:
+  postgres:
     image: postgres:18
-    # 关系数据库，强依赖
-    name: pgsql
     environment:
+      POSTGRES_DB: zeroweb
       POSTGRES_PASSWORD: postgres@123
-  zeroweb-open:
-    image: ghcr.io/xezzon/zeroweb-service-open:<version>
-    name: zeroweb-open
+  zeroweb-service-open:
+    image: ghcr.io/xezzon/zeroweb-service-open:latest
+    name: zeroweb-service-open
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres@123
 ```
 
 ## 配置清单

@@ -1,5 +1,30 @@
 # 附件管理服务
 
+[OpenAPI 规范](https://xezzon.github.io/zeroweb-spring/zeroweb-service/zeroweb-service-file/openapi.json)
+
+## 安装
+
+### Docker Compose 示例配置
+
+```yaml
+# docker-compose.yml
+service:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: zeroweb
+      POSTGRES_PASSWORD: postgres@123
+  zeroweb-open:
+    image: ghcr.io/xezzon/zeroweb-service-file:latest
+    name: zeroweb-service-file
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres@123
+      ZEROWEB_FILE_PROVIDER: FS
+      ZEROWEB_FS_BASEPATH: /srv/zeroweb/Uploads
+      spring.grpc.client.channels.file.address: localhost:10022
+```
+
 ## 配置清单
 
 | 变量                         | 描述                                                                            | 默认值 |

@@ -1,26 +1,29 @@
 # 系统管理服务
 
+[OpenAPI 规范](https://xezzon.github.io/zeroweb-spring/zeroweb-service/zeroweb-service-admin/openapi.json)
+
 ## 安装
 
 ### Docker Compose 示例配置
 
 ```yaml
 # docker-compose.yml
-version: 3
 service:
-  pgsql:
+  postgres:
     image: postgres:18  # 关系数据库，强依赖
-    name: pgsql
     environment:
+      POSTGRES_DB: zeroweb
       POSTGRES_PASSWORD: postgres@123
-  zeroweb-admin: # 系统管理服务
-    image: ghcr.io/xezzon/zeroweb-service-admin:<version>
-    name: zeroweb-admin
+  zeroweb-service-admin: # 系统管理服务
+    image: ghcr.io/xezzon/zeroweb-service-admin:latest
+    name: zeroweb-service-admin
     environment:
+      ZEROWEB_ROOT_PASSWORD: zeroweb
       JDBC_TYPE: postgresql
-      DB_URL: pgsql:5432/postgres
+      DB_URL: postgres:5432/zeroweb
       DB_USERNAME: postgres
       DB_PASSWORD: postgres@123
+      spring.grpc.client.channels.admin.address: localhost:10002
 ```
 
 ## 配置清单
