@@ -12,7 +12,7 @@
 | REDIS_DATABASE                           | REDIS 使用的库号。                                                                | 0                           |
 | ZEROWEB_ID_GENERATOR                     | 生成主键的策略。<br/>可选值：`UUID`。                                                    | UUID                        |
 | spring.grpc.client.channels.user.address | 远程调用系统管理服务的地址。                                                              | zeroweb-service-admin:10002 |
-| OTEL_SDK_DISABLED                        | 是否禁用 OpenTelemetry。                                                         | true                        |
+| OTEL_JAVAAGENT_ENABLED                   | 是否启用 OpenTelemetry。                                                         | false                       |
 | OTEL_EXPORTER_OTLP_ENDPOINT              | OpenTelemetry Collector 地址                                                  | http://localhost:4317       |
 
 OpenTelemetry 的更多配置项参考[OpenTelemetry SDK Autoconfigure](https://opentelemetry.io/docs/languages/java/configuration/)。

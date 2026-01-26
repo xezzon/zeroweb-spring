@@ -213,7 +213,7 @@
                 <environment>
                   <OTEL_EXPORTER_OTLP_PROTOCOL>grpc</OTEL_EXPORTER_OTLP_PROTOCOL>
                   <OTEL_SERVICE_NAME>${project.artifactId}</OTEL_SERVICE_NAME>
-                  <OTEL_SDK_DISABLED>true</OTEL_SDK_DISABLED>
+                  <OTEL_JAVAAGENT_ENABLED>false</OTEL_JAVAAGENT_ENABLED>
                   <OTEL_JAVA_EXTENSIONS>
                     ${agent-path}/${otel-ali-extension.name}
                   </OTEL_JAVA_EXTENSIONS>
