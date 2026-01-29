@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -19,6 +19,7 @@ import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionCon
 import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionManager;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 /// 第三方应用成员管理
 /// @author xezzon
 @RestController
-public class ThirdPartAppMemberHttpEndpoint {
+public class ThirdPartyAppMemberHttpEndpoint {
 
   private final ThirdPartyAppMemberService thirdPartyAppMemberService;
   private final ThirdPartyAppPermissionManager thirdPartyAppPermissionManager;
@@ -38,7 +39,7 @@ public class ThirdPartAppMemberHttpEndpoint {
   /// 依赖注入
   /// @param thirdPartyAppMemberService 第三方应用成员管理服务
   /// @param thirdPartyAppPermissionManager 第三方应用权限管理服务
-  public ThirdPartAppMemberHttpEndpoint(
+  public ThirdPartyAppMemberHttpEndpoint(
       ThirdPartyAppMemberService thirdPartyAppMemberService,
       ThirdPartyAppPermissionManager thirdPartyAppPermissionManager
   ) {
@@ -94,5 +95,18 @@ public class ThirdPartAppMemberHttpEndpoint {
       @RequestParam @NotBlank final String userId
   ) {
     thirdPartyAppMemberService.moveOwnership(appId, userId);
+  }
+
+  /// 将成员从第三方应用的成员中移除
+  /// @param appId 应用 ID
+  /// @param id 成员 ID
+  @DeleteMapping("/third-party-app/{appId}/member/{id}")
+  public void deleteMember(
+      @PathVariable final String appId,
+      @PathVariable final String id
+  ) {
+    thirdPartyAppPermissionManager
+        .check(appId, JwtAuth.getOrThrow().getSub(), ThirdPartyAppPermissionConstant.DELETE_MEMBER);
+    thirdPartyAppMemberService.deleteMember(appId, id);
   }
 }

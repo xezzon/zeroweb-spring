@@ -24,6 +24,8 @@ import java.util.List;
 /// @author xezzon
 public class ThirdPartyAppPermissionConstant {
 
+  /// 删除成员权限
+  public static final String DELETE_MEMBER = "third-party-app:#:delete-member";
   /// 邀请成员权限
   public static final String INVITE_MEMBER = "third-party-app:#:invite-member";
   /// 查看成员列表权限
