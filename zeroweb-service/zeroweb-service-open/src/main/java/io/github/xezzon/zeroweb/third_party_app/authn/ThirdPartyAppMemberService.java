@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -155,6 +155,24 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
     owner.moveOwnership(member);
     thirdPartyAppMemberRepository.save(owner);
     thirdPartyAppMemberRepository.save(member);
+  }
+
+  /// 删除成员
+  /// @param appId 应用 ID
+  /// @param memberId 成员 ID
+  void deleteMember(final String appId, final String memberId) {
+    thirdPartyAppMemberRepository.findById(memberId)
+        .ifPresent(member -> {
+          // 不允许删除其他应用的成员
+          if (!Objects.equals(member.getGroupId(), appId)) {
+            throw new DataPermissionForbiddenException(appId, memberId, "");
+          }
+          // 不允许删除应用所有者
+          if (member.isOwner()) {
+            throw new DataPermissionForbiddenException(appId, memberId, "");
+          }
+          thirdPartyAppMemberRepository.deleteById(memberId);
+        });
   }
 
   @Override
