@@ -23,6 +23,7 @@ import io.github.xezzon.zeroweb.third_party_app.ThirdPartyApp;
 import io.github.xezzon.zeroweb.third_party_app.authz.ThirdPartyAppPermissionConstant;
 import io.github.xezzon.zeroweb.third_party_app.event.ThirdPartyAppCreatedEvent;
 import io.github.xezzon.zeroweb.third_party_app.repository.AccessSecretRepository;
+import io.github.xezzon.zeroweb.third_party_app.repository.ThirdPartyAppRepository;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -56,16 +57,20 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
   private static final String USER_ID_CLAIM = "userId";
   private final ThirdPartyAppMemberRepository thirdPartyAppMemberRepository;
   private final AccessSecretRepository accessSecretRepository;
+  private final ThirdPartyAppRepository thirdPartyAppRepository;
 
   /// 依赖注入
   /// @param thirdPartyAppMemberRepository 第三方应用成员 JPA 接口
   /// @param accessSecretRepository 访问凭据 JPA 接口
+  /// @param thirdPartyAppRepository 第三方应用 JPA 接口
   public ThirdPartyAppMemberService(
-      ThirdPartyAppMemberRepository thirdPartyAppMemberRepository,
-      AccessSecretRepository accessSecretRepository
+      final ThirdPartyAppMemberRepository thirdPartyAppMemberRepository,
+      final AccessSecretRepository accessSecretRepository,
+      final ThirdPartyAppRepository thirdPartyAppRepository
   ) {
     this.thirdPartyAppMemberRepository = thirdPartyAppMemberRepository;
     this.accessSecretRepository = accessSecretRepository;
+    this.thirdPartyAppRepository = thirdPartyAppRepository;
   }
 
   /// 生成邀请码。获得邀请码的用户由管理员同意后可以加入对第三方应用的管理。
@@ -143,6 +148,8 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
   @Transactional
   void moveOwnership(String appId, String target) {
     String currentUser = JwtAuth.getOrThrow().getSub();
+    ThirdPartyApp thirdPartyApp = thirdPartyAppRepository.findById(appId).orElseThrow();
+    thirdPartyApp.setOwnerId(target);
     ThirdPartyAppMember owner = thirdPartyAppMemberRepository
         .findByGroupIdAndUserId(appId, currentUser)
         .filter(ThirdPartyAppMember::isOwner)
@@ -155,6 +162,7 @@ public class ThirdPartyAppMemberService implements IThirdPartyAppMemberService {
     owner.moveOwnership(member);
     thirdPartyAppMemberRepository.save(owner);
     thirdPartyAppMemberRepository.save(member);
+    thirdPartyAppRepository.save(thirdPartyApp);
   }
 
   /// 删除成员

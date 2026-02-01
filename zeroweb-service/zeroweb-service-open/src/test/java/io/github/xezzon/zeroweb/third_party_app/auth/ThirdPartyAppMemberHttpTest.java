@@ -232,6 +232,9 @@ class ThirdPartyAppMemberHttpTest {
         .findByGroupIdAndUserId(thirdPartyApp.getId(), member.getUserId())
         .orElseThrow();
     Assertions.assertTrue(newOwner.isOwner());
+
+    ThirdPartyApp actual = thirdPartyAppRepository.findById(thirdPartyApp.getId()).orElseThrow();
+    Assertions.assertEquals(member.getUserId(), actual.getOwnerId());
   }
 
   @Test
