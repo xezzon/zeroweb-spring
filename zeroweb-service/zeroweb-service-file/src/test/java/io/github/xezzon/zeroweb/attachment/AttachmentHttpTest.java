@@ -70,6 +70,7 @@ abstract class AttachmentHttpTest {
   private static final String GET_UPLOAD_ADDRESS = "/attachment/{id}/endpoint/upload";
   private static final String FINISH_UPLOAD = "/attachment/{id}/status/done";
   private static final String QUERY_BY_BIZ = "/attachment/list";
+  private static final String QUERY_BY_ID = "/attachment/{id}";
   private static final String GET_DOWNLOAD_ADDRESS = "/attachment/{id}/endpoint/download";
   private static final String DELETE_ATTACHMENT = "/attachment/{id}";
   private static final String FILE_NAME = "test.txt";
@@ -796,6 +797,17 @@ abstract class AttachmentHttpTest {
         .returnResult().getResponseBody();
     Assertions.assertNotNull(responseBody2);
     Assertions.assertTrue(responseBody2.isEmpty());
+  }
+
+  @Test
+  void queryById() {
+    Attachment responseBody = testClient.get()
+        .uri(QUERY_BY_ID, attachment.getId())
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(Attachment.class).returnResult().getResponseBody();
+    Assertions.assertNotNull(responseBody);
+    Assertions.assertEquals(attachment.getId(), responseBody.getId());
   }
 
   @Test

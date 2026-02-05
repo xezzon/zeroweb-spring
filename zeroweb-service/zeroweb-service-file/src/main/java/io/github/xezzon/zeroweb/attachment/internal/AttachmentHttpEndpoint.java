@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -124,6 +124,16 @@ public class AttachmentHttpEndpoint {
       @RequestParam @NotBlank final String bizId
   ) {
     return attachmentService.queryByBiz(bizType, bizId);
+  }
+
+  /**
+   * 查询指定附件
+   * @param id 附件ID
+   * @return 附件信息
+   */
+  @GetMapping("/{id}")
+  public Attachment queryById(@PathVariable final String id) {
+    return attachmentService.queryById(id);
   }
 
   /// 获取附件下载地址
