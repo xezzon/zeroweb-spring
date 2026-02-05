@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -11,35 +11,21 @@
  * You should have received a copy of the GNU Lesser General Public License along with ZeroWeb. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.xezzon.zeroweb.storage;
+package io.github.xezzon.zeroweb.attachment.internal;
 
-import lombok.Getter;
-import lombok.Setter;
+import io.github.xezzon.zeroweb.attachment.Attachment;
+import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
+import io.github.xezzon.zeroweb.common.jpa.BaseDAO;
+import org.springframework.stereotype.Repository;
 
-/// 附件下载地址
+/// 附件数据访问对象
 /// @author xezzon
-@Getter
-public class DownloadEndpoint {
+@Repository
+public class AttachmentDAO extends BaseDAO<Attachment, String, AttachmentRepository> {
 
-  /// 下载地址
-  private String endpoint;
-  /// 文件名
-  @Setter
-  private String filename;
-
-  /**
-   * 默认构造函数
-   */
-  @SuppressWarnings("unused")
-  DownloadEndpoint() {
-    super();
-  }
-
-  /**
-   * 构造附件下载地址
-   * @param endpoint 下载地址URL
-   */
-  public DownloadEndpoint(String endpoint) {
-    this.endpoint = endpoint;
+  /// 依赖注入
+  /// @param repository 附件 JPA 接口
+  protected AttachmentDAO(final AttachmentRepository repository) {
+    super(repository, Attachment.class);
   }
 }

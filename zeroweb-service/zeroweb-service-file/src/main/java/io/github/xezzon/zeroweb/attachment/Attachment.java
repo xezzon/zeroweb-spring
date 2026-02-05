@@ -16,6 +16,7 @@ package io.github.xezzon.zeroweb.attachment;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
+import io.github.xezzon.zeroweb.common.jpa.IEntity;
 import io.github.xezzon.zeroweb.common.jpa.IdGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,7 +43,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "zeroweb_attachment")
 @EntityListeners({AuditingEntityListener.class})
-public class Attachment {
+public class Attachment implements IEntity<String> {
 
   /**
    * 附件的唯一标识符。

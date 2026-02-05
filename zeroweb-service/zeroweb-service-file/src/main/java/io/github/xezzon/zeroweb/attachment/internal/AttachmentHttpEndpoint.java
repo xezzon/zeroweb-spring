@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,9 +15,11 @@ package io.github.xezzon.zeroweb.attachment.internal;
 
 import static io.github.xezzon.zeroweb.common.constant.FileConstant.MAX_MULTIPART_NUMBER;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentReq;
 import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
+import io.github.xezzon.zeroweb.core.odata.ODataRequestParam;
 import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.StorageContext;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
@@ -27,6 +29,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -126,6 +129,14 @@ public class AttachmentHttpEndpoint {
     return attachmentService.queryByBiz(bizType, bizId);
   }
 
+  /// 查询指定附件
+  /// @param id 附件ID
+  /// @return 附件信息
+  @GetMapping("/{id}")
+  public Attachment queryById(@PathVariable final String id) {
+    return attachmentService.queryById(id);
+  }
+
   /// 获取附件下载地址
   /// @param id 附件ID
   /// @return 附件下载地址
@@ -139,5 +150,14 @@ public class AttachmentHttpEndpoint {
   @DeleteMapping("/{id}")
   public void deleteAttachment(@PathVariable @NotBlank final String id) {
     attachmentService.deleteAttachment(id);
+  }
+
+  /// 分页查询附件列表
+  /// @param odata 查询参数
+  /// @return 附件列表
+  @SaCheckPermission("/")
+  @GetMapping("/page")
+  public Page<Attachment> queryPage(final ODataRequestParam odata) {
+    return attachmentService.queryPage(odata.into());
   }
 }

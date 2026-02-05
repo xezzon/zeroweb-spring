@@ -2,6 +2,7 @@ package io.github.xezzon.zeroweb.attachment;
 
 import static io.github.xezzon.zeroweb.auth.AuthHttpConstant.AUTHORIZATION;
 import static io.github.xezzon.zeroweb.auth.JwtFilter.PUBLIC_KEY_HEADER;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -14,6 +15,7 @@ import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.common.constant.BannerConstant;
+import io.github.xezzon.zeroweb.common.domain.PagedModel;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.common.exception.ReadFileException;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
@@ -33,11 +35,13 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.zip.CRC32;
 import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,8 +74,10 @@ abstract class AttachmentHttpTest {
   private static final String GET_UPLOAD_ADDRESS = "/attachment/{id}/endpoint/upload";
   private static final String FINISH_UPLOAD = "/attachment/{id}/status/done";
   private static final String QUERY_BY_BIZ = "/attachment/list";
+  private static final String QUERY_BY_ID = "/attachment/{id}";
   private static final String GET_DOWNLOAD_ADDRESS = "/attachment/{id}/endpoint/download";
   private static final String DELETE_ATTACHMENT = "/attachment/{id}";
+  private static final String QUERY_PAGE = "/attachment/page";
   private static final String FILE_NAME = "test.txt";
   private static final String LARGE_FILE = "large_file.jpg";
 
@@ -158,9 +164,15 @@ abstract class AttachmentHttpTest {
     attachmentForDownloading.setBizType(RandomUtil.randomString(8));
     attachmentForDownloading.setBizId(UUID.randomUUID().toString());
     attachmentForDownloading.setProvider(zerowebFileConfig.getProvider());
-    attachmentForDownloading.setStatus(AttachmentStatusEnum.UPLOADING);
+    attachmentForDownloading.setStatus(AttachmentStatusEnum.DONE);
     repository.save(attachmentForDownloading);
     this.saveFile(attachmentForDownloading);
+  }
+
+  @AfterEach
+  void tearDown() {
+    repository.deleteAll();
+    largeFileParts.clear();
   }
 
   @Test
@@ -799,6 +811,17 @@ abstract class AttachmentHttpTest {
   }
 
   @Test
+  void queryById() {
+    Attachment responseBody = testClient.get()
+        .uri(QUERY_BY_ID, attachment.getId())
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(Attachment.class).returnResult().getResponseBody();
+    Assertions.assertNotNull(responseBody);
+    Assertions.assertEquals(attachment.getId(), responseBody.getId());
+  }
+
+  @Test
   void download() throws IOException {
     DownloadEndpoint downloadEndpoint = testClient.get()
         .uri(uri -> uri
@@ -834,6 +857,37 @@ abstract class AttachmentHttpTest {
         .expectStatus().isOk();
     Assertions.assertFalse(repository.existsById(attachment.getId()));
     Assertions.assertArrayEquals(new byte[0], this.readFile(attachment));
+  }
+
+  @Test
+  void queryPage() {
+    final int top = 5;
+    final int skip = 0;
+
+    PagedModel<Attachment> responseBody = testClient.get()
+        .uri(builder -> builder
+            .path(QUERY_PAGE)
+            .queryParam("top", top)
+            .queryParam("skip", skip)
+            .build()
+        )
+        .header(PUBLIC_KEY_HEADER, TestJwtGenerator.getPublicKey())
+        .header(AUTHORIZATION, TestJwtGenerator.userBuilder().bearer())
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(new ParameterizedTypeReference<@NonNull PagedModel<Attachment>>() {
+        })
+        .returnResult().getResponseBody();
+
+    assertNotNull(responseBody);
+    Assertions.assertEquals(2, responseBody.getPage().getTotalElements());
+    List<Attachment> actual = responseBody.getContent();
+    Assertions.assertTrue(actual.stream().anyMatch(o ->
+        Objects.equals(o.getId(), attachment.getId())
+    ));
+    Assertions.assertTrue(actual.stream().anyMatch(o ->
+        Objects.equals(o.getId(), attachmentForDownloading.getId())
+    ));
   }
 
   private URI localhost(String uri) {
