@@ -18,9 +18,8 @@ import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.common.jpa.BaseDAO;
 import org.springframework.stereotype.Repository;
 
-/**
- * @author xezzon
- */
+/// 附件数据访问对象
+/// @author xezzon
 @Repository
 public class AttachmentDAO extends BaseDAO<Attachment, String, AttachmentRepository> {
 

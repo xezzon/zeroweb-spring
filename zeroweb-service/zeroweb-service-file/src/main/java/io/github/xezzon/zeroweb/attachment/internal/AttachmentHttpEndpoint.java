@@ -129,11 +129,9 @@ public class AttachmentHttpEndpoint {
     return attachmentService.queryByBiz(bizType, bizId);
   }
 
-  /**
-   * 查询指定附件
-   * @param id 附件ID
-   * @return 附件信息
-   */
+  /// 查询指定附件
+  /// @param id 附件ID
+  /// @return 附件信息
   @GetMapping("/{id}")
   public Attachment queryById(@PathVariable final String id) {
     return attachmentService.queryById(id);
@@ -154,11 +152,9 @@ public class AttachmentHttpEndpoint {
     attachmentService.deleteAttachment(id);
   }
 
-  /**
-   * 分页查询附件列表
-   * @param odata 查询参数
-   * @return 附件列表
-   */
+  /// 分页查询附件列表
+  /// @param odata 查询参数
+  /// @return 附件列表
   @SaCheckPermission("/")
   @GetMapping("/page")
   public Page<Attachment> queryPage(final ODataRequestParam odata) {

@@ -153,7 +153,7 @@ public class AttachmentService implements IAttachmentService {
 
   /// 获取文件下载访问点
   /// @param id 附件ID
-  /// @return 下载访问点信息，包含下载URL和相关参数
+  /// @return 下载访问点信息，包含下载URL、文件名等参数
   DownloadEndpoint getDownloadEndpoint(String id) {
     Attachment attachment = attachmentRepository.findById(id).orElseThrow();
     IStorageService storageService = storageServiceFactory.get(attachment.getProvider());

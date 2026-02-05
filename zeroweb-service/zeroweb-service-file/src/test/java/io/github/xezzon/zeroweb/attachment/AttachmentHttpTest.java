@@ -172,6 +172,7 @@ abstract class AttachmentHttpTest {
   @AfterEach
   void tearDown() {
     repository.deleteAll();
+    largeFileParts.clear();
   }
 
   @Test
