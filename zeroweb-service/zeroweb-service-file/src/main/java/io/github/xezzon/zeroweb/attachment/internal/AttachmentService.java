@@ -25,6 +25,7 @@ import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.JwtClaim;
 import io.github.xezzon.zeroweb.common.config.ZerowebFileConfig;
 import io.github.xezzon.zeroweb.common.exception.IncorrectFileException;
+import io.github.xezzon.zeroweb.core.odata.ODataQueryOption;
 import io.github.xezzon.zeroweb.storage.DownloadEndpoint;
 import io.github.xezzon.zeroweb.storage.IStorageService;
 import io.github.xezzon.zeroweb.storage.UploadEndpoint;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 /// 附件管理服务
@@ -41,6 +43,7 @@ import org.springframework.stereotype.Service;
 public class AttachmentService implements IAttachmentService {
 
   private final AttachmentRepository attachmentRepository;
+  private final AttachmentDAO attachmentDAO;
   private final ZerowebFileConfig zerowebFileConfig;
   private final IStorageService.Factory storageServiceFactory;
   @Resource
@@ -48,14 +51,17 @@ public class AttachmentService implements IAttachmentService {
 
   /// 依赖注入
   /// @param attachmentRepository 附件 JPA 接口
+  /// @param attachmentDAO 附件相关的数据库操作
   /// @param zerowebFileConfig 文件管理相关设置
   /// @param storageServiceFactory 用于获取存储操作服务实现类的工厂
   public AttachmentService(
       final AttachmentRepository attachmentRepository,
+      final AttachmentDAO attachmentDAO,
       final ZerowebFileConfig zerowebFileConfig,
       IStorageService.Factory storageServiceFactory
   ) {
     this.attachmentRepository = attachmentRepository;
+    this.attachmentDAO = attachmentDAO;
     this.zerowebFileConfig = zerowebFileConfig;
     this.storageServiceFactory = storageServiceFactory;
   }
@@ -173,5 +179,12 @@ public class AttachmentService implements IAttachmentService {
           attachmentRepository.deleteById(id);
           eventPublisher.publishEvent(new AttachmentDeletedEvent(attachment));
         });
+  }
+
+  /// 分页查询附件列表
+  /// @param odata 查询参数
+  /// @return 附件列表（分页）
+  Page<Attachment> queryPage(final ODataQueryOption odata) {
+    return attachmentDAO.findAll(odata);
   }
 }
