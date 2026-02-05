@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -151,7 +151,9 @@ public class AttachmentService implements IAttachmentService {
   DownloadEndpoint getDownloadEndpoint(String id) {
     Attachment attachment = attachmentRepository.findById(id).orElseThrow();
     IStorageService storageService = storageServiceFactory.get(attachment.getProvider());
-    return storageService.getDownloadEndpoint(attachment);
+    DownloadEndpoint endpoint = storageService.getDownloadEndpoint(attachment);
+    endpoint.setFilename(attachment.getName());
+    return endpoint;
   }
 
   /// 下载文件内容

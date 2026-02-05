@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -14,6 +14,7 @@
 package io.github.xezzon.zeroweb.storage;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /// 附件下载地址
 /// @author xezzon
@@ -22,6 +23,9 @@ public class DownloadEndpoint {
 
   /// 下载地址
   private String endpoint;
+  /// 文件名
+  @Setter
+  private String filename;
 
   /**
    * 默认构造函数
