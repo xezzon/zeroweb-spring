@@ -47,6 +47,7 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class LocalizedHttpTest {
 
+  public static final String ENGLISH_LANGUAGE_ID = "63000000-0000-8080-0000-000000000003";
   private static final String ADD_LANGUAGE_URL = "/language";
   private static final String LIST_LANGUAGE_URL = "/language";
   private static final String UPDATE_LANGUAGE_URL = "/language";
@@ -163,7 +164,7 @@ class LocalizedHttpTest {
         .toList();
 
     ModifyLanguageReq req = new ModifyLanguageReq(
-        "3",
+        ENGLISH_LANGUAGE_ID,
         Locale.GERMAN.toLanguageTag(),
         Locale.GERMAN.getDisplayLanguage(),
         3,
@@ -177,7 +178,7 @@ class LocalizedHttpTest {
         .exchange()
         .expectStatus().isOk();
 
-    Language actualLanguage = languageRepository.findById("3").orElseThrow();
+    Language actualLanguage = languageRepository.findById(ENGLISH_LANGUAGE_ID).orElseThrow();
     assertEquals(Locale.GERMAN.toLanguageTag(), actualLanguage.getLanguageTag());
     assertEquals(Locale.GERMAN.getDisplayLanguage(), actualLanguage.getDescription());
     assertEquals(3, actualLanguage.getOrdinal());
@@ -218,7 +219,7 @@ class LocalizedHttpTest {
   @Test
   void updateLanguage_repeat() {
     ModifyLanguageReq req = new ModifyLanguageReq(
-        "3",
+        ENGLISH_LANGUAGE_ID,
         Locale.CHINA.toLanguageTag(),
         Locale.GERMAN.getDisplayLanguage(),
         3,

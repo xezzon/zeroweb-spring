@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -41,7 +41,7 @@ public class Language implements IEntity<String> {
   /// 定义语言字典的标签，值为 "Language"。
   public static final String LANGUAGE_DICT_TAG = "Language";
   /// 定义语言字典的父级 ID，值为 "1"。
-  public static final String LANGUAGE_DICT_PARENT_ID = "1";
+  public static final String LANGUAGE_DICT_PARENT_ID = "63000000-0000-8080-0000-000000000001";
 
   /// 语言的唯一标识符。
   @Id
