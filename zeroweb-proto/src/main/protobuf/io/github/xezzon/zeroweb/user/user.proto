@@ -15,6 +15,9 @@ syntax = "proto3";
 
 package io.github.xezzon.zeroweb.user;
 
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
 option java_multiple_files = true;
 option java_outer_classname = "UserProto";
 option java_package = "io.github.xezzon.zeroweb.user";
@@ -35,9 +38,23 @@ message AddUserResp {
   string id = 1;
 }
 
+// 用户新增事件
+message UserCreatedEvent {
+  // 用户ID
+  string user_id = 1;
+  // 用户名
+  string username = 2;
+  // 用户昵称
+  string nickname = 3;
+  // 创建时间
+  google.protobuf.Timestamp create_time = 4;
+}
+
 // 用户相关的服务间接口
 service User {
   // 新增用户
   rpc AddUser (AddUserReq) returns (AddUserResp);
+  // 用户新增后广播事件
+  rpc OnUserCreated (google.protobuf.Empty) returns (stream UserCreatedEvent);
 }
 

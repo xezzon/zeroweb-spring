@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -19,6 +19,7 @@ import io.github.xezzon.zeroweb.dict.DictGrpc.DictBlockingStub;
 import io.github.xezzon.zeroweb.dict.DictGrpc.DictStub;
 import io.github.xezzon.zeroweb.setting.SettingGrpc.SettingBlockingStub;
 import io.github.xezzon.zeroweb.user.UserGrpc.UserBlockingStub;
+import io.github.xezzon.zeroweb.user.UserGrpc.UserStub;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
@@ -34,9 +35,8 @@ import org.springframework.stereotype.Component;
     prefix = "default",
     target = "admin",
     types = {
-        DictBlockingStub.class,
-        DictStub.class,
-        UserBlockingStub.class,
+        DictBlockingStub.class, DictStub.class,
+        UserBlockingStub.class, UserStub.class,
         SettingBlockingStub.class
     }
 )
@@ -44,15 +44,14 @@ import org.springframework.stereotype.Component;
     prefix = "default",
     target = "file",
     types = {
-        AttachmentBlockingStub.class,
-        AttachmentStub.class
+        AttachmentBlockingStub.class, AttachmentStub.class
     }
 )
 @Component
 public class GrpcClientFactory {
 
-/// gRPC 全局配置。
-/// 启用 gRPC 客户端的重试机制，并设置最大重试次数为 3。
+  /// gRPC 全局配置。
+  /// 启用 gRPC 客户端的重试机制，并设置最大重试次数为 3。
   @Bean
   @Order(200)
   <T extends ManagedChannelBuilder<T>> GrpcChannelBuilderCustomizer<T> retryChannelCustomizer() {
