@@ -19,7 +19,7 @@
   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
   <changeSet id="82" author="xezzon">
-    <createTable tableName="zeroweb_role_user" remarks="角色-用户绑定关系">
+    <createTable tableName="zeroweb_role_user" remarks="角色-用户绑定关系" ifNotExists="true">
       <column name="id" type="VARCHAR(64)">
         <constraints primaryKey="true" nullable="false"/>
       </column>

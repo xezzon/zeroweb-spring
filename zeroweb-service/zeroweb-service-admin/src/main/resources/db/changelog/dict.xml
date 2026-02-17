@@ -19,7 +19,7 @@
   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
   <changeSet id="23" author="xezzon" labels="0.2">
-    <createTable tableName="zeroweb_dict" remarks="字典">
+    <createTable tableName="zeroweb_dict" remarks="字典" ifNotExists="true">
       <column name="id" type="VARCHAR(64)" remarks="字典标识">
         <constraints primaryKey="true" nullable="false"/>
       </column>

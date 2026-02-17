@@ -19,7 +19,7 @@
   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
   <changeSet id="116" author="xezzon" labels="0.8">
-    <createTable tableName="zeroweb_setting" remarks="业务参数">
+    <createTable tableName="zeroweb_setting" remarks="业务参数" ifNotExists="true">
       <column name="id" type="VARCHAR(64)">
         <constraints primaryKey="true" nullable="false"/>
       </column>

@@ -19,7 +19,7 @@
   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
   <changeSet id="42" author="xezzon" labels="0.4">
-    <createTable tableName="zeroweb_third_party_app" remarks="第三方应用">
+    <createTable tableName="zeroweb_third_party_app" remarks="第三方应用" ifNotExists="true">
       <column name="id" type="VARCHAR(64)" remarks="第三方应用标识">
         <constraints primaryKey="true" nullable="false"/>
       </column>

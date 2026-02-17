@@ -19,7 +19,7 @@
   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
   <changeSet id="64" author="xezzon" labels="0.5">
-    <createTable tableName="zeroweb_translation" remarks="国际化文本">
+    <createTable tableName="zeroweb_translation" remarks="国际化文本" ifNotExists="true">
       <column name="id" type="VARCHAR(64)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
