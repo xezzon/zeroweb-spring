@@ -35,7 +35,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @Entity
-@Table(name = "zeroweb_dict")
+@Table(name = "zeroweb_i18n_language")
 public class Language implements IEntity<String> {
 
   /// 定义语言字典的标签，值为 "Language"。
