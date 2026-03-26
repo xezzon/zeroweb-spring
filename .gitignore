@@ -127,8 +127,4 @@ application-local.*
 .env
 
 # AI Editor
-.roomodes
-.kilocode/
-.roo/
-.specify/
-specs/
+## 在 AI 编辑器文件下添加 .gitignore，内容为 `*`
