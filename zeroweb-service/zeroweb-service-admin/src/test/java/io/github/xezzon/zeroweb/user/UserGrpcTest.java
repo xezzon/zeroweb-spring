@@ -10,9 +10,11 @@ import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.grpc.test.autoconfigure.AutoConfigureTestGrpcTransport;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
+@AutoConfigureTestGrpcTransport
 class UserGrpcTest {
 
   @Resource

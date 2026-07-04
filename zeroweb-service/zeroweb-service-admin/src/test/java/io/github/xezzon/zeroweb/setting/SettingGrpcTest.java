@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.grpc.test.autoconfigure.AutoConfigureTestGrpcTransport;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import tools.jackson.databind.ObjectMapper;
@@ -28,6 +29,7 @@ import tools.jackson.databind.ObjectMapper;
  * @author xezzon
  */
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@AutoConfigureTestGrpcTransport
 class SettingGrpcTest {
 
   private static String testSchema;

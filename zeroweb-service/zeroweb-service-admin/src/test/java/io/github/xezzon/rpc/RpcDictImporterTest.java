@@ -11,10 +11,12 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.grpc.test.autoconfigure.AutoConfigureTestGrpcTransport;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /// @author xezzon
 @SpringBootTest
+@AutoConfigureTestGrpcTransport
 class RpcDictImporterTest {
 
   @Resource

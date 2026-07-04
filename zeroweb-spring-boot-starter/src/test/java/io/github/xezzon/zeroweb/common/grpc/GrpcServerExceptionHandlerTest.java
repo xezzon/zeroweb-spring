@@ -11,7 +11,7 @@ import io.grpc.StatusRuntimeException;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.grpc.test.autoconfigure.AutoConfigureInProcessTransport;
+import org.springframework.boot.grpc.test.autoconfigure.AutoConfigureTestGrpcTransport;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
  * @author xezzon
  */
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@AutoConfigureInProcessTransport
+@AutoConfigureTestGrpcTransport
 class GrpcServerExceptionHandlerTest {
 
   @Resource

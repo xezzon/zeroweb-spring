@@ -15,10 +15,12 @@ import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.grpc.test.autoconfigure.AutoConfigureTestGrpcTransport;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /// @author xezzon
 @SpringBootTest
+@AutoConfigureTestGrpcTransport
 class DictGrpcServerTest {
 
   private final List<Dict> dataset = new ArrayList<>();
