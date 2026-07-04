@@ -2,6 +2,7 @@ package io.github.xezzon.zeroweb.storage.s3;
 
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.RandomUtil;
+import io.floci.testcontainers.FlociContainer;
 import io.github.xezzon.zeroweb.attachment.Attachment;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
@@ -30,14 +31,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.localstack.LocalStackContainer;
 import org.testcontainers.shaded.com.google.common.hash.Hashing;
-import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.ChecksumAlgorithm;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
@@ -49,9 +47,7 @@ import software.amazon.awssdk.services.s3.model.MultipartUpload;
 @SpringBootTest
 class S3ServiceTest {
 
-  private static final LocalStackContainer CONTAINER = new LocalStackContainer(
-      DockerImageName.parse("localstack/localstack:s3-community-archive")
-  );
+  private static final FlociContainer CONTAINER = new FlociContainer();
   private static final String BUCKET = "test";
   private static final String FILE_NAME = "test.txt";
   private static final String LARGE_FILE_NAME = "large_file.jpg";
@@ -69,15 +65,12 @@ class S3ServiceTest {
   static void beforeAll() {
     CONTAINER.start();
     s3Client = S3Client.builder()
-        .endpointOverride(CONTAINER.getEndpoint())
+        .endpointOverride(URI.create(CONTAINER.getEndpoint()))
         .credentialsProvider(StaticCredentialsProvider.create(
             AwsBasicCredentials.create(CONTAINER.getAccessKey(), CONTAINER.getSecretKey())
         ))
         .region(Region.US_EAST_1)
-        .serviceConfiguration(S3Configuration.builder()
-            .pathStyleAccessEnabled(true)
-            .build()
-        )
+        .forcePathStyle(true)
         .build();
     s3Client.createBucket(builder -> builder.bucket(BUCKET));
   }

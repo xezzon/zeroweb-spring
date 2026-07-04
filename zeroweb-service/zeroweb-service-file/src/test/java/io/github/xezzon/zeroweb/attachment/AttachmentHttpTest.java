@@ -8,6 +8,7 @@ import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
+import io.floci.testcontainers.FlociContainer;
 import io.github.xezzon.zeroweb.attachment.entity.AddAttachmentReq;
 import io.github.xezzon.zeroweb.attachment.entity.UploadInfo;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
@@ -54,14 +55,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.client.RestTestClient;
-import org.testcontainers.localstack.LocalStackContainer;
-import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.ChecksumAlgorithm;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
@@ -898,9 +896,7 @@ abstract class AttachmentHttpTest {
 @ActiveProfiles("s3")
 class S3HttpTest extends AttachmentHttpTest {
 
-  private static final LocalStackContainer CONTAINER = new LocalStackContainer(
-      DockerImageName.parse("localstack/localstack:s3-community-archive")
-  ).withServices("s3");
+  private static final FlociContainer CONTAINER = new FlociContainer();
   private static final String BUCKET = "test";
   private static S3Client s3Client = null;
   @Resource
@@ -912,15 +908,12 @@ class S3HttpTest extends AttachmentHttpTest {
   static void beforeAll() {
     CONTAINER.start();
     s3Client = S3Client.builder()
-        .endpointOverride(CONTAINER.getEndpoint())
+        .endpointOverride(URI.create(CONTAINER.getEndpoint()))
         .credentialsProvider(StaticCredentialsProvider.create(
             AwsBasicCredentials.create(CONTAINER.getAccessKey(), CONTAINER.getSecretKey())
         ))
         .region(Region.US_EAST_1)
-        .serviceConfiguration(S3Configuration.builder()
-            .pathStyleAccessEnabled(true)
-            .build()
-        )
+        .forcePathStyle(true)
         .build();
     s3Client.createBucket(builder -> builder.bucket(BUCKET));
   }

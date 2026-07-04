@@ -23,6 +23,7 @@
     <spring-boot.run.main-class>
       io.github.xezzon.zeroweb.ZerowebFileApplication
     </spring-boot.run.main-class>
+    <testcontainers-floci.version>2.11.0</testcontainers-floci.version>
   </properties>
 
   <dependencyManagement>
@@ -52,8 +53,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>testcontainers-localstack</artifactId>
+      <groupId>io.floci</groupId>
+      <artifactId>testcontainers-floci</artifactId>
+      <version>${testcontainers-floci.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

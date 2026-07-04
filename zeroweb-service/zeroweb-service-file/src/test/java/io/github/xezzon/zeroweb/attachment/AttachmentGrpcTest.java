@@ -3,6 +3,7 @@ package io.github.xezzon.zeroweb.attachment;
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.hash.Hashing;
 import com.google.protobuf.ByteString;
+import io.floci.testcontainers.FlociContainer;
 import io.github.xezzon.zeroweb.attachment.AttachmentServiceGrpc.AttachmentServiceBlockingStub;
 import io.github.xezzon.zeroweb.attachment.AttachmentServiceGrpc.AttachmentServiceStub;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
@@ -16,6 +17,7 @@ import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
@@ -36,14 +38,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.localstack.LocalStackContainer;
-import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 @SpringBootTest
@@ -284,9 +283,7 @@ abstract class AttachmentGrpcTest {
 @Slf4j
 class S3GrpcTest extends AttachmentGrpcTest {
 
-  private static final LocalStackContainer CONTAINER = new LocalStackContainer(
-      DockerImageName.parse("localstack/localstack:s3-community-archive")
-  ).withServices("s3");
+  private static final FlociContainer CONTAINER = new FlociContainer();
   private static final String BUCKET = "test";
   private static S3Client s3Client = null;
 
@@ -294,15 +291,12 @@ class S3GrpcTest extends AttachmentGrpcTest {
   static void beforeAll() {
     CONTAINER.start();
     s3Client = S3Client.builder()
-        .endpointOverride(CONTAINER.getEndpoint())
+        .endpointOverride(URI.create(CONTAINER.getEndpoint()))
+        .region(Region.of(CONTAINER.getRegion()))
         .credentialsProvider(StaticCredentialsProvider.create(
             AwsBasicCredentials.create(CONTAINER.getAccessKey(), CONTAINER.getSecretKey())
         ))
-        .region(Region.US_EAST_1)
-        .serviceConfiguration(S3Configuration.builder()
-            .pathStyleAccessEnabled(true)
-            .build()
-        )
+        .forcePathStyle(true)
         .build();
     s3Client.createBucket(builder -> builder.bucket(BUCKET));
   }
