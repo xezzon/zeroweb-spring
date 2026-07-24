@@ -1,66 +1,169 @@
-name: report
+# 文档站点：为所有模块生成 JavaDoc、为所有 service 模块生成 OpenAPI 文档，
+# 汇总后发布到 GitHub Pages 的 /javadoc 与 /openapi 路径。
+# 触发时机：合并到 main 分支、Release 流程完成后（workflow_call）、手动触发。
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+name: Report
+
+permissions: read-all
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        type: string
-        description: 应用版本号
+  push:
+    branches:
+      - main
   workflow_call:
-    inputs:
-      version:
-        type: string
+  workflow_dispatch:
 
 env:
   JAVA_DISTRIBUTION: 'temurin'
   JAVA_VERSION: '25'
 
 jobs:
-  report:
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    env:
-      version: ${{ github.event.inputs.version || inputs.version }}
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  # 各非 service 模块并行生成 JavaDoc
+  javadoc:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: zeroweb-open-sdk, dir: zeroweb-open-sdk }
+          - { name: zeroweb-spring-boot-starter, dir: zeroweb-spring-boot-starter }
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - name: Set up Apache Maven Central
-        uses: actions/setup-java@v5
+      - uses: actions/checkout@v7
+      - name: Set up JDK
+        uses: actions/setup-java@v6
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
           cache: 'maven'
-      - name: Set Version
-        run: mvn -B versions:set -D newVersion=${{ env.version }}
-        if: ${{ env.version }}
-      - name: Generate OpenAPI Specification
+      - name: Restore cached JavaDoc
+        id: cache-javadoc
+        uses: actions/cache@v4
+        with:
+          path: ${{ matrix.dir }}/target/site/apidocs
+          key: javadoc-${{ matrix.name }}-${{ hashFiles(format('{0}/pom.xml', matrix.dir)) }}
+      - name: Generate JavaDoc
+        if: steps.cache-javadoc.outputs.cache-hit != 'true'
+        working-directory: ${{ matrix.dir }}
         run: >
-          mvn -B
-          verify
+          mvn -B javadoc:javadoc
+          -D maven.javadoc.failOnError=false
+          -T 1C
+      - name: Upload JavaDoc
+        uses: actions/upload-artifact@v7
+        with:
+          name: javadoc-${{ matrix.name }}
+          path: ${{ matrix.dir }}/target/site/apidocs
+          retention-days: 1
+
+  # 各 service 模块并行生成 JavaDoc
+  service-javadoc:
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [ 'admin', 'dev', 'file', 'open' ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'maven'
+      - name: Restore cached JavaDoc
+        id: cache-javadoc
+        uses: actions/cache@v4
+        with:
+          path: zeroweb-service/zeroweb-service-${{ matrix.name }}/target/site/apidocs
+          key: javadoc-zeroweb-service-${{ matrix.name }}-${{
+            hashFiles(
+              format('zeroweb-service/zeroweb-service-{0}/pom.xml', matrix.name)
+            ) }}
+      - name: Generate JavaDoc
+        if: steps.cache-javadoc.outputs.cache-hit != 'true'
+        working-directory: zeroweb-service
+        run: >
+          mvn -B javadoc:javadoc
+          -pl zeroweb-service-${{ matrix.name }}
+          -D maven.javadoc.failOnError=false
+          -T 1C
+      - name: Upload JavaDoc
+        uses: actions/upload-artifact@v7
+        with:
+          name: javadoc-zeroweb-service-${{ matrix.name }}
+          path: zeroweb-service/zeroweb-service-${{ matrix.name }}/target/site/apidocs
+          retention-days: 1
+
+  # 各 service 模块并行生成 OpenAPI 文档
+  openapi:
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [ 'admin', 'dev', 'file', 'open' ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'maven'
+      - name: Restore cached OpenAPI
+        id: cache-openapi
+        uses: actions/cache@v4
+        with:
+          path: zeroweb-service/zeroweb-service-${{ matrix.name }}/target/site/openapi.json
+          key: openapi-${{ matrix.name }}-${{
+            hashFiles(
+              format('zeroweb-service/zeroweb-service-{0}/pom.xml', matrix.name)
+            ) }}
+      - name: Generate OpenAPI Specification
+        if: steps.cache-openapi.outputs.cache-hit != 'true'
+        working-directory: zeroweb-service
+        run: >
+          mvn -B verify
+          -pl zeroweb-service-${{ matrix.name }}
           -D openapi.enabled=true
           -D skipTests=true
-      - name: Generate the report
-        run: >
-          mvn -B
-          site site:stage
-          -P report
-          -T 1C
+      - name: Upload OpenAPI Specification
+        uses: actions/upload-artifact@v7
+        with:
+          name: openapi-${{ matrix.name }}
+          path: zeroweb-service/zeroweb-service-${{ matrix.name }}/target/site/openapi.json
+          retention-days: 1
+
+  # 汇总并发布到 GitHub Pages
+  pages:
+    needs: [ javadoc, service-javadoc, openapi ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download JavaDoc
+        uses: actions/download-artifact@v8
+        with:
+          pattern: 'javadoc-*'
+          path: site/javadoc
+      - name: Download OpenAPI
+        uses: actions/download-artifact@v8
+        with:
+          pattern: 'openapi-*'
+          path: site/openapi
       - name: Setup Pages
         uses: actions/configure-pages@v6
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
-          path: 'target/staging'
+          path: site
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5

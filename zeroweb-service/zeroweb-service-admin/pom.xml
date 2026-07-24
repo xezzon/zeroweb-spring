@@ -9,12 +9,14 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>zeroweb-service-admin</artifactId>
+  <version>0.11.0</version>
   <packaging>jar</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>系统管理服务</description>
 
   <properties>
+    <zxcvbn.version>1.9.0</zxcvbn.version>
     <http.port>10001</http.port>
     <grpc.port>10002</grpc.port>
     <management.port>10009</management.port>
@@ -28,7 +30,7 @@
     <dependency>
       <groupId>io.github.xezzon</groupId>
       <artifactId>zeroweb-proto</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${zeroweb-proto.version}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
@@ -58,6 +60,7 @@
     <dependency>
       <groupId>com.nulab-inc</groupId>
       <artifactId>zxcvbn</artifactId>
+      <version>${zxcvbn.version}</version>
     </dependency>
   </dependencies>
 </project>
