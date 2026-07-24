@@ -1,5 +1,19 @@
 # AGENTS.md
 
+## Agent skills
+
+### Issue tracker
+
+本地 markdown 工单存放在 `.scratch/<feature>/` 下。详见 `docs/agents/issue-tracker.md`。
+
+### Triage labels
+
+默认五项标签：`needs-triage`、`needs-info`、`ready-for-agent`、`ready-for-human`、`wontfix`。详见 `docs/agents/triage-labels.md`。
+
+### Domain docs
+
+单上下文布局：根目录的 `CONTEXT.md` 与 `docs/adr/`。详见 `docs/agents/domain.md`。
+
 ## 注释规范
 
 ### 应该写怎样的注释？
