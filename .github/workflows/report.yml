@@ -4,6 +4,11 @@
 
 name: Report
 
+# 默认最小权限：仅读取仓库内容。
+# 发布 GitHub Pages 的 `pages` 作业单独声明 `pages: write` 与 `id-token: write`。
+permissions:
+  contents: read
+
 on:
   push:
     branches:
