@@ -40,9 +40,9 @@ inputs:
     ref: proto/v0.11.0         # 替换为所需的标签
     subdir: zeroweb-proto/proto
 plugins:
-  - plugin: buf.build/protocolbuffers/rust
+  - remote: buf.build/protocolbuffers/rust
     out: src
-  - plugin: buf.build/community/neoeinstein-tonic
+  - remote: buf.build/community/neoeinstein-tonic
     out: src
 ```
 
@@ -76,9 +76,12 @@ inputs:
     ref: proto/v0.11.0         # 替换为所需的标签
     subdir: zeroweb-proto/proto
 plugins:
-  - plugin: buf.build/community/stephenh-ts-proto
+  - remote: buf.build/community/stephenh-ts-proto
     out: src/generated
-    opt: ts_proto_opt=outputServices=grpc-js,esModuleInterop=true,useDate=true
+    opt:
+      - outputServices=grpc-js
+      - esModuleInterop=true
+      - useDate=true
 ```
 
 执行 `buf generate` 生成 TypeScript 代码到 `src/generated/` 目录。
@@ -105,7 +108,7 @@ import { AuthenticationClient } from "./generated/io/github/xezzon/zeroweb/auth/
 const client = new AuthenticationClient("localhost:8080", /* credentials */);
 ```
 
-> `ts-proto` 生成的输出路径与 proto 文件在模块中的相对路径一致。可通过 `ts_proto_opt=paths=source_relative`（默认即此行为）控制。
+> `ts-proto` 生成的输出路径与 proto 文件在模块中的相对路径一致。可通过 `paths=source_relative`（默认即此行为）控制。
 
 #### Golang
 
@@ -124,12 +127,14 @@ managed:
     - file_option: go_package_prefix
       value: github.com/your-org/your-project/gen  # 替换为你的工程路径
 plugins:
-  - plugin: buf.build/protocolbuffers/go
+  - remote: buf.build/protocolbuffers/go
     out: gen
-    opt: paths=source_relative
-  - plugin: buf.build/grpc/go
+    opt:
+      - paths=source_relative
+  - remote: buf.build/grpc/go
     out: gen
-    opt: paths=source_relative
+    opt:
+      - paths=source_relative
 ```
 
 执行 `buf generate` 生成 Go 代码到 `gen/` 目录。

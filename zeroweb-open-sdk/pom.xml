@@ -116,7 +116,6 @@
             <configuration>
               <resources>
                 <resource>
-                  <directory>${maven.multiModuleProjectDirectory}</directory>
                   <includes>
                     <include>COPYING</include>
                     <include>COPYING.LESSER</include>

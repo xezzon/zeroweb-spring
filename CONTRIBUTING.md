@@ -124,9 +124,9 @@ JDBC_TYPE=postgresql
 
 各模块为相互独立的 Maven 工程（parent 为 [xezzon-java](https://github.com/xezzon/xezzon-java)），可在各自目录内独立构建、发布：
 
-- [zeroweb-proto](../zeroweb-proto/README.md)：gRPC 接口 SDK，发布到 Maven Central。
-- [zeroweb-spring-boot-starter](../zeroweb-spring-boot-starter/README.md)：服务端通用配置，发布到 Maven Central。
-- [zeroweb-open-sdk](../zeroweb-open-sdk/README.md)：开放平台 HTTP 接口 SDK，发布到 Maven Central。
+- [zeroweb-proto](zeroweb-proto/README.md)：gRPC 接口 SDK，发布到 Maven Central。
+- [zeroweb-spring-boot-starter](zeroweb-spring-boot-starter/README.md)：服务端通用配置，发布到 Maven Central。
+- [zeroweb-open-sdk](zeroweb-open-sdk/README.md)：开放平台 HTTP 接口 SDK，发布到 Maven Central。
 - zeroweb-service：微服务构件，发布 Docker 镜像。
 
 发布通过 GitHub Release 触发，标签约定为：

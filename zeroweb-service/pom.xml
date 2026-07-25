@@ -214,7 +214,6 @@
             <configuration>
               <resources>
                 <resource>
-                  <directory>${maven.multiModuleProjectDirectory}</directory>
                   <includes>
                     <include>COPYING</include>
                     <include>COPYING.LESSER</include>
@@ -246,7 +245,7 @@
       <id>docker</id>
       <properties>
         <!-- JavaAgent 存放路径 -->
-        <agent-extraction-root>${maven.multiModuleProjectDirectory}/javaagent</agent-extraction-root>
+        <agent-extraction-root>${project.basedir}/javaagent</agent-extraction-root>
         <!-- JavaAgent 在Docker中的路径 -->
         <agent-path>/opt/agent</agent-path>
         <workdir>/app</workdir>

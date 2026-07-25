@@ -8,7 +8,6 @@ permissions: read-all
 
 on:
   pull_request:
-  workflow_dispatch:
 
 env:
   JAVA_DISTRIBUTION: 'temurin'
@@ -25,6 +24,8 @@ jobs:
       # workflow_dispatch 等非 PR 事件下 paths-filter 需要本地 git 仓库；PR 事件走 GitHub API 无需检出
       - uses: actions/checkout@v7
         if: github.event_name != 'pull_request'
+        with:
+          persist-credentials: false
       - name: Detect changes of base modules
         id: base
         uses: dorny/paths-filter@v4
@@ -67,6 +68,8 @@ jobs:
       MODULE_DIR: zeroweb-${{ matrix.module }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Fetch base branch for version comparison
         run: git fetch --depth=1 origin "${GITHUB_BASE_REF}"
       - name: Set up JDK
@@ -122,6 +125,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -137,8 +142,11 @@ jobs:
           merge-multiple: true
       - name: Unit test
         working-directory: zeroweb-service
+        env:
+          SERVICE_NAME: ${{ matrix.name }}
+          DB_TYPE: ${{ matrix.db }}
         run: >
           mvn -B test
-          -pl zeroweb-service-${{ matrix.name }}
-          -D db.type=${{ matrix.db }}
+          -pl zeroweb-service-${SERVICE_NAME}
+          -D db.type=${DB_TYPE}
           -T 1C

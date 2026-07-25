@@ -45,6 +45,15 @@ jobs:
               echo "::error::无法识别的标签格式：${TAG}。约定：{proto|open-sdk|spring-boot-starter}/v[semver] 或 service/[name]/v[semver]"
               exit 1 ;;
           esac
+          # 校验解析结果，防止通过标签注入恶意 shell 命令
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::非法版本号：${version}"
+            exit 1
+          fi
+          if [ -n "${name:-}" ] && ! [[ "$name" =~ ^[a-z0-9-]+$ ]]; then
+            echo "::error::非法服务名：${name}"
+            exit 1
+          fi
           {
             echo "kind=${kind}"
             echo "dir=${dir}"
@@ -59,21 +68,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Set up Apache Maven Central
         uses: actions/setup-java@v5
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
-          cache: 'maven'
           server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_CENTRAL_TOKEN
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
       - name: Set version
         working-directory: ${{ needs.parse-tag.outputs.dir }}
+        env:
+          NEW_VERSION: ${{ needs.parse-tag.outputs.version }}
         run: >
           mvn -B versions:set
-          -D newVersion=${{ needs.parse-tag.outputs.version }}
+          -D newVersion="$NEW_VERSION"
           -D generateBackupPoms=false
       - name: Publish to Maven Central
         working-directory: ${{ needs.parse-tag.outputs.dir }}
@@ -97,12 +109,13 @@ jobs:
       IMAGE_VERSION: ${{ github.event.release.prerelease && 'latest' || needs.parse-tag.outputs.version }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
-          cache: 'maven'
           server-id: ${{ env.DOCKER_HOST }}
           server-username: DOCKER_USERNAME
           server-password: DOCKER_TOKEN
@@ -115,17 +128,18 @@ jobs:
           done
       - name: Build and publish Docker image
         working-directory: zeroweb-service
-        run: >
-          mvn -B deploy
-          -P docker
-          -pl zeroweb-service-${{ needs.parse-tag.outputs.name }}
-          -D skipTests=true
-          -D image.version=${IMAGE_VERSION}
-          -T 1C
         env:
+          SERVICE_NAME: ${{ needs.parse-tag.outputs.name }}
           DOCKER_REGISTRY: ${{ env.DOCKER_HOST }}/${{ github.repository_owner }}
           DOCKER_USERNAME: ${{ github.repository_owner }}
           DOCKER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          mvn -B deploy
+          -P docker
+          -pl zeroweb-service-${SERVICE_NAME}
+          -D skipTests=true
+          -D image.version=${IMAGE_VERSION}
+          -T 1C
 
   # 发布完成后更新文档站点
   report:
