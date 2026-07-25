@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,7 +15,7 @@ package io.github.xezzon.zeroweb.dict;
 
 import com.google.protobuf.Empty;
 import io.github.xezzon.zeroweb.common.marker.RpcTrait;
-import io.github.xezzon.zeroweb.dict.DictGrpc.DictStub;
+import io.github.xezzon.zeroweb.dict.DictServiceGrpc.DictServiceStub;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
 import java.util.concurrent.CountDownLatch;
@@ -35,7 +35,7 @@ public class DictRpcHandler implements DictImporter, RpcTrait {
   private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
   @Resource
-  private DictStub dictStub;
+  private DictServiceStub dictStub;
 
   /// 用于标识导入是否已完成
   /// @return 一个计数器，计数器归零时即导入已完成。

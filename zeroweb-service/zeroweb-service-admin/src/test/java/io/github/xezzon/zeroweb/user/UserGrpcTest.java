@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.hutool.core.util.RandomUtil;
-import io.github.xezzon.zeroweb.user.UserGrpc.UserBlockingStub;
+import io.github.xezzon.zeroweb.user.UserServiceGrpc.UserServiceBlockingStub;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -18,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class UserGrpcTest {
 
   @Resource
-  private UserBlockingStub userBlockingStub;
+  private UserServiceBlockingStub userBlockingStub;
   @Resource
   private UserRepository repository;
 

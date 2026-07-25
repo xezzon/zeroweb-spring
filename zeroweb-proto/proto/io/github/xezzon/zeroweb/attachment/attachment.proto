@@ -101,7 +101,7 @@ message FileDownloadResponse {
 }
 
 // 附件管理服务
-service Attachment {
+service AttachmentService {
   // 文件上传
   rpc uploadFile(stream FileUploadRequest) returns (FileUploadResponse);
   // 查询文件列表

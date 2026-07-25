@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.xezzon.zeroweb.common.constant.DatabaseConstant;
-import io.github.xezzon.zeroweb.dict.DictGrpc.DictBlockingStub;
+import io.github.xezzon.zeroweb.dict.DictServiceGrpc.DictServiceBlockingStub;
 import io.github.xezzon.zeroweb.dict.repository.DictRepository;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ class DictGrpcServerTest {
 
   private final List<Dict> dataset = new ArrayList<>();
   @Resource
-  private DictBlockingStub dictBlockingStub;
+  private DictServiceBlockingStub dictBlockingStub;
   @Resource
   private DictRepository repository;
 

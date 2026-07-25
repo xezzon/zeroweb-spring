@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -17,10 +17,10 @@ import com.google.common.hash.Hashing;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
 import io.github.xezzon.zeroweb.attachment.Attachment;
-import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentImplBase;
 import io.github.xezzon.zeroweb.attachment.AttachmentItem;
 import io.github.xezzon.zeroweb.attachment.AttachmentItem.Builder;
 import io.github.xezzon.zeroweb.attachment.AttachmentList;
+import io.github.xezzon.zeroweb.attachment.AttachmentServiceGrpc.AttachmentServiceImplBase;
 import io.github.xezzon.zeroweb.attachment.AttachmentStatus;
 import io.github.xezzon.zeroweb.attachment.FileDownloadRequest;
 import io.github.xezzon.zeroweb.attachment.FileDownloadResponse;
@@ -41,7 +41,7 @@ import org.springframework.grpc.server.service.GrpcService;
  */
 @GrpcService
 @Slf4j
-public class AttachmentGrpcEndpoint extends AttachmentImplBase {
+public class AttachmentGrpcEndpoint extends AttachmentServiceImplBase {
 
   private final AttachmentService attachmentService;
 

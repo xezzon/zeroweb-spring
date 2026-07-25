@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -20,8 +20,8 @@ import com.google.protobuf.util.JsonFormat;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import io.github.xezzon.zeroweb.setting.GetSettingRequest;
 import io.github.xezzon.zeroweb.setting.Setting;
-import io.github.xezzon.zeroweb.setting.SettingGrpc.SettingImplBase;
 import io.github.xezzon.zeroweb.setting.SettingItem;
+import io.github.xezzon.zeroweb.setting.SettingServiceGrpc.SettingServiceImplBase;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
 import org.springframework.grpc.server.service.GrpcService;
@@ -33,7 +33,7 @@ import tools.jackson.databind.ObjectMapper;
 /// 支持通过参数标识获取参数值，支持JSON格式的数据转换。
 /// @author xezzon
 @GrpcService
-public class SettingGrpcEndpoint extends SettingImplBase {
+public class SettingGrpcEndpoint extends SettingServiceImplBase {
 
   /// 业务参数服务，用于执行参数查询业务逻辑
   private final SettingService settingService;
