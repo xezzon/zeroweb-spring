@@ -50,7 +50,7 @@ import software.amazon.awssdk.services.s3.model.MultipartUpload;
 class S3ServiceTest {
 
   private static final LocalStackContainer CONTAINER = new LocalStackContainer(
-      DockerImageName.parse("localstack/localstack:s3-latest")
+      DockerImageName.parse("localstack/localstack:s3-community-archive")
   );
   private static final String BUCKET = "test";
   private static final String FILE_NAME = "test.txt";
