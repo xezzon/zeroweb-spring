@@ -5,16 +5,37 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.xezzon</groupId>
-    <artifactId>zeroweb</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>xezzon-java</artifactId>
+    <version>6.7</version>
   </parent>
   <artifactId>zeroweb-proto</artifactId>
+  <version>0.11.0</version>
   <packaging>jar</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>与 ZeroWeb 微服务进行交互的 Java SDK</description>
+  <url>https://github.com/xezzon/zeroweb-spring</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License v3.0</name>
+      <url>https://www.gnu.org/licenses/lgpl-3.0.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>xezzon</name>
+      <email>xezzon@zeroweb.dev</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:https://github.com/xezzon/zeroweb-spring.git</connection>
+    <developerConnection>scm:git:git@github.com:xezzon/zeroweb-spring.git</developerConnection>
+    <url>${project.url}/tree/main</url>
+  </scm>
 
   <properties>
+    <maven.compiler.release>17</maven.compiler.release>
   </properties>
 
   <dependencies>
@@ -48,10 +69,71 @@
         <artifactId>protobuf-maven-plugin</artifactId>
         <configuration>
           <sourceDirectories>
-            <sourceDirectory>src/main/protobuf</sourceDirectory>
+            <sourceDirectory>proto</sourceDirectory>
           </sourceDirectories>
           <cleanOutputDirectories>true</cleanOutputDirectories>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <licenseName>lgpl_v3</licenseName>
+          <organizationName>ZeroWeb</organizationName>
+          <copyrightOwners>xezzon</copyrightOwners>
+          <inceptionYear>2024</inceptionYear>
+          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+          <ignoreLastDate>true</ignoreLastDate>
+          <emptyLineAfterHeader>true</emptyLineAfterHeader>
+          <extraExtensions>
+            <proto>java</proto>
+          </extraExtensions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>check-license-and-copyright</id>
+            <phase>validate</phase>
+          </execution>
+          <execution>
+            <id>add-third-party-license</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+              <thirdPartyFilename>NOTICE</thirdPartyFilename>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-license</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <includes>
+                    <include>COPYING</include>
+                    <include>COPYING.LESSER</include>
+                  </includes>
+                </resource>
+              </resources>
+              <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

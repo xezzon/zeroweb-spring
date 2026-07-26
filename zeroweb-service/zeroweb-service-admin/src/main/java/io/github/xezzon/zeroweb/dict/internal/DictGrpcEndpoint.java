@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -15,11 +15,11 @@ package io.github.xezzon.zeroweb.dict.internal;
 
 import com.google.protobuf.Empty;
 import io.github.xezzon.zeroweb.dict.Dict;
-import io.github.xezzon.zeroweb.dict.DictGrpc.DictImplBase;
 import io.github.xezzon.zeroweb.dict.DictImportReqList;
 import io.github.xezzon.zeroweb.dict.DictListResp;
 import io.github.xezzon.zeroweb.dict.DictReq;
 import io.github.xezzon.zeroweb.dict.DictResp;
+import io.github.xezzon.zeroweb.dict.DictServiceGrpc.DictServiceImplBase;
 import io.github.xezzon.zeroweb.dict.converter.DictImportReqConverter;
 import io.grpc.stub.StreamObserver;
 import java.util.List;
@@ -29,7 +29,7 @@ import org.springframework.grpc.server.service.GrpcService;
 ///
 /// @author xezzon
 @GrpcService
-public class DictGrpcEndpoint extends DictImplBase {
+public class DictGrpcEndpoint extends DictServiceImplBase {
 
   private final DictService dictService;
 

@@ -1,0 +1,11 @@
+version: v2
+modules:
+  - path: proto
+lint:
+  # 既有接口暂不强制版本化包名等风格规则，仅做结构性检查
+  use:
+    - MINIMAL
+    - FILE_LOWER_SNAKE_CASE
+breaking:
+  use:
+    - FILE

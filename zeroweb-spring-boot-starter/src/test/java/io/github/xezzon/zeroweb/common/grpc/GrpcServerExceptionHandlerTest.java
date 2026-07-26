@@ -5,7 +5,7 @@ import static io.github.xezzon.zeroweb.common.grpc.GrpcServerExceptionHandler.ER
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.setting.GetSettingRequest;
-import io.github.xezzon.zeroweb.setting.SettingGrpc.SettingBlockingStub;
+import io.github.xezzon.zeroweb.setting.SettingServiceGrpc.SettingServiceBlockingStub;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import jakarta.annotation.Resource;
@@ -23,7 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 class GrpcServerExceptionHandlerTest {
 
   @Resource
-  private SettingBlockingStub settingBlockingStub;
+  private SettingServiceBlockingStub settingBlockingStub;
 
   @Test
   void businessException() {

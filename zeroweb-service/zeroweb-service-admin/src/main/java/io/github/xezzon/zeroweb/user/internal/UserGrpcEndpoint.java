@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -17,7 +17,7 @@ import cn.dev33.satoken.secure.BCrypt;
 import io.github.xezzon.zeroweb.user.AddUserReq;
 import io.github.xezzon.zeroweb.user.AddUserResp;
 import io.github.xezzon.zeroweb.user.User;
-import io.github.xezzon.zeroweb.user.UserGrpc.UserImplBase;
+import io.github.xezzon.zeroweb.user.UserServiceGrpc.UserServiceImplBase;
 import io.github.xezzon.zeroweb.user.converter.AddUserReqConverter;
 import io.grpc.stub.StreamObserver;
 import org.springframework.grpc.server.service.GrpcService;
@@ -26,7 +26,7 @@ import org.springframework.grpc.server.service.GrpcService;
 ///
 /// @author xezzon
 @GrpcService
-public class UserGrpcEndpoint extends UserImplBase {
+public class UserGrpcEndpoint extends UserServiceImplBase {
 
   /// 用户服务接口
   private final UserService userService;

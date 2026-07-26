@@ -1,4 +1,9 @@
-name: release
+# 发布流程：由 GitHub Release (published) 触发，按标签约定路由到对应模块。
+# 标签约定：
+#   基础模块：`{proto|open-sdk|spring-boot-starter}/v[semver]`（发布到 Maven Central，供非 zeroweb 用户使用）
+#   服务模块：`service/[name]/v[semver]`（[name] 不含 zeroweb-service- 前缀，构建 Docker 镜像）
+
+name: Release
 
 permissions: read-all
 
@@ -12,79 +17,137 @@ env:
   JAVA_VERSION: '25'
 
 jobs:
-  set-version:
-    runs-on: ubuntu-24.04
+  # 解析标签，路由发布类型
+  parse-tag:
+    runs-on: ubuntu-latest
     outputs:
-      project_version: ${{ steps.set_version.outputs.project_version }}
-      image_version: ${{ steps.set_version.outputs.image_version }}
+      kind: ${{ steps.parse.outputs.kind }}
+      dir: ${{ steps.parse.outputs.dir }}
+      name: ${{ steps.parse.outputs.name }}
+      version: ${{ steps.parse.outputs.version }}
     steps:
-      - id: set_version
+      - id: parse
         env:
-          PROJECT_VERSION: ${{ github.ref_name }}
-          IMAGE_VERSION: ${{ github.event.release.prerelease && 'latest' || github.ref_name }}
+          TAG: ${{ github.ref_name }}
         run: |
-          echo "project_version=${PROJECT_VERSION}" >> $GITHUB_OUTPUT
-          echo "image_version=${IMAGE_VERSION}" >> $GITHUB_OUTPUT
-  publish-sdk:
-    needs: set-version
-    runs-on: ubuntu-24.04
+          case "$TAG" in
+            proto/*|open-sdk/*|spring-boot-starter/*)
+              kind=sdk
+              dir="zeroweb-${TAG%%/*}"
+              version="${TAG#*/v}" ;;
+            service/*/v*)
+              kind=service
+              rest="${TAG#service/}"
+              name="${rest%%/*}"
+              version="${rest##*/v}"
+              dir="zeroweb-service/zeroweb-service-${name}" ;;
+            *)
+              echo "::error::无法识别的标签格式：${TAG}。约定：{proto|open-sdk|spring-boot-starter}/v[semver] 或 service/[name]/v[semver]"
+              exit 1 ;;
+          esac
+          # 校验解析结果，防止通过标签注入恶意 shell 命令
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::非法版本号：${version}"
+            exit 1
+          fi
+          if [ -n "${name:-}" ] && ! [[ "$name" =~ ^[a-z0-9-]+$ ]]; then
+            echo "::error::非法服务名：${name}"
+            exit 1
+          fi
+          {
+            echo "kind=${kind}"
+            echo "dir=${dir}"
+            echo "name=${name}"
+            echo "version=${version}"
+          } >> "$GITHUB_OUTPUT"
+
+  # 基础模块：修改版本号后发布到 Maven Central
+  sdk:
+    needs: parse-tag
+    if: needs.parse-tag.outputs.kind == 'sdk'
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Set up Apache Maven Central
         uses: actions/setup-java@v5
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
-          cache: 'maven'
           server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_CENTRAL_TOKEN
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
-      - name: Set SDK Version
-        run: mvn -B versions:set -D newVersion=${{ needs.set-version.outputs.project_version }}
-      - name: Publish Java package
+      - name: Set version
+        working-directory: ${{ needs.parse-tag.outputs.dir }}
+        env:
+          NEW_VERSION: ${{ needs.parse-tag.outputs.version }}
+        run: >
+          mvn -B versions:set
+          -D newVersion="$NEW_VERSION"
+          -D generateBackupPoms=false
+      - name: Publish to Maven Central
+        working-directory: ${{ needs.parse-tag.outputs.dir }}
         run: mvn -B deploy -P release -D skipTests=true -T 1C
         env:
           MAVEN_USERNAME: ${{ vars.MAVEN_USERNAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-  publish-service:
-    needs: set-version
-    runs-on: ubuntu-24.04
+
+  # 服务模块：jib 构建 Docker 镜像并推送
+  service:
+    needs: parse-tag
+    if: needs.parse-tag.outputs.kind == 'service'
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-      attestations: write
     env:
       DOCKER_HOST: ghcr.io
+      # 预发布版本的镜像仅打 latest 标签
+      IMAGE_VERSION: ${{ github.event.release.prerelease && 'latest' || needs.parse-tag.outputs.version }}
     steps:
-      - uses: actions/checkout@v6
-      - name: Set up Apache Maven Central
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
-          cache: 'maven'
           server-id: ${{ env.DOCKER_HOST }}
           server-username: DOCKER_USERNAME
           server-password: DOCKER_TOKEN
-      - name: Publish Docker image
-        run: >
-          mvn -B deploy
-          -P docker
-          -D skipTests=true
-          -D image.version=${{ needs.set-version.outputs.image_version }}
-          -T 1C
+      - name: Install base modules
+        # 服务依赖基础模块，先 install 到本地仓库（跳过测试）
+        run: |
+          set -e
+          for m in zeroweb-proto zeroweb-open-sdk zeroweb-spring-boot-starter; do
+            mvn -B clean install -D skipTests=true -T 1C -f "$m/pom.xml"
+          done
+      - name: Build and publish Docker image
+        working-directory: zeroweb-service
         env:
+          SERVICE_NAME: ${{ needs.parse-tag.outputs.name }}
           DOCKER_REGISTRY: ${{ env.DOCKER_HOST }}/${{ github.repository_owner }}
           DOCKER_USERNAME: ${{ github.repository_owner }}
           DOCKER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          mvn -B deploy
+          -P docker
+          -pl zeroweb-service-${SERVICE_NAME}
+          -D skipTests=true
+          -D image.version=${IMAGE_VERSION}
+          -T 1C
+
+  # 发布完成后更新文档站点
   report:
-    needs: set-version
+    needs: [ sdk, service ]
+    # 被跳过的分支（sdk/service 二选一）不阻塞，失败则阻止
+    if: ${{ !cancelled() && needs.sdk.result != 'failure' && needs.service.result != 'failure' }}
     permissions:
       contents: read
       pages: write
       id-token: write
     uses: ./.github/workflows/report.yml
-    with:
-      version: ${{ needs.set-version.outputs.project_version }}

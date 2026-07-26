@@ -2,9 +2,9 @@ package io.github.xezzon.zeroweb.common.grpc;
 
 import io.github.xezzon.zeroweb.auth.JwtAuth;
 import io.github.xezzon.zeroweb.auth.TestJwtGenerator;
-import io.github.xezzon.zeroweb.dict.DictGrpc.DictBlockingStub;
 import io.github.xezzon.zeroweb.dict.DictImportReqList;
 import io.github.xezzon.zeroweb.dict.DictReq;
+import io.github.xezzon.zeroweb.dict.DictServiceGrpc.DictServiceBlockingStub;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class GrpcConfigurationTest {
 
   @Resource
-  private DictBlockingStub dictBlockingStub;
+  private DictServiceBlockingStub dictBlockingStub;
 
   @Test
   void jwtInterceptor() {

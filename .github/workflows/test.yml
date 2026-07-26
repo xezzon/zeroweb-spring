@@ -1,5 +1,6 @@
-# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
+# PR 检查：仅对发生代码变动的模块执行检查。
+# 基础模块（proto / open-sdk / spring-boot-starter）先行，单测通过后将构件 install 到本地仓库，
+# 并以 artifact 形式传递给 service 模块的 job 使用。
 
 name: Test
 
@@ -7,59 +8,145 @@ permissions: read-all
 
 on:
   pull_request:
-    branches:
-      - develop
-  workflow_dispatch:
+
+env:
+  JAVA_DISTRIBUTION: 'temurin'
+  JAVA_VERSION: '25'
 
 jobs:
-  unit-test:
+  # 检测各模块是否发生代码变动，输出供动态 matrix 使用
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      base: ${{ steps.base.outputs.changes }}
+      service: ${{ steps.service.outputs.changes }}
+    steps:
+      # workflow_dispatch 等非 PR 事件下 paths-filter 需要本地 git 仓库；PR 事件走 GitHub API 无需检出
+      - uses: actions/checkout@v7
+        if: github.event_name != 'pull_request'
+        with:
+          persist-credentials: false
+      - name: Detect changes of base modules
+        id: base
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            proto:
+              - 'zeroweb-proto/**'
+            open-sdk:
+              - 'zeroweb-open-sdk/**'
+            spring-boot-starter:
+              - 'zeroweb-spring-boot-starter/**'
+      - name: Detect changes of service modules
+        id: service
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            admin:
+              - 'zeroweb-service/zeroweb-service-admin/**'
+              - 'zeroweb-service/pom.xml'
+            dev:
+              - 'zeroweb-service/zeroweb-service-dev/**'
+              - 'zeroweb-service/pom.xml'
+            file:
+              - 'zeroweb-service/zeroweb-service-file/**'
+              - 'zeroweb-service/pom.xml'
+            open:
+              - 'zeroweb-service/zeroweb-service-open/**'
+              - 'zeroweb-service/pom.xml'
+
+  # 基础模块检查：版本号检查 + 单元测试 + install 到本地仓库并上传
+  base:
+    needs: changes
+    if: needs.changes.outputs.base != '[]'
     strategy:
       fail-fast: false
       matrix:
-        db_type: [ "postgresql", "mysql" ]
-    runs-on: ubuntu-24.04
+        module: ${{ fromJSON(needs.changes.outputs.base) }}
+    runs-on: ubuntu-latest
+    env:
+      MODULE_DIR: zeroweb-${{ matrix.module }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          persist-credentials: false
+      - name: Fetch base branch for version comparison
+        run: git fetch --depth=1 origin "${GITHUB_BASE_REF}"
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          distribution: 'temurin'
-          java-version: '25'
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
           cache: 'maven'
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v5
+      - name: Check version updated
+        working-directory: ${{ env.MODULE_DIR }}
+        run: |
+          set -e
+          current=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)
+          base_pom=$(git show "origin/${GITHUB_BASE_REF}:${MODULE_DIR}/pom.xml" 2>/dev/null || true)
+          if [ -z "$base_pom" ]; then
+            echo "Base branch has no ${MODULE_DIR}/pom.xml (new module?), skip check."
+            exit 0
+          fi
+          # 模块自身版本号位于 </parent> 之后的首个 <version>
+          base_version=$(printf '%s' "$base_pom" | awk '/<\/parent>/{f=1;next} f&&/<version>/{gsub(/.*<version>|<\/version>.*/,"");print;exit}')
+          echo "base version: ${base_version}, current version: ${current}"
+          if [ "$base_version" = "$current" ]; then
+            echo "::error::版本号未更新（${current}）。开发过程中建议递增 PATCH version。"
+            exit 1
+          fi
+      - name: Install intra-repo dependencies
+        # spring-boot-starter 依赖 proto，先将其 install 到本地仓库
+        if: matrix.module == 'spring-boot-starter'
+        working-directory: zeroweb-proto
+        run: mvn -B clean install -D skipTests=true
+      - name: Unit test and install
+        # 单测与 install 合并：install 生命周期包含 test 阶段
+        working-directory: ${{ env.MODULE_DIR }}
+        run: mvn -B clean install -T 1C
+      - name: Upload local repository artifacts
+        # 仅上传本组织 groupId 目录，供 service 模块的 job 复用，避免重复构建
+        uses: actions/upload-artifact@v7
         with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-      - name: Cache Maven packages
-        uses: actions/cache@v5
+          name: m2-${{ matrix.module }}
+          path: ~/.m2/repository/io/github/xezzon
+          retention-days: 1
+
+  # service 模块检查：单元测试（晚于基础模块 install）
+  service:
+    needs: [ changes, base ]
+    # base 被跳过（无基础模块变动）时仍可运行；base 失败则阻止
+    if: ${{ !cancelled() && needs.base.result != 'failure' && needs.changes.outputs.service != '[]' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        name: ${{ fromJSON(needs.changes.outputs.service) }}
+        db: [ 'postgresql', 'mysql' ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-      - name: Unit test and installation for SDK
-        run: >
-          mvn -B clean install
-          -pl zeroweb-spring-boot-starter,zeroweb-open-sdk -am
-          -T 1C
-      - name: Unit test for services
+          persist-credentials: false
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'maven'
+      - name: Restore base modules from artifacts
+        if: needs.changes.outputs.base != '[]'
+        uses: actions/download-artifact@v8
+        with:
+          pattern: m2-*
+          path: ~/.m2/repository/io/github/xezzon
+          merge-multiple: true
+      - name: Unit test
         working-directory: zeroweb-service
+        env:
+          SERVICE_NAME: ${{ matrix.name }}
+          DB_TYPE: ${{ matrix.db }}
         run: >
           mvn -B test
-          -D db.type=${{ matrix.db_type }}
+          -pl zeroweb-service-${SERVICE_NAME}
+          -D db.type=${DB_TYPE}
           -T 1C
-      - name: Integration test
-        run: >
-          mvn -B verify
-          -D skipTests=true -D skipITs=false
-          -T 1C
-      - name: Analyze code
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: >
-          mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
-          -D sonar.projectKey=xezzon_zeroweb-spring

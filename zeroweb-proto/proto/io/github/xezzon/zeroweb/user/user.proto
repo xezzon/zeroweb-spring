@@ -36,7 +36,7 @@ message AddUserResp {
 }
 
 // 用户相关的服务间接口
-service User {
+service UserService {
   // 新增用户
   rpc AddUser (AddUserReq) returns (AddUserResp);
 }

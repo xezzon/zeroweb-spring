@@ -5,7 +5,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import io.github.xezzon.zeroweb.core.util.ResourceUtil;
-import io.github.xezzon.zeroweb.setting.SettingGrpc.SettingBlockingStub;
+import io.github.xezzon.zeroweb.setting.SettingServiceGrpc.SettingServiceBlockingStub;
 import io.github.xezzon.zeroweb.setting.TestEntity.Child;
 import io.github.xezzon.zeroweb.setting.repository.SettingRepository;
 import io.grpc.StatusRuntimeException;
@@ -37,7 +37,7 @@ class SettingGrpcTest {
   private final Setting expect = new Setting();
   private final TestEntity expectValue = new TestEntity();
   @Resource
-  private SettingBlockingStub settingBlockingStub;
+  private SettingServiceBlockingStub settingBlockingStub;
   @Resource
   private SettingRepository repository;
   @Resource

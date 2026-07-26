@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (C) 2025 xezzon
+ * SPDX-FileCopyrightText: Copyright (C) 2025-2026 xezzon
  * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * This file is part of ZeroWeb.
@@ -13,12 +13,12 @@
 
 package io.github.xezzon.zeroweb.common.grpc;
 
-import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentBlockingStub;
-import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentStub;
-import io.github.xezzon.zeroweb.dict.DictGrpc.DictBlockingStub;
-import io.github.xezzon.zeroweb.dict.DictGrpc.DictStub;
-import io.github.xezzon.zeroweb.setting.SettingGrpc.SettingBlockingStub;
-import io.github.xezzon.zeroweb.user.UserGrpc.UserBlockingStub;
+import io.github.xezzon.zeroweb.attachment.AttachmentServiceGrpc.AttachmentServiceBlockingStub;
+import io.github.xezzon.zeroweb.attachment.AttachmentServiceGrpc.AttachmentServiceStub;
+import io.github.xezzon.zeroweb.dict.DictServiceGrpc.DictServiceBlockingStub;
+import io.github.xezzon.zeroweb.dict.DictServiceGrpc.DictServiceStub;
+import io.github.xezzon.zeroweb.setting.SettingServiceGrpc.SettingServiceBlockingStub;
+import io.github.xezzon.zeroweb.user.UserServiceGrpc.UserServiceBlockingStub;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
@@ -34,18 +34,18 @@ import org.springframework.stereotype.Component;
     prefix = "default",
     target = "admin",
     types = {
-        DictBlockingStub.class,
-        DictStub.class,
-        UserBlockingStub.class,
-        SettingBlockingStub.class
+        DictServiceBlockingStub.class,
+        DictServiceStub.class,
+        UserServiceBlockingStub.class,
+        SettingServiceBlockingStub.class
     }
 )
 @ImportGrpcClients(
     prefix = "default",
     target = "file",
     types = {
-        AttachmentBlockingStub.class,
-        AttachmentStub.class
+        AttachmentServiceBlockingStub.class,
+        AttachmentServiceStub.class
     }
 )
 @Component

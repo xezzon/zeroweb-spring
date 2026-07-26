@@ -3,8 +3,8 @@ package io.github.xezzon.zeroweb.attachment;
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.hash.Hashing;
 import com.google.protobuf.ByteString;
-import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentBlockingStub;
-import io.github.xezzon.zeroweb.attachment.AttachmentGrpc.AttachmentStub;
+import io.github.xezzon.zeroweb.attachment.AttachmentServiceGrpc.AttachmentServiceBlockingStub;
+import io.github.xezzon.zeroweb.attachment.AttachmentServiceGrpc.AttachmentServiceStub;
 import io.github.xezzon.zeroweb.attachment.enumeration.AttachmentStatusEnum;
 import io.github.xezzon.zeroweb.attachment.repository.AttachmentRepository;
 import io.github.xezzon.zeroweb.common.config.FileProviderEnum;
@@ -62,9 +62,9 @@ abstract class AttachmentGrpcTest {
   @Resource
   private AttachmentRepository repository;
   @Resource
-  private AttachmentStub attachmentStub;
+  private AttachmentServiceStub attachmentStub;
   @Resource
-  private AttachmentBlockingStub blockingStub;
+  private AttachmentServiceBlockingStub blockingStub;
 
   abstract FileProviderEnum provider();
 
@@ -285,7 +285,7 @@ abstract class AttachmentGrpcTest {
 class S3GrpcTest extends AttachmentGrpcTest {
 
   private static final LocalStackContainer CONTAINER = new LocalStackContainer(
-      DockerImageName.parse("localstack/localstack:s3-latest")
+      DockerImageName.parse("localstack/localstack:s3-community-archive")
   ).withServices("s3");
   private static final String BUCKET = "test";
   private static S3Client s3Client = null;

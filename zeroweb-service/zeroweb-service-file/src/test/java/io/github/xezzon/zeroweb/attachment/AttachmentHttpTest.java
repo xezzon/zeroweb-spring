@@ -899,7 +899,7 @@ abstract class AttachmentHttpTest {
 class S3HttpTest extends AttachmentHttpTest {
 
   private static final LocalStackContainer CONTAINER = new LocalStackContainer(
-      DockerImageName.parse("localstack/localstack:s3-latest")
+      DockerImageName.parse("localstack/localstack:s3-community-archive")
   ).withServices("s3");
   private static final String BUCKET = "test";
   private static S3Client s3Client = null;

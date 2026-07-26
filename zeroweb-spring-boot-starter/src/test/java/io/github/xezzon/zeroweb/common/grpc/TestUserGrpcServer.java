@@ -5,14 +5,14 @@ import cn.dev33.satoken.exception.NotRoleException;
 import io.github.xezzon.zeroweb.common.exception.ErrorCodeConstant;
 import io.github.xezzon.zeroweb.common.exception.RepeatDataException;
 import io.github.xezzon.zeroweb.setting.GetSettingRequest;
-import io.github.xezzon.zeroweb.setting.SettingGrpc.SettingImplBase;
 import io.github.xezzon.zeroweb.setting.SettingItem;
+import io.github.xezzon.zeroweb.setting.SettingServiceGrpc.SettingServiceImplBase;
 import io.grpc.stub.StreamObserver;
 import java.util.NoSuchElementException;
 import org.springframework.grpc.server.service.GrpcService;
 
 @GrpcService
-public class TestUserGrpcServer extends SettingImplBase {
+public class TestUserGrpcServer extends SettingServiceImplBase {
 
   @Override
   public void getSetting(

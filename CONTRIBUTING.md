@@ -12,8 +12,11 @@
 
 ### 模块
 
+各模块为相互独立的 Maven 工程，可在各自目录内独立构建、发布。模块间的依赖通过 Maven Central 上已发布的版本解析。
+
 - `zeroweb-proto`: 通过protobuf定义的服务间交互的结构体与接口。
 - `zeroweb-spring-boot-starter`: 所有服务间共享的配置与工具。
+- `zeroweb-open-sdk`: 与开放平台交互的 HTTP 接口 SDK。
 - `zeroweb-service`: 包含若干子模块，每一个模块是一个微服务构件。
   - `zeroweb-service-admin`: 系统管理服务。
   - `zeroweb-service-dev`: 研发平台服务。
@@ -116,6 +119,32 @@ JDBC_TYPE=postgresql
 ### 运行服务
 
 依据[项目结构](#项目结构)所示，运行服务的启动类。
+
+## 构建与发布
+
+各模块为相互独立的 Maven 工程（parent 为 [xezzon-java](https://github.com/xezzon/xezzon-java)），可在各自目录内独立构建、发布：
+
+- [zeroweb-proto](zeroweb-proto/README.md)：gRPC 接口 SDK，发布到 Maven Central。
+- [zeroweb-spring-boot-starter](zeroweb-spring-boot-starter/README.md)：服务端通用配置，发布到 Maven Central。
+- [zeroweb-open-sdk](zeroweb-open-sdk/README.md)：开放平台 HTTP 接口 SDK，发布到 Maven Central。
+- zeroweb-service：微服务构件，发布 Docker 镜像。
+
+发布通过 GitHub Release 触发，标签约定为：
+
+- 基础模块（proto / open-sdk / spring-boot-starter）：`{proto|open-sdk|spring-boot-starter}/v<version>`，如 `proto/v0.11.0`。
+  基础模块发版面向非 zeroweb 用户，建议每次发起一个新的 MINOR version（不强制）。
+- 服务：`service/<name>/v<version>`，如 `service/admin/v0.11.0`。其中 `<name>` 不含 `zeroweb-service-` 前缀。
+
+版本号约定：
+
+- 开发过程中改动某个模块时，建议递增其 PATCH version（CI 会检查版本号是否与主分支一致，仅做一致性校验，不约束递增位）。
+- 版本号遵循 [SemVer](https://semver.org/lang/zh-CN/)。
+
+CI/CD 流程（见 `.github/workflows/`）：
+
+- `test.yml`：PR 触发。按代码变动情况对基础模块（版本号检查、单元测试、install 到本地仓库）与服务模块（单元测试）分别并行检查。
+- `release.yml`：Release 发布时触发。按标签约定将基础模块发布到 Maven Central，或使用 jib 将服务构建为 Docker 镜像并推送到 GHCR。
+- `report.yml`：合并到 main 或 Release 流程完成后触发。生成各模块 JavaDoc 与各服务 OpenAPI 文档，发布到 GitHub Pages 的 `/javadoc` 与 `/openapi` 路径。
 
 ## 工程规范
 

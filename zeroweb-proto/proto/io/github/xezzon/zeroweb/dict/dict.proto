@@ -58,7 +58,7 @@ message DictImportReqList {
 }
 
 // 字典相关的服务间接口
-service Dict {
+service DictService {
   // 根据字典目获取字典列表
   rpc GetDictListByTag(DictReq) returns (DictListResp);
   // 导入字典
