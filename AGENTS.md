@@ -12,7 +12,7 @@
 
 ### Domain docs
 
-单上下文布局：根目录的 `CONTEXT.md` 与 `docs/adr/`。详见 `docs/agents/domain.md`。
+单上下文布局：`docs/GLOSSARY.md` 与 `docs/adr/`。详见 `docs/agents/domain.md`。
 
 ## 注释规范
 
