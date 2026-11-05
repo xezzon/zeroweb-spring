@@ -156,11 +156,8 @@ public class FsService implements IStorageService {
       // 递归创建其父目录
       Files.createDirectories(path.getParent());
       // 新建文件并设置其可访问性（所有者可读、可写，所有人不可执行）
-      File file = path.toFile();
-      file.setReadable(true, true);
-      file.setWritable(true, true);
-      file.setExecutable(false);
-      file.createNewFile();
+      makeOwnerOnly(path);
+      path.toFile().createNewFile();
       // 写入文件内容
       Files.write(path, fileContent, StandardOpenOption.CREATE);
     } catch (IOException e) {
@@ -177,6 +174,16 @@ public class FsService implements IStorageService {
     } catch (IOException e) {
       throw new ReadFileException(e);
     }
+  }
+
+  /// 设置文件权限为仅所有者可读、可写，所有用户不可执行。
+  ///
+  /// @param path 文件路径
+  private static void makeOwnerOnly(Path path) {
+    File file = path.toFile();
+    file.setReadable(true, true);
+    file.setWritable(true, true);
+    file.setExecutable(false);
   }
 
   /// 上传文件。
@@ -292,10 +299,7 @@ public class FsService implements IStorageService {
       Path finalPath = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
       Files.createDirectories(finalPath.getParent());
       Files.move(mergedTemp, finalPath, StandardCopyOption.REPLACE_EXISTING);
-      File file = finalPath.toFile();
-      file.setReadable(true, true);
-      file.setWritable(true, true);
-      file.setExecutable(false);
+      makeOwnerOnly(finalPath);
     } catch (IOException e) {
       try {
         Files.deleteIfExists(mergedTemp);
