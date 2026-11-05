@@ -330,7 +330,7 @@ public class S3Service implements IStorageService {
   ///
   /// @param event 附件删除事件。
   @EventListener
-  @Async()
+  @Async
   void listen(AttachmentDeletedEvent event) {
     final Attachment attachment = event.attachment();
     s3Client.deleteObject(builder -> builder

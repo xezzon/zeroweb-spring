@@ -323,7 +323,7 @@ public class FsService implements IStorageService {
 
   /// 附件删除后，将对应的文件也删除
   @EventListener
-  @Async()
+  @Async
   void listen(AttachmentDeletedEvent event) throws IOException {
     final Attachment attachment = event.attachment();
     Path path = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
