@@ -241,7 +241,6 @@ public class FsService implements IStorageService {
   }
 
   /// 大文件上传后，将分片合并
-  @SuppressWarnings("UnstableApiUsage")
   @EventListener
   void listen(AttachmentUploadedEvent event) {
     Attachment attachment = event.attachment();
@@ -264,18 +263,42 @@ public class FsService implements IStorageService {
       throw new WriteFileException("Fail to create  merge temporary file.", e);
     }
 
+    try {
+      MergedFile mergedFile = mergeParts(tempAttachmentDir, mergedTemp);
+      verifyMerged(mergedFile, attachment);
+      Path finalPath = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
+      moveIntoPlace(mergedTemp, finalPath);
+      makeOwnerOnly(finalPath);
+    } catch (IncorrectFileException e) {
+      deleteMergedTemp(mergedTemp);
+      throw e;
+    } catch (IOException e) {
+      deleteMergedTemp(mergedTemp);
+      throw new WriteFileException(e);
+    } finally {
+      cleanupTempDir(tempAttachmentDir);
+    }
+  }
+
+  /// 按分片序号合并分段文件，并在合并过程中计算校验和。
+  ///
+  /// @param tempDir 分段文件所在目录
+  /// @param merged 合并后的临时文件
+  /// @return 合并后文件的大小与校验和
+  /// @throws IOException 读取分段文件或写入临时文件失败
+  @SuppressWarnings("UnstableApiUsage")
+  private static MergedFile mergeParts(Path tempDir, Path merged) throws IOException {
     try (
-        Stream<Path> parts = Files.list(tempAttachmentDir);
+        Stream<Path> parts = Files.list(tempDir);
         HashingOutputStream hashingStream = new HashingOutputStream(
             Hashing.sha256(),
             Files.newOutputStream(
-                mergedTemp,
+                merged,
                 StandardOpenOption.WRITE,
                 StandardOpenOption.TRUNCATE_EXISTING
             )
         )
     ) {
-      // 合并分段文件
       List<Path> partFiles = parts
           .filter(Files::isRegularFile)
           .sorted(Comparator.comparingInt(p -> Integer.parseInt(p.getFileName().toString())))
@@ -285,40 +308,67 @@ public class FsService implements IStorageService {
         mergedSize += Files.copy(partFile, hashingStream);
       }
       hashingStream.flush();
-      if (!Objects.equals(mergedSize, attachment.getSize())) {
-        Files.deleteIfExists(mergedTemp);
-        throw new IncorrectFileException("Invalid size.");
-      }
       String checksum = Base64.getEncoder()
           .encodeToString(hashingStream.hash().asBytes());
-      if (!Objects.equals(checksum, attachment.getChecksum())) {
-        Files.deleteIfExists(mergedTemp);
-        throw new IncorrectFileException("Invalid checksum.");
-      }
-
-      Path finalPath = zerowebFsConfig.getBasePath().resolve(attachment.objectKey());
-      Files.createDirectories(finalPath.getParent());
-      Files.move(mergedTemp, finalPath, StandardCopyOption.REPLACE_EXISTING);
-      makeOwnerOnly(finalPath);
-    } catch (IOException e) {
-      try {
-        Files.deleteIfExists(mergedTemp);
-      } catch (IOException suppressed) {
-        log.warn("Failed to clean merged temp file: {}", suppressed.getMessage());
-      }
-      throw new WriteFileException(e);
-    } finally {
-      // 清理临时文件
-      try (Stream<Path> stream = Files.walk(tempAttachmentDir)) {
-        stream
-            .sorted(Comparator.reverseOrder())
-            .map(Path::toFile)
-            .forEach(File::delete);
-      } catch (IOException e) {
-        // Log the error but don't rethrow, as the main task is done
-        log.warn("Failed to clean up temporary directory: {}", e.getMessage());
-      }
+      return new MergedFile(mergedSize, checksum);
     }
+  }
+
+  /// 校验合并后文件的大小与校验和是否与附件一致。
+  ///
+  /// @param merged 合并后文件的大小与校验和
+  /// @param attachment 附件信息
+  /// @throws IncorrectFileException 大小或校验和不一致
+  private static void verifyMerged(MergedFile merged, Attachment attachment) {
+    if (!Objects.equals(merged.size(), attachment.getSize())) {
+      throw new IncorrectFileException("Invalid size.");
+    }
+    if (!Objects.equals(merged.checksum(), attachment.getChecksum())) {
+      throw new IncorrectFileException("Invalid checksum.");
+    }
+  }
+
+  /// 将合并后的临时文件移动到最终存储位置。
+  ///
+  /// @param merged 合并后的临时文件
+  /// @param finalPath 最终存储路径
+  /// @throws IOException 创建父目录或移动文件失败
+  private static void moveIntoPlace(Path merged, Path finalPath) throws IOException {
+    Files.createDirectories(finalPath.getParent());
+    Files.move(merged, finalPath, StandardCopyOption.REPLACE_EXISTING);
+  }
+
+  /// 删除合并失败的临时文件，删除失败时仅记录日志。
+  ///
+  /// @param mergedTemp 合并后的临时文件
+  private void deleteMergedTemp(Path mergedTemp) {
+    try {
+      Files.deleteIfExists(mergedTemp);
+    } catch (IOException e) {
+      log.warn("Failed to clean merged temp file: {}", e.getMessage());
+    }
+  }
+
+  /// 递归清理分段临时目录，清理失败时仅记录日志。
+  ///
+  /// @param tempDir 分段临时目录
+  private void cleanupTempDir(Path tempDir) {
+    try (Stream<Path> stream = Files.walk(tempDir)) {
+      stream
+          .sorted(Comparator.reverseOrder())
+          .map(Path::toFile)
+          .forEach(File::delete);
+    } catch (IOException e) {
+      // Log the error but don't rethrow, as the main task is done
+      log.warn("Failed to clean up temporary directory: {}", e.getMessage());
+    }
+  }
+
+  /// 分段合并结果。
+  ///
+  /// @param size 合并后文件大小
+  /// @param checksum 合并后文件内容的 Base64 编码 SHA-256 校验和
+  private record MergedFile(long size, String checksum) {
   }
 
   /// 附件删除后，将对应的文件也删除
