@@ -55,6 +55,13 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @Slf4j
 public class GlobalExceptionHandler {
 
+  /// 无法解析错误码时使用的默认错误码。
+  private static final String INVALID_ERROR_CODE = "Invalid error code.";
+  /// 无法解析错误消息时使用的默认错误消息。
+  private static final String UNKNOWN_REASON = "Unknown reason.";
+  /// 无法解析字段名时使用的默认字段名。
+  private static final String UNKNOWN_FIELD = "Unknown field.";
+
   /**
    * 处理 {@link ZerowebBusinessException 业务异常}。
    * 当业务逻辑中发生可预期的错误时，抛出此异常，并返回自定义的 HTTP 状态码和错误信息。
@@ -199,8 +206,8 @@ public class GlobalExceptionHandler {
             // 如果不是采用 Hibernate Validator 实现，则不添加消息参数
           }
           return new ErrorResult.Detail(
-              Objects.requireNonNullElse(error.getCode(), "Invalid error code."),
-              Objects.requireNonNullElse(error.getDefaultMessage(), "Unknown reason."),
+              Objects.requireNonNullElse(error.getCode(), INVALID_ERROR_CODE),
+              Objects.requireNonNullElse(error.getDefaultMessage(), UNKNOWN_REASON),
               parameters
           );
         })
@@ -233,7 +240,7 @@ public class GlobalExceptionHandler {
                 Map<String, Object> parameter = new HashMap<>(
                     Collections.singletonMap(
                         "field",
-                        Objects.requireNonNullElse(field, "Unknown field.")
+                        Objects.requireNonNullElse(field, UNKNOWN_FIELD)
                     )
                 );
                 try {
@@ -248,10 +255,10 @@ public class GlobalExceptionHandler {
                 String code = Optional.ofNullable(error.getCodes())
                     .filter(codes -> codes.length > 0)
                     .map(codes -> codes[codes.length - 1])
-                    .orElse("Invalid error code.");
+                    .orElse(INVALID_ERROR_CODE);
                 return new ErrorResult.Detail(
                     code,
-                    Objects.requireNonNullElse(error.getDefaultMessage(), "Unknown reason."),
+                    Objects.requireNonNullElse(error.getDefaultMessage(), UNKNOWN_REASON),
                     parameter
                 );
               });
