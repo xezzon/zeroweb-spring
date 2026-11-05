@@ -194,9 +194,6 @@ public class FsService implements IStorageService {
   /// @param fileContent 文件内容
   void upload(String id, int partNumber, byte[] fileContent) {
     Attachment attachment = attachmentService.queryById(id);
-    if (attachment == null) {
-      throw new IncorrectFileException("Invalid attachment.");
-    }
     Path tempFile = TEMP_DIR
         .resolve(id)
         .resolve(String.valueOf(partNumber));
