@@ -88,8 +88,7 @@ public class FsService implements IStorageService {
   @Override
   public UploadInfo getUploadInfo(Attachment attachment) {
     long partSize = zerowebFsConfig.getPartSize();
-    int partCount = Math.toIntExact(
-        (attachment.getSize() - 1) / partSize + 1);
+    int partCount = attachment.partCount(partSize);
 
     if (partCount > 1) {
       try {

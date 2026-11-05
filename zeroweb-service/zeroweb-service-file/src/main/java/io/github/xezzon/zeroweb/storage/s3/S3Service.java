@@ -96,7 +96,7 @@ public class S3Service implements IStorageService {
   @Override
   public UploadInfo getUploadInfo(Attachment attachment) {
     long partSize = zerowebS3Config.getPartSize();
-    int partCount = Math.toIntExact((attachment.getSize() - 1) / partSize + 1);
+    int partCount = attachment.partCount(partSize);
 
     if (partCount > 1) {
       s3UploadIdRepository.findById(attachment.getId()).ifPresentOrElse(

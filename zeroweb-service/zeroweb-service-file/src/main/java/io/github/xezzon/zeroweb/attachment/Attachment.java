@@ -94,6 +94,14 @@ public class Attachment implements IEntity<String> {
   @CreatedDate
   Instant createTime;
 
+  /// 计算分段上传时的分段数量。
+  ///
+  /// @param partSize 每个分段的最大字节数
+  /// @return 分段数量
+  public int partCount(long partSize) {
+    return Math.toIntExact((this.size - 1) / partSize + 1);
+  }
+
   /// 生成附件在存储系统中的对象键（Object Key）。
   /// 对象键的格式为 `yyyy/MM/dd/id`，其中日期部分基于附件的创建时间（UTC）。
   ///
