@@ -1,0 +1,145 @@
+# 服务模块发布：手动触发，使用 jib 构建 Docker 镜像并推送到 GHCR，最后创建 Git 标签与 GitHub Release。
+# 标签约定：`service/[name]/v[semver]`（[name] 不含 zeroweb-service- 前缀）
+# 基础模块的发布见 release-sdk.yml。
+
+name: Release Service
+
+permissions: read-all
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: '服务模块'
+        type: choice
+        required: true
+        options:
+          - admin
+          - dev
+          - file
+          - open
+      version:
+        description: '版本号（不带 v 前缀，如 0.12.0）'
+        type: string
+        required: true
+      prerelease:
+        description: '预发布版本'
+        type: boolean
+        default: false
+
+# 同一服务的发布串行执行，避免并发推送镜像
+concurrency:
+  group: release-service-${{ inputs.service }}
+  cancel-in-progress: false
+
+env:
+  JAVA_DISTRIBUTION: 'temurin'
+  JAVA_VERSION: '25'
+
+jobs:
+  # 校验输入，生成标签等信息
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+      dir: ${{ steps.parse.outputs.dir }}
+      tag: ${{ steps.parse.outputs.tag }}
+      title: ${{ steps.parse.outputs.title }}
+    steps:
+      - id: parse
+        env:
+          SERVICE: ${{ inputs.service }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -e
+          if ! [[ "$SERVICE" =~ ^[a-z0-9-]+$ ]]; then
+            echo "::error::非法服务名：${SERVICE}"
+            exit 1
+          fi
+          # 校验版本号，防止通过输入注入恶意 shell 命令
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::非法版本号：${VERSION}"
+            exit 1
+          fi
+          {
+            echo "version=${VERSION}"
+            echo "dir=zeroweb-service/zeroweb-service-${SERVICE}"
+            echo "tag=service/${SERVICE}/v${VERSION}"
+            echo "title=ZeroWeb ${SERVICE} service ${VERSION}"
+          } >> "$GITHUB_OUTPUT"
+
+  # jib 构建 Docker 镜像并推送
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      DOCKER_HOST: ghcr.io
+      # 预发布版本的镜像仅打 latest 标签
+      IMAGE_VERSION: ${{ inputs.prerelease && 'latest' || needs.validate.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+          server-id: ${{ env.DOCKER_HOST }}
+          server-username: DOCKER_USERNAME
+          server-password: DOCKER_TOKEN
+      - name: Install base modules
+        # 服务依赖基础模块，先 install 到本地仓库（跳过测试）
+        run: |
+          set -e
+          for m in zeroweb-proto zeroweb-open-sdk zeroweb-spring-boot-starter; do
+            mvn -B clean install -D skipTests=true -T 1C -f "$m/pom.xml"
+          done
+      - name: Build and publish Docker image
+        working-directory: zeroweb-service
+        env:
+          SERVICE_NAME: ${{ inputs.service }}
+          DOCKER_REGISTRY: ${{ env.DOCKER_HOST }}/${{ github.repository_owner }}
+          DOCKER_USERNAME: ${{ github.repository_owner }}
+          DOCKER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          mvn -B deploy
+          -P docker
+          -pl zeroweb-service-${SERVICE_NAME}
+          -D skipTests=true
+          -D image.version=${IMAGE_VERSION}
+          -T 1C
+
+  # 发布成功后创建 Git 标签与 GitHub Release
+  release:
+    needs: [ validate, publish ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.validate.outputs.tag }}
+          TITLE: ${{ needs.validate.outputs.title }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          set -e
+          args=(--title "$TITLE" --target "$GITHUB_SHA" --generate-notes)
+          if [ "$PRERELEASE" = 'true' ]; then
+            args+=(--prerelease)
+          fi
+          gh release create "$TAG" "${args[@]}"
+
+  # 发布完成后更新文档站点
+  report:
+    needs: [ publish, release ]
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/report.yml

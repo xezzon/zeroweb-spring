@@ -1,0 +1,136 @@
+# 基础模块发布：手动触发，将指定模块发布到 Maven Central，最后创建 Git 标签与 GitHub Release。
+# 标签约定：`{proto|open-sdk|spring-boot-starter}/v[semver]`
+# 服务模块的发布见 release-service.yml。
+
+name: Release SDK
+
+permissions: read-all
+
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: '基础模块'
+        type: choice
+        required: true
+        options:
+          - proto
+          - open-sdk
+          - spring-boot-starter
+      version:
+        description: '版本号（不带 v 前缀，如 0.12.0）'
+        type: string
+        required: true
+      prerelease:
+        description: '预发布版本'
+        type: boolean
+        default: false
+
+# 同一模块的发布串行执行，避免并发写入 Maven Central
+concurrency:
+  group: release-sdk-${{ inputs.module }}
+  cancel-in-progress: false
+
+env:
+  JAVA_DISTRIBUTION: 'temurin'
+  JAVA_VERSION: '25'
+
+jobs:
+  # 校验输入，生成标签等信息
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+      dir: ${{ steps.parse.outputs.dir }}
+      tag: ${{ steps.parse.outputs.tag }}
+      title: ${{ steps.parse.outputs.title }}
+    steps:
+      - id: parse
+        env:
+          MODULE: ${{ inputs.module }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -e
+          case "$MODULE" in
+            proto) title='ZeroWeb proto' ;;
+            open-sdk) title='ZeroWeb Open SDK' ;;
+            spring-boot-starter) title='ZeroWeb Spring Boot Starter' ;;
+            *)
+              echo "::error::非法模块：${MODULE}"
+              exit 1 ;;
+          esac
+          # 校验版本号，防止通过输入注入恶意 shell 命令
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::非法版本号：${VERSION}"
+            exit 1
+          fi
+          {
+            echo "version=${VERSION}"
+            echo "dir=zeroweb-${MODULE}"
+            echo "tag=${MODULE}/v${VERSION}"
+            echo "title=${title} ${VERSION}"
+          } >> "$GITHUB_OUTPUT"
+
+  # 修改版本号后发布到 Maven Central
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Apache Maven Central
+        uses: actions/setup-java@v5
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_CENTRAL_TOKEN
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+      - name: Set version
+        working-directory: ${{ needs.validate.outputs.dir }}
+        env:
+          NEW_VERSION: ${{ needs.validate.outputs.version }}
+        run: >
+          mvn -B versions:set
+          -D newVersion="$NEW_VERSION"
+          -D generateBackupPoms=false
+      - name: Publish to Maven Central
+        working-directory: ${{ needs.validate.outputs.dir }}
+        run: mvn -B deploy -P release -D skipTests=true -T 1C
+        env:
+          MAVEN_USERNAME: ${{ vars.MAVEN_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+  # 发布成功后创建 Git 标签与 GitHub Release
+  release:
+    needs: [ validate, publish ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.validate.outputs.tag }}
+          TITLE: ${{ needs.validate.outputs.title }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          set -e
+          args=(--title "$TITLE" --target "$GITHUB_SHA" --generate-notes)
+          if [ "$PRERELEASE" = 'true' ]; then
+            args+=(--prerelease)
+          fi
+          gh release create "$TAG" "${args[@]}"
+
+  # 发布完成后更新文档站点
+  report:
+    needs: [ publish, release ]
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/report.yml

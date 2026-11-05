@@ -18,7 +18,7 @@
 
 ### 通过 buf 生成代码（其他语言）
 
-proto 定义位于 `zeroweb-proto/proto` 目录，发布时通过形如 `proto/v[semver]` 的 Git 标签触发（详见 `.github/workflows/release.yml`）。
+proto 定义位于 `zeroweb-proto/proto` 目录，发布时手动触发 `Release SDK` 工作流，由工作流创建形如 `proto/v[semver]` 的 Git 标签（详见 `.github/workflows/release-sdk.yml`）。
 
 消费者可通过 `buf.gen.yaml` 调用对应语言的插件生成代码。
 

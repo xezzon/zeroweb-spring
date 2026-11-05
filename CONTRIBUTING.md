@@ -129,7 +129,7 @@ JDBC_TYPE=postgresql
 - [zeroweb-open-sdk](zeroweb-open-sdk/README.md)：开放平台 HTTP 接口 SDK，发布到 Maven Central。
 - zeroweb-service：微服务构件，发布 Docker 镜像。
 
-发布通过 GitHub Release 触发，标签约定为：
+发布通过手动触发 GitHub Actions 工作流完成，工作流在发布成功后自动创建 Git 标签与 GitHub Release。标签约定为：
 
 - 基础模块（proto / open-sdk / spring-boot-starter）：`{proto|open-sdk|spring-boot-starter}/v<version>`，如 `proto/v0.11.0`。
   基础模块发版面向非 zeroweb 用户，建议每次发起一个新的 MINOR version（不强制）。
@@ -143,7 +143,8 @@ JDBC_TYPE=postgresql
 CI/CD 流程（见 `.github/workflows/`）：
 
 - `test.yml`：PR 触发。按代码变动情况对基础模块（版本号检查、单元测试、install 到本地仓库）与服务模块（单元测试）分别并行检查。
-- `release.yml`：Release 发布时触发。按标签约定将基础模块发布到 Maven Central，或使用 jib 将服务构建为 Docker 镜像并推送到 GHCR。
+- `release-sdk.yml`：手动触发。将选定的基础模块发布到 Maven Central，最后创建对应标签的 GitHub Release。
+- `release-service.yml`：手动触发。使用 jib 将选定的服务构建为 Docker 镜像并推送到 GHCR，最后创建对应标签的 GitHub Release。
 - `report.yml`：合并到 main 或 Release 流程完成后触发。生成各模块 JavaDoc 与各服务 OpenAPI 文档，发布到 GitHub Pages 的 `/javadoc` 与 `/openapi` 路径。
 
 ## 工程规范
