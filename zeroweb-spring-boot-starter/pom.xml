@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.github.xezzon</groupId>
     <artifactId>xezzon-java</artifactId>
-    <version>6.7</version>
+    <version>6.8</version>
   </parent>
   <artifactId>zeroweb-spring-boot-starter</artifactId>
   <version>0.11.0</version>
