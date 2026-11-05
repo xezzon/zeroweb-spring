@@ -26,7 +26,7 @@
     <maven.compiler.release>25</maven.compiler.release>
     <!-- 内部依赖版本 -->
     <zeroweb-proto.version>0.11.0</zeroweb-proto.version>
-    <zeroweb-starter.version>0.11.0</zeroweb-starter.version>
+    <zeroweb-starter.version>0.11.1</zeroweb-starter.version>
     <!-- 依赖版本 -->
     <sa-token.version>1.45.0</sa-token.version>
     <!-- 应用端口号 -->
