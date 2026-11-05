@@ -6,9 +6,7 @@ import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 class PermissionConstantUtilTest {
 
   @Test

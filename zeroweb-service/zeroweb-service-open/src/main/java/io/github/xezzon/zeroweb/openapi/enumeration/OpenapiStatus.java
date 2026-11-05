@@ -24,13 +24,9 @@ import io.github.xezzon.zeroweb.core.trait.IDict;
 /// @author xezzon
 public enum OpenapiStatus implements IDict {
 
-  /**
-   * 草稿状态
-   */
+  /// 草稿状态
   DRAFT("草稿"),
-  /**
-   * 已发布状态
-   */
+  /// 已发布状态
   PUBLISHED("已发布"),
   ;
 

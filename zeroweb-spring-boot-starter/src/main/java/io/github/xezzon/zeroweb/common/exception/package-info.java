@@ -11,11 +11,9 @@
  * You should have received a copy of the GNU Lesser General Public License along with ZeroWeb. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * 为 ZeroWeb 框架提供通用的异常类。
- *
- * @author xezzon
- */
+/// 为 ZeroWeb 框架提供通用的异常类。
+///
+/// @author xezzon
 @NullMarked
 package io.github.xezzon.zeroweb.common.exception;
 

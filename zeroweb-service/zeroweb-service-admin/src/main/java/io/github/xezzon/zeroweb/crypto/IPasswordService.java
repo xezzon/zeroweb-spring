@@ -16,10 +16,8 @@ package io.github.xezzon.zeroweb.crypto;
 import com.nulabinc.zxcvbn.Strength;
 import io.github.xezzon.zeroweb.crypto.exception.PasswordStrengthException;
 
-/**
- * 口令相关服务的抽象接口
- * @author xezzon
- */
+/// 口令相关服务的抽象接口
+/// @author xezzon
 public interface IPasswordService {
 
   /// 校验口令强度是否符合要求。

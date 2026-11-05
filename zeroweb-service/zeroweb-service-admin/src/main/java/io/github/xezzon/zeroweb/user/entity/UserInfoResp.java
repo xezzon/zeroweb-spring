@@ -20,9 +20,7 @@ import lombok.Setter;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Getter
 @Setter
 public class UserInfoResp {
@@ -31,11 +29,9 @@ public class UserInfoResp {
   private String username;
   private String nickname;
 
-  /**
-   * 隐藏非公开的用户信息字段
-   * @param user 用户信息
-   * @return 用户公开展示的信息
-   */
+  /// 隐藏非公开的用户信息字段
+  /// @param user 用户信息
+  /// @return 用户公开展示的信息
   public static UserInfoResp from(User user) {
     return Converter.INSTANCE.from(user);
   }

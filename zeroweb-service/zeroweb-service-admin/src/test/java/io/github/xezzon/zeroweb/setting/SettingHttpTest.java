@@ -40,9 +40,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class SettingHttpTest {
 

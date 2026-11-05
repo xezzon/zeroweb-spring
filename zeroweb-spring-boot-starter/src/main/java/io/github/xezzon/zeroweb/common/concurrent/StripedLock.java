@@ -50,14 +50,10 @@ public class StripedLock implements LockProvider {
   /// 它维护一个 [Striped][Striped] 实例，用于为不同的 ID 提供不同的锁。
   public static class InnerLock implements LockAdaptor {
 
-    /**
-     * 用于提供本地锁的 {@link Striped Striped<Lock>} 实例。
-     * 使用 {@link Striped#lazyWeakLock(int)} 创建，支持弱引用且按需创建锁。
-     */
+    /// 用于提供本地锁的 {@link Striped Striped<Lock>} 实例。
+    /// 使用 {@link Striped#lazyWeakLock(int)} 创建，支持弱引用且按需创建锁。
     private final Striped<Lock> stripedLocks = Striped.lazyWeakLock(100);
-    /**
-     * 尝试获取锁时的超时时间（秒）。
-     */
+    /// 尝试获取锁时的超时时间（秒）。
     private final int timeout;
 
     /// 初始化 [InnerLock] 实例，设置超时时间。

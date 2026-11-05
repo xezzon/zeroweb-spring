@@ -25,9 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @AutoConfigureTestGrpcTransport
 class SettingGrpcTest {

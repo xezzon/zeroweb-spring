@@ -29,10 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 口令、密钥相关的 HTTP 接口
- * @author xezzon
- */
+/// 口令、密钥相关的 HTTP 接口
+/// @author xezzon
 @RestController
 @RequestMapping
 public class CryptoHttpEndpoint {
@@ -63,11 +61,9 @@ public class CryptoHttpEndpoint {
     return PasswordStrength.from(measure);
   }
 
-  /**
-   * 以 JWKs 的形式对外暴露用于签名的公钥
-   * @return JWK 集合。如果有多条数据，从前往后，优先级递减。
-   * @see <a href="https://tools.ietf.org/html/rfc7517">JSON Web Key</a>
-   */
+  /// 以 JWKs 的形式对外暴露用于签名的公钥
+  /// @return JWK 集合。如果有多条数据，从前往后，优先级递减。
+  /// @see <a href="https://tools.ietf.org/html/rfc7517">JSON Web Key</a>
   @GetMapping("/well-known/jwks.json")
   JwkSet wellKnownJwks() {
     ECPublicKey publicKey = jwtKeyManager.getPublicKey();

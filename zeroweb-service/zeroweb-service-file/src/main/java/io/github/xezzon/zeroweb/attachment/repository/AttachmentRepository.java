@@ -28,11 +28,9 @@ public interface AttachmentRepository extends
     JpaRepository<Attachment, String>,
     JpaSpecificationExecutor<Attachment> {
 
-  /**
-   * 查询业务关联的附件列表
-   * @param bizType 业务类型
-   * @param bizId 业务ID
-   * @return 附件列表
-   */
+  /// 查询业务关联的附件列表
+  /// @param bizType 业务类型
+  /// @param bizId 业务ID
+  /// @return 附件列表
   List<Attachment> findByBizTypeAndBizId(String bizType, String bizId);
 }

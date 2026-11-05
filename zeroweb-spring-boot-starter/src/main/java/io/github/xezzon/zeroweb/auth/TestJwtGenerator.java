@@ -31,12 +31,10 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import org.jetbrains.annotations.TestOnly;
 
-/**
- * 为单元测试生成 JWT (JSON Web Token) 的实用工具类。
- * 该类提供静态方法来生成用于测试目的的公钥、私钥和对称密钥，并包含一个 Builder 类用于方便地构造具有特定声明的 JWT。
- *
- * @author xezzon
- */
+/// 为单元测试生成 JWT (JSON Web Token) 的实用工具类。
+/// 该类提供静态方法来生成用于测试目的的公钥、私钥和对称密钥，并包含一个 Builder 类用于方便地构造具有特定声明的 JWT。
+///
+/// @author xezzon
 @TestOnly
 public class TestJwtGenerator {
 

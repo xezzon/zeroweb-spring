@@ -35,10 +35,8 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
 
-/**
- * 附件管理
- * @author xezzon
- */
+/// 附件管理
+/// @author xezzon
 @GrpcService
 @Slf4j
 public class AttachmentGrpcEndpoint extends AttachmentServiceImplBase {
