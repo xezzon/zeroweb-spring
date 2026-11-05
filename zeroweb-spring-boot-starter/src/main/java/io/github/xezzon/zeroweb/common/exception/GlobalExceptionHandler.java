@@ -196,18 +196,17 @@ public class GlobalExceptionHandler {
     log(e, request, Level.INFO);
     List<ErrorResult.Detail> errorDetails = e.getFieldErrors().stream()
         .map(error -> {
-          Map<String, Object> parameters = new HashMap<>(Map.ofEntries(
-              Map.entry("field", error.getField())
-          ));
+          Map<String, Object> parameters = Collections.emptyMap();
           try {
             ConstraintViolationImpl<?> source = error.unwrap(ConstraintViolationImpl.class);
-            parameters.putAll(source.getMessageParameters());
+            parameters = source.getMessageParameters();
           } catch (IllegalArgumentException _) {
             // 如果不是采用 Hibernate Validator 实现，则不添加消息参数
           }
-          return new ErrorResult.Detail(
-              Objects.requireNonNullElse(error.getCode(), INVALID_ERROR_CODE),
-              Objects.requireNonNullElse(error.getDefaultMessage(), UNKNOWN_REASON),
+          return toDetail(
+              error.getField(),
+              error.getCode(),
+              error.getDefaultMessage(),
               parameters
           );
         })
@@ -233,36 +232,30 @@ public class GlobalExceptionHandler {
   ) {
     log(e, request, Level.INFO);
     List<ErrorResult.Detail> errorDetails = e.getValueResults().stream()
-        .flatMap(result -> {
-          String field = result.getMethodParameter().getParameterName();
-          return result.getResolvableErrors().stream()
-              .map(error -> {
-                Map<String, Object> parameter = new HashMap<>(
-                    Collections.singletonMap(
-                        "field",
-                        Objects.requireNonNullElse(field, UNKNOWN_FIELD)
-                    )
-                );
-                try {
-                  ConstraintViolation<?> violation = result
-                      .unwrap(error, ConstraintViolation.class);
-                  if (violation instanceof ConstraintViolationImpl<?> violationImpl) {
-                    parameter.putAll(violationImpl.getMessageParameters());
-                  }
-                } catch (IllegalArgumentException _) {
-                  // 如果不是采用 Hibernate Validator 实现，则不添加消息参数
+        .flatMap(result -> result.getResolvableErrors().stream()
+            .map(error -> {
+              Map<String, Object> parameters = Collections.emptyMap();
+              try {
+                ConstraintViolation<?> violation = result
+                    .unwrap(error, ConstraintViolation.class);
+                if (violation instanceof ConstraintViolationImpl<?> violationImpl) {
+                  parameters = violationImpl.getMessageParameters();
                 }
-                String code = Optional.ofNullable(error.getCodes())
-                    .filter(codes -> codes.length > 0)
-                    .map(codes -> codes[codes.length - 1])
-                    .orElse(INVALID_ERROR_CODE);
-                return new ErrorResult.Detail(
-                    code,
-                    Objects.requireNonNullElse(error.getDefaultMessage(), UNKNOWN_REASON),
-                    parameter
-                );
-              });
-        })
+              } catch (IllegalArgumentException _) {
+                // 如果不是采用 Hibernate Validator 实现，则不添加消息参数
+              }
+              String code = Optional.ofNullable(error.getCodes())
+                  .filter(codes -> codes.length > 0)
+                  .map(codes -> codes[codes.length - 1])
+                  .orElse(INVALID_ERROR_CODE);
+              return toDetail(
+                  result.getMethodParameter().getParameterName(),
+                  code,
+                  error.getDefaultMessage(),
+                  parameters
+              );
+            })
+        )
         .toList();
     return ResponseEntity
         .status(ErrorCodeConstant.CLIENT_ERROR_STATUS)
@@ -287,6 +280,31 @@ public class GlobalExceptionHandler {
     return ResponseEntity
         .status(HttpStatus.METHOD_NOT_ALLOWED)
         .body(new ErrorResult(e));
+  }
+
+  /// 构造参数校验失败的详细信息。
+  ///
+  /// @param field             参数名称，为空时使用默认字段名
+  /// @param code              错误码，为空时使用默认错误码
+  /// @param message           错误消息，为空时使用默认错误消息
+  /// @param messageParameters 消息插值参数
+  /// @return 参数校验失败的详细信息
+  private static ErrorResult.Detail toDetail(
+      String field,
+      String code,
+      String message,
+      Map<String, Object> messageParameters
+  ) {
+    Map<String, Object> parameters = new HashMap<>(Map.of(
+        "field",
+        Objects.requireNonNullElse(field, UNKNOWN_FIELD)
+    ));
+    parameters.putAll(messageParameters);
+    return new ErrorResult.Detail(
+        Objects.requireNonNullElse(code, INVALID_ERROR_CODE),
+        Objects.requireNonNullElse(message, UNKNOWN_REASON),
+        parameters
+    );
   }
 
   /// 记录异常信息到日志，并记录到 OpenTelemetry Span。
