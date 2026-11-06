@@ -20,10 +20,8 @@ import com.nulabinc.zxcvbn.ZxcvbnBuilder;
 import io.github.xezzon.zeroweb.common.exception.ZerowebRuntimeException;
 import java.io.IOException;
 
-/**
- * zxcvbn 相关的常量
- * @author xezzon
- */
+/// zxcvbn 相关的常量
+/// @author xezzon
 public class ZxcvbnConstant {
 
   /// 全局默认的 [Zxcvbn] 实例。加载了所有的内置字典。

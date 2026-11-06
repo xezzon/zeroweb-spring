@@ -12,9 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 class SecretKeyUtilTest {
 
   private static PrivateKey privateKey;

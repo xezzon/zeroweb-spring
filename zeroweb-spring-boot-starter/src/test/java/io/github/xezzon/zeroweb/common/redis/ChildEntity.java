@@ -5,9 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Getter
 @Setter
 @ToString

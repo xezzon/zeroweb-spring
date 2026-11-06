@@ -60,6 +60,10 @@ public class S3Service implements IStorageService {
 
   /// S3 对象元数据中存储文件名的键。
   public static final String FILENAME_METADATA_KEY = "filename";
+  /// 单文件上传预签名 URL 的有效期。
+  private static final Duration UPLOAD_URL_TTL = Duration.ofMinutes(10);
+  /// 文件下载预签名 URL 的有效期。
+  private static final Duration DOWNLOAD_URL_TTL = Duration.ofHours(12);
   private final ZerowebS3Config zerowebS3Config;
   private final S3Presigner s3Presigner;
   private final S3Client s3Client;
@@ -96,7 +100,7 @@ public class S3Service implements IStorageService {
   @Override
   public UploadInfo getUploadInfo(Attachment attachment) {
     long partSize = zerowebS3Config.getPartSize();
-    int partCount = Math.toIntExact((attachment.getSize() - 1) / partSize + 1);
+    int partCount = attachment.partCount(partSize);
 
     if (partCount > 1) {
       s3UploadIdRepository.findById(attachment.getId()).ifPresentOrElse(
@@ -132,7 +136,7 @@ public class S3Service implements IStorageService {
   /// @return 包含预签名 URL 的上传访问点。
   public UploadEndpoint getUploadAddress(Attachment attachment) {
     PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder()
-        .signatureDuration(Duration.ofMinutes(10))
+        .signatureDuration(UPLOAD_URL_TTL)
         .putObjectRequest(builder -> builder
             .bucket(zerowebS3Config.getBucket())
             .key(attachment.objectKey())
@@ -174,7 +178,7 @@ public class S3Service implements IStorageService {
 
     PresignedUploadPartRequest presignedUploadPartRequest = s3Presigner
         .presignUploadPart(presignRequest -> presignRequest
-            .signatureDuration(Duration.ofMinutes(10))
+            .signatureDuration(UPLOAD_URL_TTL)
             .uploadPartRequest(partRequest -> {
               partRequest
                   .bucket(zerowebS3Config.getBucket())
@@ -198,7 +202,7 @@ public class S3Service implements IStorageService {
   public DownloadEndpoint getDownloadEndpoint(Attachment attachment) {
     PresignedGetObjectRequest presigned = s3Presigner.presignGetObject(
         builder -> builder
-            .signatureDuration(Duration.ofHours(12))
+            .signatureDuration(DOWNLOAD_URL_TTL)
             .getObjectRequest(getObject -> getObject
                 .bucket(zerowebS3Config.getBucket())
                 .key(attachment.objectKey())
@@ -326,7 +330,7 @@ public class S3Service implements IStorageService {
   ///
   /// @param event 附件删除事件。
   @EventListener
-  @Async()
+  @Async
   void listen(AttachmentDeletedEvent event) {
     final Attachment attachment = event.attachment();
     s3Client.deleteObject(builder -> builder

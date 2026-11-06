@@ -45,11 +45,9 @@ public class FsHttpEndpoint {
   private final FsService fsService;
   private final IAttachmentService attachmentService;
 
-  /**
-   * 注入依赖
-   * @param fsService 文件系统存储服务
-   * @param attachmentService 附件服务
-   */
+  /// 注入依赖
+  /// @param fsService 文件系统存储服务
+  /// @param attachmentService 附件服务
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   public FsHttpEndpoint(
       final Optional<FsService> fsService,
@@ -71,12 +69,10 @@ public class FsHttpEndpoint {
     fsService().upload(id, fileContent);
   }
 
-  /**
-   * 上传文件分段到服务器磁盘
-   * @param id 附件ID
-   * @param partNumber 分段序号
-   * @param fileContent 文件内容
-   */
+  /// 上传文件分段到服务器磁盘
+  /// @param id 附件ID
+  /// @param partNumber 分段序号
+  /// @param fileContent 文件内容
   @PutMapping(FsService.MULTIPART_UPLOAD_ENDPOINT)
   public void upload(
       @PathVariable @NotBlank final String id,

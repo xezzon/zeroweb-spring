@@ -22,12 +22,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * S3 的上传 ID 实体。
- * 用于存储 S3 分段上传的 ID 信息。
- *
- * @author xezzon
- */
+/// S3 的上传 ID 实体。
+/// 用于存储 S3 分段上传的 ID 信息。
+///
+/// @author xezzon
 @Getter
 @Setter
 @ToString

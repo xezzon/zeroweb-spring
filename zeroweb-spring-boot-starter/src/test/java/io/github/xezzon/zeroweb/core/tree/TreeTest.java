@@ -10,9 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 class TreeTest {
 
   public static final List<Menu> DATA_SET = new ArrayList<>();

@@ -13,16 +13,12 @@
 
 package io.github.xezzon.zeroweb.core.trait;
 
-/**
- * 参考 Rust 的 NewType 机制
- * @param <T> 原数据类型
- * @author xezzon
- */
+/// 参考 Rust 的 NewType 机制
+/// @param <T> 原数据类型
+/// @author xezzon
 public interface NewType<T> {
 
-  /**
-   * 获取原类型以使用其方法
-   * @return 原类型的一个对象
-   */
+  /// 获取原类型以使用其方法
+  /// @return 原类型的一个对象
   T get();
 }

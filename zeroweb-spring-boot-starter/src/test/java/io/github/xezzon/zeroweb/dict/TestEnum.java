@@ -2,9 +2,7 @@ package io.github.xezzon.zeroweb.dict;
 
 import io.github.xezzon.zeroweb.core.trait.IDict;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 public enum TestEnum implements IDict {
 
   NORMAL("正常"),

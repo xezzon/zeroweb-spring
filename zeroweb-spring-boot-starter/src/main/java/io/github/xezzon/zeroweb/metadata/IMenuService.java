@@ -15,15 +15,11 @@ package io.github.xezzon.zeroweb.metadata;
 
 import java.util.List;
 
-/**
- * 菜单服务接口。
- * 用于提供服务内的菜单或资源信息，包括接口权限和资源权限。
- */
+/// 菜单服务接口。
+/// 用于提供服务内的菜单或资源信息，包括接口权限和资源权限。
 public interface IMenuService {
 
-  /**
-   * 列举服务内所有的接口权限与资源权限
-   * @return 权限列表
-   */
+  /// 列举服务内所有的接口权限与资源权限
+  /// @return 权限列表
   List<MenuInfo> list();
 }

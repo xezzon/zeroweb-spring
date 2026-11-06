@@ -13,12 +13,10 @@
 
 package io.github.xezzon.zeroweb.core.trait;
 
-/**
- * 类型转换
- * @author xezzon
- * @param <S> 源类型
- * @param <T> 目标类型
- */
+/// 类型转换
+/// @author xezzon
+/// @param <S> 源类型
+/// @param <T> 目标类型
 public interface From<S, T> {
 
   /// 将源类型转换为目标类型。

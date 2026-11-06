@@ -37,10 +37,8 @@ public class TranslationHttpEndpoint {
 
   private final LocalizedService localizedService;
 
-  /**
-   * 构造函数。注入国际化服务类。
-   * @param localizedService 国际化服务类
-   */
+  /// 构造函数。注入国际化服务类。
+  /// @param localizedService 国际化服务类
   public TranslationHttpEndpoint(final LocalizedService localizedService) {
     this.localizedService = localizedService;
   }

@@ -24,25 +24,15 @@ import io.github.xezzon.zeroweb.core.trait.IDict;
 /// @author xezzon
 public enum HttpMethod implements IDict {
 
-  /**
-   * HTTP GET请求
-   */
+  /// HTTP GET请求
   GET,
-  /**
-   * HTTP POST请求
-   */
+  /// HTTP POST请求
   POST,
-  /**
-   * HTTP PUT请求
-   */
+  /// HTTP PUT请求
   PUT,
-  /**
-   * HTTP DELETE请求
-   */
+  /// HTTP DELETE请求
   DELETE,
-  /**
-   * HTTP PATCH请求
-   */
+  /// HTTP PATCH请求
   PATCH,
   ;
 

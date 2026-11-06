@@ -16,9 +16,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootTest
 @ActiveProfiles({"redis"})
 class RedisTemplateFactoryTest {

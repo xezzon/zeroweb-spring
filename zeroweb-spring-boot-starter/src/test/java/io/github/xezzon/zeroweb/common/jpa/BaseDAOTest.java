@@ -10,9 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootTest
 class BaseDAOTest {
 

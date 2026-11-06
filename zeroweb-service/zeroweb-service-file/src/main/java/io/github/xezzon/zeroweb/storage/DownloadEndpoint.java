@@ -27,18 +27,14 @@ public class DownloadEndpoint {
   @Setter
   private String filename;
 
-  /**
-   * 默认构造函数
-   */
+  /// 默认构造函数
   @SuppressWarnings("unused")
   DownloadEndpoint() {
     super();
   }
 
-  /**
-   * 构造附件下载地址
-   * @param endpoint 下载地址URL
-   */
+  /// 构造附件下载地址
+  /// @param endpoint 下载地址URL
   public DownloadEndpoint(String endpoint) {
     this.endpoint = endpoint;
   }

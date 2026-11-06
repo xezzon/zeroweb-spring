@@ -5,9 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Service
 public class MenuService implements IMenuService {
 

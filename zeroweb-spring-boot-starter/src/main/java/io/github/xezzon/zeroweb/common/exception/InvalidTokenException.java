@@ -23,11 +23,9 @@ public class InvalidTokenException extends ZerowebRuntimeException {
   @Serial
   private static final long serialVersionUID = 4676151668260963197L;
 
-  /**
-   * 使用指定的原因构造一个新的 `InvalidTokenException`。
-   *
-   * @param e 导致此异常的原因。
-   */
+  /// 使用指定的原因构造一个新的 `InvalidTokenException`。
+  ///
+  /// @param e 导致此异常的原因。
   public InvalidTokenException(Throwable e) {
     super(e);
   }

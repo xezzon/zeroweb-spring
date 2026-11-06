@@ -18,9 +18,7 @@ import io.github.xezzon.zeroweb.user.User;
 import io.github.xezzon.zeroweb.user.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Repository
 public class UserDAO extends BaseDAO<User, String, UserRepository> {
 

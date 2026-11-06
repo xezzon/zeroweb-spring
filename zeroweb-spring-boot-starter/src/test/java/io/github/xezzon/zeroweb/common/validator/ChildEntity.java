@@ -3,9 +3,7 @@ package io.github.xezzon.zeroweb.common.validator;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Getter
 @Setter
 public class ChildEntity {

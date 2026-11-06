@@ -45,22 +45,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners({AuditingEntityListener.class})
 public class Attachment implements IEntity<String> {
 
-  /**
-   * 附件的唯一标识符。
-   */
+  /// 附件的唯一标识符。
   @Id
   @Column(name = "id", nullable = false, updatable = false, length = DatabaseConstant.ID_LENGTH)
   @IdGenerator
   String id;
-  /**
-   * 原始文件名，包含扩展名。
-   */
+  /// 原始文件名，包含扩展名。
   @Column(name = "file_name", nullable = false)
   String name;
-  /**
-   * 文件的内容摘要，用于验证文件完整性和唯一性。
-   * 通常是文件的哈希值。
-   */
+  /// 文件的内容摘要，用于验证文件完整性和唯一性。
+  /// 通常是文件的哈希值。
   @Column(name = "checksum", nullable = false)
   String checksum;
   /// 文件的大小。
@@ -93,6 +87,14 @@ public class Attachment implements IEntity<String> {
   @Column(name = "create_time", nullable = false, updatable = false)
   @CreatedDate
   Instant createTime;
+
+  /// 计算分段上传时的分段数量。
+  ///
+  /// @param partSize 每个分段的最大字节数
+  /// @return 分段数量
+  public int partCount(long partSize) {
+    return Math.toIntExact((this.size - 1) / partSize + 1);
+  }
 
   /// 生成附件在存储系统中的对象键（Object Key）。
   /// 对象键的格式为 `yyyy/MM/dd/id`，其中日期部分基于附件的创建时间（UTC）。

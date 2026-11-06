@@ -16,10 +16,8 @@ package io.github.xezzon.zeroweb.setting;
 import java.util.NoSuchElementException;
 import org.jspecify.annotations.NonNull;
 
-/**
- * 向其他服务提供的业务参数接口
- * @author xezzon
- */
+/// 向其他服务提供的业务参数接口
+/// @author xezzon
 public interface ISettingService {
 
   /// 根据参数标识查询配置项

@@ -24,11 +24,9 @@ public class RepeatDataException extends ZerowebBusinessException {
   /// 错误码，表示唯一键冲突。
   public static final String ERROR_CODE = "C0006";
 
-  /**
-   * 构造一个新的 RepeatDataException 实例。
-   *
-   * @param key 导致冲突的唯一键。
-   */
+  /// 构造一个新的 RepeatDataException 实例。
+  ///
+  /// @param key 导致冲突的唯一键。
   public RepeatDataException(String key) {
     super(
         Collections.singletonMap("keyword", key),

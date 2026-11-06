@@ -19,11 +19,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.jetbrains.annotations.TestOnly;
 
-/**
- * 生成测试数据的规范。
- * @param <T> 测试数据类型
- * @author xezzon
- */
+/// 生成测试数据的规范。
+/// @param <T> 测试数据类型
+/// @author xezzon
 @SuppressWarnings("unused")
 @TestOnly
 public interface IDataGenerator<T> {

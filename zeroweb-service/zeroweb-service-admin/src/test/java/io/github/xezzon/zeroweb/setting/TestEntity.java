@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Getter
 @Setter
 @NoArgsConstructor

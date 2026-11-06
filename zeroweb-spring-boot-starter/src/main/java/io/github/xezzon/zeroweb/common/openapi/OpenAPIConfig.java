@@ -17,9 +17,7 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Configuration
 @OpenAPIDefinition(
     info = @Info(
