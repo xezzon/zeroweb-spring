@@ -199,7 +199,6 @@ public class FsService implements IStorageService {
   /// @param partNumber 分段序号
   /// @param fileContent 文件内容
   void upload(String id, int partNumber, byte[] fileContent) {
-    Attachment attachment = attachmentService.queryById(id);
     Path tempFile = TEMP_DIR
         .resolve(id)
         .resolve(String.valueOf(partNumber));
