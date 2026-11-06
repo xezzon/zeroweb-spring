@@ -41,8 +41,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-/// 全局异常处理，统一管理应用程序中抛出的各种异常，并将其转换为统一的 {@link ErrorResult} 响应格式。
-/// 通过 {@link RestControllerAdvice} 捕获所有控制器抛出的异常，并根据异常类型进行相应的处理，
+/// 全局异常处理，统一管理应用程序中抛出的各种异常，并将其转换为统一的 [ErrorResult] 响应格式。
+/// 通过 [RestControllerAdvice] 捕获所有控制器抛出的异常，并根据异常类型进行相应的处理，
 /// 包括业务异常、参数校验异常、认证授权异常以及其他未捕获的运行时异常。
 ///
 /// @author xezzon
@@ -60,12 +60,12 @@ public class GlobalExceptionHandler {
   /// 无法解析字段名时使用的默认字段名。
   private static final String UNKNOWN_FIELD = "Unknown field.";
 
-  /// 处理 {@link ZerowebBusinessException 业务异常}。
+  /// 处理 [业务异常][ErrorResult]。
   /// 当业务逻辑中发生可预期的错误时，抛出此异常，并返回自定义的 HTTP 状态码和错误信息。
   ///
   /// @param e       业务异常实例
   /// @param request 当前的 HTTP 请求
-  /// @return 包含错误详情的 {@link ErrorResult} 响应实体
+  /// @return 包含错误详情的 [ErrorResult] 响应实体
   @ExceptionHandler(ZerowebBusinessException.class)
   public ResponseEntity<ErrorResult> handleException(
       ZerowebBusinessException e,
@@ -78,12 +78,12 @@ public class GlobalExceptionHandler {
         .body(new ErrorResult(e));
   }
 
-  /// 处理所有未被特定异常处理器捕获的 {@link Throwable 异常}。
+  /// 处理所有未被特定异常处理器捕获的 [异常][Throwable]。
   /// 作为兜底的异常处理机制，捕获所有非业务异常，返回通用的服务器错误信息。
   ///
   /// @param e       异常实例
   /// @param request 当前的 HTTP 请求
-  /// @return 包含错误详情的 {@link ErrorResult} 响应实体，HTTP 状态码为 500
+  /// @return 包含错误详情的 [ErrorResult] 响应实体，HTTP 状态码为 500
   @ExceptionHandler(Throwable.class)
   public ResponseEntity<ErrorResult> handleException(
       Throwable e,
@@ -96,9 +96,9 @@ public class GlobalExceptionHandler {
         .body(new ErrorResult(e));
   }
 
-  /// 处理 {@link NoResourceFoundException 请求资源不存在异常}。
+  /// 处理 [请求资源不存在异常][NoResourceFoundException]。
   /// 当请求的资源（如静态文件、API 访问点）不存在时，捕获此异常。
-  /// 此方法会重新抛出异常，让 Spring Boot 默认的 {@code BasicErrorController} 或其他处理器接管。
+  /// 此方法会重新抛出异常，让 Spring Boot 默认的 `BasicErrorController` 或其他处理器接管。
   ///
   /// @param e       资源未找到异常实例
   /// @param request 当前的 HTTP 请求
@@ -112,12 +112,12 @@ public class GlobalExceptionHandler {
     throw e;
   }
 
-  /// 处理 {@link NotLoginException 未登录异常}。
+  /// 处理 [未登录异常][NotLoginException]。
   /// 当用户未通过身份认证访问受保护资源时，捕获此异常。
   ///
   /// @param e       未登录异常实例
   /// @param request 当前的 HTTP 请求
-  /// @return 包含错误详情的 {@link ErrorResult} 响应实体，HTTP 状态码为 401
+  /// @return 包含错误详情的 [ErrorResult] 响应实体，HTTP 状态码为 401
   @ExceptionHandler(NotLoginException.class)
   public ResponseEntity<ErrorResult> handleException(
       NotLoginException e,
@@ -130,12 +130,12 @@ public class GlobalExceptionHandler {
         .body(new ErrorResult(e));
   }
 
-  /// 处理 {@link NotRoleException 角色不足异常} 或 {@link NotPermissionException 权限不足异常}。
+  /// 处理 [角色不足异常][NotRoleException] 或 [权限不足异常][NotPermissionException]。
   /// 当用户已登录但没有足够的角色或权限访问特定资源时，捕获此异常。
   ///
-  /// @param e       运行时异常实例 ({@link NotRoleException} 或 {@link NotPermissionException})
+  /// @param e       运行时异常实例 ([NotRoleException] 或 [NotPermissionException])
   /// @param request 当前的 HTTP 请求
-  /// @return 包含错误详情的 {@link ErrorResult} 响应实体，HTTP 状态码为 403
+  /// @return 包含错误详情的 [ErrorResult] 响应实体，HTTP 状态码为 403
   @ExceptionHandler({NotRoleException.class, NotPermissionException.class})
   public ResponseEntity<ErrorResult> handleForbiddenException(
       RuntimeException e,
@@ -148,12 +148,12 @@ public class GlobalExceptionHandler {
         .body(new ErrorResult(e));
   }
 
-  /// 处理 {@link EntityNotFoundException 实体未找到异常} 或 {@link NoSuchElementException 元素不存在异常}。
+  /// 处理 [实体未找到异常][EntityNotFoundException] 或 [元素不存在异常][NoSuchElementException]。
   /// 当尝试访问数据库中不存在的实体或集合中不存在的元素时，捕获此异常。
   ///
-  /// @param e       运行时异常实例 ({@link EntityNotFoundException} 或 {@link NoSuchElementException})
+  /// @param e       运行时异常实例 ([EntityNotFoundException] 或 [NoSuchElementException])
   /// @param request 当前的 HTTP 请求
-  /// @return 包含错误详情的 {@link ErrorResult} 响应实体，HTTP 状态码为 400
+  /// @return 包含错误详情的 [ErrorResult] 响应实体，HTTP 状态码为 400
   @ExceptionHandler({EntityNotFoundException.class, NoSuchElementException.class})
   public ResponseEntity<ErrorResult> handleDataNotExistException(
       RuntimeException e,
@@ -166,12 +166,12 @@ public class GlobalExceptionHandler {
         .body(new ErrorResult(e));
   }
 
-  /// 处理 {@link MethodArgumentNotValidException 参数校验不通过异常}。
+  /// 处理 [参数校验不通过异常][MethodArgumentNotValidException]。
   /// 当请求参数不符合校验规则时，捕获此异常，并返回详细的参数错误信息。
   ///
   /// @param e       参数校验异常实例
   /// @param request 当前的 HTTP 请求
-  /// @return 包含参数错误详情的 {@link ErrorResult} 响应实体，HTTP 状态码为 400
+  /// @return 包含参数错误详情的 [ErrorResult] 响应实体，HTTP 状态码为 400
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResult> handleException(
       MethodArgumentNotValidException e,
@@ -201,12 +201,12 @@ public class GlobalExceptionHandler {
         .body(new ErrorResult(e, errorDetails));
   }
 
-  /// 处理 {@link HandlerMethodValidationException 方法参数验证异常}。
+  /// 处理 [方法参数验证异常][HandlerMethodValidationException]。
   /// 当控制器方法的参数验证失败时，捕获此异常，并返回详细的参数错误信息。
   ///
   /// @param e       方法参数验证异常实例
   /// @param request 当前的 HTTP 请求
-  /// @return 包含参数错误详情的 {@link ErrorResult} 响应实体，HTTP 状态码为 400
+  /// @return 包含参数错误详情的 [ErrorResult] 响应实体，HTTP 状态码为 400
   @ExceptionHandler(HandlerMethodValidationException.class)
   public ResponseEntity<ErrorResult> handleException(
       HandlerMethodValidationException e,
@@ -245,12 +245,12 @@ public class GlobalExceptionHandler {
         .body(new ErrorResult(e, errorDetails));
   }
 
-  /// 处理 {@link HttpRequestMethodNotSupportedException HTTP 请求方法不支持异常}。
+  /// 处理 [HTTP 请求方法不支持异常][HttpRequestMethodNotSupportedException]。
   /// 当客户端使用了服务器不支持的 HTTP 方法（如 GET、POST 等）时，捕获此异常。
   ///
   /// @param e       HTTP 请求方法不支持异常实例
   /// @param request 当前的 HTTP 请求
-  /// @return 包含错误详情的 {@link ErrorResult} 响应实体，HTTP 状态码为 405
+  /// @return 包含错误详情的 [ErrorResult] 响应实体，HTTP 状态码为 405
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
   public ResponseEntity<ErrorResult> handleException(
       HttpRequestMethodNotSupportedException e,

@@ -18,7 +18,7 @@ import java.util.List;
 import org.springframework.context.annotation.Fallback;
 import org.springframework.stereotype.Service;
 
-/// {@link IMenuService} 接口的默认实现，在没有其他具体实现时提供一个空列表。
+/// [IMenuService] 接口的默认实现，在没有其他具体实现时提供一个空列表。
 /// @author xezzon
 @Service
 @Fallback
