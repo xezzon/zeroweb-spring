@@ -51,18 +51,18 @@ public class ZerowebOpenRequestBuilder extends Feign.Builder {
     this.requestInterceptor(new ZerowebOpenRequestInterceptor());
   }
 
-  /// <p>OpenFeign 请求拦截器实现。</p>
-  /// <p>负责在每个请求发送前，向请求头中添加 ZeroWeb 开放接口所需的认证信息，
-  /// 包括应用访问凭据（X-Access-Key）、时间戳（X-Timestamp）和请求摘要（X-Signature）。</p>
+  /// OpenFeign 请求拦截器实现。
+  ///
+  /// 负责在每个请求发送前，向请求头中添加 ZeroWeb 开放接口所需的认证信息，
+  /// 包括应用访问凭据（X-Access-Key）、时间戳（X-Timestamp）和请求摘要（X-Signature）。
   class ZerowebOpenRequestInterceptor implements RequestInterceptor {
 
-    /// <p>应用请求拦截逻辑。</p>
-    /// <p>在此处为每个 Feign 请求添加 `X-Access-Key`、`X-Timestamp` 和 `X-Signature` 请求头。</p>
-    /// <ul>
-    ///   <li>`X-Access-Key`：客户端的应用访问凭据。</li>
-    ///   <li>`X-Timestamp`：当前请求时间戳，用于签名盐值和防止重放攻击。</li>
-    ///   <li>`X-Signature`：请求体和时间戳的 HMAC-SHA256 摘要，使用应用密钥进行签名。</li>
-    /// </ul>
+    /// 应用请求拦截逻辑。
+    ///
+    /// 在此处为每个 Feign 请求添加 `X-Access-Key`、`X-Timestamp` 和 `X-Signature` 请求头。
+    /// - `X-Access-Key`：客户端的应用访问凭据。
+    /// - `X-Timestamp`：当前请求时间戳，用于签名盐值和防止重放攻击。
+    /// - `X-Signature`：请求体和时间戳的 HMAC-SHA256 摘要，使用应用密钥进行签名。
     /// @param requestTemplate HTTP 请求客户端。
     @Override
     public void apply(RequestTemplate requestTemplate) {
