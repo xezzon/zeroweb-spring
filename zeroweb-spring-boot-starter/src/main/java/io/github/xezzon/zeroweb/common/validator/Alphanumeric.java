@@ -53,32 +53,20 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 @Constraint(validatedBy = {AlphanumericValidator.class})
 public @interface Alphanumeric {
 
-  /**
-   * 大写字母
-   * 字符集范围：A-Z。
-   */
+  /// 大写字母
+  /// 字符集范围：A-Z。
   String ASCII_UPPER_CASE = "A-Z";
-  /**
-   * 小写字母
-   * 字符集范围：a-z。
-   */
+  /// 小写字母
+  /// 字符集范围：a-z。
   String ASCII_LOWER_CASE = "a-z";
-  /**
-   * 数字
-   * 字符集范围：0-9。
-   */
+  /// 数字
+  /// 字符集范围：0-9。
   String DIGIT = "0-9";
-  /**
-   * 特殊字符：下划线 `_`。
-   */
+  /// 特殊字符：下划线 `_`。
   String UNDERSCORE = "_";
-  /**
-   * 特殊字符：短横线 `-`。
-   */
+  /// 特殊字符：短横线 `-`。
   String HYPHEN = "\\-";
-  /**
-   * 特殊字符：点 `.`。
-   */
+  /// 特殊字符：点 `.`。
   String DOT = "\\.";
 
   /// 指定校验允许包含的字符集。

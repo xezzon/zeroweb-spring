@@ -3,9 +3,7 @@ package io.github.xezzon.zeroweb.common.jpa;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Repository
 public class TestEntityDAO extends BaseDAO<TestEntity, String, TestEntityRepository> {
 

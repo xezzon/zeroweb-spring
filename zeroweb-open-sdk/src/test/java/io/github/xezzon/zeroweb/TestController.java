@@ -21,9 +21,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @RestController
 public class TestController {
 

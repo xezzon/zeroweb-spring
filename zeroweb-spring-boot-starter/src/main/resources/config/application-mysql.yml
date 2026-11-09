@@ -2,6 +2,12 @@ spring:
   datasource:
     url: jdbc:mysql://${DB_URL:mysql:3306/zeroweb}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      data-source-properties:
+        # Liquibase 5.0.4 在 MySQL 将 BOOLEAN 建为 TINYINT(1)，驱动默认将其作为 BIT 上报，
+        # 与下方 Hibernate 期望的 TINYINT 不符，导致 ddl-auto=validate 失败；关闭后两种写法均上报 TINYINT。
+        # 不能直接改 BIT：Liquibase 5.0.3 及更早版本创建的旧库使用 TINYINT，仍会上报 TINYINT。
+        tinyInt1isBit: false
   jpa:
     properties:
       "[hibernate.type.preferred_boolean_jdbc_type]": TINYINT

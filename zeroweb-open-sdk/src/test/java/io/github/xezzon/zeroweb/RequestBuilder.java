@@ -2,9 +2,7 @@ package io.github.xezzon.zeroweb;
 
 import feign.jackson.JacksonEncoder;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 public class RequestBuilder extends ZerowebOpenRequestBuilder {
 
   public RequestBuilder(String accessKey, String secretKey) {

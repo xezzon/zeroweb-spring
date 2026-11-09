@@ -15,9 +15,7 @@ import org.springframework.boot.grpc.test.autoconfigure.AutoConfigureTestGrpcTra
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @AutoConfigureTestGrpcTransport
 class GrpcServerExceptionHandlerTest {

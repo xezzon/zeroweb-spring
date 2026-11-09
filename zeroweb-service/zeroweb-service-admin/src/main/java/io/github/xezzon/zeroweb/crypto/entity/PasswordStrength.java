@@ -20,10 +20,8 @@ import lombok.Setter;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-/**
- * 口令强度实体类
- * @author xezzon
- */
+/// 口令强度实体类
+/// @author xezzon
 @Getter
 @Setter
 public class PasswordStrength {

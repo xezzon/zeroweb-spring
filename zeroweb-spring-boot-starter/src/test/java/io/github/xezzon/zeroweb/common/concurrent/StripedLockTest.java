@@ -12,9 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootTest
 class StripedLockTest {
 
@@ -60,7 +58,7 @@ class StripedLockTest {
         });
       }
 
-      latch.await(5, TimeUnit.SECONDS); // 等待所有线程完成，设置超时时间
+      Assertions.assertTrue(latch.await(5, TimeUnit.SECONDS)); // 等待所有线程完成，设置超时时间
 
       Assertions.assertEquals(numberOfThreads, counter.get());
       Assertions.assertFalse(isLocked.get(), "Lock should be released after all operations");
@@ -88,14 +86,14 @@ class StripedLockTest {
         });
       });
 
-      lockHeldLatch.await(1, TimeUnit.SECONDS); // 等待第一个线程获取锁
+      Assertions.assertTrue(lockHeldLatch.await(1, TimeUnit.SECONDS)); // 等待第一个线程获取锁
 
       // 尝试在超时时间内获取同一个锁
       Optional<String> result = lockAdaptor.tryLock("timeoutResourceId", () -> "locked");
 
       Assertions.assertTrue(result.isEmpty(), "Expected tryLock to return null on timeout");
 
-      lockReleasedLatch.await(3, TimeUnit.SECONDS); // 等待第一个线程释放锁
+      Assertions.assertTrue(lockReleasedLatch.await(3, TimeUnit.SECONDS)); // 等待第一个线程释放锁
       longHoldingExecutor.shutdownNow(); // 关闭线程池
     }
   }
@@ -138,7 +136,7 @@ class StripedLockTest {
         latch.countDown();
       });
 
-      latch.await(5, TimeUnit.SECONDS);
+      Assertions.assertTrue(latch.await(5, TimeUnit.SECONDS));
 
       Assertions.assertTrue(lock1Acquired.get(), "Lock for resourceType1 should be acquired");
       Assertions.assertTrue(lock2Acquired.get(), "Lock for resourceType2 should be acquired");
@@ -180,7 +178,7 @@ class StripedLockTest {
         latch.countDown();
       });
 
-      latch.await(5, TimeUnit.SECONDS);
+      Assertions.assertTrue(latch.await(5, TimeUnit.SECONDS));
 
       Assertions.assertTrue(lock1Acquired.get(), "Lock for resourceId1 should be acquired");
       Assertions.assertTrue(lock2Acquired.get(), "Lock for resourceId2 should be acquired");

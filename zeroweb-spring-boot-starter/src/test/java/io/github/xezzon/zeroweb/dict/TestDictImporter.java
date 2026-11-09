@@ -5,9 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Component
 @Priority(-1)
 public class TestDictImporter implements DictImporter {

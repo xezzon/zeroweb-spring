@@ -73,10 +73,8 @@ public class UserHttpEndpoint {
     return Id.of(user.getId());
   }
 
-  /**
-   * 查询当前用户信息
-   * @return 用户信息
-   */
+  /// 查询当前用户信息
+  /// @return 用户信息
   @GetMapping("/me")
   public User getMyInfo() {
     String userId = StpUtil.getLoginIdAsString();
@@ -93,11 +91,9 @@ public class UserHttpEndpoint {
         .map(UserInfoResp::from);
   }
 
-  /**
-   * 查询指定用户
-   * @param id 用户 ID
-   * @return 用户信息
-   */
+  /// 查询指定用户
+  /// @param id 用户 ID
+  /// @return 用户信息
   @GetMapping("/{id}")
   public UserInfoResp queryUserById(@PathVariable final String id) {
     User user = userService.queryById(id);

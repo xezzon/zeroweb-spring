@@ -26,10 +26,8 @@ import org.springframework.grpc.client.GrpcChannelBuilderCustomizer;
 import org.springframework.grpc.client.ImportGrpcClients;
 import org.springframework.stereotype.Component;
 
-/**
- * 构造 gRPC 客户端 Bean。
- * @author xezzon
- */
+/// 构造 gRPC 客户端 Bean。
+/// @author xezzon
 @ImportGrpcClients(
     prefix = "default",
     target = "admin",

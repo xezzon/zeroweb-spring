@@ -23,10 +23,8 @@ import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.type.TypeReference;
 
-/**
- * 口令相关服务
- * @author xezzon
- */
+/// 口令相关服务
+/// @author xezzon
 @Service
 public class PasswordService implements IPasswordService {
 
@@ -36,9 +34,7 @@ public class PasswordService implements IPasswordService {
     this.settingService = settingService;
   }
 
-  /**
-   * 检查计算出的强度与配置的要求是否一致
-   */
+  /// 检查计算出的强度与配置的要求是否一致
   @Override
   public void checkStrength(final Strength strength) {
     Setting setting;

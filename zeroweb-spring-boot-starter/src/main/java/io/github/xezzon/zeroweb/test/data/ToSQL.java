@@ -47,11 +47,9 @@ public interface ToSQL<T> {
         .collect(Collectors.joining(",", "(", "),"));
   }
 
-  /**
-   * 将数据转换为 INSERT DML 语句
-   * @param dataset 数据集合
-   * @return INSERT DML 语句
-   */
+  /// 将数据转换为 INSERT DML 语句
+  /// @param dataset 数据集合
+  /// @return INSERT DML 语句
   default String toSql(List<T> dataset) {
     StringBuilder sqlBuilder = new StringBuilder();
     // 表头

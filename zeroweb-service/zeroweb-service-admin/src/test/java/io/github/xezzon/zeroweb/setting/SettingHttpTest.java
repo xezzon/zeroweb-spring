@@ -40,9 +40,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class SettingHttpTest {
 
@@ -154,7 +152,8 @@ class SettingHttpTest {
     assertNotNull(responseBody);
     assertEquals(dataset.size(), responseBody.getPage().getTotalElements());
     List<Setting> except = dataset.stream()
-        .sorted(Comparator.comparing(Setting::getUpdateTime).reversed())
+        .sorted(Comparator.comparing(Setting::getUpdateTime).reversed()
+            .thenComparing(Setting::getId, Comparator.reverseOrder()))
         .skip(skip)
         .limit(top)
         .toList();

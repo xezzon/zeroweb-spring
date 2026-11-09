@@ -7,9 +7,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @Component
 public class TestClientFactory {
 

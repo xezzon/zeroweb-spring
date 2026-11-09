@@ -12,9 +12,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.grpc.server.service.GrpcService;
 
-/**
- * @author xezzon
- */
+/// @author xezzon
 @GrpcService
 public class TestDictGrpcServer extends DictServiceImplBase {
 

@@ -40,12 +40,12 @@ public class SettingDAO extends BaseDAO<Setting, String, SettingRepository> {
 
   /// 查询所有业务参数（分页）
   ///
-  /// 使用 OData 查询选项进行分页查询，默认按更新时间降序排序。
+  /// 使用 OData 查询选项进行分页查询，默认按更新时间降序排序，更新时间相同时按 ID 降序排序。
   /// @param odata OData 查询选项，包含查询条件、排序、分页等参数
   /// @return 分页结果，包含业务参数列表和分页信息
   @Override
   public Page<@NonNull Setting> findAll(final @NonNull ODataQueryOption odata) {
-    Sort sort = Sort.by(Order.desc(Setting_.UPDATE_TIME));
+    Sort sort = Sort.by(Order.desc(Setting_.UPDATE_TIME), Order.desc(Setting_.ID));
     return super.findAll(odata, null, sort);
   }
 }
