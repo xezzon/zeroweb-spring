@@ -4,7 +4,7 @@
 
 ### Issue tracker
 
-本地 markdown 工单存放在 `.scratch/<feature>/` 下。详见 `docs/agents/issue-tracker.md`。
+Issue 与规格说明以 GitHub issue 形式管理（使用 `gh` CLI）。详见 `docs/agents/issue-tracker.md`。
 
 ### Triage labels
 
